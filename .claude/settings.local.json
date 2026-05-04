@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx create-next-app@latest . --typescript --tailwind --eslint --app --no-src-dir --import-alias \"@/*\" --yes)",
+      "Bash(mv /Users/seanhollen/code/language-learning/.env /tmp/ll_env_backup)",
+      "Bash(mv /Users/seanhollen/code/language-learning/.gitignore /tmp/ll_gitignore_backup)",
+      "Bash(mv /tmp/ll_env_backup /Users/seanhollen/code/language-learning/.env)",
+      "Bash(mv /tmp/ll_gitignore_backup /tmp/ll_gitignore_backup_keep)",
+      "Read(//tmp/**)",
+      "Bash(npm install *)",
+      "Bash(npm run *)",
+      "Bash(echo \"PID: $!\")",
+      "Bash(cp /tmp/ll_env_backup /Users/seanhollen/code/language-learning/.env)",
+      "Bash(sed -i '' 's/^OPENAI_API_KEY=/VITE_OPENAI_API_KEY=/' /Users/seanhollen/code/language-learning/.env)",
+      "Bash(npm create *)",
+      "Bash(python3 -c \"import json; json.load\\(open\\('src/data/difficulty-levels.json'\\)\\)\")",
+      "Bash(python3 *)",
+      "Bash(node *)"
+    ]
+  }
+}

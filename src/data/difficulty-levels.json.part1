@@ -1,0 +1,151 @@
+{
+  "1": {
+    "description": "Pre-A1. Day 1 of study. Single isolated words only — basic nouns and simple greetings. No grammar, no sentences. Equivalent to pointing at objects and naming them. Vocabulary is 10–20 core words.",
+    "example": "Hello. Hi. Yes. No. Water. Milk. Bread. Cat. Dog. Bird. Fish. Tree. House. Door. Book. Pen. Boy. Girl. Man. Woman. Mom. Dad. Sun. Moon. Star. Day. Night. One. Two. Three. Four. Five. Six. Seven. Big. Small. Hot. Cold. Good. Bad. New. Old. Red. Blue. Green. Yellow. Black. White. Eye. Ear. Hand. Foot. Hat. Shoe. Bag. Cup. Plate. Fork. Spoon. Apple. Banana. Egg. Rice. Salt. Sugar. Tea. Hello. Bye. Yes. No. Please. Thank you. Sorry.",
+    "exampleQuestion": {
+      "question": "Which group of words in the passage names colors?",
+      "options": ["A) Boy, girl, man, woman", "B) Red, blue, green, yellow", "C) One, two, three, four", "D) Apple, banana, egg, rice"],
+      "answer": 1
+    },
+    "example2": "Sun. Moon. Star. Cloud. Sky. Rain. Snow. Wind. Tree. Flower. Leaf. Grass. Rock. Sand. Sea. Lake. Bird. Fish. Cat. Dog. Cow. Pig. Horse. Sheep. Bee. Ant. Red. Blue. Green. Yellow. Black. White. Pink. Brown. Big. Small. Tall. Short. Hot. Cold. Wet. Dry. Soft. Hard. One. Two. Three. Four. Five. Six. Boy. Girl. Mom. Dad. Hand. Foot. Eye. Mouth. Yes. No. Hello. Bye. Please. Thank you. Sorry. Good. Bad.",
+    "exampleQuestion2": {
+      "question": "Which group of words in the passage names animals?",
+      "options": ["A) Sun, moon, star, cloud", "B) Tree, flower, leaf, grass", "C) Cat, dog, cow, pig", "D) Hand, foot, eye, mouth"],
+      "answer": 2
+    }
+  },
+  "2": {
+    "description": "Pre-A1. Day 1–2. Single words and very simple two-word phrases. Basic greetings and farewells. No verbs except 'is' used implicitly. The learner recognizes common objects and social words.",
+    "example": "Hi. Hello. Bye. Good day. Good night. Thank you. Please. Sorry. Yes. No. Cat. Big cat. Small cat. Dog. Big dog. Small dog. Apple. Red apple. Big apple. Water. Cold water. Hot water. Bread. Good bread. New bread. Boy. Small boy. Big boy. Girl. Small girl. Big girl. Mom. My mom. Dad. My dad. Book. New book. Old book. Tree. Big tree. Small tree. Sun. Big sun. Moon. Small moon. Hi. Hello. Bye. Good day. Good. Bad. Yes. No. Please. Thank you.",
+    "exampleQuestion": {
+      "question": "Which words in the passage are used when meeting or leaving people?",
+      "options": ["A) Big and small", "B) Hi and bye", "C) Apple and bread", "D) Mom and dad"],
+      "answer": 1
+    },
+    "example2": "Star. Big star. Small star. Sky. Blue sky. Bird. Small bird. Fish. Big fish. Tree. Tall tree. Flower. Red flower. Blue flower. Cup. Hot cup. Plate. New plate. Bag. Old bag. Hat. Red hat. Shoe. Black shoe. Boy. Good boy. Girl. Good girl. Cat. Soft cat. Dog. Big dog. Egg. Small egg. Bread. Good bread. Water. Cold water. Milk. Hot milk. Sorry. Please. Thank you. Hello. Bye. Yes. No. Good. Bad.",
+    "exampleQuestion2": {
+      "question": "Which words in the passage are used to be polite?",
+      "options": ["A) Cup and plate", "B) Big and small", "C) Sorry, please, and thank you", "D) Star and sky"],
+      "answer": 2
+    }
+  },
+  "3": {
+    "description": "Pre-A1. Day 2–3. Two- to three-word phrases. Simple subject-verb constructions at the most basic level. Colors, numbers 1–5, and common nouns introduced. No past or future tense.",
+    "example": "One cat. Two dogs. Three birds. Four fish. Five apples. Red apple. Blue ball. Green tree. Yellow sun. Big house. Small cat. Tall man. Short girl. Hot tea. Cold milk. New book. Old hat. Good boy. Bad day. My mom. My dad. My cat. Your dog. Her bag. His pen. One sun. One moon. Two stars. Three cups. Four plates. Five eggs. Big tree. Small tree. Red flower. Blue flower. Tall tree. Short grass.",
+    "exampleQuestion": {
+      "question": "Which color in the passage is used for the apple?",
+      "options": ["A) Blue", "B) Green", "C) Red", "D) Yellow"],
+      "answer": 2
+    },
+    "example2": "One sun. One moon. Two stars. Three trees. Four birds. Five fish. Blue sky. Green grass. Red flower. Yellow leaf. Big rock. Small rock. Tall tree. Short tree. Hot day. Cold night. New nest. Old nest. Two cats. Three dogs. Four cows. Five sheep. Big cow. Small cow. White sheep. Black cat. Brown dog. Red bird. Blue bird. Wet grass. Dry leaf. My tree. Your flower. His bird. Her fish.",
+    "exampleQuestion2": {
+      "question": "How many stars and how many fish are named in the passage?",
+      "options": ["A) Two stars and five fish", "B) Three stars and four fish", "C) One star and two fish", "D) Five stars and one fish"],
+      "answer": 0
+    }
+  },
+  "4": {
+    "description": "Pre-A1. Day 3–5. Very short sentences with 'is' and 'are.' Subject + verb + noun, with simple adjectives. Numbers up to 10, basic colors, and body parts. Present tense only.",
+    "example": "This is a cat. That is a dog. The cat is small. The dog is big. I am here. You are nice. The sun is hot. The moon is cold. The sky is blue. The grass is green. My hand is small. My foot is big. The book is new. The hat is old. The tea is hot. The milk is cold. One boy is tall. Two girls are short. The apple is red. The bag is black. We are friends. They are happy. I am ten. You are nine.",
+    "exampleQuestion": {
+      "question": "Which two things in the passage are described with opposite words?",
+      "options": ["A) The cat and the dog, by size", "B) The boy and the girls, by name", "C) The book and the hat, by color", "D) The apple and the bag, by shape"],
+      "answer": 0
+    },
+    "example2": "The sky is blue. The sun is big. The moon is small. The cloud is white. The tree is tall. The grass is short. The flower is red. The leaf is green. I am here. You are there. The cat is on the mat. The dog is in the yard. The bird is in the tree. The fish is in the lake. My mom is kind. My dad is tall. My sister is small. My brother is big. The day is hot. The night is cold. We are at home. They are at school.",
+    "exampleQuestion2": {
+      "question": "Which family member in the passage is described as being small?",
+      "options": ["A) The mother", "B) The father", "C) The sister", "D) The brother"],
+      "answer": 2
+    }
+  },
+  "5": {
+    "description": "Pre-A1. First week. Simple declarative sentences using 'I have,' 'I like,' and 'I see.' Vocabulary of roughly 50 common concrete nouns and basic verbs. No negation, no questions yet. The learner can name things in their environment.",
+    "example": "I see a cat. I see a dog. I see a bird. I have a book. I have a pen. I have a bag. I like apples. I like bread. I like milk. She has a cat. She has a small cat. He has a dog. He has a big dog. The boy is happy. The girl is happy. My mom is at home. My dad is at home. We are happy. The sun is hot. The day is good. I see a tree. I see a flower. I have a friend. I like my friend. The cat is on the mat. The dog is in the yard.",
+    "exampleQuestion": {
+      "question": "Based on the passage, which of the following does the speaker own?",
+      "options": ["A) A cat, a dog, and a bird", "B) A book, a pen, and a bag", "C) Apples, bread, and milk", "D) A tree, a flower, and a yard"],
+      "answer": 1
+    },
+    "example2": "I see a tree. I see a flower. I see a bird. I have a ball. I have a hat. I have a cup. I like the sea. I like the sand. I like the sun. The bird is small. The fish is big. The cat is soft. The dog is loud. The sky is blue. The cloud is white. My friend is kind. My friend is tall. We are at the park. The day is warm. The grass is green. I see a boat. I see a fish. I have a stone. I like the wind. The sea is wide.",
+    "exampleQuestion2": {
+      "question": "Which natural place does the speaker most clearly enjoy in the passage?",
+      "options": ["A) A small forest", "B) The mountains", "C) The seaside", "D) A city park"],
+      "answer": 2
+    }
+  },
+  "6": {
+    "description": "A1 entry. First week. Simple yes/no questions and short answers. Introduces 'do you like' and 'what is this.' Vocabulary expands to 75 words. Sentences are 4–6 words. Present tense with common verbs: eat, drink, walk, sit.",
+    "example": "Hi. Do you have a dog? Yes, I have a dog. Do you have a cat? No, I do not. What is this? This is a book. Do you like apples? Yes, I like apples. Do you eat bread? Yes, I eat bread. I drink water. She drinks milk. He eats an apple. The boy walks to school. The girl sits in the chair. The dog runs in the yard. The cat sits on the mat. Do you like tea? Yes, I like tea. What is that? That is a pen. The day is good. We are happy.",
+    "exampleQuestion": {
+      "question": "What can we say about the speaker's pets, based on the passage?",
+      "options": ["A) The speaker has a cat but not a dog", "B) The speaker has a dog but not a cat", "C) The speaker has both a dog and a cat", "D) The speaker has no pets at all"],
+      "answer": 1
+    },
+    "example2": "Do you see the bird? Yes, I see it. The bird sits in the tree. It eats a seed. Do you see the fish? Yes, I see it. The fish swims in the lake. It eats small bugs. Do you see the cat? Yes, I see it. The cat sits on the wall. It looks at the bird. The bird flies away. The cat sits and waits. The sun is hot. The wind is soft. I sit by the lake. I drink water. I eat an apple. The day is good.",
+    "exampleQuestion2": {
+      "question": "Why does the bird most likely fly away in the passage?",
+      "options": ["A) Because the wind is too strong", "B) Because the cat is watching it", "C) Because it has finished eating its seed", "D) Because the sun is too hot"],
+      "answer": 1
+    }
+  },
+  "7": {
+    "description": "A1 entry. Days 7–10. Short dialogues with basic questions and answers. Introduces possessives (my, your, his, her) and simple plurals. Vocabulary of about 100 words. Family members and household objects appear.",
+    "example": "This is my house. My house has four rooms. This is my cat. Her name is Luna. My cat is small and soft. My dog is big. His name is Max. Your book is on the table. Your pen is in the bag. I have two sisters. My sisters are nice. I have one brother. My brother is tall. His room is small. Her room is big. Our mom cooks lunch. Our dad reads a book. The cat sits on my bed. The dog sits at the door. We are at home. The day is good. We are a happy family.",
+    "exampleQuestion": {
+      "question": "What does the passage suggest about the speaker's brother and sisters?",
+      "options": ["A) The speaker has more brothers than sisters", "B) The speaker has more sisters than brothers", "C) The speaker has the same number of each", "D) The speaker has no siblings at all"],
+      "answer": 1
+    },
+    "example2": "This is my garden. My garden is small. My flowers are red. My flowers are pretty. His tree is tall. His tree has green leaves. Her bird is yellow. Her bird sings in the morning. I have three plants. My plants are by the window. Our cat sits in the sun. The cat looks at the bird. The bird is high in the tree. My mom waters the flowers. My dad cuts the grass. My sister picks a flower. My brother kicks a ball. We are all in the garden. The day is warm and bright.",
+    "exampleQuestion2": {
+      "question": "Which item in the garden belongs to a male person, based on the passage?",
+      "options": ["A) The flowers", "B) The tree", "C) The bird", "D) The plants"],
+      "answer": 1
+    }
+  },
+  "8": {
+    "description": "A1 entry. Second week. Present continuous introduced ('I am eating'). Simple descriptions of ongoing actions. Vocabulary around 125 words. Sentences remain very short but actions are now depicted in progress.",
+    "example": "I am eating lunch. My mom is cooking dinner. My dad is reading a book. My sister is writing in her book. My brother is playing with the dog. The dog is running in the yard. The cat is sleeping on the bed. The bird is flying in the sky. The fish is swimming in the lake. Outside, the wind is blowing. The trees are moving. The sun is shining. A man is walking on the street. A girl is riding a bike. A boy is kicking a ball. We are all busy. The day is good. I am happy.",
+    "exampleQuestion": {
+      "question": "Which family member in the passage is doing something that involves moving from place to place?",
+      "options": ["A) The mother, who is cooking dinner", "B) The father, who is reading a book", "C) The sister, who is writing in her book", "D) The brother, who is playing with the dog"],
+      "answer": 3
+    },
+    "example2": "The wind is blowing. The leaves are falling. The rain is starting. The birds are flying away. The sky is turning gray. The clouds are moving fast. A man is running home. A woman is closing the window. A boy is putting on his coat. A girl is opening her umbrella. The dog is hiding under the chair. The cat is sitting by the fire. My mom is making hot tea. My dad is reading the news. I am looking out the window. The street is wet. The day is cold. I am happy at home.",
+    "exampleQuestion2": {
+      "question": "What in the passage is just beginning to happen, while other things are already underway?",
+      "options": ["A) The wind blowing", "B) The leaves falling", "C) The rain starting", "D) The birds flying"],
+      "answer": 2
+    }
+  },
+  "9": {
+    "description": "A1 entry. Weeks 2–3. Simple negation ('I don't like') and basic 'where' questions. Prepositions of place: in, on, under, next to. Vocabulary of roughly 150 words. Spatial relationships between simple objects.",
+    "example": "The cat is on the table. The dog is under the chair. The book is in the bag. The pen is next to the book. The cup is on the desk. I don't like milk. I don't like cold tea. I like hot tea. Where is my hat? My hat is on the bed. Where is my coat? My coat is in the closet. Where is the key? The key is under the mat. My mom is in the kitchen. My dad is in the garden. My sister is in her room. My brother is next to the dog. Where is the cat now? The cat is on my bed.",
+    "exampleQuestion": {
+      "question": "If you wanted to find the key, where should you look, based on the passage?",
+      "options": ["A) On the bed", "B) In the closet", "C) Under the mat", "D) Next to the book"],
+      "answer": 2
+    },
+    "example2": "The ball is in the box. The box is on the floor. The toy is next to the box. The book is under the table. I don't like rain. I don't like cold days. I like the sun. I like warm days. Where is my hat? My hat is on the bed, next to the pillow. Where is my bag? My bag is under the chair. Where is the cat? The cat is in the bag. Where is the dog? The dog is on the mat. My mom is in the kitchen. My dad is in the yard. We are at home. The day is quiet.",
+    "exampleQuestion2": {
+      "question": "Which item in the passage is described as being inside something else?",
+      "options": ["A) The hat, which is on the bed", "B) The ball, which is in the box", "C) The pillow, which is on the bed", "D) The bag, which is under the chair"],
+      "answer": 1
+    }
+  },
+  "10": {
+    "description": "A1 entry. Third week. Introduces 'there is / there are' and simple 'how many' questions. Counting objects in simple scenes. Numbers to 20. Vocabulary near 175 words. Sentences are still one clause each.",
+    "example": "There is a cat in the room. There are three apples on the table. There is one book next to the apples. There are two cups on the desk. There are five chairs in the room. There is one big window. There are six birds on the tree outside. How many dogs do you have? I have two dogs. How many cats do you have? I have one cat. How many sisters do you have? I have three sisters. How many brothers do you have? I have one brother. There is one mom and one dad in the house. There are seven people in my family. We are a big family.",
+    "exampleQuestion": {
+      "question": "How many people in total live in the speaker's family home, based on the passage?",
+      "options": ["A) Five people", "B) Six people", "C) Seven people", "D) Eight people"],
+      "answer": 2
+    },
+    "example2": "There are five fish in the pond. There is one tree near the pond. There are four birds in the tree. There are two frogs on the rocks. There is one cat by the water. There are eight flowers in the grass. How many bees are on the flowers? There are three bees. How many ducks are on the pond? There are two ducks. How many people are in the garden? There is one boy and one girl. There are ten small stones near the pond. There is one big stone in the middle. The day is warm. The water is calm.",
+    "exampleQuestion2": {
+      "question": "Which group in the passage has the largest number of members?",
+      "options": ["A) The fish in the pond", "B) The flowers in the grass", "C) The small stones near the pond", "D) The birds in the tree"],
+      "answer": 2
+    }
+  },

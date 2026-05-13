@@ -12,6 +12,7 @@ import { generatePhrasesAudio } from "../hooks/useTTS";
 import { useLanguage } from "../contexts/LanguageContext";
 import { saveAssessment } from "../utils/history";
 import { uploadAssessment } from "../utils/api";
+import { getUserId } from "../utils/user";
 
 type Phase = "setup" | "exercise" | "results";
 
@@ -70,27 +71,27 @@ export function PronunciationPage() {
     } else {
       setRatingResult(null);
     }
-    const id = saveAssessment({
+    const completedAt = Date.now();
+    const localId = saveAssessment({
       mode: `pronunciation`,
       language,
       title: exercise.title,
       difficulty,
       scoreEarned: goodCount,
       scoreMax: total,
-      completedAt: Date.now(),
+      completedAt,
     });
+    const id = exercise.id ?? localId;
     setAssessmentId(id);
-    uploadAssessment({
-      id,
-      mode: `pronunciation`,
-      language,
-      title: exercise.title,
-      difficulty,
-      scoreEarned: goodCount,
-      scoreMax: total,
-      exercise,
-      ratings,
-    });
+    if (exercise.id) {
+      uploadAssessment({
+        id: exercise.id,
+        userId: getUserId(),
+        scoreEarned: goodCount,
+        scoreMax: total,
+        completedAt,
+      });
+    }
     setPhase(`results`);
   }
 

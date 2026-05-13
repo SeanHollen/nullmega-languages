@@ -12,10 +12,18 @@ export interface ChatMessage {
   content: string;
 }
 
+export interface ChatMetadata {
+  mode: string;
+  language: string;
+  difficulty: number;
+  userId: string;
+}
+
 export interface ChatBody {
   model: string;
   messages: ChatMessage[];
   response_format?: { type: string };
+  metadata?: ChatMetadata;
 }
 
 export interface ChatResponse {
@@ -31,14 +39,22 @@ export interface TTSBody {
 export async function callChat(body: ChatBody): Promise<ChatResponse> {
   const { textGen } = loadSettings();
 
-  const url = textGen
-    ? "https://api.openai.com/v1/chat/completions"
-    : `${resolvedBackendUrl()}/api/generate`;
-
+  let url: string;
+  let outgoingBody: object;
   const headers: Record<string, string> = { "Content-Type": "application/json" };
-  if (textGen) headers["Authorization"] = `Bearer ${textGen.key}`;
 
-  const res = await fetch(url, { method: "POST", headers, body: JSON.stringify(body) });
+  if (textGen) {
+    url = "https://api.openai.com/v1/chat/completions";
+    headers["Authorization"] = `Bearer ${textGen.key}`;
+    // OpenAI rejects unknown fields — strip metadata for direct calls
+    const { metadata: _metadata, ...rest } = body;
+    outgoingBody = rest;
+  } else {
+    url = `${resolvedBackendUrl()}/api/generate`;
+    outgoingBody = body;
+  }
+
+  const res = await fetch(url, { method: "POST", headers, body: JSON.stringify(outgoingBody) });
   if (!res.ok) throw new Error(`API error: ${res.status}`);
   return res.json() as Promise<ChatResponse>;
 }

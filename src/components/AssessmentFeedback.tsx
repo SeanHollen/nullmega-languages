@@ -2,6 +2,7 @@ import { useState } from "react";
 import { FaThumbsUp, FaThumbsDown } from "react-icons/fa";
 import { updateFeedback } from "../utils/history";
 import { submitFeedback } from "../utils/api";
+import { getUserId } from "../utils/user";
 
 interface Props {
   assessmentId: string;
@@ -14,7 +15,7 @@ export function AssessmentFeedback({ assessmentId }: Props) {
     if (voted !== null) return;
     setVoted(helpful);
     updateFeedback(assessmentId, helpful);
-    submitFeedback({ id: assessmentId, helpful });
+    submitFeedback({ id: assessmentId, userId: getUserId(), helpful });
   }
 
   return (

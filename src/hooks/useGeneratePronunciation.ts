@@ -1,5 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { callChat } from "../utils/api";
+import { getUserId } from "../utils/user";
 
 export interface PronunciationPhrase {
   phrase: string;
@@ -7,6 +8,7 @@ export interface PronunciationPhrase {
 }
 
 export interface PronunciationExercise {
+  id?: string;
   title: string;
   phrases: PronunciationPhrase[];
 }
@@ -57,6 +59,7 @@ Return ONLY valid JSON with this exact shape:
     model: "o4-mini",
     messages: [{ role: "user", content: prompt }],
     response_format: { type: "json_object" },
+    metadata: { mode: "pronunciation", language, difficulty, userId: getUserId() },
   });
   return JSON.parse(data.choices[0].message.content) as PronunciationExercise;
 }

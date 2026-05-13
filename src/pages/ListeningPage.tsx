@@ -12,6 +12,7 @@ import { generateExerciseAudio, ExerciseAudio } from "../hooks/useTTS";
 import { useLanguage } from "../contexts/LanguageContext";
 import { saveAssessment } from "../utils/history";
 import { uploadAssessment } from "../utils/api";
+import { getUserId } from "../utils/user";
 import { Exercise } from "../types";
 
 type Phase = "setup" | "listening" | "results";
@@ -34,7 +35,7 @@ export function ListeningPage() {
   function handleGenerate() {
     setAudioError(``);
     mutate(
-      { language, difficulty },
+      { language, difficulty, mode: `listening` },
       {
         onSuccess: async (data: Exercise) => {
           setExercise(data);
@@ -71,27 +72,27 @@ export function ListeningPage() {
     } else {
       setRatingResult(null);
     }
-    const id = saveAssessment({
+    const completedAt = Date.now();
+    const localId = saveAssessment({
       mode: `listening`,
       language,
       title: exercise.title,
       difficulty,
       scoreEarned: correct,
       scoreMax: total,
-      completedAt: Date.now(),
+      completedAt,
     });
+    const id = exercise.id ?? localId;
     setAssessmentId(id);
-    uploadAssessment({
-      id,
-      mode: `listening`,
-      language,
-      title: exercise.title,
-      difficulty,
-      scoreEarned: correct,
-      scoreMax: total,
-      exercise,
-      selected,
-    });
+    if (exercise.id) {
+      uploadAssessment({
+        id: exercise.id,
+        userId: getUserId(),
+        scoreEarned: correct,
+        scoreMax: total,
+        completedAt,
+      });
+    }
     setPhase(`results`);
   }
 

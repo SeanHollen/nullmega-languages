@@ -1,6 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import difficultyLevels from "../data/difficulty-levels.json";
 import { callChat } from "../utils/api";
+import { getUserId } from "../utils/user";
 
 interface LevelRef {
   description: string;
@@ -17,6 +18,7 @@ export interface WritingQuestion {
 }
 
 export interface WritingExercise {
+  id?: string;
   title: string;
   passage: string;
   translation: string;
@@ -103,6 +105,7 @@ DIFFICULT WORDS: exclude cognates an English speaker could recognise. Include ge
     model: "o4-mini",
     messages: [{ role: "user", content: prompt }],
     response_format: { type: "json_object" },
+    metadata: { mode: "writing", language, difficulty, userId: getUserId() },
   });
   const parsed = JSON.parse(data.choices[0].message.content) as WritingExercise;
 

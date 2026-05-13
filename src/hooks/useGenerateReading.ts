@@ -2,6 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import { Exercise } from "../types";
 import difficultyLevels from "../data/difficulty-levels.json";
 import { callChat } from "../utils/api";
+import { getUserId } from "../utils/user";
 
 interface ExampleRef {
   passage: string;
@@ -41,7 +42,11 @@ function passageLengthGuide(difficulty: number): string {
   return "160-220 words";
 }
 
-async function fetchExercise(language: string, difficulty: number): Promise<Exercise> {
+async function fetchExercise(
+  language: string,
+  difficulty: number,
+  mode: "reading" | "listening",
+): Promise<Exercise> {
   const lo = Math.max(1, difficulty - 1);
   const hi = Math.min(100, difficulty + 1);
 
@@ -97,13 +102,21 @@ All four answer options for each question must be similar in length and grammati
     model: "o4-mini",
     messages: [{ role: "user", content: prompt }],
     response_format: { type: "json_object" },
+    metadata: { mode, language, difficulty, userId: getUserId() },
   });
   return JSON.parse(data.choices[0].message.content) as Exercise;
 }
 
 export function useGenerateReading() {
   return useMutation({
-    mutationFn: ({ language, difficulty }: { language: string; difficulty: number }) =>
-      fetchExercise(language, difficulty),
+    mutationFn: ({
+      language,
+      difficulty,
+      mode = "reading",
+    }: {
+      language: string;
+      difficulty: number;
+      mode?: "reading" | "listening";
+    }) => fetchExercise(language, difficulty, mode),
   });
 }

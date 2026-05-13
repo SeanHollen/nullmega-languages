@@ -11,6 +11,7 @@ import { loadAbility, computeRating, RatingResult } from "../hooks/useAbility";
 import { useLanguage } from "../contexts/LanguageContext";
 import { saveAssessment } from "../utils/history";
 import { uploadAssessment } from "../utils/api";
+import { getUserId } from "../utils/user";
 import { Exercise, Phase } from "../types";
 
 export function ReadingPage() {
@@ -55,27 +56,27 @@ export function ReadingPage() {
     } else {
       setRatingResult(null);
     }
-    const id = saveAssessment({
+    const completedAt = Date.now();
+    const localId = saveAssessment({
       mode: `reading`,
       language,
       title: exercise.title,
       difficulty,
       scoreEarned: correct,
       scoreMax: total,
-      completedAt: Date.now(),
+      completedAt,
     });
+    const id = exercise.id ?? localId;
     setAssessmentId(id);
-    uploadAssessment({
-      id,
-      mode: `reading`,
-      language,
-      title: exercise.title,
-      difficulty,
-      scoreEarned: correct,
-      scoreMax: total,
-      exercise,
-      selected,
-    });
+    if (exercise.id) {
+      uploadAssessment({
+        id: exercise.id,
+        userId: getUserId(),
+        scoreEarned: correct,
+        scoreMax: total,
+        completedAt,
+      });
+    }
     setPhase(`results`);
   }
 

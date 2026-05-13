@@ -5,6 +5,7 @@ export interface Question {
 }
 
 export interface Exercise {
+  id?: string;
   title: string;
   passage: string;
   translation: string;

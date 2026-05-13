@@ -12,6 +12,7 @@ import { loadAbility, computeRating, RatingResult } from "../hooks/useAbility";
 import { useLanguage } from "../contexts/LanguageContext";
 import { saveAssessment } from "../utils/history";
 import { uploadAssessment } from "../utils/api";
+import { getUserId } from "../utils/user";
 
 type Phase = "setup" | "writing" | "results";
 
@@ -64,28 +65,27 @@ export function WritingPage() {
           } else {
             setRatingResult(null);
           }
-          const id = saveAssessment({
+          const completedAt = Date.now();
+          const localId = saveAssessment({
             mode: `writing`,
             language,
             title: exercise.title,
             difficulty,
             scoreEarned: totalScore,
             scoreMax: maxScore,
-            completedAt: Date.now(),
+            completedAt,
           });
+          const id = exercise.id ?? localId;
           setAssessmentId(id);
-          uploadAssessment({
-            id,
-            mode: `writing`,
-            language,
-            title: exercise.title,
-            difficulty,
-            scoreEarned: totalScore,
-            scoreMax: maxScore,
-            exercise,
-            answers,
-            grades: result.grades,
-          });
+          if (exercise.id) {
+            uploadAssessment({
+              id: exercise.id,
+              userId: getUserId(),
+              scoreEarned: totalScore,
+              scoreMax: maxScore,
+              completedAt,
+            });
+          }
           setPhase(`results`);
         },
       },

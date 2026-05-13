@@ -48,7 +48,7 @@ export function LanguageBanner() {
 
   return (
     <header className="bg-green-600 sticky top-0 z-10 shadow-md">
-      <div className="max-w-5xl mx-auto px-6 py-3 flex items-center justify-center gap-8">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-center gap-3 sm:gap-8">
         {addingCustom ? (
           <div className="flex items-center gap-2 flex-1 max-w-md">
             <input
@@ -78,8 +78,8 @@ export function LanguageBanner() {
             </button>
           </div>
         ) : (
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-white">{`Language:`}</span>
+          <div className="flex items-center gap-2 min-w-0">
+            <span className="hidden sm:inline text-sm font-medium text-white">{`Language:`}</span>
             <select
               value={language}
               onChange={(e) => handleSelectChange(e.target.value)}
@@ -98,11 +98,11 @@ export function LanguageBanner() {
 
         <button
           onClick={() => navigate(`/settings`)}
-          className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-white hover:bg-white/10 transition cursor-pointer text-sm font-medium"
+          className="flex items-center gap-2 px-2 sm:px-3 py-1.5 rounded-lg text-white hover:bg-white/10 transition cursor-pointer text-sm font-medium whitespace-nowrap shrink-0"
           title={`Configure AI provider keys`}
         >
           <FaCog />
-          <span>{`AI provider`}</span>
+          <span className="hidden sm:inline">{`AI provider`}</span>
         </button>
       </div>
     </header>

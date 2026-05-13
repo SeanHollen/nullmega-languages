@@ -4,6 +4,7 @@ export interface AssessmentRecord {
   id: string;
   mode: Mode;
   language: string;
+  title: string;
   difficulty: number;
   scoreEarned: number;
   scoreMax: number;
@@ -61,4 +62,10 @@ function sameDay(a: number, b: number): boolean {
 export function getCompletedToday(mode: Mode): number {
   const now = Date.now();
   return load().filter((r) => r.mode === mode && sameDay(r.completedAt, now)).length;
+}
+
+export function getHistory(mode: Mode, language: string): AssessmentRecord[] {
+  return load()
+    .filter((r) => r.mode === mode && r.language === language)
+    .sort((a, b) => b.completedAt - a.completedAt);
 }

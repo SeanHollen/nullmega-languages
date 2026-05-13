@@ -5,6 +5,7 @@ import { SetupView } from "../components/reading/SetupView";
 import { LoadingView } from "../components/reading/LoadingView";
 import { ListeningPassageView } from "../components/listening/ListeningPassageView";
 import { ResultsView } from "../components/reading/ResultsView";
+import { HistoryList } from "../components/HistoryList";
 import { useGenerateReading } from "../hooks/useGenerateReading";
 import { loadAbility, computeRating, RatingResult } from "../hooks/useAbility";
 import { generateExerciseAudio, ExerciseAudio } from "../hooks/useTTS";
@@ -73,6 +74,7 @@ export function ListeningPage() {
     const id = saveAssessment({
       mode: `listening`,
       language,
+      title: exercise.title,
       difficulty,
       scoreEarned: correct,
       scoreMax: total,
@@ -83,6 +85,7 @@ export function ListeningPage() {
       id,
       mode: `listening`,
       language,
+      title: exercise.title,
       difficulty,
       scoreEarned: correct,
       scoreMax: total,
@@ -119,17 +122,20 @@ export function ListeningPage() {
         </div>
 
         {phase === `setup` && !isLoading && (
-          <SetupView
-            language={language}
-            difficulty={difficulty}
-            rated={rated}
-            savedRating={loadAbility(language, `listening`)}
-            error={error}
-            generateLabel={`Generate Listening Exercise`}
-            onDifficultyChange={setDifficulty}
-            onRatedChange={setRated}
-            onGenerate={handleGenerate}
-          />
+          <>
+            <SetupView
+              language={language}
+              difficulty={difficulty}
+              rated={rated}
+              savedRating={loadAbility(language, `listening`)}
+              error={error}
+              generateLabel={`Generate Listening Exercise`}
+              onDifficultyChange={setDifficulty}
+              onRatedChange={setRated}
+              onGenerate={handleGenerate}
+            />
+            <HistoryList mode={`listening`} language={language} />
+          </>
         )}
 
         {phase === `setup` && isPending && <LoadingView message={`Generating passage…`} />}

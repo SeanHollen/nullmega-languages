@@ -64,7 +64,7 @@ export function PronunciationResultsView({
             </div>
           )
         ) : (
-          <p className="text-sm text-gray-400">{`Unrated session`}</p>
+          <p className="text-sm text-gray-400">{`Unrated exercise`}</p>
         )}
       </div>
 

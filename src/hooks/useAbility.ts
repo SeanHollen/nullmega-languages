@@ -1,4 +1,4 @@
-// ELO tuning: divisor controls sensitivity to rating gaps, K controls max change per session
+// ELO tuning: divisor controls sensitivity to rating gaps, K controls max change per exercise
 const K = 5;
 const DIVISOR = 20;
 

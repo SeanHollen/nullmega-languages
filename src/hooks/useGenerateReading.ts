@@ -60,6 +60,7 @@ ${referenceBlock}
 
 Return ONLY valid JSON with this exact shape:
 {
+  "title": "3-6 word title in ${language} describing the topic of the passage",
   "passage": "${passageLengthGuide(difficulty)} passage entirely in ${language}",
   "translation": "full English translation of the passage",
   "difficultWords": [{ "source": "word in ${language}", "translation": "English equivalent" }],

@@ -5,6 +5,7 @@ import { SetupView } from "../components/reading/SetupView";
 import { LoadingView } from "../components/reading/LoadingView";
 import { WritingPassageView } from "../components/writing/WritingPassageView";
 import { WritingResultsView } from "../components/writing/WritingResultsView";
+import { HistoryList } from "../components/HistoryList";
 import { useGenerateWriting, WritingExercise } from "../hooks/useGenerateWriting";
 import { useGradeWriting, WritingGrade } from "../hooks/useGradeWriting";
 import { loadAbility, computeRating, RatingResult } from "../hooks/useAbility";
@@ -66,6 +67,7 @@ export function WritingPage() {
           const id = saveAssessment({
             mode: `writing`,
             language,
+            title: exercise.title,
             difficulty,
             scoreEarned: totalScore,
             scoreMax: maxScore,
@@ -76,6 +78,7 @@ export function WritingPage() {
             id,
             mode: `writing`,
             language,
+            title: exercise.title,
             difficulty,
             scoreEarned: totalScore,
             scoreMax: maxScore,
@@ -115,17 +118,20 @@ export function WritingPage() {
         </div>
 
         {phase === `setup` && !generateWriting.isPending && (
-          <SetupView
-            language={language}
-            difficulty={difficulty}
-            rated={rated}
-            savedRating={loadAbility(language, `writing`)}
-            error={error}
-            generateLabel={`Generate Exercise`}
-            onDifficultyChange={setDifficulty}
-            onRatedChange={setRated}
-            onGenerate={handleGenerate}
-          />
+          <>
+            <SetupView
+              language={language}
+              difficulty={difficulty}
+              rated={rated}
+              savedRating={loadAbility(language, `writing`)}
+              error={error}
+              generateLabel={`Generate Writing Exercise`}
+              onDifficultyChange={setDifficulty}
+              onRatedChange={setRated}
+              onGenerate={handleGenerate}
+            />
+            <HistoryList mode={`writing`} language={language} />
+          </>
         )}
 
         {phase === `setup` && generateWriting.isPending && (

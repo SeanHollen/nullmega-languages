@@ -5,6 +5,7 @@ export interface Question {
 }
 
 export interface Exercise {
+  title: string;
   passage: string;
   translation: string;
   difficultWords: { source: string; translation: string }[];

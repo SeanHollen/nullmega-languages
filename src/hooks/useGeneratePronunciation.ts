@@ -7,6 +7,7 @@ export interface PronunciationPhrase {
 }
 
 export interface PronunciationExercise {
+  title: string;
   phrases: PronunciationPhrase[];
 }
 
@@ -39,6 +40,7 @@ async function fetchPronunciationExercise(
 
 Return ONLY valid JSON with this exact shape:
 {
+  "title": "3-6 word title in ${language} describing the theme of the phrases",
   "phrases": [
     { "phrase": "...", "translation": "..." }
   ]

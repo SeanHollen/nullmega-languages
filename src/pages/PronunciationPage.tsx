@@ -5,6 +5,7 @@ import { SetupView } from "../components/reading/SetupView";
 import { LoadingView } from "../components/reading/LoadingView";
 import { PronunciationExerciseView } from "../components/pronunciation/PronunciationExerciseView";
 import { PronunciationResultsView } from "../components/pronunciation/PronunciationResultsView";
+import { HistoryList } from "../components/HistoryList";
 import { useGeneratePronunciation, PronunciationExercise } from "../hooks/useGeneratePronunciation";
 import { loadAbility, computeRating, RatingResult } from "../hooks/useAbility";
 import { generatePhrasesAudio } from "../hooks/useTTS";
@@ -72,6 +73,7 @@ export function PronunciationPage() {
     const id = saveAssessment({
       mode: `pronunciation`,
       language,
+      title: exercise.title,
       difficulty,
       scoreEarned: goodCount,
       scoreMax: total,
@@ -82,6 +84,7 @@ export function PronunciationPage() {
       id,
       mode: `pronunciation`,
       language,
+      title: exercise.title,
       difficulty,
       scoreEarned: goodCount,
       scoreMax: total,
@@ -118,17 +121,20 @@ export function PronunciationPage() {
         </div>
 
         {phase === `setup` && !isLoading && (
-          <SetupView
-            language={language}
-            difficulty={difficulty}
-            rated={rated}
-            savedRating={loadAbility(language, `pronunciation`)}
-            error={error}
-            generateLabel={`Generate Phrases`}
-            onDifficultyChange={setDifficulty}
-            onRatedChange={setRated}
-            onGenerate={handleGenerate}
-          />
+          <>
+            <SetupView
+              language={language}
+              difficulty={difficulty}
+              rated={rated}
+              savedRating={loadAbility(language, `pronunciation`)}
+              error={error}
+              generateLabel={`Generate Pronunciation Exercise`}
+              onDifficultyChange={setDifficulty}
+              onRatedChange={setRated}
+              onGenerate={handleGenerate}
+            />
+            <HistoryList mode={`pronunciation`} language={language} />
+          </>
         )}
 
         {phase === `setup` && isPending && <LoadingView message={`Generating phrases…`} />}

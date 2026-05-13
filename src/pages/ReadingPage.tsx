@@ -5,6 +5,7 @@ import { SetupView } from "../components/reading/SetupView";
 import { LoadingView } from "../components/reading/LoadingView";
 import { PassageView } from "../components/reading/PassageView";
 import { ResultsView } from "../components/reading/ResultsView";
+import { HistoryList } from "../components/HistoryList";
 import { useGenerateReading } from "../hooks/useGenerateReading";
 import { loadAbility, computeRating, RatingResult } from "../hooks/useAbility";
 import { useLanguage } from "../contexts/LanguageContext";
@@ -57,6 +58,7 @@ export function ReadingPage() {
     const id = saveAssessment({
       mode: `reading`,
       language,
+      title: exercise.title,
       difficulty,
       scoreEarned: correct,
       scoreMax: total,
@@ -67,6 +69,7 @@ export function ReadingPage() {
       id,
       mode: `reading`,
       language,
+      title: exercise.title,
       difficulty,
       scoreEarned: correct,
       scoreMax: total,
@@ -99,16 +102,20 @@ export function ReadingPage() {
         </div>
 
         {phase === `setup` && !isPending && (
-          <SetupView
-            language={language}
-            difficulty={difficulty}
-            rated={rated}
-            savedRating={loadAbility(language)}
-            error={error?.message ?? ``}
-            onDifficultyChange={setDifficulty}
-            onRatedChange={setRated}
-            onGenerate={handleGenerate}
-          />
+          <>
+            <SetupView
+              language={language}
+              difficulty={difficulty}
+              rated={rated}
+              savedRating={loadAbility(language)}
+              error={error?.message ?? ``}
+              generateLabel={`Generate Reading Exercise`}
+              onDifficultyChange={setDifficulty}
+              onRatedChange={setRated}
+              onGenerate={handleGenerate}
+            />
+            <HistoryList mode={`reading`} language={language} />
+          </>
         )}
 
         {phase === `setup` && isPending && <LoadingView />}

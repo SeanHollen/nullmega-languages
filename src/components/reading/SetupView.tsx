@@ -70,7 +70,7 @@ export function SetupView({
           onChange={(e) => onRatedChange(!e.target.checked)}
           className="w-4 h-4 accent-green-600 cursor-pointer"
         />
-        <span className="text-sm text-gray-600">{`Unrated session`}</span>
+        <span className="text-sm text-gray-600">{`Unrated exercise`}</span>
         <span className="text-xs text-gray-400">{`(won't affect your rating)`}</span>
       </label>
 

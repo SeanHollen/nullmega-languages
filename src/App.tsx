@@ -8,6 +8,7 @@ import { ListeningPage } from "./pages/ListeningPage";
 import { PronunciationPage } from "./pages/PronunciationPage";
 import { WritingPage } from "./pages/WritingPage";
 import { SettingsPage } from "./pages/SettingsPage";
+import { GoalsPage } from "./pages/GoalsPage";
 
 const queryClient = new QueryClient();
 
@@ -24,6 +25,7 @@ export function App() {
             <Route path="/pronunciation" element={<PronunciationPage />} />
             <Route path="/writing" element={<WritingPage />} />
             <Route path="/settings" element={<SettingsPage />} />
+            <Route path="/goals" element={<GoalsPage />} />
           </Routes>
         </LanguageProvider>
       </BrowserRouter>

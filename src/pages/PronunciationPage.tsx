@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa";
 import { SetupView } from "../components/reading/SetupView";
@@ -8,26 +8,26 @@ import { PronunciationResultsView } from "../components/pronunciation/Pronunciat
 import { useGeneratePronunciation, PronunciationExercise } from "../hooks/useGeneratePronunciation";
 import { loadAbility, computeRating, RatingResult } from "../hooks/useAbility";
 import { generatePhrasesAudio } from "../hooks/useTTS";
+import { useLanguage } from "../contexts/LanguageContext";
+import { saveAssessment } from "../utils/history";
+import { uploadAssessment } from "../utils/api";
 
 type Phase = "setup" | "exercise" | "results";
 
 export function PronunciationPage() {
   const navigate = useNavigate();
-  const [language, setLanguage] = useState(`French`);
-  const [difficulty, setDifficulty] = useState(50);
+  const { language } = useLanguage();
+  const [difficulty, setDifficulty] = useState(() => loadAbility(language, `pronunciation`) ?? 50);
   const [rated, setRated] = useState(true);
   const [phase, setPhase] = useState<Phase>(`setup`);
   const [exercise, setExercise] = useState<PronunciationExercise | null>(null);
   const [audioUrls, setAudioUrls] = useState<string[]>([]);
   const [ratings, setRatings] = useState<("good" | "bad" | null)[]>([]);
   const [ratingResult, setRatingResult] = useState<RatingResult | null>(null);
+  const [assessmentId, setAssessmentId] = useState<string | null>(null);
   const [loadingAudio, setLoadingAudio] = useState(false);
   const [audioError, setAudioError] = useState(``);
   const { mutate, isPending, error: genError } = useGeneratePronunciation();
-
-  useEffect(() => {
-    setDifficulty(loadAbility(language, `pronunciation`) ?? 50);
-  }, [language]);
 
   function handleGenerate() {
     setAudioError(``);
@@ -36,7 +36,7 @@ export function PronunciationPage() {
       {
         onSuccess: async (data: PronunciationExercise) => {
           setExercise(data);
-          setRatings(new Array(data.phrases.length).fill(null));
+          setRatings(Array.from({ length: data.phrases.length }, () => null));
           setLoadingAudio(true);
           try {
             const urls = await generatePhrasesAudio(data.phrases.map((p) => p.phrase));
@@ -48,7 +48,7 @@ export function PronunciationPage() {
             setLoadingAudio(false);
           }
         },
-      }
+      },
     );
   }
 
@@ -63,13 +63,31 @@ export function PronunciationPage() {
   function handleSubmit() {
     if (!exercise) return;
     const goodCount = ratings.filter((r) => r === "good").length;
+    const total = exercise.phrases.length;
     if (rated) {
-      setRatingResult(
-        computeRating(language, goodCount, exercise.phrases.length, difficulty, `pronunciation`)
-      );
+      setRatingResult(computeRating(language, goodCount, total, difficulty, `pronunciation`));
     } else {
       setRatingResult(null);
     }
+    const id = saveAssessment({
+      mode: `pronunciation`,
+      language,
+      difficulty,
+      scoreEarned: goodCount,
+      scoreMax: total,
+      completedAt: Date.now(),
+    });
+    setAssessmentId(id);
+    uploadAssessment({
+      id,
+      mode: `pronunciation`,
+      language,
+      difficulty,
+      scoreEarned: goodCount,
+      scoreMax: total,
+      exercise,
+      ratings,
+    });
     setPhase(`results`);
   }
 
@@ -78,6 +96,7 @@ export function PronunciationPage() {
     setAudioUrls([]);
     setRatings([]);
     setRatingResult(null);
+    setAssessmentId(null);
     setDifficulty(loadAbility(language, `pronunciation`) ?? 50);
     setPhase(`setup`);
   }
@@ -86,7 +105,7 @@ export function PronunciationPage() {
   const error = genError?.message ?? audioError;
 
   return (
-    <div className="min-h-screen bg-green-50 py-10 px-4">
+    <div className="min-h-screen bg-green-100 py-10 px-4">
       <div className="max-w-2xl mx-auto">
         <div className="flex items-center gap-4 mb-8">
           <button
@@ -106,16 +125,13 @@ export function PronunciationPage() {
             savedRating={loadAbility(language, `pronunciation`)}
             error={error}
             generateLabel={`Generate Phrases`}
-            onLanguageChange={setLanguage}
             onDifficultyChange={setDifficulty}
             onRatedChange={setRated}
             onGenerate={handleGenerate}
           />
         )}
 
-        {phase === `setup` && isPending && (
-          <LoadingView message={`Generating phrases…`} />
-        )}
+        {phase === `setup` && isPending && <LoadingView message={`Generating phrases…`} />}
 
         {phase === `setup` && loadingAudio && (
           <LoadingView
@@ -142,6 +158,7 @@ export function PronunciationPage() {
             language={language}
             ratings={ratings}
             ratingResult={ratingResult}
+            assessmentId={assessmentId}
             onGoAgain={handleGoAgain}
             onHome={() => navigate(`/`)}
           />

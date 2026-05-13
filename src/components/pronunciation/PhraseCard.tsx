@@ -46,9 +46,11 @@ export function PhraseCard({ index, phrase, translation, audioUrl, rating, onRat
   }
 
   const borderColor =
-    rating === "good" ? `border-green-200` :
-    rating === "bad" ? `border-red-200` :
-    `border-gray-100`;
+    rating === "good"
+      ? `border-green-200`
+      : rating === "bad"
+        ? `border-red-200`
+        : `border-gray-100`;
 
   return (
     <div className={`bg-white rounded-2xl border shadow-sm p-6 space-y-4 ${borderColor}`}>
@@ -75,9 +77,7 @@ export function PhraseCard({ index, phrase, translation, audioUrl, rating, onRat
       {(textRevealed || translationRevealed) && (
         <div className="bg-gray-50 rounded-xl px-4 py-3 space-y-1">
           {textRevealed && <p className="text-gray-800 font-medium">{phrase}</p>}
-          {translationRevealed && (
-            <p className="text-gray-500 text-sm italic">{translation}</p>
-          )}
+          {translationRevealed && <p className="text-gray-500 text-sm italic">{translation}</p>}
         </div>
       )}
 

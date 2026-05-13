@@ -10,7 +10,8 @@
     "prettier": "prettier --write .",
     "prebuild": "prettier --write .",
     "lint": "eslint src/",
-    "lint:fix": "eslint src/ --fix"
+    "lint:fix": "eslint src/ --fix",
+    "check": "oxlint --react-plugin src/ && oxfmt --write src/"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
@@ -21,6 +22,8 @@
     "eslint": "^10.3.0",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.1.1",
+    "oxfmt": "^0.47.0",
+    "oxlint": "^1.62.0",
     "prettier": "^3.8.3",
     "tailwindcss": "^4.2.4",
     "typescript": "^6.0.3",

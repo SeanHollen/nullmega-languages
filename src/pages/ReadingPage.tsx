@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa";
 import { SetupView } from "../components/reading/SetupView";
@@ -7,22 +7,22 @@ import { PassageView } from "../components/reading/PassageView";
 import { ResultsView } from "../components/reading/ResultsView";
 import { useGenerateReading } from "../hooks/useGenerateReading";
 import { loadAbility, computeRating, RatingResult } from "../hooks/useAbility";
+import { useLanguage } from "../contexts/LanguageContext";
+import { saveAssessment } from "../utils/history";
+import { uploadAssessment } from "../utils/api";
 import { Exercise, Phase } from "../types";
 
 export function ReadingPage() {
   const navigate = useNavigate();
-  const [language, setLanguage] = useState(`French`);
-  const [difficulty, setDifficulty] = useState(50);
+  const { language } = useLanguage();
+  const [difficulty, setDifficulty] = useState(() => loadAbility(language) ?? 50);
   const [rated, setRated] = useState(true);
   const [phase, setPhase] = useState<Phase>(`setup`);
   const [exercise, setExercise] = useState<Exercise | null>(null);
   const [selected, setSelected] = useState<(number | null)[]>([]);
   const [ratingResult, setRatingResult] = useState<RatingResult | null>(null);
+  const [assessmentId, setAssessmentId] = useState<string | null>(null);
   const { mutate, isPending, error } = useGenerateReading();
-
-  useEffect(() => {
-    setDifficulty(loadAbility(language) ?? 50);
-  }, [language]);
 
   function handleGenerate() {
     mutate(
@@ -30,10 +30,10 @@ export function ReadingPage() {
       {
         onSuccess: (data: Exercise) => {
           setExercise(data);
-          setSelected(new Array(data.questions.length).fill(null));
+          setSelected(Array.from({ length: data.questions.length }, () => null));
           setPhase(`reading`);
         },
-      }
+      },
     );
   }
 
@@ -47,14 +47,32 @@ export function ReadingPage() {
 
   function handleSubmit() {
     if (!exercise) return;
-    const correct = selected.filter(
-      (s, i) => s === exercise.questions[i].correct
-    ).length;
+    const correct = selected.filter((s, i) => s === exercise.questions[i].correct).length;
+    const total = exercise.questions.length;
     if (rated) {
-      setRatingResult(computeRating(language, correct, exercise.questions.length, difficulty));
+      setRatingResult(computeRating(language, correct, total, difficulty));
     } else {
       setRatingResult(null);
     }
+    const id = saveAssessment({
+      mode: `reading`,
+      language,
+      difficulty,
+      scoreEarned: correct,
+      scoreMax: total,
+      completedAt: Date.now(),
+    });
+    setAssessmentId(id);
+    uploadAssessment({
+      id,
+      mode: `reading`,
+      language,
+      difficulty,
+      scoreEarned: correct,
+      scoreMax: total,
+      exercise,
+      selected,
+    });
     setPhase(`results`);
   }
 
@@ -62,12 +80,13 @@ export function ReadingPage() {
     setExercise(null);
     setSelected([]);
     setRatingResult(null);
+    setAssessmentId(null);
     setDifficulty(loadAbility(language) ?? 50);
     setPhase(`setup`);
   }
 
   return (
-    <div className="min-h-screen bg-green-50 py-10 px-4">
+    <div className="min-h-screen bg-green-100 py-10 px-4">
       <div className="max-w-2xl mx-auto">
         <div className="flex items-center gap-4 mb-8">
           <button
@@ -86,7 +105,6 @@ export function ReadingPage() {
             rated={rated}
             savedRating={loadAbility(language)}
             error={error?.message ?? ``}
-            onLanguageChange={setLanguage}
             onDifficultyChange={setDifficulty}
             onRatedChange={setRated}
             onGenerate={handleGenerate}
@@ -112,6 +130,7 @@ export function ReadingPage() {
             language={language}
             selected={selected}
             ratingResult={ratingResult}
+            assessmentId={assessmentId}
             onGoAgain={handleGoAgain}
             onHome={() => navigate(`/`)}
           />

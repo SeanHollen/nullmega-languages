@@ -1,6 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { Exercise } from "../types";
 import difficultyLevels from "../data/difficulty-levels.json";
+import { callChat } from "../utils/api";
 
 interface ExampleRef {
   passage: string;
@@ -32,8 +33,10 @@ ${exampleLines}`;
 }
 
 function passageLengthGuide(difficulty: number): string {
-  if (difficulty <= 15) return "100-150 words. At this level, achieve length through simple conversations, repetitive sentence structures, lists of objects or actions, or labelled descriptions — not by using complex vocabulary or grammar";
-  if (difficulty <= 30) return "120-170 words. Use dialogue, simple narratives with repeated patterns, or descriptive lists to fill the length while keeping language elementary";
+  if (difficulty <= 15)
+    return "100-150 words. At this level, achieve length through simple conversations, repetitive sentence structures, lists of objects or actions, or labelled descriptions — not by using complex vocabulary or grammar";
+  if (difficulty <= 30)
+    return "120-170 words. Use dialogue, simple narratives with repeated patterns, or descriptive lists to fill the length while keeping language elementary";
   if (difficulty <= 50) return "140-200 words";
   return "160-220 words";
 }
@@ -89,21 +92,11 @@ Before finalising each question, apply this test: "Could someone answer this cor
 ANSWER OPTION LENGTH:
 All four answer options for each question must be similar in length and grammatical complexity. Do not let the correct answer stand out by being noticeably longer, more detailed, or more qualified than the others. A reader should not be able to guess the answer from its length or structure alone.`;
 
-  const res = await fetch("https://api.openai.com/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${import.meta.env.VITE_OPENAI_API_KEY}`,
-    },
-    body: JSON.stringify({
-      model: "o4-mini",
-      messages: [{ role: "user", content: prompt }],
-      response_format: { type: "json_object" },
-    }),
+  const data = await callChat({
+    model: "o4-mini",
+    messages: [{ role: "user", content: prompt }],
+    response_format: { type: "json_object" },
   });
-
-  if (!res.ok) throw new Error(`OpenAI error: ${res.status}`);
-  const data = await res.json();
   return JSON.parse(data.choices[0].message.content) as Exercise;
 }
 

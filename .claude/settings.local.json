@@ -15,7 +15,9 @@
       "Bash(npm create *)",
       "Bash(python3 -c \"import json; json.load\\(open\\('src/data/difficulty-levels.json'\\)\\)\")",
       "Bash(python3 *)",
-      "Bash(node *)"
+      "Bash(node *)",
+      "Bash(npm info *)",
+      "Bash(npx oxlint *)"
     ]
   }
 }

@@ -3,6 +3,7 @@ import { FaCheck, FaTimes } from "react-icons/fa";
 import { Exercise } from "../../types";
 import { RatingResult } from "../../hooks/useAbility";
 import { translateBatch } from "../../hooks/useTranslate";
+import { AssessmentFeedback } from "../AssessmentFeedback";
 
 const OUTCOME_STYLE = {
   win: { label: `Win`, color: `text-green-600`, bg: `bg-green-100 border-green-200` },
@@ -22,7 +23,7 @@ function boldWords(text: string, words: string[]): React.ReactNode {
       </strong>
     ) : (
       <span key={i}>{part}</span>
-    )
+    ),
   );
 }
 
@@ -36,6 +37,7 @@ interface Props {
   language: string;
   selected: (number | null)[];
   ratingResult: RatingResult | null;
+  assessmentId: string | null;
   onGoAgain: () => void;
   onHome: () => void;
 }
@@ -45,6 +47,7 @@ export function ResultsView({
   language,
   selected,
   ratingResult,
+  assessmentId,
   onGoAgain,
   onHome,
 }: Props) {
@@ -74,7 +77,9 @@ export function ResultsView({
 
   return (
     <div className="space-y-6">
-      <div className={`bg-white rounded-2xl border shadow-sm p-8 text-center ${outcome ? outcome.bg : `border-green-100`}`}>
+      <div
+        className={`bg-white rounded-2xl border shadow-sm p-8 text-center ${outcome ? outcome.bg : `border-green-100`}`}
+      >
         {outcome && (
           <p className={`text-sm font-semibold uppercase tracking-widest mb-2 ${outcome.color}`}>
             {outcome.label}
@@ -94,7 +99,9 @@ export function ResultsView({
               <span className="text-gray-300">{`→`}</span>
               <span className="font-semibold text-gray-800">{ratingResult.newRating}</span>
               <span className={ratingResult.change >= 0 ? `text-green-600` : `text-red-500`}>
-                {ratingResult.change >= 0 ? `(+${ratingResult.change})` : `(${ratingResult.change})`}
+                {ratingResult.change >= 0
+                  ? `(+${ratingResult.change})`
+                  : `(${ratingResult.change})`}
               </span>
             </div>
           )
@@ -106,12 +113,18 @@ export function ResultsView({
       <div className="bg-white rounded-2xl border border-green-100 shadow-sm p-8 space-y-4">
         <p className="text-xs text-gray-400 uppercase tracking-wide">{`Passage`}</p>
         <p className="text-gray-800 leading-relaxed whitespace-pre-wrap">
-          {boldWords(exercise.passage, exercise.difficultWords.map((w) => w.source))}
+          {boldWords(
+            exercise.passage,
+            exercise.difficultWords.map((w) => w.source),
+          )}
         </p>
         <div className="border-t border-green-100 pt-4">
           <p className="text-xs text-gray-400 uppercase tracking-wide mb-2">{`English Translation`}</p>
           <p className="text-gray-500 leading-relaxed italic text-sm whitespace-pre-wrap">
-            {boldWords(exercise.translation, exercise.difficultWords.map((w) => w.translation))}
+            {boldWords(
+              exercise.translation,
+              exercise.difficultWords.map((w) => w.translation),
+            )}
           </p>
         </div>
         {exercise.insight && (
@@ -156,9 +169,7 @@ export function ResultsView({
                     }`}
                   >
                     <p>{opt}</p>
-                    {topts?.[oi] && (
-                      <p className="text-xs opacity-60 mt-0.5">{topts[oi]}</p>
-                    )}
+                    {topts?.[oi] && <p className="text-xs opacity-60 mt-0.5">{topts[oi]}</p>}
                   </div>
                 ))}
               </div>
@@ -166,6 +177,8 @@ export function ResultsView({
           );
         })}
       </div>
+
+      {assessmentId && <AssessmentFeedback assessmentId={assessmentId} />}
 
       <div className="flex gap-3">
         <button

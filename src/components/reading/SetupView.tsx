@@ -1,24 +1,5 @@
 import { FaExclamationTriangle } from "react-icons/fa";
 
-const LANGUAGES = [
-  "English",
-  "French",
-  "Spanish",
-  "German",
-  "Italian",
-  "Portuguese",
-  "Japanese",
-  "Chinese (Mandarin)",
-  "Korean",
-  "Arabic",
-  "Russian",
-  "Dutch",
-  "Swedish",
-  "Polish",
-  "Turkish",
-  "Hindi",
-];
-
 function difficultyLabel(d: number) {
   if (d <= 20) return "Beginner";
   if (d <= 40) return "Elementary";
@@ -34,7 +15,6 @@ interface Props {
   savedRating: number | null;
   error: string;
   generateLabel?: string;
-  onLanguageChange: (l: string) => void;
   onDifficultyChange: (d: number) => void;
   onRatedChange: (r: boolean) => void;
   onGenerate: () => void;
@@ -47,7 +27,6 @@ export function SetupView({
   savedRating,
   error,
   generateLabel = `Generate Passage`,
-  onLanguageChange,
   onDifficultyChange,
   onRatedChange,
   onGenerate,
@@ -56,21 +35,6 @@ export function SetupView({
 
   return (
     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 space-y-6">
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">{`Language`}</label>
-        <select
-          className="w-full border border-gray-200 rounded-lg px-3 py-2 text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-500 cursor-pointer"
-          value={language}
-          onChange={(e) => onLanguageChange(e.target.value)}
-        >
-          {LANGUAGES.map((l) => (
-            <option key={l} value={l}>
-              {l}
-            </option>
-          ))}
-        </select>
-      </div>
-
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
           {`Difficulty: `}

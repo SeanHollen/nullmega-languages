@@ -26,9 +26,7 @@ export function PassageView({
         <p className="text-xs text-gray-400 uppercase tracking-wide mb-4">
           {`${language} · Level ${difficulty}`}
         </p>
-        <p className="text-gray-800 leading-relaxed whitespace-pre-wrap">
-          {exercise.passage}
-        </p>
+        <p className="text-gray-800 leading-relaxed whitespace-pre-wrap">{exercise.passage}</p>
       </div>
 
       {exercise.questions.map((q, qi) => (

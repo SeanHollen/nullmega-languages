@@ -2,13 +2,17 @@
 const K = 5;
 const DIVISOR = 20;
 
-export type Mode = "reading" | "listening" | "pronunciation";
+export type Mode = "reading" | "listening" | "pronunciation" | "writing";
 
 function storageKey(language: string, mode: Mode) {
   const prefix =
-    mode === "reading" ? "ability" :
-    mode === "listening" ? "listening_ability" :
-    "pronunciation_ability";
+    mode === "reading"
+      ? "ability"
+      : mode === "listening"
+        ? "listening_ability"
+        : mode === "pronunciation"
+          ? "pronunciation_ability"
+          : "writing_ability";
   return `${prefix}_${language.toLowerCase().replace(/\s+/g, "_")}`;
 }
 
@@ -54,7 +58,7 @@ export function computeRating(
   correct: number,
   total: number,
   difficulty: number,
-  mode: Mode = "reading"
+  mode: Mode = "reading",
 ): RatingResult {
   const oldRating = loadAbility(language, mode);
   const outcome = getOutcome(correct, total);
@@ -63,11 +67,23 @@ export function computeRating(
     const change = K * (actualScore(outcome) - 0.5);
     const newRating = Math.max(1, Math.min(100, Math.round((difficulty + change) * 10) / 10));
     saveAbility(language, newRating, mode);
-    return { outcome, oldRating: null, newRating, change: Math.round(change * 10) / 10, isPlacement: true };
+    return {
+      outcome,
+      oldRating: null,
+      newRating,
+      change: Math.round(change * 10) / 10,
+      isPlacement: true,
+    };
   }
 
   const change = K * (actualScore(outcome) - expectedScore(oldRating, difficulty));
   const newRating = Math.max(1, Math.min(100, Math.round((oldRating + change) * 10) / 10));
   saveAbility(language, newRating, mode);
-  return { outcome, oldRating, newRating, change: Math.round(change * 10) / 10, isPlacement: false };
+  return {
+    outcome,
+    oldRating,
+    newRating,
+    change: Math.round(change * 10) / 10,
+    isPlacement: false,
+  };
 }

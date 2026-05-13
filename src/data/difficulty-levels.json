@@ -6,12 +6,7 @@
         "passage": "Hello. Yes. No. Hello. Water. Cat. Dog. Bread. Milk. Egg. Fish. Rice. Tea. Apple. Book. Pen. Hand. Foot. Eye. Ear. Mouth. Hat. Bag. Box. Key. Door. Bed. Cup. Plate. Spoon. Knife. Salt. Sugar. Boy. Girl. Man. Woman. Mom. Dad. Yes. No. Hello. Water. Cat. Dog. Bread. Milk. Tea. Hand. Foot. Eye. Ear. Hat. Bag. Key. Door. Bed. Cup. Boy. Girl. Mom. Dad. Apple. Book. Pen. Box. Plate. Spoon. Knife. Salt. Egg. Fish. Rice. Yes. No. Hello. Water. Cat. Dog. Bread. Milk. Tea. Sugar. Man. Woman. Eye. Ear. Mouth. Hat. Bag. Box. Key. Door. Bed. Cup. Plate. Spoon. Hand. Foot. Yes. Hello.",
         "question": {
           "question": "Which word in this passage is used to greet someone?",
-          "options": [
-            "A) Yes",
-            "B) No",
-            "C) Hello",
-            "D) Water"
-          ],
+          "options": ["A) Yes", "B) No", "C) Hello", "D) Water"],
           "answer": 2
         }
       },
@@ -19,12 +14,7 @@
         "passage": "Sun. Moon. Tree. Bird. Red. Blue. Star. Sky. Sea. Rock. Green. Yellow. Black. White. Pink. Brown. Grey. Cloud. Rain. Wind. Snow. Fire. Ice. Leaf. Flower. Grass. Sand. Hill. River. Lake. Fish. Bee. Ant. Cow. Pig. Sheep. Horse. Frog. Sun. Moon. Tree. Bird. Star. Sky. Sea. Rock. Cloud. Rain. Wind. Snow. Fire. Leaf. Flower. Grass. Sand. Hill. River. Fish. Cow. Pig. Sheep. Horse. Red. Blue. Green. Yellow. Pink. Brown. Black. White. Sun. Moon. Tree. Bird. Star. Sky. Sea. Rock. Cloud. Rain. Wind. Snow. Fire. Ice. Leaf. Flower. Grass. Sand. Hill. River. Lake. Bee. Ant. Frog. Cow. Pig. Sheep. Horse. Red. Blue.",
         "question": {
           "question": "Which two words in the passage name colors?",
-          "options": [
-            "A) Sun and Moon",
-            "B) Tree and Bird",
-            "C) Red and Blue",
-            "D) Sun and Red"
-          ],
+          "options": ["A) Sun and Moon", "B) Tree and Bird", "C) Red and Blue", "D) Sun and Red"],
           "answer": 2
         }
       }
@@ -37,12 +27,7 @@
         "passage": "Hi. Bye. Thank you. Cat. Dog. Apple. Water. Good. Hi. Bye. Thank you. Good morning. Good night. Cat. Dog. Bird. Fish. Apple. Bread. Water. Milk. Tea. Good. Bad. Big. Small. Hot. Cold. New. Old. Yes. No. Please. Hi. Bye. Thank you. Good morning. Good night. Cat. Dog. Bird. Apple. Bread. Water. Milk. Good. Bad. Big. Small. Hot. Cold. New. Old. Boy. Girl. Mom. Dad. House. Car. Bus. School. Bag. Book. Hi. Bye. Thank you. Cat. Dog. Apple. Water. Good. Big. Small. Hot. Cold. Yes. No. Boy. Girl. House. Car. Bus. School. Bag. Book. Hi. Bye. Thank you. Cat. Dog. Apple. Water. Good. Bad. Hot. Cold. Yes. No. Boy. Girl. House. Car. Hi. Bye. Good.",
         "question": {
           "question": "Which of the following is something you say when leaving someone?",
-          "options": [
-            "A) Thank you",
-            "B) Hi",
-            "C) Good",
-            "D) Bye"
-          ],
+          "options": ["A) Thank you", "B) Hi", "C) Good", "D) Bye"],
           "answer": 3
         }
       },
@@ -50,12 +35,7 @@
         "passage": "Star. Sky. Bird. Fish. Big. Small. Please. Sorry. Star. Sky. Sun. Moon. Bird. Fish. Cat. Dog. Tree. Flower. Big. Small. Hot. Cold. Old. New. Good. Bad. Please. Sorry. Thank you. Hi. Bye. Yes. No. Mom. Dad. Boy. Girl. Star. Sky. Sun. Moon. Bird. Fish. Cat. Dog. Tree. Flower. Big. Small. Hot. Cold. Old. New. Please. Sorry. Thank you. Hi. Bye. Yes. No. Boy. Girl. Mom. Dad. Bag. Book. Hat. Door. Cup. Star. Sky. Sun. Moon. Bird. Fish. Cat. Dog. Tree. Big. Small. Hot. Cold. Please. Sorry. Thank you. Yes. No. Hi. Bye. Boy. Girl. Bag. Book. Hat. Cup. Door. Mom. Dad. Star. Bird.",
         "question": {
           "question": "Which word in the passage is used to apologize?",
-          "options": [
-            "A) Please",
-            "B) Sorry",
-            "C) Big",
-            "D) Small"
-          ],
+          "options": ["A) Please", "B) Sorry", "C) Big", "D) Small"],
           "answer": 1
         }
       }
@@ -68,12 +48,7 @@
         "passage": "One cat. Two dogs. Red apple. Big dog. Small cat. One book. Two pens. Red bag. Big house. Small box. One boy. Two girls. Red hat. Big cup. Small key. One bird. Two fish. Red flower. Big tree. Small leaf. One mom. Two kids. Red door. Big bed. Small chair. One man. Two women. Red car. Big bus. Small bike. One cat. Two dogs. Red apple. Big dog. Small cat. One book. Two pens. Red bag. Big house. Small box. One boy. Two girls. Red hat. Big cup. Small key. One bird. Two fish. Red flower. Big tree. Small leaf. One mom. Two kids. Red door. Big bed. Small chair. One man. Two women. Red car. Big bus. Small bike. One cat. Two dogs.",
         "question": {
           "question": "How many dogs are described in the passage?",
-          "options": [
-            "A) One",
-            "B) Two",
-            "C) Three",
-            "D) Five"
-          ],
+          "options": ["A) One", "B) Two", "C) Three", "D) Five"],
           "answer": 1
         }
       },
@@ -81,12 +56,7 @@
         "passage": "Three trees. Four birds. Blue sky. Big sun. One moon. Three rocks. Four fish. Blue sea. Big cloud. One star. Three flowers. Four leaves. Blue river. Big hill. One lake. Three cows. Four sheep. Blue cup. Big bag. One hat. Three boys. Four girls. Blue car. Big house. One school. Three books. Four pens. Blue door. Big bed. One key. Three trees. Four birds. Blue sky. Big sun. One moon. Three rocks. Four fish. Blue sea. Big cloud. One star. Three flowers. Four leaves. Blue river. Big hill. One lake. Three cows. Four sheep. Blue cup. Big bag. One hat. Three boys. Four girls. Blue car. Big house. One school.",
         "question": {
           "question": "What color is the sky in the passage?",
-          "options": [
-            "A) Red",
-            "B) Green",
-            "C) Blue",
-            "D) Yellow"
-          ],
+          "options": ["A) Red", "B) Green", "C) Blue", "D) Yellow"],
           "answer": 2
         }
       }
@@ -112,12 +82,7 @@
         "passage": "The sky is blue. The sun is big. The moon is small. I am tall. The tree is tall. The flower is small. The bird is red. The fish is blue. The sea is big. The lake is small. The hill is high. The road is long. The car is new. The bus is old. The house is big. The door is small. The cup is hot. The plate is cold. The bread is good. The milk is bad. The cat is here. The dog is there. I am happy. You are sad. The boy is short. The girl is tall. The mom is kind. The dad is funny. The book is new. The bag is old. The hat is red. The key is small.",
         "question": {
           "question": "Which thing in the passage is described as small?",
-          "options": [
-            "A) The sky",
-            "B) The sun",
-            "C) The moon",
-            "D) The speaker"
-          ],
+          "options": ["A) The sky", "B) The sun", "C) The moon", "D) The speaker"],
           "answer": 2
         }
       }
@@ -143,12 +108,7 @@
         "passage": "I see a tree. I have a ball. I like the sea. The bird is small. The fish is big. I see a flower. I see a leaf. I see a rock. I have a box. I have a key. I like the sun. I like the rain. The cat is small. The dog is small. The cow is small. The bee is small. The frog is small. The horse is small. The fish is big. The sky is blue. The sea is blue. The grass is green. The flower is red. I see the moon. I see a star. I have a friend. I like my friend. He is kind. She is nice. The boy is happy. The girl is happy. I am here. They are here too.",
         "question": {
           "question": "Which animal in the passage is described as big?",
-          "options": [
-            "A) The cat",
-            "B) The bird",
-            "C) The fish",
-            "D) The dog"
-          ],
+          "options": ["A) The cat", "B) The bird", "C) The fish", "D) The dog"],
           "answer": 2
         }
       }
@@ -174,12 +134,7 @@
         "passage": "Do you see the bird? Yes, I see it. The bird sits in the tree. It eats a seed. Do you see the cat? Yes, I see the cat. The cat sits on the wall. It drinks milk. Do you see the dog? Yes, I see the dog. The dog sits on the grass. It eats a bone. Do you see the fish? Yes, I see the fish. The fish swims in the sea. It eats food. Do you see the boy? Yes, I see the boy. The boy walks in the park. He eats an apple. Do you see the girl? Yes, I see the girl. The girl sits at the table. She drinks tea. Do you see the cow? Yes, I see the cow. The cow eats grass.",
         "question": {
           "question": "Where is the bird in the passage?",
-          "options": [
-            "A) On the ground",
-            "B) In the tree",
-            "C) Near the water",
-            "D) On a rock"
-          ],
+          "options": ["A) On the ground", "B) In the tree", "C) Near the water", "D) On a rock"],
           "answer": 1
         }
       }
@@ -205,12 +160,7 @@
         "passage": "This is my garden. My flowers are red. His tree is tall. Her bird is yellow. I have three plants. My plants are green. My garden is small. His garden is big. Her garden is old. My house has one door. Your house has two doors. His house has three windows. Her house has four rooms. My room has a bed. Your room has a desk. His room has a chair. Her room has a lamp. My family is small. We are five. My mom cooks. My dad cleans. My sister reads books. My brother plays games. We have one cat. We have two dogs. Our dogs are big. Our cat is small. Their dog is small too. Their cat is big.",
         "question": {
           "question": "Which item belongs to a male person in the passage?",
-          "options": [
-            "A) The flowers",
-            "B) The tree",
-            "C) The bird",
-            "D) The plants"
-          ],
+          "options": ["A) The flowers", "B) The tree", "C) The bird", "D) The plants"],
           "answer": 1
         }
       }
@@ -223,12 +173,7 @@
         "passage": "I am eating lunch. She is reading a book. He is walking to school. The dog is sleeping. The cat is sitting on the bed. My mom is cooking food. My dad is washing the car. My sister is drawing a picture. My brother is playing with a ball. The baby is drinking milk. I am drinking water. She is eating an apple. He is opening the door. The bird is flying. The fish is swimming. The horse is running. The cow is eating grass. The teacher is talking. The boy is listening. The girl is writing. We are sitting in class. They are playing a game. I am wearing a hat. She is wearing a coat. He is holding a pen. The dog is sleeping under the chair.",
         "question": {
           "question": "Who is doing something that involves moving from one place to another?",
-          "options": [
-            "A) The dog",
-            "B) He",
-            "C) She",
-            "D) I"
-          ],
+          "options": ["A) The dog", "B) He", "C) She", "D) I"],
           "answer": 1
         }
       },
@@ -267,12 +212,7 @@
         "passage": "The ball is in the box. I don't like rain. Where is my hat? My hat is on the bed, next to the pillow. Where is my coat? My coat is in the closet. Where is my bag? My bag is on the floor. Where are my shoes? My shoes are under the chair. Where is my book? My book is on the shelf. Where is the cat? The cat is on the bed too. Where is the dog? The dog is next to the door. Where is the food? The food is on the table. The plate is next to the cup. The cup is on the plate. The spoon is in the cup. I don't like cold tea. I don't like hot milk. The box is in the room. The toys are in the box.",
         "question": {
           "question": "Which item in the passage is described as being inside something?",
-          "options": [
-            "A) The hat",
-            "B) The ball",
-            "C) The pillow",
-            "D) The bed"
-          ],
+          "options": ["A) The hat", "B) The ball", "C) The pillow", "D) The bed"],
           "answer": 1
         }
       }
@@ -298,12 +238,7 @@
         "passage": "There are five fish in the pond. There is one tree near the pond. How many birds are in the tree? There are four birds. There are three flowers near the tree. There is one rock by the water. There are two frogs on the rock. There are five fish in the water. How many fish do I see? I see five fish. How many birds are flying? Two birds are flying. How many birds are sitting? Two birds are sitting. There is one boy near the pond. There is one girl with him. They have two bags. They have three books. They have one ball. The boy has one hat. The girl has one hat too. There is one dog with them. The dog has one bone.",
         "question": {
           "question": "Which group in the passage has more members than any other?",
-          "options": [
-            "A) Birds",
-            "B) Fish",
-            "C) Trees",
-            "D) Ponds"
-          ],
+          "options": ["A) Birds", "B) Fish", "C) Trees", "D) Ponds"],
           "answer": 1
         }
       }
@@ -329,12 +264,7 @@
         "passage": "Tomorrow is Saturday. I do not work on Saturday. Yesterday was Friday. I worked all day. Today I will rest. On Monday I worked all day. On Tuesday I worked all day. On Wednesday I worked all day. On Thursday I worked all day. On Friday I worked all day. I worked five days this week. Tomorrow I do not work. On Sunday I do not work. I will rest two days. Today I am tired. Today I am at home. I will read a book. I will watch a film. I will eat good food. I will sleep a lot. I like rest days. I do not like work days. But I need work days for money. Tomorrow will be good. Yesterday was hard. Today is calm.",
         "question": {
           "question": "On which day did the speaker work?",
-          "options": [
-            "A) Today",
-            "B) Tomorrow",
-            "C) Yesterday",
-            "D) Saturday"
-          ],
+          "options": ["A) Today", "B) Tomorrow", "C) Yesterday", "D) Saturday"],
           "answer": 2
         }
       }
@@ -347,12 +277,7 @@
         "passage": "I wake up at seven o'clock. I eat lunch at twelve. School starts at eight. What time is dinner? Dinner is at six o'clock. I go to bed at ten. I wake up at seven every day. I eat breakfast at half past seven. I leave home at quarter to eight. School starts at eight. The first class is math. The second class is reading. The third class is music. We have a break at ten. We eat lunch at twelve. School ends at three. I walk home at three. I do my homework at four. I play with my friends at five. I eat dinner at six. I read a book at seven. I watch TV at eight. I have a bath at nine. I go to bed at ten. What time do you go to bed?",
         "question": {
           "question": "How much time passes between when the speaker wakes up and when school starts?",
-          "options": [
-            "A) One hour",
-            "B) Two hours",
-            "C) Three hours",
-            "D) Five hours"
-          ],
+          "options": ["A) One hour", "B) Two hours", "C) Three hours", "D) Five hours"],
           "answer": 0
         }
       },
@@ -360,12 +285,7 @@
         "passage": "The first train leaves at six. The second train leaves at nine. The third train leaves at noon. I want the second train. The fourth train leaves at three in the afternoon. The fifth train leaves at six in the evening. The sixth train leaves at nine at night. There are six trains every day. I go to the city by train. The trip takes one hour. I work in the city. I want the second train because it is not too early. The first train is too early for me. I wake up at seven. I eat at eight. I walk to the station at eight thirty. The train leaves at nine. I am at work at ten. I work until five. Then I take a train back home.",
         "question": {
           "question": "How many hours after the first train does the speaker's chosen train leave?",
-          "options": [
-            "A) Two hours",
-            "B) Three hours",
-            "C) Six hours",
-            "D) Nine hours"
-          ],
+          "options": ["A) Two hours", "B) Three hours", "C) Six hours", "D) Nine hours"],
           "answer": 1
         }
       }
@@ -484,12 +404,7 @@
         "passage": "Next week the team is going to travel to another city. They will play three games there. If they win two, they will come home as champions. The coach thinks they are ready. The team will leave on Monday morning. They will take a bus to the train station. Then they will take a train to the new city. The trip will take five hours. They will stay in a small hotel near the field. They are going to train on Tuesday morning. They are going to play the first game on Tuesday afternoon. The second game will be on Wednesday. The third game will be on Friday. The coach will help the players prepare. He will talk to them before each game. The team is going to work hard. They will run fast and play well. After the last game, they will come home on Saturday. The fans are going to wait for them at the station.",
         "question": {
           "question": "What is the smallest number of wins the team needs to be champions?",
-          "options": [
-            "A) One",
-            "B) Two",
-            "C) Three",
-            "D) All of them"
-          ],
+          "options": ["A) One", "B) Two", "C) Three", "D) All of them"],
           "answer": 1
         }
       }
@@ -515,12 +430,7 @@
         "passage": "The river is wider than the road. The road is older than the bridge. The bridge is the newest thing in our town. People say the river is the most beautiful. Our town is small but very old. The river is the oldest thing of all. It was here long before the people came. The people built the road many years ago. The road is wide enough for two cars. The bridge is newer than the road. Workers built the bridge ten years ago, so it looks clean and bright. The houses near the river are old and small. The houses near the bridge are bigger and newer. The school is older than the bridge but newer than the road. The shop near the school is the smallest building in town. The market is bigger than the shop. People walk on the bridge every day to go to the market. The river runs under the bridge.",
         "question": {
           "question": "Which of the following is the youngest in age?",
-          "options": [
-            "A) The river",
-            "B) The road",
-            "C) The bridge",
-            "D) The town"
-          ],
+          "options": ["A) The river", "B) The road", "C) The bridge", "D) The town"],
           "answer": 2
         }
       }
@@ -533,12 +443,7 @@
         "passage": "Go straight and turn left. The school is next to the park. Where is the library? It is on Main Street, after the store. To get to the school from my house, walk straight for two minutes. Turn left at the end of my street. Walk past the bus stop. The school is next to the park, and the park has many trees. To get to the shop, leave the school and turn right. Walk past three houses. The shop is on the corner. To get to the library, do not turn at the shop. Go straight on Main Street. Walk past the small café. Walk past the bank. The library is on Main Street, just after the store. It is a big white building. To get home from the library, walk back the same way. Turn right at the school. Then walk straight, and you are home.",
         "question": {
           "question": "If you are walking toward the library on Main Street, what do you pass before reaching it?",
-          "options": [
-            "A) The school",
-            "B) The park",
-            "C) The store",
-            "D) A left turn"
-          ],
+          "options": ["A) The school", "B) The park", "C) The store", "D) A left turn"],
           "answer": 2
         }
       },
@@ -564,12 +469,7 @@
         "passage": "How much does this cost? It costs five dollars. I would like two apples, please. Here is the money. Thank you very much. I went to the small shop on the corner. The man at the shop said hello to me. I said hello and looked at the food. I asked, How much do these apples cost? The man said, They cost five dollars each. I said, I would like two apples, please. The man put two apples in a bag. I asked, How much is the bread? The man said, The bread is three dollars. I said, I would like one bread, please. He put the bread in the bag. I asked, How much is the milk? The man said, The milk is two dollars. I said, I would like one bottle, please. The total cost was fifteen dollars. I gave him a twenty-dollar bill. He gave me five dollars back. I said, Thank you very much.",
         "question": {
           "question": "What is the total cost implied if the speaker buys two apples at five dollars each?",
-          "options": [
-            "A) Two dollars",
-            "B) Five dollars",
-            "C) Seven dollars",
-            "D) Ten dollars"
-          ],
+          "options": ["A) Two dollars", "B) Five dollars", "C) Seven dollars", "D) Ten dollars"],
           "answer": 3
         }
       },
@@ -577,12 +477,7 @@
         "passage": "The book costs ten dollars. The pen costs three dollars. I have fifteen dollars. I want both items. After I pay, I will still have some money left. I went to the bookshop after school. I wanted to buy a book and a pen. I had fifteen dollars in my bag. I looked at many books. I found one good book about animals. The book costs ten dollars. I picked it up. Then I looked at the pens. I found a nice blue pen. The pen costs three dollars. I picked it up too. I went to the man at the desk. He said, Hello, how can I help you? I said, I would like to buy this book and this pen, please. He said, That will be thirteen dollars. I gave him my fifteen dollars. He gave me two dollars back. I said, Thank you. I left the shop happy.",
         "question": {
           "question": "How much money will the speaker have left after buying both items?",
-          "options": [
-            "A) One dollar",
-            "B) Two dollars",
-            "C) Three dollars",
-            "D) Five dollars"
-          ],
+          "options": ["A) One dollar", "B) Two dollars", "C) Three dollars", "D) Five dollars"],
           "answer": 1
         }
       }

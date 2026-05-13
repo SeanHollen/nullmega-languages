@@ -7,14 +7,20 @@ interface Props {
 }
 
 export function AudioPlayer({ src, label }: Props) {
+  const [trackedSrc, setTrackedSrc] = useState(src);
   const [playing, setPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const rafRef = useRef<number | null>(null);
 
-  useEffect(() => {
+  // Reset playing/progress during render when src changes (not in an effect)
+  if (trackedSrc !== src) {
+    setTrackedSrc(src);
     setPlaying(false);
     setProgress(0);
+  }
+
+  useEffect(() => {
     const audio = new Audio(src);
     audio.onended = () => {
       setPlaying(false);

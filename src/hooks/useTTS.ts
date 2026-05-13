@@ -1,4 +1,5 @@
 import { Exercise } from "../types";
+import { callTTS } from "../utils/api";
 
 const VOICES = ["alloy", "echo", "fable", "onyx", "nova", "shimmer"] as const;
 
@@ -7,16 +8,7 @@ function pickVoice(): string {
 }
 
 async function tts(text: string, voice: string): Promise<string> {
-  const res = await fetch("https://api.openai.com/v1/audio/speech", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${import.meta.env.VITE_OPENAI_API_KEY}`,
-    },
-    body: JSON.stringify({ model: "tts-1", voice, input: text }),
-  });
-  if (!res.ok) throw new Error(`TTS error: ${res.status}`);
-  const blob = await res.blob();
+  const blob = await callTTS({ model: "tts-1", voice, input: text });
   return URL.createObjectURL(blob);
 }
 

@@ -1,1 +1,10 @@
 @import "tailwindcss";
+
+html {
+  background-color: #16a34a; /* green-600 — matches LanguageBanner so overscroll-up doesn't reveal white */
+  overscroll-behavior: none;
+}
+
+body {
+  background-color: #dcfce7; /* green-100 — matches page bg */
+}

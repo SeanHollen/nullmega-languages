@@ -1,4 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
+import { callChat } from "../utils/api";
 
 export interface PronunciationPhrase {
   phrase: string;
@@ -17,16 +18,20 @@ function phraseCount(difficulty: number): number {
 }
 
 function phraseLengthGuide(difficulty: number): string {
-  if (difficulty <= 20) return "3-6 words each. Use very common vocabulary and basic everyday phrases";
-  if (difficulty <= 40) return "5-10 words each. Use common vocabulary with some variety in tense and structure";
-  if (difficulty <= 60) return "8-15 words each. Include varied grammar, some idioms, and moderately challenging vocabulary";
-  if (difficulty <= 80) return "12-20 words each. Use complex sentence structures, idiomatic language, and nuanced vocabulary";
+  if (difficulty <= 20)
+    return "3-6 words each. Use very common vocabulary and basic everyday phrases";
+  if (difficulty <= 40)
+    return "5-10 words each. Use common vocabulary with some variety in tense and structure";
+  if (difficulty <= 60)
+    return "8-15 words each. Include varied grammar, some idioms, and moderately challenging vocabulary";
+  if (difficulty <= 80)
+    return "12-20 words each. Use complex sentence structures, idiomatic language, and nuanced vocabulary";
   return "15-25 words each. Include sophisticated idioms, complex grammar, and advanced vocabulary";
 }
 
 async function fetchPronunciationExercise(
   language: string,
-  difficulty: number
+  difficulty: number,
 ): Promise<PronunciationExercise> {
   const count = phraseCount(difficulty);
 
@@ -46,21 +51,11 @@ Return ONLY valid JSON with this exact shape:
 - At low difficulty: prioritise common sounds and basic patterns; at high difficulty: include challenging phoneme combinations, intonation shifts, and less common vocabulary
 - "translation" is the complete English translation of each phrase`;
 
-  const res = await fetch("https://api.openai.com/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${import.meta.env.VITE_OPENAI_API_KEY}`,
-    },
-    body: JSON.stringify({
-      model: "o4-mini",
-      messages: [{ role: "user", content: prompt }],
-      response_format: { type: "json_object" },
-    }),
+  const data = await callChat({
+    model: "o4-mini",
+    messages: [{ role: "user", content: prompt }],
+    response_format: { type: "json_object" },
   });
-
-  if (!res.ok) throw new Error(`OpenAI error: ${res.status}`);
-  const data = await res.json();
   return JSON.parse(data.choices[0].message.content) as PronunciationExercise;
 }
 

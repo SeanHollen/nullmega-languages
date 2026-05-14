@@ -66,11 +66,11 @@ export function PronunciationPage() {
     if (!exercise) return;
     const goodCount = ratings.filter((r) => r === "good").length;
     const total = exercise.phrases.length;
+    let rr: RatingResult | null = null;
     if (rated) {
-      setRatingResult(computeRating(language, goodCount, total, difficulty, `pronunciation`));
-    } else {
-      setRatingResult(null);
+      rr = computeRating(language, goodCount, total, difficulty, `pronunciation`);
     }
+    setRatingResult(rr);
     const completedAt = Date.now();
     const localId = saveAssessment({
       mode: `pronunciation`,
@@ -79,6 +79,8 @@ export function PronunciationPage() {
       difficulty,
       scoreEarned: goodCount,
       scoreMax: total,
+      ratingBefore: rr?.oldRating ?? null,
+      ratingAfter: rr?.newRating ?? null,
       completedAt,
     });
     const id = exercise.id ?? localId;

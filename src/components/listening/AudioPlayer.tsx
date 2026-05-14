@@ -11,7 +11,6 @@ export function AudioPlayer({ src, label }: Props) {
   const [playing, setPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const rafRef = useRef<number | null>(null);
 
   // Reset playing/progress during render when src changes (not in an effect)
   if (trackedSrc !== src) {
@@ -22,36 +21,31 @@ export function AudioPlayer({ src, label }: Props) {
 
   useEffect(() => {
     const audio = new Audio(src);
-    audio.onended = () => {
+    audio.addEventListener(`timeupdate`, () => {
+      if (audio.duration) setProgress(audio.currentTime / audio.duration);
+    });
+    audio.addEventListener(`ended`, () => {
       setPlaying(false);
       setProgress(0);
-    };
+    });
+    audio.addEventListener(`pause`, () => {
+      setPlaying(false);
+    });
     audioRef.current = audio;
     return () => {
       audio.pause();
       audioRef.current = null;
-      if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
     };
   }, [src]);
-
-  function tick() {
-    const audio = audioRef.current;
-    if (!audio || !audio.duration) return;
-    setProgress(audio.currentTime / audio.duration);
-    rafRef.current = requestAnimationFrame(tick);
-  }
 
   function toggle() {
     const audio = audioRef.current;
     if (!audio) return;
     if (playing) {
       audio.pause();
-      setPlaying(false);
-      if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
     } else {
       audio.play();
       setPlaying(true);
-      rafRef.current = requestAnimationFrame(tick);
     }
   }
 

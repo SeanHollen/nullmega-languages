@@ -1,3 +1,4 @@
+import { ReactNode } from "react";
 import { Question } from "../../types";
 
 interface Props {
@@ -5,12 +6,16 @@ interface Props {
   index: number;
   selected: number | null;
   onSelect: (index: number) => void;
+  headerSlot?: ReactNode;
 }
 
-export function QuestionCard({ question, index, selected, onSelect }: Props) {
+export function QuestionCard({ question, index, selected, onSelect, headerSlot }: Props) {
   return (
     <div className="bg-white rounded-2xl border border-green-100 shadow-sm p-6">
-      <p className="font-medium text-gray-800 mb-4">{`${index + 1}. ${question.question}`}</p>
+      <div className="flex items-center gap-3 mb-4">
+        <p className="font-medium text-gray-800">{`${index + 1}. ${question.question}`}</p>
+        {headerSlot}
+      </div>
       <div className="space-y-2">
         {question.options.map((opt, oi) => (
           <button

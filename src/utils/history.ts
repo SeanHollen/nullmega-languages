@@ -8,6 +8,8 @@ export interface AssessmentRecord {
   difficulty: number;
   scoreEarned: number;
   scoreMax: number;
+  ratingBefore: number | null;
+  ratingAfter: number | null;
   completedAt: number;
   helpful: boolean | null;
 }

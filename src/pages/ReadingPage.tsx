@@ -51,11 +51,11 @@ export function ReadingPage() {
     if (!exercise) return;
     const correct = selected.filter((s, i) => s === exercise.questions[i].correct).length;
     const total = exercise.questions.length;
+    let rr: RatingResult | null = null;
     if (rated) {
-      setRatingResult(computeRating(language, correct, total, difficulty));
-    } else {
-      setRatingResult(null);
+      rr = computeRating(language, correct, total, difficulty);
     }
+    setRatingResult(rr);
     const completedAt = Date.now();
     const localId = saveAssessment({
       mode: `reading`,
@@ -64,6 +64,8 @@ export function ReadingPage() {
       difficulty,
       scoreEarned: correct,
       scoreMax: total,
+      ratingBefore: rr?.oldRating ?? null,
+      ratingAfter: rr?.newRating ?? null,
       completedAt,
     });
     const id = exercise.id ?? localId;

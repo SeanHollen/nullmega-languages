@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { Mode } from "../hooks/useAbility";
 import { getHistory } from "../utils/history";
 
@@ -31,10 +32,23 @@ export function HistoryList({ mode, language, limit = 10 }: Props) {
 
   return (
     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mt-6">
-      <h3 className="text-sm font-semibold text-gray-700 mb-3">{`Recent exercises`}</h3>
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="text-sm font-semibold text-gray-700">{`Recent exercises`}</h3>
+        <Link
+          to={`/stats/${mode}`}
+          className="text-xs text-green-600 hover:text-green-700 font-medium"
+        >
+          {`View stats →`}
+        </Link>
+      </div>
       <div className="divide-y divide-gray-50">
         {records.map((r) => {
           const pct = r.scoreMax > 0 ? r.scoreEarned / r.scoreMax : 0;
+          const showRating = typeof r.ratingAfter === `number`;
+          const hasBefore = typeof r.ratingBefore === `number`;
+          const delta = showRating && hasBefore ? r.ratingAfter! - r.ratingBefore! : 0;
+          const ratingClass =
+            delta > 0 ? `text-green-600` : delta < 0 ? `text-red-500` : `text-gray-500`;
           return (
             <div key={r.id} className="flex items-center justify-between gap-3 py-2 text-sm">
               <div className="min-w-0 flex-1">
@@ -42,7 +56,12 @@ export function HistoryList({ mode, language, limit = 10 }: Props) {
                 <p className="text-xs text-gray-400">{relativeTime(r.completedAt)}</p>
               </div>
               <div className="flex items-center gap-4 text-xs shrink-0">
-                <span className="text-gray-500">{`Difficulty ${r.difficulty}`}</span>
+                <span className="text-gray-500">{`Diff ${r.difficulty}`}</span>
+                {showRating && (
+                  <span className={`font-medium ${ratingClass}`}>
+                    {hasBefore ? `${r.ratingBefore} → ${r.ratingAfter}` : `→ ${r.ratingAfter}`}
+                  </span>
+                )}
                 <span className={`font-semibold ${scoreColor(pct)}`}>
                   {`${r.scoreEarned}/${r.scoreMax}`}
                 </span>

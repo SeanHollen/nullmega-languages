@@ -189,7 +189,7 @@ export function ResultsView({
         </button>
         <button
           onClick={onHome}
-          className="flex-1 border border-gray-200 text-gray-600 py-3 rounded-xl font-semibold hover:border-gray-300 transition cursor-pointer"
+          className="flex-1 bg-white border border-gray-200 text-gray-600 py-3 rounded-xl font-semibold hover:bg-gray-50 hover:border-gray-300 transition cursor-pointer"
         >
           {`Home`}
         </button>

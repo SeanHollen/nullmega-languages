@@ -4,5 +4,4 @@ html,
 body {
   background-color: #dcfce7; /* green-100 — matches the page background everywhere */
   overscroll-behavior: none;
-  overflow-x: hidden;
 }

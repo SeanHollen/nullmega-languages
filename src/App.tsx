@@ -9,6 +9,7 @@ import { PronunciationPage } from "./pages/PronunciationPage";
 import { WritingPage } from "./pages/WritingPage";
 import { SettingsPage } from "./pages/SettingsPage";
 import { GoalsPage } from "./pages/GoalsPage";
+import { StatsPage } from "./pages/StatsPage";
 
 const queryClient = new QueryClient();
 
@@ -26,6 +27,7 @@ export function App() {
             <Route path="/writing" element={<WritingPage />} />
             <Route path="/settings" element={<SettingsPage />} />
             <Route path="/goals" element={<GoalsPage />} />
+            <Route path="/stats/:mode" element={<StatsPage />} />
           </Routes>
         </LanguageProvider>
       </BrowserRouter>

@@ -67,11 +67,11 @@ export function ListeningPage() {
     if (!exercise) return;
     const correct = selected.filter((s, i) => s === exercise.questions[i].correct).length;
     const total = exercise.questions.length;
+    let rr: RatingResult | null = null;
     if (rated) {
-      setRatingResult(computeRating(language, correct, total, difficulty, `listening`));
-    } else {
-      setRatingResult(null);
+      rr = computeRating(language, correct, total, difficulty, `listening`);
     }
+    setRatingResult(rr);
     const completedAt = Date.now();
     const localId = saveAssessment({
       mode: `listening`,
@@ -80,6 +80,8 @@ export function ListeningPage() {
       difficulty,
       scoreEarned: correct,
       scoreMax: total,
+      ratingBefore: rr?.oldRating ?? null,
+      ratingAfter: rr?.newRating ?? null,
       completedAt,
     });
     const id = exercise.id ?? localId;

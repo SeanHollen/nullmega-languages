@@ -51,15 +51,14 @@ export function ListeningPassageView({
       </div>
 
       {exercise.questions.map((q, qi) => (
-        <div key={qi} className="space-y-3">
-          <AudioPlayer src={audio.questionUrls[qi]} label={`Question ${qi + 1}`} />
-          <QuestionCard
-            question={{ ...q, question: `` }}
-            index={qi}
-            selected={selected[qi]}
-            onSelect={(oi) => onSelect(qi, oi)}
-          />
-        </div>
+        <QuestionCard
+          key={qi}
+          question={{ ...q, question: `` }}
+          index={qi}
+          selected={selected[qi]}
+          onSelect={(oi) => onSelect(qi, oi)}
+          headerSlot={<AudioPlayer src={audio.questionUrls[qi]} label={`Question ${qi + 1}`} />}
+        />
       ))}
 
       <button

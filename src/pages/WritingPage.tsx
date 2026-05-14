@@ -60,11 +60,11 @@ export function WritingPage() {
           setGrades(result.grades);
           const totalScore = result.grades.reduce((sum, g) => sum + g.score, 0);
           const maxScore = result.grades.length * 5;
+          let rr: RatingResult | null = null;
           if (rated) {
-            setRatingResult(computeRating(language, totalScore, maxScore, difficulty, `writing`));
-          } else {
-            setRatingResult(null);
+            rr = computeRating(language, totalScore, maxScore, difficulty, `writing`);
           }
+          setRatingResult(rr);
           const completedAt = Date.now();
           const localId = saveAssessment({
             mode: `writing`,
@@ -73,6 +73,8 @@ export function WritingPage() {
             difficulty,
             scoreEarned: totalScore,
             scoreMax: maxScore,
+            ratingBefore: rr?.oldRating ?? null,
+            ratingAfter: rr?.newRating ?? null,
             completedAt,
           });
           const id = exercise.id ?? localId;

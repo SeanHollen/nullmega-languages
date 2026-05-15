@@ -1,7 +1,6 @@
 import { useRef, useState } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa";
-import { useLanguage } from "../contexts/LanguageContext";
 import { patchFlashcard, Flashcard } from "../utils/flashcards";
 import { loadVocabSettings, VocabSettings } from "../utils/vocabSettings";
 import { loadAudio } from "../utils/audioStore";
@@ -19,7 +18,6 @@ type StudyMode = "learn" | "review";
 export function StudyPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { language } = useLanguage();
   const { mode: modeParam } = useParams<{ mode: string }>();
   const mode: StudyMode = modeParam === "review" ? "review" : "learn";
 

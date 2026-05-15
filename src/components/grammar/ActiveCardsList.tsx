@@ -29,9 +29,6 @@ export function ActiveCardsList({ cards, onPlay }: Props) {
 
   return (
     <div className="mb-6">
-      <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">
-        {`To study (${cards.length})`}
-      </p>
       <div className="flex flex-col gap-1">
         {cards.map((card) => {
           const status = computeGrammarStatus(card);

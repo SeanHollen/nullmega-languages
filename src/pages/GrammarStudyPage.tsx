@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa";
-import { useLanguage } from "../contexts/LanguageContext";
 import { GrammarCard, computeGrammarStatus, patchGrammarCard } from "../utils/grammarCards";
 import { GrammarSessionData } from "../utils/grammarSession";
 import { INITIAL_INTERVAL, nextInterval, pickRandom } from "../utils/studySession";
@@ -15,7 +14,6 @@ function normalizeAnswer(s: string): string {
 export function GrammarStudyPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { language } = useLanguage();
   const { mode: modeParam } = useParams<{ mode: string }>();
   const mode = modeParam === `review` ? `review` : `learn`;
 

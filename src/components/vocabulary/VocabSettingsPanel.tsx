@@ -18,11 +18,11 @@ export function VocabSettingsPanel({ settings, onUpdate }: Props) {
 
   return (
     <div className="mb-6">
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden w-fit">
-        <div className="px-6 pt-4 pb-1">
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <div className="px-6 pt-4 pb-1 text-center">
           <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">{`Settings`}</p>
         </div>
-        <div className="px-6 py-3 flex items-center gap-3 text-sm">
+        <div className="px-6 py-3 flex items-center justify-center gap-3 text-sm">
           <span className="text-gray-600">{`New words per day`}</span>
           <input
             type="number"
@@ -36,13 +36,13 @@ export function VocabSettingsPanel({ settings, onUpdate }: Props) {
         </div>
         <button
           onClick={() => setOpen((p) => !p)}
-          className="w-full px-6 py-3 flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700 transition cursor-pointer"
+          className="w-full px-6 py-3 flex items-center justify-center gap-2 text-sm text-gray-500 hover:text-gray-700 transition cursor-pointer"
         >
           {open ? <FaChevronDown className="text-xs" /> : <FaChevronRight className="text-xs" />}
           <span>{`Advanced`}</span>
         </button>
         {open && (
-          <div className="px-6 pb-4 flex gap-16 text-sm">
+          <div className="px-6 pb-4 flex justify-center gap-16 text-sm">
             <div className="grid grid-cols-[auto_auto] gap-x-3 gap-y-3 items-center">
               <span className="text-gray-600">{`New word selection order`}</span>
               <select
@@ -66,7 +66,7 @@ export function VocabSettingsPanel({ settings, onUpdate }: Props) {
                 className="w-16 border border-gray-200 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-green-500"
               />
             </div>
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-3 justify-center">
               <label className="flex items-center gap-2 cursor-pointer select-none">
                 <input
                   type="checkbox"

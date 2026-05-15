@@ -142,29 +142,16 @@ export function GrammarPage() {
               {reviewError && <p className="text-xs text-red-500">{reviewError}</p>}
             </div>
           </div>
-
-          <div className="flex flex-col items-center gap-1 text-xs text-gray-500">
-            <span>{`Level`}</span>
-            <input
-              type="range"
-              min={1}
-              max={10}
-              value={settings.level}
-              onChange={(e) => updateSettings({ level: parseInt(e.target.value, 10) })}
-              className="w-48 accent-green-500 cursor-pointer"
-            />
-            <span className="text-gray-400">{`${settings.level} — ${LEVEL_LABELS[settings.level]}`}</span>
-          </div>
         </div>
 
         {activeCards.length > 0 && <ActiveCardsList cards={activeCards} onPlay={handlePlayCard} />}
 
         <div className="mb-6">
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden w-fit mx-auto">
-            <div className="px-6 pt-4 pb-1">
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+            <div className="px-6 pt-4 pb-1 text-center">
               <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">{`Settings`}</p>
             </div>
-            <div className="px-6 py-3 flex items-center gap-3 text-sm">
+            <div className="px-6 py-3 flex items-center justify-center gap-3 text-sm">
               <span className="text-gray-600">{`New cards per day`}</span>
               <input
                 type="number"
@@ -177,6 +164,18 @@ export function GrammarPage() {
                 onWheel={(e) => e.currentTarget.blur()}
                 className="w-16 border border-gray-200 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-green-500"
               />
+            </div>
+            <div className="px-6 py-3 flex flex-col items-center gap-1 text-sm">
+              <span className="text-gray-600">{`Level`}</span>
+              <input
+                type="range"
+                min={1}
+                max={10}
+                value={settings.level}
+                onChange={(e) => updateSettings({ level: parseInt(e.target.value, 10) })}
+                className="w-48 accent-green-500 cursor-pointer"
+              />
+              <span className="text-xs text-gray-400">{`${settings.level} — ${LEVEL_LABELS[settings.level]}`}</span>
             </div>
           </div>
         </div>

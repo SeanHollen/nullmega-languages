@@ -81,6 +81,28 @@ export async function callContexts(body: ChatBody): Promise<ChatResponse> {
   return res.json() as Promise<ChatResponse>;
 }
 
+export async function callGrammar(body: ChatBody): Promise<ChatResponse> {
+  const { textGen } = loadSettings();
+
+  let url: string;
+  let outgoingBody: object;
+  const headers: Record<string, string> = { "Content-Type": "application/json" };
+
+  if (textGen) {
+    url = "https://api.openai.com/v1/chat/completions";
+    headers["Authorization"] = `Bearer ${textGen.key}`;
+    const { metadata: _metadata, ...rest } = body;
+    outgoingBody = rest;
+  } else {
+    url = `${resolvedBackendUrl()}/api/grammar`;
+    outgoingBody = body;
+  }
+
+  const res = await fetch(url, { method: "POST", headers, body: JSON.stringify(outgoingBody) });
+  if (!res.ok) throw new Error(`API error: ${res.status}`);
+  return res.json() as Promise<ChatResponse>;
+}
+
 export async function callTTS(body: TTSBody): Promise<Blob> {
   const { tts } = loadSettings();
 

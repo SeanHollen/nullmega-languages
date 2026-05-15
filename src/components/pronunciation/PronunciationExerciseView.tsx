@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { PronunciationPhrase } from "../../hooks/useGeneratePronunciation";
 import { PhraseCard } from "./PhraseCard";
 
@@ -6,8 +7,8 @@ interface Props {
   audioUrls: string[];
   language: string;
   difficulty: number;
-  ratings: ("good" | "bad" | null)[];
-  onRate: (index: number, rating: "good" | "bad") => void;
+  ratings: ("good" | "medium" | "bad" | null)[];
+  onRate: (index: number, rating: "good" | "medium" | "bad") => void;
   onSubmit: () => void;
 }
 
@@ -21,6 +22,7 @@ export function PronunciationExerciseView({
   onSubmit,
 }: Props) {
   const allRated = ratings.every((r) => r !== null);
+  const [showPhrasesByDefault, setShowPhrasesByDefault] = useState(true);
 
   return (
     <div className="space-y-6">
@@ -31,6 +33,15 @@ export function PronunciationExerciseView({
         <p className="text-sm text-gray-400 mt-1">
           {`Listen to each phrase, practise speaking it, then rate yourself.`}
         </p>
+        <label className="flex items-center gap-2 mt-3 cursor-pointer select-none">
+          <input
+            type="checkbox"
+            checked={showPhrasesByDefault}
+            onChange={(e) => setShowPhrasesByDefault(e.target.checked)}
+            className="accent-green-600 cursor-pointer"
+          />
+          <span className="text-sm text-gray-600">{`Show phrases by default`}</span>
+        </label>
       </div>
 
       {phrases.map((p, i) => (
@@ -41,6 +52,7 @@ export function PronunciationExerciseView({
           translation={p.translation}
           audioUrl={audioUrls[i]}
           rating={ratings[i]}
+          defaultTextRevealed={showPhrasesByDefault}
           onRate={(r) => onRate(i, r)}
         />
       ))}

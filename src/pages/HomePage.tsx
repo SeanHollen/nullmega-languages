@@ -1,30 +1,25 @@
 import { useNavigate } from "react-router-dom";
-import { FaBook, FaPen, FaHeadphones, FaMicrophone } from "react-icons/fa";
+import { FaBook, FaPen, FaHeadphones, FaMicrophone, FaListUl } from "react-icons/fa";
 import { IconType } from "react-icons";
 import { loadAbility, Mode } from "../hooks/useAbility";
 import { useLanguage } from "../contexts/LanguageContext";
 import { getCompletedToday } from "../utils/history";
 import { loadGoals } from "../utils/goals";
+import { loadFlashcards } from "../utils/flashcards";
 
 interface ModeConfig {
   label: string;
   Icon: IconType;
   href: string;
-  active: boolean;
   mode: Mode | null;
 }
 
 const MODES: ModeConfig[] = [
-  { label: `Reading`, Icon: FaBook, href: `/reading`, active: true, mode: `reading` },
-  { label: `Writing`, Icon: FaPen, href: `/writing`, active: true, mode: `writing` },
-  { label: `Listening`, Icon: FaHeadphones, href: `/listening`, active: true, mode: `listening` },
-  {
-    label: `Pronunciation`,
-    Icon: FaMicrophone,
-    href: `/pronunciation`,
-    active: true,
-    mode: `pronunciation`,
-  },
+  { label: `Reading`, Icon: FaBook, href: `/reading`, mode: `reading` },
+  { label: `Writing`, Icon: FaPen, href: `/writing`, mode: `writing` },
+  { label: `Listening`, Icon: FaHeadphones, href: `/listening`, mode: `listening` },
+  { label: `Pronunciation`, Icon: FaMicrophone, href: `/pronunciation`, mode: `pronunciation` },
+  { label: `Vocabulary`, Icon: FaListUl, href: `/vocabulary`, mode: null },
 ];
 
 export function HomePage() {
@@ -47,13 +42,14 @@ export function HomePage() {
         </div>
 
         <div className="grid grid-cols-2 gap-4">
-          {MODES.map(({ label, Icon, href, active, mode }) => {
+          {MODES.map(({ label, Icon, href, mode }) => {
             const rating = mode ? loadAbility(language, mode) : null;
             const completedToday = mode ? getCompletedToday(mode) : 0;
             const goal = mode ? goals[mode] : 0;
             const met = completedToday >= goal;
-            const showBadge = goal > 0 || completedToday > 0;
-            return active ? (
+            const showBadge = mode && (goal > 0 || completedToday > 0);
+            const cardCount = mode ? null : loadFlashcards(language).length;
+            return (
               <button
                 key={label}
                 onClick={() => navigate(href)}
@@ -63,13 +59,20 @@ export function HomePage() {
                 <span className="font-semibold text-gray-800 group-hover:text-green-600 transition">
                   {label}
                 </span>
-                <span className="text-xs font-medium">
-                  {rating !== null ? (
-                    <span className="text-green-600">{`Rating: ${rating}`}</span>
-                  ) : (
-                    <span className="text-gray-300">{`Unrated`}</span>
-                  )}
-                </span>
+                {mode && (
+                  <span className="text-xs font-medium">
+                    {rating !== null ? (
+                      <span className="text-green-600">{`Rating: ${rating}`}</span>
+                    ) : (
+                      <span className="text-gray-300">{`Unrated`}</span>
+                    )}
+                  </span>
+                )}
+                {cardCount !== null && (
+                  <span className="text-xs font-medium text-gray-500">
+                    {cardCount === 1 ? `1 card saved` : `${cardCount} cards saved`}
+                  </span>
+                )}
                 {showBadge && (
                   <span
                     className={`text-xs font-semibold px-2 py-0.5 rounded-full mt-1 ${
@@ -82,14 +85,6 @@ export function HomePage() {
                   </span>
                 )}
               </button>
-            ) : (
-              <div
-                key={label}
-                className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col items-center gap-2 opacity-40 cursor-not-allowed text-center"
-              >
-                <Icon className="text-3xl text-gray-500" />
-                <span className="font-semibold text-gray-800">{label}</span>
-              </div>
             );
           })}
         </div>

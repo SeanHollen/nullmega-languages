@@ -4,6 +4,7 @@ import { Exercise } from "../../types";
 import { RatingResult } from "../../hooks/useAbility";
 import { translateBatch } from "../../hooks/useTranslate";
 import { AssessmentFeedback } from "../AssessmentFeedback";
+import { ClickableText } from "../ClickableText";
 
 const OUTCOME_STYLE = {
   win: { label: `Win`, color: `text-green-600`, bg: `bg-green-100 border-green-200` },
@@ -112,11 +113,12 @@ export function ResultsView({
 
       <div className="bg-white rounded-2xl border border-green-100 shadow-sm p-8 space-y-4">
         <p className="text-xs text-gray-400 uppercase tracking-wide">{`Passage`}</p>
-        <p className="text-gray-800 leading-relaxed whitespace-pre-wrap">
-          {boldWords(
-            exercise.passage,
-            exercise.difficultWords.map((w) => w.source),
-          )}
+        <p className="text-gray-800 leading-relaxed">
+          <ClickableText
+            text={exercise.passage}
+            boldWords={exercise.difficultWords.map((w) => w.source)}
+            language={language}
+          />
         </p>
         <div className="border-t border-green-100 pt-4">
           <p className="text-xs text-gray-400 uppercase tracking-wide mb-2">{`English Translation`}</p>
@@ -152,7 +154,10 @@ export function ResultsView({
                   <FaTimes className="text-red-500 mt-1 shrink-0" />
                 )}
                 <div>
-                  <p className="font-medium text-gray-800">{`${qi + 1}. ${q.question}`}</p>
+                  <p className="font-medium text-gray-800">
+                    {`${qi + 1}. `}
+                    <ClickableText text={q.question} language={language} />
+                  </p>
                   {tq && <p className="text-xs text-gray-400 mt-0.5">{tq}</p>}
                 </div>
               </div>
@@ -168,7 +173,9 @@ export function ResultsView({
                           : `text-gray-500`
                     }`}
                   >
-                    <p>{opt}</p>
+                    <p>
+                      <ClickableText text={opt} language={language} />
+                    </p>
                     {topts?.[oi] && <p className="text-xs opacity-60 mt-0.5">{topts[oi]}</p>}
                   </div>
                 ))}

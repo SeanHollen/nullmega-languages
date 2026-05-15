@@ -1,4 +1,4 @@
-async function translateOne(text: string): Promise<string> {
+export async function translateOne(text: string): Promise<string> {
   const url =
     `https://translate.googleapis.com/translate_a/single` +
     `?client=gtx&sl=auto&tl=en&dt=t&q=${encodeURIComponent(text)}`;

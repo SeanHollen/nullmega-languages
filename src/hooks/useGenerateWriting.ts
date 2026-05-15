@@ -2,6 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import difficultyLevels from "../data/difficulty-levels.json";
 import { callChat } from "../utils/api";
 import { getUserId } from "../utils/user";
+import { getRecentTitles } from "../utils/history";
 
 interface LevelRef {
   description: string;
@@ -79,9 +80,27 @@ ${refBlock(hi, "One level harder")}
 
 Match the difficulty of the target level. Choose your own topic independently.`;
 
+  const recentTitles = getRecentTitles("writing", language, 10);
+  const avoidanceBlock =
+    recentTitles.length > 0
+      ? `\n\nRECENT TOPICS (do not repeat these or cover closely related ground — choose something fresh):
+${recentTitles.map((t) => `- ${t}`).join("\n")}`
+      : "";
+
+  const narrativeBlock = `
+
+NARRATIVE QUALITY:
+Where the form supports it, give the passage genuine interest. Aim for at least one of:
+- A clear narrative arc (setup → complication → resolution or twist)
+- Disagreement, conflict, or contrasting perspectives between people or ideas
+- An unexpected detail, observation, or insight that earns its place
+- A protagonist with a recognisable motivation, not a generic actor
+- Concrete specifics (names, places, gestures) over abstract description
+Avoid bland "person does activity in pleasant location" filler — passages should be the kind of thing a reader would actually want to keep reading.`;
+
   const prompt = `Generate a writing exercise in ${language} at difficulty ${difficulty}/100.
 
-${referenceBlock}
+${referenceBlock}${avoidanceBlock}${narrativeBlock}
 
 Return ONLY valid JSON with this exact shape:
 {

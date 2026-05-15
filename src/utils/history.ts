@@ -71,3 +71,10 @@ export function getHistory(mode: Mode, language: string): AssessmentRecord[] {
     .filter((r) => r.mode === mode && r.language === language)
     .sort((a, b) => b.completedAt - a.completedAt);
 }
+
+export function getRecentTitles(mode: Mode, language: string, limit: number): string[] {
+  return getHistory(mode, language)
+    .slice(0, limit)
+    .map((r) => r.title)
+    .filter((t): t is string => typeof t === "string" && t.length > 0 && t !== "Untitled");
+}

@@ -26,6 +26,10 @@ function scoreColor(pct: number): string {
   return `text-red-500`;
 }
 
+function formatScore(n: number): string {
+  return Number.isInteger(n) ? String(n) : n.toFixed(2).replace(/\.?0+$/, ``);
+}
+
 export function HistoryList({ mode, language, limit = 10 }: Props) {
   const records = getHistory(mode, language).slice(0, limit);
   if (records.length === 0) return null;
@@ -63,7 +67,7 @@ export function HistoryList({ mode, language, limit = 10 }: Props) {
                   </span>
                 )}
                 <span className={`font-semibold ${scoreColor(pct)}`}>
-                  {`${r.scoreEarned}/${r.scoreMax}`}
+                  {`${formatScore(r.scoreEarned)}/${r.scoreMax}`}
                 </span>
               </div>
             </div>

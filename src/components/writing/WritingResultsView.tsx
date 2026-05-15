@@ -2,6 +2,7 @@ import { WritingExercise } from "../../hooks/useGenerateWriting";
 import { WritingGrade } from "../../hooks/useGradeWriting";
 import { RatingResult } from "../../hooks/useAbility";
 import { AssessmentFeedback } from "../AssessmentFeedback";
+import { ClickableText } from "../ClickableText";
 
 const OUTCOME_STYLE = {
   win: { label: `Win`, color: `text-green-600`, bg: `bg-green-100 border-green-200` },
@@ -86,7 +87,10 @@ export function WritingResultsView({
               className="bg-white rounded-2xl border border-green-100 shadow-sm p-6 space-y-3"
             >
               <div className="flex items-start justify-between gap-4">
-                <p className="font-medium text-gray-800">{`${i + 1}. ${q.question}`}</p>
+                <p className="font-medium text-gray-800">
+                  {`${i + 1}. `}
+                  <ClickableText text={q.question} language={language} />
+                </p>
                 {grade && (
                   <span className={`text-lg font-bold shrink-0 ${scoreColor(grade.score)}`}>
                     {`${grade.score}/5`}
@@ -94,7 +98,9 @@ export function WritingResultsView({
                 )}
               </div>
               <div className="bg-gray-50 rounded-xl px-4 py-3">
-                <p className="text-sm text-gray-700 whitespace-pre-wrap">{answers[i]}</p>
+                <p className="text-sm text-gray-700">
+                  <ClickableText text={answers[i] ?? ``} language={language} />
+                </p>
               </div>
               {grade?.notes && <p className="text-sm text-gray-500 italic">{grade.notes}</p>}
             </div>

@@ -24,7 +24,7 @@ export function PronunciationPage() {
   const [phase, setPhase] = useState<Phase>(`setup`);
   const [exercise, setExercise] = useState<PronunciationExercise | null>(null);
   const [audioUrls, setAudioUrls] = useState<string[]>([]);
-  const [ratings, setRatings] = useState<("good" | "bad" | null)[]>([]);
+  const [ratings, setRatings] = useState<("good" | "medium" | "bad" | null)[]>([]);
   const [ratingResult, setRatingResult] = useState<RatingResult | null>(null);
   const [assessmentId, setAssessmentId] = useState<string | null>(null);
   const [loadingAudio, setLoadingAudio] = useState(false);
@@ -54,7 +54,7 @@ export function PronunciationPage() {
     );
   }
 
-  function handleRate(index: number, rating: "good" | "bad") {
+  function handleRate(index: number, rating: "good" | "medium" | "bad") {
     setRatings((prev) => {
       const next = [...prev];
       next[index] = rating;
@@ -65,10 +65,12 @@ export function PronunciationPage() {
   function handleSubmit() {
     if (!exercise) return;
     const goodCount = ratings.filter((r) => r === "good").length;
+    const mediumCount = ratings.filter((r) => r === "medium").length;
+    const weighted = goodCount + 0.75 * mediumCount;
     const total = exercise.phrases.length;
     let rr: RatingResult | null = null;
     if (rated) {
-      rr = computeRating(language, goodCount, total, difficulty, `pronunciation`);
+      rr = computeRating(language, weighted, total, difficulty, `pronunciation`);
     }
     setRatingResult(rr);
     const completedAt = Date.now();
@@ -77,7 +79,7 @@ export function PronunciationPage() {
       language,
       title: exercise.title,
       difficulty,
-      scoreEarned: goodCount,
+      scoreEarned: weighted,
       scoreMax: total,
       ratingBefore: rr?.oldRating ?? null,
       ratingAfter: rr?.newRating ?? null,
@@ -89,7 +91,7 @@ export function PronunciationPage() {
       uploadAssessment({
         id: exercise.id,
         userId: getUserId(),
-        scoreEarned: goodCount,
+        scoreEarned: weighted,
         scoreMax: total,
         completedAt,
       });

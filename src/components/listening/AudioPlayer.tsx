@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { FaPlay, FaPause } from "react-icons/fa";
+import { FaPlay, FaPause, FaUndo } from "react-icons/fa";
 
 interface Props {
   src: string;
@@ -49,16 +49,41 @@ export function AudioPlayer({ src, label }: Props) {
     }
   }
 
+  function restart() {
+    const audio = audioRef.current;
+    if (!audio) return;
+    audio.currentTime = 0;
+    setProgress(0);
+  }
+
   return (
-    <button
-      onClick={toggle}
-      className="relative overflow-hidden flex items-center gap-2 px-4 py-2 rounded-xl border border-green-200 text-green-700 hover:brightness-95 transition text-sm font-medium cursor-pointer"
+    <div
+      className="inline-flex items-center gap-3 px-4 py-2 rounded-xl border border-green-200 text-green-700 text-sm font-medium overflow-hidden"
       style={{
         background: `linear-gradient(to right, #bbf7d0 ${progress * 100}%, #f0fdf4 ${progress * 100}%)`,
       }}
     >
-      {playing ? <FaPause className="shrink-0" /> : <FaPlay className="shrink-0" />}
-      {label && <span>{label}</span>}
-    </button>
+      <button
+        onClick={toggle}
+        className="hover:brightness-90 transition cursor-pointer"
+        aria-label={playing ? `Pause` : `Play`}
+      >
+        {playing ? <FaPause className="shrink-0" /> : <FaPlay className="shrink-0" />}
+      </button>
+      <button
+        onClick={restart}
+        disabled={progress === 0}
+        className="transition enabled:hover:brightness-90 enabled:cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+        title={`Restart`}
+        aria-label={`Restart`}
+      >
+        <FaUndo className="shrink-0" />
+      </button>
+      {label && (
+        <button onClick={toggle} className="cursor-pointer hover:brightness-90 transition">
+          {label}
+        </button>
+      )}
+    </div>
   );
 }

@@ -1,7 +1,8 @@
-import { FaCheck, FaTimes } from "react-icons/fa";
+import { FaCheck, FaTimes, FaMinus } from "react-icons/fa";
 import { PronunciationPhrase } from "../../hooks/useGeneratePronunciation";
 import { RatingResult } from "../../hooks/useAbility";
 import { AssessmentFeedback } from "../AssessmentFeedback";
+import { ClickableText } from "../ClickableText";
 
 const OUTCOME_STYLE = {
   win: { label: `Win`, color: `text-green-600`, bg: `bg-green-100 border-green-200` },
@@ -12,11 +13,15 @@ const OUTCOME_STYLE = {
 interface Props {
   phrases: PronunciationPhrase[];
   language: string;
-  ratings: ("good" | "bad" | null)[];
+  ratings: ("good" | "medium" | "bad" | null)[];
   ratingResult: RatingResult | null;
   assessmentId: string | null;
   onGoAgain: () => void;
   onHome: () => void;
+}
+
+function formatScore(n: number): string {
+  return Number.isInteger(n) ? String(n) : n.toFixed(2).replace(/\.?0+$/, ``);
 }
 
 export function PronunciationResultsView({
@@ -28,7 +33,10 @@ export function PronunciationResultsView({
   onGoAgain,
   onHome,
 }: Props) {
-  const good = ratings.filter((r) => r === "good").length;
+  const goodCount = ratings.filter((r) => r === "good").length;
+  const mediumCount = ratings.filter((r) => r === "medium").length;
+  const badCount = ratings.filter((r) => r === "bad").length;
+  const weighted = goodCount + 0.75 * mediumCount;
   const total = phrases.length;
   const outcome = ratingResult ? OUTCOME_STYLE[ratingResult.outcome] : null;
 
@@ -42,8 +50,10 @@ export function PronunciationResultsView({
             {outcome.label}
           </p>
         )}
-        <p className="text-5xl font-bold text-gray-800 mb-3">{`${good}/${total}`}</p>
-        <p className="text-xs text-gray-400 mb-3">{`phrases rated good`}</p>
+        <p className="text-5xl font-bold text-gray-800 mb-3">{`${formatScore(weighted)}/${total}`}</p>
+        <p className="text-xs text-gray-400 mb-3">
+          {`${goodCount} easy · ${mediumCount} medium · ${badCount} hard`}
+        </p>
         {ratingResult ? (
           ratingResult.isPlacement ? (
             <div className="flex items-center justify-center gap-2 text-sm">
@@ -70,20 +80,29 @@ export function PronunciationResultsView({
 
       <div className="space-y-3">
         {phrases.map((p, i) => {
-          const good = ratings[i] === "good";
+          const r = ratings[i];
+          const border =
+            r === "good"
+              ? `border-green-200`
+              : r === "medium"
+                ? `border-yellow-200`
+                : `border-red-200`;
+          const icon =
+            r === "good" ? (
+              <FaCheck className="text-green-500 mt-0.5 shrink-0" />
+            ) : r === "medium" ? (
+              <FaMinus className="text-yellow-500 mt-0.5 shrink-0" />
+            ) : (
+              <FaTimes className="text-red-500 mt-0.5 shrink-0" />
+            );
           return (
-            <div
-              key={i}
-              className={`bg-white rounded-2xl border shadow-sm p-5 ${good ? `border-green-200` : `border-red-200`}`}
-            >
+            <div key={i} className={`bg-white rounded-2xl border shadow-sm p-5 ${border}`}>
               <div className="flex items-start gap-3">
-                {good ? (
-                  <FaCheck className="text-green-500 mt-0.5 shrink-0" />
-                ) : (
-                  <FaTimes className="text-red-500 mt-0.5 shrink-0" />
-                )}
+                {icon}
                 <div>
-                  <p className="font-medium text-gray-800">{p.phrase}</p>
+                  <p className="font-medium text-gray-800">
+                    <ClickableText text={p.phrase} language={language} />
+                  </p>
                   <p className="text-sm text-gray-400 italic mt-0.5">{p.translation}</p>
                 </div>
               </div>

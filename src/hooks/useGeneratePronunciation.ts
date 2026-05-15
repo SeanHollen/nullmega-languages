@@ -1,6 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { callChat } from "../utils/api";
 import { getUserId } from "../utils/user";
+import { getRecentTitles } from "../utils/history";
 
 export interface PronunciationPhrase {
   phrase: string;
@@ -38,6 +39,13 @@ async function fetchPronunciationExercise(
 ): Promise<PronunciationExercise> {
   const count = phraseCount(difficulty);
 
+  const recentTitles = getRecentTitles("pronunciation", language, 10);
+  const avoidanceBlock =
+    recentTitles.length > 0
+      ? `\n\nRECENT THEMES (do not repeat these or use closely related themes — pick something fresh):
+${recentTitles.map((t) => `- ${t}`).join("\n")}`
+      : "";
+
   const prompt = `Generate a pronunciation practice exercise in ${language} at difficulty ${difficulty}/100.
 
 Return ONLY valid JSON with this exact shape:
@@ -53,7 +61,7 @@ Return ONLY valid JSON with this exact shape:
 - Include a variety of types: statements, questions, exclamations
 - Focus on phrases that are practical and natural-sounding in ${language}
 - At low difficulty: prioritise common sounds and basic patterns; at high difficulty: include challenging phoneme combinations, intonation shifts, and less common vocabulary
-- "translation" is the complete English translation of each phrase`;
+- "translation" is the complete English translation of each phrase${avoidanceBlock}`;
 
   const data = await callChat({
     model: "o4-mini",

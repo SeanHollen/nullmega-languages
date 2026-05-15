@@ -7,13 +7,29 @@ interface Props {
   phrase: string;
   translation: string;
   audioUrl: string;
-  rating: "good" | "bad" | null;
-  onRate: (rating: "good" | "bad") => void;
+  rating: "good" | "medium" | "bad" | null;
+  defaultTextRevealed?: boolean;
+  onRate: (rating: "good" | "medium" | "bad") => void;
 }
 
-export function PhraseCard({ index, phrase, translation, audioUrl, rating, onRate }: Props) {
-  const [textRevealed, setTextRevealed] = useState(false);
+export function PhraseCard({
+  index,
+  phrase,
+  translation,
+  audioUrl,
+  rating,
+  defaultTextRevealed = false,
+  onRate,
+}: Props) {
+  const [textRevealed, setTextRevealed] = useState(defaultTextRevealed);
+  const [trackedDefault, setTrackedDefault] = useState(defaultTextRevealed);
   const [translationRevealed, setTranslationRevealed] = useState(false);
+
+  // When the master "show by default" toggle changes, re-apply to this card
+  if (trackedDefault !== defaultTextRevealed) {
+    setTrackedDefault(defaultTextRevealed);
+    setTextRevealed(defaultTextRevealed);
+  }
   const [isRecording, setIsRecording] = useState(false);
   const [userRecordingUrl, setUserRecordingUrl] = useState<string | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -48,9 +64,11 @@ export function PhraseCard({ index, phrase, translation, audioUrl, rating, onRat
   const borderColor =
     rating === "good"
       ? `border-green-200`
-      : rating === "bad"
-        ? `border-red-200`
-        : `border-gray-100`;
+      : rating === "medium"
+        ? `border-yellow-200`
+        : rating === "bad"
+          ? `border-red-200`
+          : `border-gray-100`;
 
   return (
     <div className={`bg-white rounded-2xl border shadow-sm p-6 space-y-4 ${borderColor}`}>
@@ -115,6 +133,16 @@ export function PhraseCard({ index, phrase, translation, audioUrl, rating, onRat
             }`}
           >
             {`Easy`}
+          </button>
+          <button
+            onClick={() => onRate("medium")}
+            className={`cursor-pointer text-xs px-3 py-1.5 rounded-lg border transition font-medium ${
+              rating === "medium"
+                ? `bg-yellow-100 border-yellow-300 text-yellow-700`
+                : `border-gray-200 text-gray-500 hover:border-yellow-300 hover:text-yellow-600`
+            }`}
+          >
+            {`Medium`}
           </button>
           <button
             onClick={() => onRate("bad")}

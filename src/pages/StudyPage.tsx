@@ -131,7 +131,6 @@ export function StudyPage() {
               <FaArrowLeft />
             </button>
             <h1 className="text-2xl font-bold text-gray-800">{title}</h1>
-            <span className="text-sm text-gray-400">{`— ${language}`}</span>
           </div>
           {remaining.length > 0 && (
             <span className="text-sm text-gray-500">{`${remaining.length} left`}</span>

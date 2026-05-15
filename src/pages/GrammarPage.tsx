@@ -112,7 +112,6 @@ export function GrammarPage() {
             <FaArrowLeft />
           </button>
           <h1 className="text-2xl font-bold text-gray-800">{`Grammar`}</h1>
-          <span className="text-sm text-gray-400">{`— ${language}`}</span>
         </div>
 
         <div className="flex flex-col items-center gap-3 mb-8">

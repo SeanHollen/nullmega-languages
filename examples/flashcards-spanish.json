@@ -1,0 +1,14 @@
+[
+  { "source": "el madrugador", "translation": "the early riser", "tags": ["noun"] },
+  { "source": "atreverse", "translation": "to dare", "tags": ["verb"] },
+  { "source": "la madrugada", "translation": "early morning", "tags": ["time"] },
+  { "source": "el atardecer", "translation": "dusk", "tags": ["time"] },
+  { "source": "apañárselas", "translation": "to manage", "tags": ["verb", "idiom"] },
+  { "source": "agotado", "translation": "exhausted", "tags": ["adjective"] },
+  { "source": "un suspiro", "translation": "a sigh", "tags": ["noun"] },
+  { "source": "presuntamente", "translation": "presumably", "tags": ["adverb"] },
+  { "source": "un descuido", "translation": "a careless mistake", "tags": ["noun"] },
+  { "source": "frustrar", "translation": "to thwart", "tags": ["verb"] },
+  { "source": "el hortelano", "translation": "the market gardener", "tags": ["profession"] },
+  { "source": "ni modo", "translation": "too bad", "tags": ["idiom"] }
+]

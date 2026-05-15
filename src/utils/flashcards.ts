@@ -1,5 +1,11 @@
 export type FlashcardStatus = "new" | "learning" | "scheduled" | "due" | "dropped";
 
+export interface FlashcardContext {
+  source: string;
+  translation: string;
+  audioKey: string | null;
+}
+
 export interface Flashcard {
   id: string;
   source: string;
@@ -10,9 +16,22 @@ export interface Flashcard {
   currentInterval: number;
   tags: string[];
   status: FlashcardStatus;
+  contexts: FlashcardContext[];
+  dateContextGenerated: number | null;
 }
 
 const KEY = "flashcards";
+
+function normalizeContext(raw: unknown): FlashcardContext | null {
+  if (!raw || typeof raw !== "object") return null;
+  const r = raw as Record<string, unknown>;
+  if (typeof r.source !== "string" || typeof r.translation !== "string") return null;
+  return {
+    source: r.source,
+    translation: r.translation,
+    audioKey: typeof r.audioKey === "string" ? r.audioKey : null,
+  };
+}
 
 function normalize(raw: unknown): Flashcard | null {
   if (!raw || typeof raw !== "object") return null;
@@ -34,6 +53,11 @@ function normalize(raw: unknown): Flashcard | null {
       r.status === "dropped"
         ? r.status
         : "new",
+    contexts: Array.isArray(r.contexts)
+      ? r.contexts.map(normalizeContext).filter((c): c is FlashcardContext => c !== null)
+      : [],
+    dateContextGenerated:
+      typeof r.dateContextGenerated === "number" ? r.dateContextGenerated : null,
   };
 }
 
@@ -75,6 +99,8 @@ export function addFlashcard(
     currentInterval: 0,
     tags: [],
     status: "new",
+    contexts: [],
+    dateContextGenerated: null,
   };
   cards.push(card);
   persist(cards);
@@ -97,6 +123,81 @@ export function updateFlashcardTags(id: string, tags: string[]): boolean {
   const idx = cards.findIndex((f) => f.id === id);
   if (idx === -1) return false;
   cards[idx] = { ...cards[idx], tags };
+  persist(cards);
+  return true;
+}
+
+export function updateFlashcardContexts(
+  id: string,
+  contexts: FlashcardContext[],
+  dateContextGenerated: number | null,
+): boolean {
+  const cards = load();
+  const idx = cards.findIndex((f) => f.id === id);
+  if (idx === -1) return false;
+  cards[idx] = { ...cards[idx], contexts, dateContextGenerated };
+  persist(cards);
+  return true;
+}
+
+export interface ImportableCard {
+  source: string;
+  translation: string;
+  tags?: string[];
+}
+
+export function exportFlashcards(language: string): string {
+  const cards = loadFlashcards(language).map<ImportableCard>((c) => ({
+    source: c.source,
+    translation: c.translation,
+    tags: c.tags.length > 0 ? c.tags : undefined,
+  }));
+  return JSON.stringify(cards, null, 2);
+}
+
+export function importFlashcards(
+  language: string,
+  json: string,
+): { added: number; skipped: number } {
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(json);
+  } catch {
+    throw new Error(`Invalid JSON`);
+  }
+  if (!Array.isArray(parsed)) throw new Error(`Expected a JSON array of cards`);
+
+  let added = 0;
+  let skipped = 0;
+  for (const item of parsed) {
+    if (!item || typeof item !== "object") {
+      skipped++;
+      continue;
+    }
+    const r = item as Record<string, unknown>;
+    if (typeof r.source !== "string" || typeof r.translation !== "string") {
+      skipped++;
+      continue;
+    }
+    const card = addFlashcard(language, r.source, r.translation);
+    if (!card) {
+      skipped++;
+      continue;
+    }
+    if (Array.isArray(r.tags)) {
+      const tags = (r.tags as unknown[]).filter((t): t is string => typeof t === "string");
+      if (tags.length > 0) updateFlashcardTags(card.id, tags);
+    }
+    added++;
+  }
+  return { added, skipped };
+}
+
+export function patchFlashcard(id: string, patch: Partial<Flashcard>): boolean {
+  const cards = load();
+  const idx = cards.findIndex((f) => f.id === id);
+  if (idx === -1) return false;
+  cards[idx] = { ...cards[idx], ...patch };
   persist(cards);
   return true;
 }

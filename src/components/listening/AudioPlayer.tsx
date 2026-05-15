@@ -4,9 +4,10 @@ import { FaPlay, FaPause, FaUndo } from "react-icons/fa";
 interface Props {
   src: string;
   label?: string;
+  autoplay?: boolean;
 }
 
-export function AudioPlayer({ src, label }: Props) {
+export function AudioPlayer({ src, label, autoplay = false }: Props) {
   const [trackedSrc, setTrackedSrc] = useState(src);
   const [playing, setPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -32,11 +33,19 @@ export function AudioPlayer({ src, label }: Props) {
       setPlaying(false);
     });
     audioRef.current = audio;
+    if (autoplay) {
+      audio
+        .play()
+        .then(() => setPlaying(true))
+        .catch(() => {
+          // Browser autoplay policies may block; silently ignore — user can press play
+        });
+    }
     return () => {
       audio.pause();
       audioRef.current = null;
     };
-  }, [src]);
+  }, [src, autoplay]);
 
   function toggle() {
     const audio = audioRef.current;

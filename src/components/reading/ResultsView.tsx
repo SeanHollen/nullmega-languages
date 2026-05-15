@@ -1,8 +1,6 @@
-import { useState, useEffect } from "react";
 import { FaCheck, FaTimes } from "react-icons/fa";
 import { Exercise } from "../../types";
 import { RatingResult } from "../../hooks/useAbility";
-import { translateBatch } from "../../hooks/useTranslate";
 import { AssessmentFeedback } from "../AssessmentFeedback";
 import { ClickableText } from "../ClickableText";
 
@@ -28,7 +26,7 @@ function boldWords(text: string, words: string[]): React.ReactNode {
   );
 }
 
-interface Translations {
+export interface Translations {
   questions: string[];
   options: string[][];
 }
@@ -39,6 +37,7 @@ interface Props {
   selected: (number | null)[];
   ratingResult: RatingResult | null;
   assessmentId: string | null;
+  translations: Translations | null;
   onGoAgain: () => void;
   onHome: () => void;
 }
@@ -49,29 +48,10 @@ export function ResultsView({
   selected,
   ratingResult,
   assessmentId,
+  translations,
   onGoAgain,
   onHome,
 }: Props) {
-  const [translations, setTranslations] = useState<Translations | null>(null);
-
-  useEffect(() => {
-    const allTexts = [
-      ...exercise.questions.map((q) => q.question),
-      ...exercise.questions.flatMap((q) => q.options),
-    ];
-    translateBatch(allTexts).then((results) => {
-      const nq = exercise.questions.length;
-      const questions = results.slice(0, nq);
-      const options: string[][] = [];
-      let cursor = nq;
-      for (const q of exercise.questions) {
-        options.push(results.slice(cursor, cursor + q.options.length));
-        cursor += q.options.length;
-      }
-      setTranslations({ questions, options });
-    });
-  }, [exercise]);
-
   const score = selected.filter((s, i) => s === exercise.questions[i].correct).length;
   const total = exercise.questions.length;
   const outcome = ratingResult ? OUTCOME_STYLE[ratingResult.outcome] : null;

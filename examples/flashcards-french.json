@@ -1,0 +1,14 @@
+[
+  { "source": "L'apiculteur", "translation": "the beekeeper", "tags": ["profession", "nature"] },
+  { "source": "ramasser", "translation": "to gather", "tags": ["verb"] },
+  { "source": "l'aube", "translation": "dawn", "tags": ["time"] },
+  { "source": "le crépuscule", "translation": "twilight", "tags": ["time"] },
+  { "source": "se débrouiller", "translation": "to manage", "tags": ["verb", "idiom"] },
+  { "source": "épuisé", "translation": "exhausted", "tags": ["adjective"] },
+  { "source": "un soupir", "translation": "a sigh", "tags": ["noun"] },
+  { "source": "vraisemblablement", "translation": "presumably", "tags": ["adverb"] },
+  { "source": "une étourderie", "translation": "a careless mistake", "tags": ["noun"] },
+  { "source": "déjouer", "translation": "to thwart", "tags": ["verb"] },
+  { "source": "le maraîcher", "translation": "the market gardener", "tags": ["profession"] },
+  { "source": "tant pis", "translation": "too bad", "tags": ["idiom"] }
+]

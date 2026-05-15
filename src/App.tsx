@@ -11,7 +11,7 @@ import { SettingsPage } from "./pages/SettingsPage";
 import { GoalsPage } from "./pages/GoalsPage";
 import { StatsPage } from "./pages/StatsPage";
 import { VocabularyPage } from "./pages/VocabularyPage";
-import { PracticePage } from "./pages/PracticePage";
+import { StudyPage } from "./pages/StudyPage";
 
 const queryClient = new QueryClient();
 
@@ -31,7 +31,7 @@ export function App() {
             <Route path="/goals" element={<GoalsPage />} />
             <Route path="/stats/:mode" element={<StatsPage />} />
             <Route path="/vocabulary" element={<VocabularyPage />} />
-            <Route path="/practice" element={<PracticePage />} />
+            <Route path="/vocabulary/:mode" element={<StudyPage />} />
           </Routes>
         </LanguageProvider>
       </BrowserRouter>

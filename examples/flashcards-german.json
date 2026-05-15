@@ -1,0 +1,14 @@
+[
+  { "source": "der Imker", "translation": "the beekeeper", "tags": ["profession", "nature"] },
+  { "source": "sammeln", "translation": "to gather", "tags": ["verb"] },
+  { "source": "die Morgendämmerung", "translation": "dawn", "tags": ["time"] },
+  { "source": "die Abenddämmerung", "translation": "twilight", "tags": ["time"] },
+  { "source": "zurechtkommen", "translation": "to manage", "tags": ["verb"] },
+  { "source": "erschöpft", "translation": "exhausted", "tags": ["adjective"] },
+  { "source": "ein Seufzer", "translation": "a sigh", "tags": ["noun"] },
+  { "source": "vermutlich", "translation": "presumably", "tags": ["adverb"] },
+  { "source": "ein Flüchtigkeitsfehler", "translation": "a careless mistake", "tags": ["noun"] },
+  { "source": "vereiteln", "translation": "to thwart", "tags": ["verb"] },
+  { "source": "der Gemüsebauer", "translation": "the market gardener", "tags": ["profession"] },
+  { "source": "schade", "translation": "too bad", "tags": ["idiom"] }
+]

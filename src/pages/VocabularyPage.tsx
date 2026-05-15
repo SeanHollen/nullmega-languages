@@ -2,49 +2,16 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa";
 import { useLanguage } from "../contexts/LanguageContext";
+import { loadFlashcards, computeStatus, Flashcard } from "../utils/flashcards";
 import {
-  loadFlashcards,
-  updateFlashcardTags,
-  computeStatus,
-  Flashcard,
-  FlashcardStatus,
-} from "../utils/flashcards";
-
-const STATUS_STYLES: Record<FlashcardStatus, string> = {
-  new: `bg-gray-100 text-gray-600`,
-  learning: `bg-yellow-100 text-yellow-700`,
-  scheduled: `bg-blue-100 text-blue-700`,
-  due: `bg-orange-100 text-orange-700`,
-  dropped: `bg-gray-100 text-gray-400 line-through`,
-};
-
-function relativeTime(ts: number | null): string {
-  if (ts === null) return `Never`;
-  const diff = Date.now() - ts;
-  const mins = Math.floor(diff / 60000);
-  if (mins < 1) return `Just now`;
-  if (mins < 60) return `${mins}m ago`;
-  const hours = Math.floor(mins / 60);
-  if (hours < 24) return `${hours}h ago`;
-  const days = Math.floor(hours / 24);
-  if (days < 7) return `${days}d ago`;
-  return new Date(ts).toLocaleDateString();
-}
-
-function formatInterval(ms: number): string {
-  if (ms === 0) return `—`;
-  if (ms < 60_000) return `${Math.round(ms / 1000)}s`;
-  if (ms < 60 * 60_000) return `${Math.round(ms / 60_000)}m`;
-  if (ms < 24 * 60 * 60_000) return `${Math.round(ms / (60 * 60_000))}h`;
-  return `${Math.round(ms / (24 * 60 * 60_000))}d`;
-}
-
-function parseTags(input: string): string[] {
-  return input
-    .split(`,`)
-    .map((t) => t.trim())
-    .filter((t) => t.length > 0);
-}
+  loadVocabSettings,
+  saveVocabSettings,
+  getLearnedTodayCount,
+  VocabSettings,
+} from "../utils/vocabSettings";
+import { prepareLearnSession, prepareReviewSession } from "../utils/studySession";
+import { VocabSettingsPanel } from "../components/vocabulary/VocabSettingsPanel";
+import { FlashcardTable } from "../components/vocabulary/FlashcardTable";
 
 export function VocabularyPage() {
   const navigate = useNavigate();
@@ -52,170 +19,109 @@ export function VocabularyPage() {
   const [cards, setCards] = useState<Flashcard[]>(() =>
     loadFlashcards(language).sort((a, b) => b.addedAt - a.addedAt),
   );
-  const [search, setSearch] = useState(``);
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [tagInput, setTagInput] = useState(``);
+  const [settings, setSettingsState] = useState<VocabSettings>(loadVocabSettings);
+  const [learnLoading, setLearnLoading] = useState(false);
+  const [learnError, setLearnError] = useState<string | null>(null);
+  const [reviewLoading, setReviewLoading] = useState(false);
+  const [reviewError, setReviewError] = useState<string | null>(null);
 
-  const q = search.trim().toLowerCase();
-  const filtered = q
-    ? cards.filter(
-        (c) =>
-          c.source.toLowerCase().includes(q) ||
-          c.translation.toLowerCase().includes(q) ||
-          c.tags.some((t) => t.toLowerCase().includes(q)),
-      )
-    : cards;
-
-  function startEdit(c: Flashcard) {
-    setEditingId(c.id);
-    setTagInput(c.tags.join(`, `));
+  function updateSettings(patch: Partial<VocabSettings>) {
+    const next = { ...settings, ...patch };
+    setSettingsState(next);
+    saveVocabSettings(next);
   }
 
-  function saveEdit() {
-    if (editingId === null) return;
-    const tags = parseTags(tagInput);
-    updateFlashcardTags(editingId, tags);
+  function refreshCards() {
     setCards(loadFlashcards(language).sort((a, b) => b.addedAt - a.addedAt));
-    setEditingId(null);
-    setTagInput(``);
   }
 
-  function cancelEdit() {
-    setEditingId(null);
-    setTagInput(``);
+  function handleStartLearn() {
+    setLearnLoading(true);
+    setLearnError(null);
+    prepareLearnSession(language, settings)
+      .then((data) => {
+        if (!data) {
+          setLearnLoading(false);
+          return;
+        }
+        navigate(`/vocabulary/learn`, { state: data });
+      })
+      .catch((err) => {
+        setLearnError(String(err));
+        setLearnLoading(false);
+      });
   }
+
+  function handleStartReview() {
+    setReviewLoading(true);
+    setReviewError(null);
+    prepareReviewSession(language, settings)
+      .then((data) => {
+        if (!data) {
+          setReviewLoading(false);
+          return;
+        }
+        navigate(`/vocabulary/review`, { state: data });
+      })
+      .catch((err) => {
+        setReviewError(String(err));
+        setReviewLoading(false);
+      });
+  }
+
+  const availableNewCount = Math.max(
+    0,
+    Math.min(
+      cards.filter((c) => computeStatus(c) === `new`).length,
+      settings.newWordsPerDay - getLearnedTodayCount(),
+    ),
+  );
+  const learningCount = cards.filter((c) => computeStatus(c) === `learning`).length;
+  const dueCount = cards.filter((c) => computeStatus(c) === `due`).length;
 
   return (
     <div className="min-h-screen bg-green-100 py-10 px-4">
       <div className="max-w-4xl mx-auto">
-        <div className="flex items-center justify-between gap-4 mb-8">
-          <div className="flex items-center gap-4 min-w-0">
-            <button
-              onClick={() => navigate(`/`)}
-              className="text-gray-400 hover:text-gray-600 transition cursor-pointer"
-            >
-              <FaArrowLeft />
-            </button>
-            <h1 className="text-2xl font-bold text-gray-800">{`Vocabulary`}</h1>
-            <span className="text-sm text-gray-400">{`— ${language}`}</span>
-          </div>
-          {cards.length > 0 && (
-            <button
-              onClick={() => navigate(`/practice`)}
-              className="bg-green-600 text-white px-4 py-2 rounded-xl font-semibold text-sm hover:bg-green-700 transition cursor-pointer whitespace-nowrap"
-            >
-              {`Practice →`}
-            </button>
-          )}
+        <div className="flex items-center gap-4 mb-6">
+          <button
+            onClick={() => navigate(`/`)}
+            className="text-gray-400 hover:text-gray-600 transition cursor-pointer"
+          >
+            <FaArrowLeft />
+          </button>
+          <h1 className="text-2xl font-bold text-gray-800">{`Vocabulary`}</h1>
+          <span className="text-sm text-gray-400">{`— ${language}`}</span>
         </div>
 
-        {cards.length === 0 ? (
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 text-center">
-            <p className="text-gray-500">
-              {`No flashcards yet. Save words and phrases from any exercise's results page.`}
-            </p>
+        <div className="flex justify-center gap-4 mb-8">
+          <div className="flex flex-col items-center gap-1">
+            <button
+              onClick={handleStartLearn}
+              disabled={(availableNewCount === 0 && learningCount === 0) || learnLoading}
+              className="bg-white border-2 border-green-400 text-green-700 px-8 py-4 rounded-2xl font-bold text-base hover:bg-green-50 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition text-center min-w-48"
+            >
+              <div>{learnLoading ? `Preparing…` : `Learn new cards →`}</div>
+              <div className="text-sm font-normal text-green-600 mt-1">
+                {`new: ${availableNewCount} · learning: ${learningCount}`}
+              </div>
+            </button>
+            {learnError && <p className="text-xs text-red-500">{learnError}</p>}
           </div>
-        ) : (
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-            <div className="px-4 py-3 border-b border-gray-100">
-              <input
-                type="text"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder={`Search source, translation, or tags…`}
-                className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
-              />
-            </div>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead className="border-b border-gray-100 bg-gray-50">
-                  <tr className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                    <th className="px-4 py-3">{`Source`}</th>
-                    <th className="px-4 py-3">{`Translation`}</th>
-                    <th className="px-4 py-3">{`Status`}</th>
-                    <th className="px-4 py-3">{`Last reviewed`}</th>
-                    <th className="px-4 py-3">{`Interval`}</th>
-                    <th className="px-4 py-3">{`Tags`}</th>
-                    <th className="px-4 py-3">{`Added`}</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-50">
-                  {filtered.length === 0 ? (
-                    <tr>
-                      <td colSpan={7} className="px-4 py-6 text-center text-gray-400 text-sm">
-                        {`No matches for "${search}"`}
-                      </td>
-                    </tr>
-                  ) : (
-                    filtered.map((c) => {
-                      const status = computeStatus(c);
-                      const isEditing = editingId === c.id;
-                      return (
-                        <tr key={c.id}>
-                          <td className="px-4 py-3 font-medium text-gray-800">{c.source}</td>
-                          <td className="px-4 py-3 text-gray-600 italic">{c.translation}</td>
-                          <td className="px-4 py-3">
-                            <span
-                              className={`text-xs font-medium px-2 py-0.5 rounded-full ${STATUS_STYLES[status]}`}
-                            >
-                              {status}
-                            </span>
-                          </td>
-                          <td className="px-4 py-3 text-gray-500 text-xs">
-                            {relativeTime(c.lastReviewed)}
-                          </td>
-                          <td className="px-4 py-3 text-gray-500 text-xs">
-                            {formatInterval(c.currentInterval)}
-                          </td>
-                          <td className="px-4 py-3 text-xs">
-                            {isEditing ? (
-                              <input
-                                autoFocus
-                                value={tagInput}
-                                onChange={(e) => setTagInput(e.target.value)}
-                                onBlur={saveEdit}
-                                onKeyDown={(e) => {
-                                  if (e.key === `Enter`) saveEdit();
-                                  if (e.key === `Escape`) cancelEdit();
-                                }}
-                                placeholder={`tag1, tag2`}
-                                className="w-32 text-xs border border-green-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-green-500"
-                              />
-                            ) : (
-                              <button
-                                onClick={() => startEdit(c)}
-                                className="text-left cursor-pointer hover:bg-gray-50 rounded px-1 py-0.5 transition"
-                                title={`Click to edit tags`}
-                              >
-                                {c.tags.length === 0 ? (
-                                  <span className="text-gray-300">{`+ add`}</span>
-                                ) : (
-                                  <span className="flex flex-wrap gap-1">
-                                    {c.tags.map((t) => (
-                                      <span
-                                        key={t}
-                                        className="bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded"
-                                      >
-                                        {t}
-                                      </span>
-                                    ))}
-                                  </span>
-                                )}
-                              </button>
-                            )}
-                          </td>
-                          <td className="px-4 py-3 text-gray-500 text-xs">
-                            {relativeTime(c.addedAt)}
-                          </td>
-                        </tr>
-                      );
-                    })
-                  )}
-                </tbody>
-              </table>
-            </div>
+          <div className="flex flex-col items-center gap-1">
+            <button
+              onClick={handleStartReview}
+              disabled={dueCount === 0 || reviewLoading}
+              className="bg-white border-2 border-green-400 text-green-700 px-8 py-4 rounded-2xl font-bold text-base hover:bg-green-50 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition text-center min-w-48"
+            >
+              <div>{reviewLoading ? `Preparing…` : `Review cards →`}</div>
+              <div className="text-sm font-normal text-green-600 mt-1">{`due: ${dueCount}`}</div>
+            </button>
+            {reviewError && <p className="text-xs text-red-500">{reviewError}</p>}
           </div>
-        )}
+        </div>
+
+        <VocabSettingsPanel settings={settings} onUpdate={updateSettings} />
+        <FlashcardTable cards={cards} language={language} onRefresh={refreshCards} />
       </div>
     </div>
   );

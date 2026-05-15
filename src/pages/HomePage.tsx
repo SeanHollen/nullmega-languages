@@ -5,7 +5,8 @@ import { loadAbility, Mode } from "../hooks/useAbility";
 import { useLanguage } from "../contexts/LanguageContext";
 import { getCompletedToday } from "../utils/history";
 import { loadGoals } from "../utils/goals";
-import { loadFlashcards } from "../utils/flashcards";
+import { loadFlashcards, computeStatus } from "../utils/flashcards";
+import { loadVocabSettings, getLearnedTodayCount } from "../utils/vocabSettings";
 
 interface ModeConfig {
   label: string;
@@ -48,7 +49,23 @@ export function HomePage() {
             const goal = mode ? goals[mode] : 0;
             const met = completedToday >= goal;
             const showBadge = mode && (goal > 0 || completedToday > 0);
-            const cardCount = mode ? null : loadFlashcards(language).length;
+            const allCards = mode ? null : loadFlashcards(language);
+            const cardCount = allCards ? allCards.length : null;
+            const studyCount = allCards
+              ? (() => {
+                  const settings = loadVocabSettings();
+                  const due = allCards.filter((c) => computeStatus(c) === `due`).length;
+                  const learning = allCards.filter((c) => computeStatus(c) === `learning`).length;
+                  const availableNew = Math.max(
+                    0,
+                    Math.min(
+                      allCards.filter((c) => computeStatus(c) === `new`).length,
+                      settings.newWordsPerDay - getLearnedTodayCount(),
+                    ),
+                  );
+                  return due + learning + availableNew;
+                })()
+              : null;
             return (
               <button
                 key={label}
@@ -69,8 +86,19 @@ export function HomePage() {
                   </span>
                 )}
                 {cardCount !== null && (
-                  <span className="text-xs font-medium text-gray-500">
+                  <span className="text-xs font-medium text-green-600">
                     {cardCount === 1 ? `1 card saved` : `${cardCount} cards saved`}
+                  </span>
+                )}
+                {studyCount !== null && cardCount !== null && cardCount > 0 && (
+                  <span
+                    className={`text-xs font-semibold px-2 py-0.5 rounded-full mt-1 ${
+                      studyCount > 0
+                        ? `text-yellow-700 bg-yellow-100`
+                        : `text-green-700 bg-green-100`
+                    }`}
+                  >
+                    {studyCount > 0 ? `${studyCount} cards left` : `All caught up!`}
                   </span>
                 )}
                 {showBadge && (

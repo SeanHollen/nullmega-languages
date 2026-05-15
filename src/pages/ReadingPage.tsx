@@ -4,9 +4,10 @@ import { FaArrowLeft } from "react-icons/fa";
 import { SetupView } from "../components/reading/SetupView";
 import { LoadingView } from "../components/reading/LoadingView";
 import { PassageView } from "../components/reading/PassageView";
-import { ResultsView } from "../components/reading/ResultsView";
+import { ResultsView, Translations } from "../components/reading/ResultsView";
 import { HistoryList } from "../components/HistoryList";
 import { useGenerateReading } from "../hooks/useGenerateReading";
+import { translateBatch } from "../hooks/useTranslate";
 import { loadAbility, computeRating, RatingResult } from "../hooks/useAbility";
 import { useLanguage } from "../contexts/LanguageContext";
 import { saveAssessment } from "../utils/history";
@@ -24,6 +25,7 @@ export function ReadingPage() {
   const [selected, setSelected] = useState<(number | null)[]>([]);
   const [ratingResult, setRatingResult] = useState<RatingResult | null>(null);
   const [assessmentId, setAssessmentId] = useState<string | null>(null);
+  const [translations, setTranslations] = useState<Translations | null>(null);
   const { mutate, isPending, error } = useGenerateReading();
 
   function handleGenerate() {
@@ -79,6 +81,21 @@ export function ReadingPage() {
         completedAt,
       });
     }
+    const allTexts = [
+      ...exercise.questions.map((q) => q.question),
+      ...exercise.questions.flatMap((q) => q.options),
+    ];
+    translateBatch(allTexts).then((results) => {
+      const nq = exercise.questions.length;
+      const questions = results.slice(0, nq);
+      const options: string[][] = [];
+      let cursor = nq;
+      for (const q of exercise.questions) {
+        options.push(results.slice(cursor, cursor + q.options.length));
+        cursor += q.options.length;
+      }
+      setTranslations({ questions, options });
+    });
     setPhase(`results`);
   }
 
@@ -87,6 +104,7 @@ export function ReadingPage() {
     setSelected([]);
     setRatingResult(null);
     setAssessmentId(null);
+    setTranslations(null);
     setDifficulty(loadAbility(language) ?? 50);
     setPhase(`setup`);
   }
@@ -141,6 +159,7 @@ export function ReadingPage() {
             selected={selected}
             ratingResult={ratingResult}
             assessmentId={assessmentId}
+            translations={translations}
             onGoAgain={handleGoAgain}
             onHome={() => navigate(`/`)}
           />

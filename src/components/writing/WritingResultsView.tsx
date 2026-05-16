@@ -1,6 +1,6 @@
-import { WritingExercise } from "../../hooks/useGenerateWriting";
-import { WritingGrade } from "../../hooks/useGradeWriting";
-import { RatingResult } from "../../hooks/useAbility";
+import type { WritingExercise } from "../../hooks/useGenerateWriting";
+import type { WritingGrade } from "../../hooks/useGradeWriting";
+import type { RatingResult } from "../../hooks/useAbility";
 import { AssessmentFeedback } from "../AssessmentFeedback";
 import { ClickableText } from "../ClickableText";
 

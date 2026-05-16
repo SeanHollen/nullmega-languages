@@ -1,5 +1,5 @@
-import { Exercise } from "../../types";
-import { ExerciseAudio } from "../../hooks/useTTS";
+import type { Exercise } from "../../types";
+import type { ExerciseAudio } from "../../hooks/useTTS";
 import { AudioPlayer } from "./AudioPlayer";
 import { QuestionCard } from "../reading/QuestionCard";
 

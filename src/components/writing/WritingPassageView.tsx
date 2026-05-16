@@ -1,4 +1,4 @@
-import { WritingExercise } from "../../hooks/useGenerateWriting";
+import type { WritingExercise } from "../../hooks/useGenerateWriting";
 
 function wordCount(text: string): number {
   return text.trim() === "" ? 0 : text.trim().split(/\s+/).length;

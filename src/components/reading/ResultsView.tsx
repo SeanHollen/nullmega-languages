@@ -1,6 +1,6 @@
 import { FaCheck, FaTimes } from "react-icons/fa";
-import { Exercise } from "../../types";
-import { RatingResult } from "../../hooks/useAbility";
+import type { Exercise } from "../../types";
+import type { RatingResult } from "../../hooks/useAbility";
 import { AssessmentFeedback } from "../AssessmentFeedback";
 import { ClickableText } from "../ClickableText";
 

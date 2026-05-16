@@ -4,17 +4,20 @@ import { FaArrowLeft } from "react-icons/fa";
 import { SetupView } from "../components/reading/SetupView";
 import { LoadingView } from "../components/reading/LoadingView";
 import { ListeningPassageView } from "../components/listening/ListeningPassageView";
-import { ResultsView, Translations } from "../components/reading/ResultsView";
+import type { Translations } from "../components/reading/ResultsView";
+import { ResultsView } from "../components/reading/ResultsView";
 import { HistoryList } from "../components/HistoryList";
 import { useGenerateReading } from "../hooks/useGenerateReading";
 import { translateBatch } from "../hooks/useTranslate";
-import { loadAbility, computeRating, RatingResult } from "../hooks/useAbility";
-import { generateExerciseAudio, ExerciseAudio } from "../hooks/useTTS";
+import type { RatingResult } from "../hooks/useAbility";
+import { loadAbility, computeRating } from "../hooks/useAbility";
+import type { ExerciseAudio } from "../hooks/useTTS";
+import { generateExerciseAudio } from "../hooks/useTTS";
 import { useLanguage } from "../contexts/LanguageContext";
 import { saveAssessment } from "../utils/history";
 import { uploadAssessment } from "../utils/api";
 import { getUserId } from "../utils/user";
-import { Exercise } from "../types";
+import type { Exercise } from "../types";
 
 type Phase = "setup" | "listening" | "results";
 
@@ -39,19 +42,21 @@ export function ListeningPage() {
     mutate(
       { language, difficulty, mode: `listening` },
       {
-        onSuccess: async (data: Exercise) => {
+        onSuccess: (data: Exercise) => {
           setExercise(data);
           setSelected(Array.from({ length: data.questions.length }, () => null));
           setLoadingAudio(true);
-          try {
-            const exerciseAudio = await generateExerciseAudio(data);
-            setAudio(exerciseAudio);
-            setPhase(`listening`);
-          } catch {
-            setAudioError(`Failed to generate audio. Please try again.`);
-          } finally {
-            setLoadingAudio(false);
-          }
+          void generateExerciseAudio(data).then(
+            (exerciseAudio) => {
+              setAudio(exerciseAudio);
+              setPhase(`listening`);
+              setLoadingAudio(false);
+            },
+            () => {
+              setAudioError(`Failed to generate audio. Please try again.`);
+              setLoadingAudio(false);
+            },
+          );
         },
       },
     );
@@ -101,7 +106,7 @@ export function ListeningPage() {
       ...exercise.questions.map((q) => q.question),
       ...exercise.questions.flatMap((q) => q.options),
     ];
-    translateBatch(allTexts).then((results) => {
+    void translateBatch(allTexts).then((results) => {
       const nq = exercise.questions.length;
       const questions = results.slice(0, nq);
       const options: string[][] = [];

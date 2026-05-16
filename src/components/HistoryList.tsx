@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Mode } from "../hooks/useAbility";
+import type { Mode } from "../hooks/useAbility";
 import { getHistory } from "../utils/history";
 
 interface Props {

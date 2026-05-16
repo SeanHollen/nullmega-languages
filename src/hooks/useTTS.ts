@@ -1,4 +1,4 @@
-import { Exercise } from "../types";
+import type { Exercise } from "../types";
 import { callTTS } from "../utils/api";
 
 const VOICES = ["alloy", "echo", "fable", "onyx", "nova", "shimmer"] as const;

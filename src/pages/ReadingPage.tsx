@@ -4,16 +4,18 @@ import { FaArrowLeft } from "react-icons/fa";
 import { SetupView } from "../components/reading/SetupView";
 import { LoadingView } from "../components/reading/LoadingView";
 import { PassageView } from "../components/reading/PassageView";
-import { ResultsView, Translations } from "../components/reading/ResultsView";
+import type { Translations } from "../components/reading/ResultsView";
+import { ResultsView } from "../components/reading/ResultsView";
 import { HistoryList } from "../components/HistoryList";
 import { useGenerateReading } from "../hooks/useGenerateReading";
 import { translateBatch } from "../hooks/useTranslate";
-import { loadAbility, computeRating, RatingResult } from "../hooks/useAbility";
+import type { RatingResult } from "../hooks/useAbility";
+import { loadAbility, computeRating } from "../hooks/useAbility";
 import { useLanguage } from "../contexts/LanguageContext";
 import { saveAssessment } from "../utils/history";
 import { uploadAssessment } from "../utils/api";
 import { getUserId } from "../utils/user";
-import { Exercise, Phase } from "../types";
+import type { Exercise, Phase } from "../types";
 
 export function ReadingPage() {
   const navigate = useNavigate();
@@ -85,7 +87,7 @@ export function ReadingPage() {
       ...exercise.questions.map((q) => q.question),
       ...exercise.questions.flatMap((q) => q.options),
     ];
-    translateBatch(allTexts).then((results) => {
+    void translateBatch(allTexts).then((results) => {
       const nq = exercise.questions.length;
       const questions = results.slice(0, nq);
       const options: string[][] = [];

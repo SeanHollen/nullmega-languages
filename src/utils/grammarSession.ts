@@ -1,10 +1,7 @@
-import {
-  loadGrammarCards,
-  addGrammarCards,
-  computeGrammarStatus,
-  GrammarCard,
-} from "./grammarCards";
-import { GrammarSettings, getGeneratedTodayCount, recordGeneratedToday } from "./grammarSettings";
+import type { GrammarCard } from "./grammarCards";
+import { loadGrammarCards, addGrammarCards, computeGrammarStatus } from "./grammarCards";
+import type { GrammarSettings } from "./grammarSettings";
+import { getGeneratedTodayCount, recordGeneratedToday } from "./grammarSettings";
 import { generateGrammarCards } from "./generateGrammarCards";
 import { pickRandom } from "./studySession";
 

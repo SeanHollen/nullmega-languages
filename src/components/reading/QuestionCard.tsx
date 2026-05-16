@@ -1,5 +1,5 @@
-import { ReactNode } from "react";
-import { Question } from "../../types";
+import type { ReactNode } from "react";
+import type { Question } from "../../types";
 
 interface Props {
   question: Question;

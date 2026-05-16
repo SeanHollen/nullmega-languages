@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { FaChevronDown, FaChevronRight } from "react-icons/fa";
+import type { VocabSettings } from "../../utils/vocabSettings";
 import {
-  VocabSettings,
   NEW_WORDS_PER_DAY_MIN,
   NEW_WORDS_PER_DAY_MAX,
   CONTEXTS_PER_CARD_MIN,

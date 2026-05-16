@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa";
-import { GrammarCard, computeGrammarStatus, patchGrammarCard } from "../utils/grammarCards";
-import { GrammarSessionData } from "../utils/grammarSession";
+import type { GrammarCard } from "../utils/grammarCards";
+import { computeGrammarStatus, patchGrammarCard } from "../utils/grammarCards";
+import type { GrammarSessionData } from "../utils/grammarSession";
 import { INITIAL_INTERVAL, nextInterval, pickRandom } from "../utils/studySession";
 
 type Phase = "answering" | "results";

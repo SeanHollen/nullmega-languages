@@ -1,6 +1,6 @@
 import { FaCheck, FaTimes, FaMinus } from "react-icons/fa";
-import { PronunciationPhrase } from "../../hooks/useGeneratePronunciation";
-import { RatingResult } from "../../hooks/useAbility";
+import type { PronunciationPhrase } from "../../hooks/useGeneratePronunciation";
+import type { RatingResult } from "../../hooks/useAbility";
 import { AssessmentFeedback } from "../AssessmentFeedback";
 import { ClickableText } from "../ClickableText";
 

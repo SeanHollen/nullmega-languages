@@ -100,7 +100,7 @@ export function ClickableText({ text, boldWords = [], language }: Props) {
     const x = rect.left + rect.width / 2;
     setPopup({ text: rawText, translation: cached ?? null, x, y: rect.bottom + 4 });
     if (cached) return;
-    translateOne(rawText).then((t) => {
+    void translateOne(rawText).then((t) => {
       cache.set(key, t);
       setPopup((prev) => (prev?.text === rawText ? { ...prev, translation: t } : prev));
     });

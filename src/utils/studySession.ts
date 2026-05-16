@@ -1,11 +1,8 @@
-import { Flashcard, loadFlashcards, computeStatus, patchFlashcard } from "./flashcards";
-import {
-  VocabSettings,
-  VocabOrder,
-  getLearnedTodayCount,
-  recordLearnedToday,
-} from "./vocabSettings";
-import { regenerateContextsFor, addMissingAudioFor } from "./contextOrchestrator";
+import type { Flashcard } from "./flashcards";
+import { loadFlashcards, computeStatus } from "./flashcards";
+import type { VocabSettings, VocabOrder } from "./vocabSettings";
+import { getLearnedTodayCount, recordLearnedToday } from "./vocabSettings";
+import { generateContextsFor, addMissingAudioFor } from "./contextOrchestrator";
 import { loadAudio } from "./audioStore";
 
 export const DAY = 24 * 60 * 60 * 1000;
@@ -88,12 +85,11 @@ export async function prepareLearnSession(
   const picked = pickInitial(all, "learn", settings.order, availableNew);
   if (picked.length === 0) return null;
 
+  const newCount = picked.filter((c) => c.status === "new").length;
   const needContexts = picked.filter((c) => c.contexts.length === 0);
-  await Promise.all(needContexts.map((c) => regenerateContextsFor(c, settings)));
+  await Promise.all(needContexts.map((c) => generateContextsFor(c, settings)));
 
-  const newlyIntroduced = picked.filter((c) => c.status === "new");
-  for (const c of newlyIntroduced) patchFlashcard(c.id, { status: "learning" });
-  if (newlyIntroduced.length > 0) recordLearnedToday(newlyIntroduced.length);
+  if (newCount > 0) recordLearnedToday(newCount);
 
   const cards = reloadCards(language, picked);
 
@@ -121,7 +117,7 @@ export async function prepareReviewSession(
   if (picked.length === 0) return null;
 
   const needContexts = picked.filter((c) => c.contexts.length === 0);
-  await Promise.all(needContexts.map((c) => regenerateContextsFor(c, settings)));
+  await Promise.all(needContexts.map((c) => generateContextsFor(c, settings)));
 
   const cards = reloadCards(language, picked);
 

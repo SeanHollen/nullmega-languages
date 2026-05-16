@@ -6,8 +6,10 @@ import { LoadingView } from "../components/reading/LoadingView";
 import { PronunciationExerciseView } from "../components/pronunciation/PronunciationExerciseView";
 import { PronunciationResultsView } from "../components/pronunciation/PronunciationResultsView";
 import { HistoryList } from "../components/HistoryList";
-import { useGeneratePronunciation, PronunciationExercise } from "../hooks/useGeneratePronunciation";
-import { loadAbility, computeRating, RatingResult } from "../hooks/useAbility";
+import type { PronunciationExercise } from "../hooks/useGeneratePronunciation";
+import { useGeneratePronunciation } from "../hooks/useGeneratePronunciation";
+import type { RatingResult } from "../hooks/useAbility";
+import { loadAbility, computeRating } from "../hooks/useAbility";
 import { generatePhrasesAudio } from "../hooks/useTTS";
 import { useLanguage } from "../contexts/LanguageContext";
 import { saveAssessment } from "../utils/history";
@@ -36,19 +38,21 @@ export function PronunciationPage() {
     mutate(
       { language, difficulty },
       {
-        onSuccess: async (data: PronunciationExercise) => {
+        onSuccess: (data: PronunciationExercise) => {
           setExercise(data);
           setRatings(Array.from({ length: data.phrases.length }, () => null));
           setLoadingAudio(true);
-          try {
-            const urls = await generatePhrasesAudio(data.phrases.map((p) => p.phrase));
-            setAudioUrls(urls);
-            setPhase(`exercise`);
-          } catch {
-            setAudioError(`Failed to generate audio. Please try again.`);
-          } finally {
-            setLoadingAudio(false);
-          }
+          void generatePhrasesAudio(data.phrases.map((p) => p.phrase)).then(
+            (urls) => {
+              setAudioUrls(urls);
+              setPhase(`exercise`);
+              setLoadingAudio(false);
+            },
+            () => {
+              setAudioError(`Failed to generate audio. Please try again.`);
+              setLoadingAudio(false);
+            },
+          );
         },
       },
     );

@@ -1,4 +1,4 @@
-import { Exercise } from "../../types";
+import type { Exercise } from "../../types";
 import { QuestionCard } from "./QuestionCard";
 
 interface Props {

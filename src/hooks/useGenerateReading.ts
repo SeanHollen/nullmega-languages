@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import { Exercise } from "../types";
+import type { Exercise } from "../types";
 import difficultyLevels from "../data/difficulty-levels.json";
 import { callChat } from "../utils/api";
 import { getUserId } from "../utils/user";

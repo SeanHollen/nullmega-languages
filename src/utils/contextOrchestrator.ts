@@ -1,5 +1,6 @@
-import { Flashcard, FlashcardContext, updateFlashcardContexts } from "./flashcards";
-import { VocabSettings } from "./vocabSettings";
+import type { Flashcard, FlashcardContext } from "./flashcards";
+import { updateFlashcardContexts, patchFlashcard } from "./flashcards";
+import type { VocabSettings } from "./vocabSettings";
 import { generateContexts } from "../hooks/useGenerateContexts";
 import { callTTS } from "./api";
 import { saveAudio, deleteAudioByPrefix } from "./audioStore";
@@ -35,10 +36,7 @@ export async function addMissingAudioFor(card: Flashcard, settings: VocabSetting
   updateFlashcardContexts(card.id, updated, card.dateContextGenerated);
 }
 
-export async function regenerateContextsFor(
-  card: Flashcard,
-  settings: VocabSettings,
-): Promise<void> {
+export async function generateContextsFor(card: Flashcard, settings: VocabSettings): Promise<void> {
   // Clear any previous audio blobs for this card
   await deleteAudioByPrefix(`flashcard-${card.id}-ctx-`);
 
@@ -67,4 +65,5 @@ export async function regenerateContextsFor(
   );
 
   updateFlashcardContexts(card.id, contexts, Date.now());
+  if (card.status === "new") patchFlashcard(card.id, { status: "learning" });
 }

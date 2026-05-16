@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa";
-import { loadSettings, saveSettings, Provider } from "../utils/settings";
+import type { Provider } from "../utils/settings";
+import { loadSettings, saveSettings } from "../utils/settings";
 
 export function SettingsPage() {
   const navigate = useNavigate();
@@ -27,7 +28,7 @@ export function SettingsPage() {
       tts = { provider, key: ttsKey };
     }
     saveSettings({ textGen, tts, backendUrl: initial.backendUrl });
-    navigate(`/`);
+    void navigate(`/`);
   }
 
   return (

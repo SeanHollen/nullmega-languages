@@ -7,8 +7,9 @@ import {
   FaListUl,
   FaGraduationCap,
 } from "react-icons/fa";
-import { IconType } from "react-icons";
-import { loadAbility, Mode } from "../hooks/useAbility";
+import type { IconType } from "react-icons";
+import type { Mode } from "../hooks/useAbility";
+import { loadAbility } from "../hooks/useAbility";
 import { useLanguage } from "../contexts/LanguageContext";
 import { getCompletedToday } from "../utils/history";
 import { loadGoals } from "../utils/goals";

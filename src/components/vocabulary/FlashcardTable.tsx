@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import { FaPlus, FaFileImport, FaFileExport, FaPen } from "react-icons/fa";
+import type { Flashcard, FlashcardStatusDerived } from "../../utils/flashcards";
 import {
   updateFlashcardTags,
   computeStatus,
@@ -7,12 +8,10 @@ import {
   removeFlashcard,
   exportFlashcards,
   importFlashcards,
-  Flashcard,
-  FlashcardStatus,
 } from "../../utils/flashcards";
 import { EditCardModal } from "./EditCardModal";
 
-const STATUS_STYLES: Record<FlashcardStatus, string> = {
+const STATUS_STYLES: Record<FlashcardStatusDerived, string> = {
   new: `bg-gray-100 text-gray-600`,
   learning: `bg-yellow-100 text-yellow-700`,
   scheduled: `bg-blue-100 text-blue-700`,

@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa";
-import { Mode } from "../hooks/useAbility";
-import { Goals, loadGoals, saveGoals, GOAL_MIN, GOAL_MAX } from "../utils/goals";
+import type { Mode } from "../hooks/useAbility";
+import type { Goals } from "../utils/goals";
+import { loadGoals, saveGoals, GOAL_MIN, GOAL_MAX } from "../utils/goals";
 
 const MODE_LABELS: Record<Mode, string> = {
   reading: `Reading`,

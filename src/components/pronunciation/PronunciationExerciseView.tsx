@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { PronunciationPhrase } from "../../hooks/useGeneratePronunciation";
+import type { PronunciationPhrase } from "../../hooks/useGeneratePronunciation";
 import { PhraseCard } from "./PhraseCard";
 
 interface Props {

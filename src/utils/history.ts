@@ -1,4 +1,4 @@
-import { Mode } from "../hooks/useAbility";
+import type { Mode } from "../hooks/useAbility";
 
 export interface AssessmentRecord {
   id: string;

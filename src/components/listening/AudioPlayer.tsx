@@ -54,7 +54,7 @@ export function AudioPlayer({ src, label, autoplay = false, small = false }: Pro
     if (playing) {
       audio.pause();
     } else {
-      audio.play();
+      void audio.play();
       setPlaying(true);
     }
   }

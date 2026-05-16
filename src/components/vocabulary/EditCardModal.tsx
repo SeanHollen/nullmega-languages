@@ -1,13 +1,9 @@
 import { useState } from "react";
-import {
-  Flashcard,
-  FlashcardStatus,
-  patchFlashcard,
-  updateFlashcardTags,
-} from "../../utils/flashcards";
+import type { Flashcard, FlashcardStatus } from "../../utils/flashcards";
+import { patchFlashcard, updateFlashcardTags } from "../../utils/flashcards";
 
 const DAY = 24 * 60 * 60 * 1000;
-const ALL_STATUSES: FlashcardStatus[] = ["new", "learning", "scheduled", "due", "dropped"];
+const ALL_STATUSES: FlashcardStatus[] = ["new", "learning", "scheduled", "dropped"];
 const INTERVAL_DAYS = [1, 3, 7, 14, 30, 90, 180, 365];
 
 function parseTags(input: string): string[] {
@@ -90,8 +86,8 @@ export function EditCardModal({ card, onSave, onClose }: Props) {
                 ))}
               </select>
             </div>
-            <div className="w-28">
-              <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">{`Interval (days)`}</label>
+            <div className="w-48">
+              <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">{`Current interval (days)`}</label>
               <select
                 value={intervalDays}
                 onChange={(e) => setIntervalDays(Number(e.target.value))}

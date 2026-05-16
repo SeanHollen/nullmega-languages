@@ -2,13 +2,10 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa";
 import { useLanguage } from "../contexts/LanguageContext";
-import { loadFlashcards, computeStatus, Flashcard } from "../utils/flashcards";
-import {
-  loadVocabSettings,
-  saveVocabSettings,
-  getLearnedTodayCount,
-  VocabSettings,
-} from "../utils/vocabSettings";
+import type { Flashcard } from "../utils/flashcards";
+import { loadFlashcards, computeStatus } from "../utils/flashcards";
+import type { VocabSettings } from "../utils/vocabSettings";
+import { loadVocabSettings, saveVocabSettings, getLearnedTodayCount } from "../utils/vocabSettings";
 import { prepareLearnSession, prepareReviewSession } from "../utils/studySession";
 import { VocabSettingsPanel } from "../components/vocabulary/VocabSettingsPanel";
 import { FlashcardTable } from "../components/vocabulary/FlashcardTable";
@@ -44,7 +41,7 @@ export function VocabularyPage() {
           setLearnLoading(false);
           return;
         }
-        navigate(`/vocabulary/learn`, { state: data });
+        void navigate(`/vocabulary/learn`, { state: data });
       })
       .catch((err) => {
         setLearnError(String(err));
@@ -61,7 +58,7 @@ export function VocabularyPage() {
           setReviewLoading(false);
           return;
         }
-        navigate(`/vocabulary/review`, { state: data });
+        void navigate(`/vocabulary/review`, { state: data });
       })
       .catch((err) => {
         setReviewError(String(err));

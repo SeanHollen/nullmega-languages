@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa";
-import { Mode } from "../hooks/useAbility";
+import type { Mode } from "../hooks/useAbility";
 import { useLanguage } from "../contexts/LanguageContext";
 import { getHistory } from "../utils/history";
 

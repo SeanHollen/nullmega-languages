@@ -1,4 +1,5 @@
-import { GrammarCard, GrammarCategory, computeGrammarStatus } from "../../utils/grammarCards";
+import type { GrammarCard, GrammarCategory } from "../../utils/grammarCards";
+import { computeGrammarStatus } from "../../utils/grammarCards";
 
 const CATEGORY_LABELS: Record<GrammarCategory, string> = {
   "tense-conjugation": `Tense`,

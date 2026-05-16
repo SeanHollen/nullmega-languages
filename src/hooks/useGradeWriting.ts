@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import { WritingExercise } from "./useGenerateWriting";
+import type { WritingExercise } from "./useGenerateWriting";
 import { callChat } from "../utils/api";
 
 export interface WritingGrade {

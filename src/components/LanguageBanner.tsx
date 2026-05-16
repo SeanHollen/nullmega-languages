@@ -19,7 +19,7 @@ export function LanguageBanner() {
 
   function applyLanguage(lang: string) {
     setLanguage(lang);
-    navigate(`/`);
+    void navigate(`/`);
   }
 
   function handleSelectChange(value: string) {

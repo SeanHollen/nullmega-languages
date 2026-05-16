@@ -1,18 +1,15 @@
 import { useRef, useState } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { FaArrowLeft, FaEllipsisV } from "react-icons/fa";
-import { patchFlashcard, Flashcard } from "../utils/flashcards";
-import { loadVocabSettings, VocabSettings } from "../utils/vocabSettings";
+import type { Flashcard } from "../utils/flashcards";
+import { patchFlashcard } from "../utils/flashcards";
+import type { VocabSettings } from "../utils/vocabSettings";
+import { loadVocabSettings } from "../utils/vocabSettings";
 import { loadAudio } from "../utils/audioStore";
 import { AudioPlayer } from "../components/listening/AudioPlayer";
 import { BoldWord } from "../components/BoldWord";
-import {
-  StudySessionData,
-  INITIAL_INTERVAL,
-  nextInterval,
-  easyInterval,
-  pickRandom,
-} from "../utils/studySession";
+import type { StudySessionData } from "../utils/studySession";
+import { INITIAL_INTERVAL, nextInterval, easyInterval, pickRandom } from "../utils/studySession";
 
 type StudyMode = "learn" | "review";
 
@@ -62,7 +59,7 @@ export function StudyPage() {
     cancelAudio.current = () => {
       cancelled = true;
     };
-    loadAudio(key).then((blob) => {
+    void loadAudio(key).then((blob) => {
       if (cancelled) return;
       setAudioUrl((prev) => {
         if (prev) URL.revokeObjectURL(prev);

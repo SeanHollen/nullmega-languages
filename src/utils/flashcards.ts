@@ -1,4 +1,5 @@
-export type FlashcardStatus = "new" | "learning" | "scheduled" | "due" | "dropped";
+export type FlashcardStatus = "new" | "learning" | "scheduled" | "dropped";
+export type FlashcardStatusDerived = FlashcardStatus | "due";
 
 export interface FlashcardContext {
   source: string;
@@ -47,9 +48,9 @@ function normalize(raw: unknown): Flashcard | null {
     currentInterval: typeof r.currentInterval === "number" ? r.currentInterval : 0,
     tags: Array.isArray(r.tags) ? (r.tags as string[]).filter((t) => typeof t === "string") : [],
     status:
+      r.status === "new" ||
       r.status === "learning" ||
       r.status === "scheduled" ||
-      r.status === "due" ||
       r.status === "dropped"
         ? r.status
         : "new",
@@ -202,10 +203,11 @@ export function patchFlashcard(id: string, patch: Partial<Flashcard>): boolean {
   return true;
 }
 
-export function computeStatus(card: Flashcard): FlashcardStatus {
+export function computeStatus(card: Flashcard): FlashcardStatusDerived {
   if (card.status === "dropped") return "dropped";
+  if (card.status === "new") return "new";
   if (card.status === "learning") return "learning";
-  if (card.lastReviewed === null) return "new";
-  if (card.lastReviewed + card.currentInterval <= Date.now()) return "due";
+  if (card.lastReviewed !== null && card.lastReviewed + card.currentInterval <= Date.now())
+    return "due";
   return "scheduled";
 }

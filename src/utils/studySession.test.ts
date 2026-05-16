@@ -1,10 +1,16 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { IDBFactory } from "fake-indexeddb";
 import { prepareReviewSession } from "./studySession";
-import { VocabSettings } from "./vocabSettings";
-import { addFlashcard, patchFlashcard, updateFlashcardContexts } from "./flashcards";
+import type { VocabSettings } from "./vocabSettings";
+import { callTTS } from "./api";
+import {
+  addFlashcard,
+  loadFlashcards,
+  patchFlashcard,
+  updateFlashcardContexts,
+} from "./flashcards";
 import { DAY, INITIAL_INTERVAL } from "./studySession";
-import { regenerateContextsFor } from "./contextOrchestrator";
+import { generateContextsFor } from "./contextOrchestrator";
 
 vi.mock("./api", () => ({
   callTTS: vi.fn(async () => new Blob(["audio"], { type: "audio/mpeg" })),
@@ -71,11 +77,11 @@ describe("prepareReviewSession", () => {
     // then user turns generateAudio on and starts a review session.
     const card = addFlashcard("Spanish", "gracias", "thank you")!;
     makeCardDue(card.id);
+    const dueCard = loadFlashcards("Spanish").find((c) => c.id === card.id)!;
 
-    await regenerateContextsFor(card, { ...settings, generateAudio: false });
+    await generateContextsFor(dueCard, { ...settings, generateAudio: false });
 
     // Confirm contexts exist but have no audio
-    const { loadFlashcards } = await import("./flashcards");
     const [stored] = loadFlashcards("Spanish").filter((c) => c.id === card.id);
     expect(stored.contexts.length).toBeGreaterThan(0);
     expect(stored.contexts.every((ctx) => ctx.audioKey === null)).toBe(true);
@@ -91,7 +97,6 @@ describe("prepareReviewSession", () => {
   });
 
   it("does not call TTS when generateAudio is false", async () => {
-    const { callTTS } = await import("./api");
     vi.mocked(callTTS).mockClear();
 
     const card = addFlashcard("Spanish", "adios", "goodbye")!;

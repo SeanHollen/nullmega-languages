@@ -2,12 +2,13 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa";
 import { useLanguage } from "../contexts/LanguageContext";
-import { loadGrammarCards, computeGrammarStatus, GrammarCard } from "../utils/grammarCards";
+import type { GrammarCard } from "../utils/grammarCards";
+import { loadGrammarCards, computeGrammarStatus } from "../utils/grammarCards";
+import type { GrammarSettings } from "../utils/grammarSettings";
 import {
   loadGrammarSettings,
   saveGrammarSettings,
   getGeneratedTodayCount,
-  GrammarSettings,
   NEW_CARDS_PER_DAY_MIN,
   NEW_CARDS_PER_DAY_MAX,
 } from "../utils/grammarSettings";
@@ -59,7 +60,7 @@ export function GrammarPage() {
           setLearnLoading(false);
           return;
         }
-        navigate(`/grammar/learn`, { state: data });
+        void navigate(`/grammar/learn`, { state: data });
       })
       .catch((err) => {
         setLearnError(String(err));
@@ -76,7 +77,7 @@ export function GrammarPage() {
           setReviewLoading(false);
           return;
         }
-        navigate(`/grammar/review`, { state: data });
+        void navigate(`/grammar/review`, { state: data });
       })
       .catch((err) => {
         setReviewError(String(err));
@@ -86,7 +87,7 @@ export function GrammarPage() {
 
   function handlePlayCard(card: GrammarCard) {
     const mode = computeGrammarStatus(card) === `due` ? `review` : `learn`;
-    navigate(`/grammar/${mode}`, {
+    void navigate(`/grammar/${mode}`, {
       state: { cards: [card], current: card, mode },
     });
   }

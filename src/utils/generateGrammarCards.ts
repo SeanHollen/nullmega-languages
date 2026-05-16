@@ -25,14 +25,20 @@ export async function generateGrammarCards(params: {
   language: string;
   level: number;
   count: number;
-  existingTitles: string[];
+  existingCards: { title: string; level: number }[];
 }): Promise<RawGrammarCard[]> {
-  const { language, level, count, existingTitles } = params;
+  const { language, level, count, existingCards } = params;
   const safeLevel = Math.max(1, Math.min(10, level));
   const levelDesc = LEVEL_DESCRIPTIONS[safeLevel];
+
+  const prioritised = [...existingCards]
+    .sort((a, b) => Math.abs(a.level - safeLevel) - Math.abs(b.level - safeLevel))
+    .slice(0, 500)
+    .map((c) => c.title);
+
   const avoidNote =
-    existingTitles.length > 0
-      ? `\n\nAvoid redundancy with these previously generated quiz titles:\n${existingTitles.slice(0, 60).join(`, `)}`
+    prioritised.length > 0
+      ? `\n\nAvoid redundancy with these previously generated quiz titles:\n${prioritised.join(`, `)}`
       : ``;
 
   const prompt = `Generate ${count} grammar quiz card${count === 1 ? `` : `s`} for a ${language} learner at difficulty level ${safeLevel}/10 (${levelDesc}).
@@ -64,7 +70,13 @@ Return ONLY valid JSON:
 
   const data = await callGrammar({
     model: `o4-mini`,
-    messages: [{ role: `user`, content: prompt }],
+    messages: [
+      {
+        role: `system`,
+        content: `You generate grammar quiz cards for language learners. Card titles must be descriptive and specific — name the exact construction or rule being tested (e.g. "Passé Composé with avoir: irregular past participles" rather than "Past Tense Practice"). Titles should be concise but informative, typically 4–10 words.`,
+      },
+      { role: `user`, content: prompt },
+    ],
     response_format: { type: `json_object` },
   });
 

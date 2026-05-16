@@ -64,7 +64,7 @@ export function HomePage() {
           </button>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 min-[420px]:grid-cols-2 gap-4">
           {MODES.map(({ label, Icon, href, mode, kind }) => {
             const rating = mode ? loadAbility(language, mode) : null;
             const completedToday = mode ? getCompletedToday(mode) : 0;

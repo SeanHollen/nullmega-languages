@@ -22,12 +22,11 @@ export async function prepareGrammarLearnSession(
 
   if (toGenerate > 0) {
     const existing = loadGrammarCards(language);
-    const existingTitles = existing.map((c) => c.title);
     const rawCards = await generateGrammarCards({
       language,
       level: settings.level,
       count: toGenerate,
-      existingTitles,
+      existingCards: existing.map((c) => ({ title: c.title, level: c.level })),
     });
     if (rawCards.length > 0) {
       addGrammarCards(language, rawCards, settings.level);

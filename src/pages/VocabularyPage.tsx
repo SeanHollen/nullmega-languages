@@ -89,10 +89,10 @@ export function VocabularyPage() {
           >
             <FaArrowLeft />
           </button>
-          <h1 className="text-2xl font-bold text-gray-800">{`Vocabulary`}</h1>
+          <h1 className="text-2xl font-bold text-gray-800">{`Vocabulary Flashcards`}</h1>
         </div>
 
-        <div className="flex justify-center gap-4 mb-8">
+        <div className="flex flex-col min-[420px]:flex-row justify-center gap-4 mb-8">
           <div className="flex flex-col items-center gap-1">
             <button
               onClick={handleStartLearn}

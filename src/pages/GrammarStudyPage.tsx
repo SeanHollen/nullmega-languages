@@ -130,9 +130,12 @@ export function GrammarStudyPage() {
               <p className="text-sm text-gray-500">{current.prompt}</p>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-6">
               {current.questions.map((q, i) => (
-                <div key={i} className="space-y-2">
+                <div
+                  key={i}
+                  className={`space-y-2${i > 0 ? ` pt-6 border-t border-gray-100` : ``}`}
+                >
                   <p className="text-base text-gray-700 leading-relaxed">{q.prompt}</p>
                   {q.type === `multiple-choice` && q.choices ? (
                     <div className="flex flex-col gap-2">
@@ -194,8 +197,13 @@ export function GrammarStudyPage() {
                 >
                   <span className="font-bold flex-shrink-0">{questionResults[i] ? `✓` : `✗`}</span>
                   <span className="flex-1">{q.prompt}</span>
-                  {!questionResults[i] && (
-                    <span className="text-xs flex-shrink-0 font-medium">{`→ ${q.answer}`}</span>
+                  {questionResults[i] ? (
+                    <span className="text-xs flex-shrink-0 opacity-60">{answers[i]}</span>
+                  ) : (
+                    <span className="text-xs flex-shrink-0 font-medium">
+                      <span className="line-through opacity-60">{answers[i]}</span>
+                      {` → ${q.answer}`}
+                    </span>
                   )}
                 </div>
               ))}

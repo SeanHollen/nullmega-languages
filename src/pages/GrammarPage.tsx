@@ -111,11 +111,11 @@ export function GrammarPage() {
           >
             <FaArrowLeft />
           </button>
-          <h1 className="text-2xl font-bold text-gray-800">{`Grammar`}</h1>
+          <h1 className="text-2xl font-bold text-gray-800">{`Grammar Quizzes`}</h1>
         </div>
 
         <div className="flex flex-col items-center gap-3 mb-8">
-          <div className="flex justify-center gap-4">
+          <div className="flex flex-col min-[420px]:flex-row justify-center gap-4">
             <div className="flex flex-col items-center gap-1">
               <button
                 onClick={handleLearn}

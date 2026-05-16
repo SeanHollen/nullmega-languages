@@ -5,7 +5,7 @@ import {
   getLearnedTodayCount,
   recordLearnedToday,
 } from "./vocabSettings";
-import { regenerateContextsFor } from "./contextOrchestrator";
+import { regenerateContextsFor, addMissingAudioFor } from "./contextOrchestrator";
 import { loadAudio } from "./audioStore";
 
 export const DAY = 24 * 60 * 60 * 1000;
@@ -54,6 +54,12 @@ function pickInitial(
   return [...sortedNew.slice(0, newLimit), ...learningCards];
 }
 
+function reloadCards(language: string, cards: Flashcard[]): Flashcard[] {
+  const refreshed = loadFlashcards(language);
+  const byId = new Map(refreshed.map((c) => [c.id, c]));
+  return cards.map((c) => byId.get(c.id) ?? c);
+}
+
 async function initialAudioUrl(
   card: Flashcard,
   contextIndex: number,
@@ -81,16 +87,21 @@ export async function prepareLearnSession(
   for (const c of newlyIntroduced) patchFlashcard(c.id, { status: "learning" });
   if (newlyIntroduced.length > 0) recordLearnedToday(newlyIntroduced.length);
 
-  const refreshed = loadFlashcards(language);
-  const byId = new Map(refreshed.map((c) => [c.id, c]));
-  const cards = picked.map((p) => byId.get(p.id) ?? p);
+  const cards = reloadCards(language, picked);
 
-  const current = pickRandom(cards);
+  const needAudio = cards.filter(
+    (c) => c.contexts.length > 0 && c.contexts.some((ctx) => !ctx.audioKey),
+  );
+  await Promise.all(needAudio.map((c) => addMissingAudioFor(c, settings)));
+
+  const finalCards = needAudio.length > 0 ? reloadCards(language, cards) : cards;
+
+  const current = pickRandom(finalCards);
   const contextIndex =
     current.contexts.length > 0 ? Math.floor(Math.random() * current.contexts.length) : 0;
   const audioUrl = await initialAudioUrl(current, contextIndex, settings.generateAudio);
 
-  return { cards, current, contextIndex, audioUrl };
+  return { cards: finalCards, current, contextIndex, audioUrl };
 }
 
 export async function prepareReviewSession(
@@ -104,14 +115,19 @@ export async function prepareReviewSession(
   const needContexts = picked.filter((c) => c.contexts.length === 0);
   await Promise.all(needContexts.map((c) => regenerateContextsFor(c, settings)));
 
-  const refreshed = loadFlashcards(language);
-  const byId = new Map(refreshed.map((c) => [c.id, c]));
-  const cards = picked.map((p) => byId.get(p.id) ?? p);
+  const cards = reloadCards(language, picked);
 
-  const current = pickRandom(cards);
+  const needAudio = cards.filter(
+    (c) => c.contexts.length > 0 && c.contexts.some((ctx) => !ctx.audioKey),
+  );
+  await Promise.all(needAudio.map((c) => addMissingAudioFor(c, settings)));
+
+  const finalCards = needAudio.length > 0 ? reloadCards(language, cards) : cards;
+
+  const current = pickRandom(finalCards);
   const contextIndex =
     current.contexts.length > 0 ? Math.floor(Math.random() * current.contexts.length) : 0;
   const audioUrl = await initialAudioUrl(current, contextIndex, settings.generateAudio);
 
-  return { cards, current, contextIndex, audioUrl };
+  return { cards: finalCards, current, contextIndex, audioUrl };
 }

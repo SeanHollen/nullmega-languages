@@ -14,6 +14,27 @@ function audioKey(cardId: string, contextIndex: number): string {
   return `flashcard-${cardId}-ctx-${contextIndex}`;
 }
 
+export async function addMissingAudioFor(card: Flashcard, settings: VocabSettings): Promise<void> {
+  if (!settings.generateAudio) return;
+  if (!card.contexts.some((ctx) => !ctx.audioKey)) return;
+
+  const voice = pickVoice();
+  const updated = await Promise.all(
+    card.contexts.map(async (ctx, i) => {
+      if (ctx.audioKey) return ctx;
+      try {
+        const blob = await callTTS({ model: `tts-1`, voice, input: ctx.source });
+        const key = audioKey(card.id, i);
+        await saveAudio(key, blob);
+        return { ...ctx, audioKey: key };
+      } catch {
+        return ctx;
+      }
+    }),
+  );
+  updateFlashcardContexts(card.id, updated, card.dateContextGenerated);
+}
+
 export async function regenerateContextsFor(
   card: Flashcard,
   settings: VocabSettings,

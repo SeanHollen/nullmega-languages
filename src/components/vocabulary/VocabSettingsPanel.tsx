@@ -92,7 +92,7 @@ export function VocabSettingsPanel({ settings, onUpdate }: Props) {
                   onChange={(e) => onUpdate({ autoplayAudio: e.target.checked })}
                   className="accent-green-600 cursor-pointer"
                 />
-                <span className="text-gray-600">{`Autoplay audio`}</span>
+                <span className="text-gray-600">{`Autoplay audio if existing`}</span>
               </label>
             </div>
           </div>

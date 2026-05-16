@@ -27,6 +27,7 @@ export function StudyPage() {
   const [remaining, setRemaining] = useState<Flashcard[]>(() => sessionData?.cards ?? []);
   const [current, setCurrent] = useState<Flashcard | null>(() => sessionData?.current ?? null);
   const [revealed, setRevealed] = useState(false);
+  const [textRevealed, setTextRevealed] = useState(false);
   const [contextIndex, setContextIndex] = useState(() => sessionData?.contextIndex ?? 0);
   const [stats, setStats] = useState({ right: 0, wrong: 0 });
   const [audioUrl, setAudioUrl] = useState<string | null>(() => sessionData?.audioUrl ?? null);
@@ -36,6 +37,7 @@ export function StudyPage() {
   function showCard(card: Flashcard) {
     cancelAudio.current();
     setRevealed(false);
+    setTextRevealed(false);
     if (card.contexts.length === 0) {
       setContextIndex(0);
       setAudioUrl((prev) => {
@@ -158,15 +160,28 @@ export function StudyPage() {
           </div>
         ) : current && ctx ? (
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-10 space-y-6 text-center">
-            <p className="text-2xl text-gray-800 break-words leading-relaxed">
-              <BoldWord text={ctx.source} target={current.source} />
-            </p>
+            {settings.showText ? (
+              <p className="text-2xl text-gray-800 break-words leading-relaxed">
+                <BoldWord text={ctx.source} target={current.source} />
+              </p>
+            ) : textRevealed ? (
+              <p className="text-2xl text-gray-800 break-words leading-relaxed opacity-70">
+                <BoldWord text={ctx.source} target={current.source} />
+              </p>
+            ) : (
+              <button
+                onClick={() => setTextRevealed(true)}
+                className="text-sm text-gray-400 hover:text-gray-600 underline underline-offset-2 transition cursor-pointer"
+              >
+                {`Show text`}
+              </button>
+            )}
             {audioUrl && (
               <div className="flex justify-center">
                 <AudioPlayer src={audioUrl} autoplay={settings.autoplayAudio} />
               </div>
             )}
-            {revealed && settings.showText && (
+            {revealed && (
               <div className="border-t border-gray-100 pt-6">
                 <p className="text-xl text-gray-600 italic break-words leading-relaxed">
                   <BoldWord text={ctx.translation} target={current.translation} />

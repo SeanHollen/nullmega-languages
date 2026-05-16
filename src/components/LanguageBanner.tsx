@@ -4,6 +4,7 @@ import { FaCog } from "react-icons/fa";
 import { LANGUAGES, getCustomLanguages, addCustomLanguage } from "../utils/language";
 import { useLanguage } from "../contexts/LanguageContext";
 import { LanguageSelect } from "./LanguageSelect";
+import logo from "../assets/logo.png";
 
 const OTHER = `__other__`;
 
@@ -50,6 +51,14 @@ export function LanguageBanner() {
   return (
     <header className="bg-green-600 sticky top-0 z-10 shadow-md">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-center gap-3 sm:gap-8">
+        <button
+          onClick={() => void navigate(`/`)}
+          className="shrink-0 cursor-pointer hover:opacity-80 transition"
+          title={`Home`}
+        >
+          <img src={logo} alt={`Logo`} className="h-8 w-8" />
+        </button>
+
         {addingCustom ? (
           <div className="flex items-center gap-2 flex-1 max-w-md">
             <input
@@ -90,7 +99,7 @@ export function LanguageBanner() {
         )}
 
         <button
-          onClick={() => navigate(`/settings`)}
+          onClick={() => void navigate(`/settings`)}
           className="flex items-center gap-2 px-2 sm:px-3 py-1.5 rounded-lg text-white hover:bg-white/10 transition cursor-pointer text-sm font-medium whitespace-nowrap shrink-0"
           title={`Configure AI provider keys`}
         >

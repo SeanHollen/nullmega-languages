@@ -1,5 +1,6 @@
+import type { ReactNode } from "react";
 import * as Select from "@radix-ui/react-select";
-import { FaCheck, FaChevronDown } from "react-icons/fa";
+import { FaCheck, FaChevronDown, FaPen } from "react-icons/fa";
 
 interface Props {
   value: string;
@@ -7,7 +8,17 @@ interface Props {
   onChange: (value: string) => void;
 }
 
-function Item({ value, label, muted }: { value: string; label: string; muted?: boolean }) {
+function Item({
+  value,
+  label,
+  muted,
+  icon,
+}: {
+  value: string;
+  label: string;
+  muted?: boolean;
+  icon?: ReactNode;
+}) {
   return (
     <Select.Item
       value={value}
@@ -19,6 +30,7 @@ function Item({ value, label, muted }: { value: string; label: string; muted?: b
         </Select.ItemIndicator>
       </span>
       <Select.ItemText>{label}</Select.ItemText>
+      {icon}
     </Select.Item>
   );
 }
@@ -40,7 +52,11 @@ export function LanguageSelect({ value, languages, onChange }: Props) {
           className="z-50 min-w-[160px] max-h-72 overflow-y-auto bg-white rounded-xl shadow-lg border border-gray-100 py-1"
         >
           <Select.Viewport>
-            <Item value="__other__" label="Write the name" />
+            <Item
+              value="__other__"
+              label="Write it"
+              icon={<FaPen className="text-xs text-gray-400" />}
+            />
             <Select.Separator className="my-1 h-px bg-gray-300" />
             {languages.map((lang) => (
               <Item key={lang} value={lang} label={lang} />

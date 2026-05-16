@@ -1,6 +1,13 @@
 import { useRef, useState } from "react";
-import { FaPlus, FaFileImport, FaFileExport, FaPen } from "react-icons/fa";
-import type { Flashcard, FlashcardStatusDerived } from "../../utils/flashcards";
+import {
+  FaPlus,
+  FaFileImport,
+  FaFileExport,
+  FaPen,
+  FaSort,
+  FaSortUp,
+  FaSortDown,
+} from "react-icons/fa";
 import {
   updateFlashcardTags,
   computeStatus,
@@ -9,6 +16,7 @@ import {
   exportFlashcards,
   importFlashcards,
 } from "../../utils/flashcards";
+import type { Flashcard, FlashcardStatusDerived } from "../../utils/flashcards";
 import { EditCardModal } from "./EditCardModal";
 
 const STATUS_STYLES: Record<FlashcardStatusDerived, string> = {
@@ -17,6 +25,14 @@ const STATUS_STYLES: Record<FlashcardStatusDerived, string> = {
   scheduled: `bg-blue-100 text-blue-700`,
   due: `bg-orange-100 text-orange-700`,
   dropped: `bg-gray-100 text-gray-400 line-through`,
+};
+
+const STATUS_ORDER: Record<FlashcardStatusDerived, number> = {
+  due: 0,
+  learning: 1,
+  new: 2,
+  scheduled: 3,
+  dropped: 4,
 };
 
 function relativeTime(ts: number | null): string {
@@ -47,6 +63,79 @@ function parseTags(input: string): string[] {
     .filter((t) => t.length > 0);
 }
 
+type SortCol =
+  | "source"
+  | "translation"
+  | "status"
+  | "lastReviewed"
+  | "interval"
+  | "tags"
+  | "addedAt";
+type SortDir = "asc" | "desc";
+
+function sortCards(cards: Flashcard[], col: SortCol, dir: SortDir): Flashcard[] {
+  const sign = dir === "asc" ? 1 : -1;
+  return [...cards].sort((a, b) => {
+    let cmp = 0;
+    switch (col) {
+      case "source":
+        cmp = a.source.localeCompare(b.source);
+        break;
+      case "translation":
+        cmp = a.translation.localeCompare(b.translation);
+        break;
+      case "status":
+        cmp = STATUS_ORDER[computeStatus(a)] - STATUS_ORDER[computeStatus(b)];
+        break;
+      case "lastReviewed":
+        cmp = (a.lastReviewed ?? 0) - (b.lastReviewed ?? 0);
+        break;
+      case "interval":
+        cmp = a.currentInterval - b.currentInterval;
+        break;
+      case "tags":
+        cmp = a.tags.length - b.tags.length;
+        break;
+      case "addedAt":
+        cmp = a.addedAt - b.addedAt;
+        break;
+    }
+    return cmp * sign;
+  });
+}
+
+function SortableHeader({
+  label,
+  active,
+  dir,
+  onClick,
+}: {
+  label: string;
+  active: boolean;
+  dir: SortDir;
+  onClick: () => void;
+}) {
+  return (
+    <th className="px-4 py-3">
+      <button
+        onClick={onClick}
+        className="flex items-center gap-0.5 uppercase tracking-wide hover:text-gray-700 cursor-pointer"
+      >
+        {label}
+        {active ? (
+          dir === "asc" ? (
+            <FaSortUp className="ml-1 text-xs" />
+          ) : (
+            <FaSortDown className="ml-1 text-xs" />
+          )
+        ) : (
+          <FaSort className="ml-1 text-xs text-gray-300" />
+        )}
+      </button>
+    </th>
+  );
+}
+
 interface Props {
   cards: Flashcard[];
   language: string;
@@ -61,7 +150,25 @@ export function FlashcardTable({ cards, language, onRefresh }: Props) {
   const [newTranslation, setNewTranslation] = useState(``);
   const [newTags, setNewTags] = useState(``);
   const [actionMessage, setActionMessage] = useState<string | null>(null);
+  const [sort, setSort] = useState<{ col: SortCol; dir: SortDir } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  function handleSort(col: SortCol) {
+    setSort((prev) =>
+      prev?.col === col ? { col, dir: prev.dir === "asc" ? "desc" : "asc" } : { col, dir: "asc" },
+    );
+  }
+
+  function th(col: SortCol, label: string) {
+    return (
+      <SortableHeader
+        label={label}
+        active={sort?.col === col}
+        dir={sort?.col === col ? sort.dir : "asc"}
+        onClick={() => handleSort(col)}
+      />
+    );
+  }
 
   function handleAddCard() {
     const source = newSource.trim();
@@ -125,6 +232,8 @@ export function FlashcardTable({ cards, language, onRefresh }: Props) {
           c.tags.some((t) => t.toLowerCase().includes(q)),
       )
     : cards;
+
+  const sorted = sort ? sortCards(filtered, sort.col, sort.dir) : filtered;
 
   return (
     <>
@@ -248,27 +357,27 @@ export function FlashcardTable({ cards, language, onRefresh }: Props) {
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="border-b border-gray-100 bg-gray-50">
-                <tr className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                  <th className="px-4 py-3">{`Source`}</th>
-                  <th className="px-4 py-3">{`Translation`}</th>
-                  <th className="px-4 py-3">{`Status`}</th>
-                  <th className="px-4 py-3">{`Last reviewed`}</th>
-                  <th className="px-4 py-3">{`Interval`}</th>
-                  <th className="px-4 py-3">{`Tags`}</th>
-                  <th className="px-4 py-3">{`Added`}</th>
+              <thead className="border-b border-gray-100 bg-gray-50 text-xs font-semibold text-gray-500">
+                <tr className="text-left">
+                  {th("source", "Source")}
+                  {th("translation", "Translation")}
+                  {th("status", "Status")}
+                  {th("lastReviewed", "Last reviewed")}
+                  {th("interval", "Interval")}
+                  {th("tags", "Tags")}
+                  {th("addedAt", "Added")}
                   <th className="px-4 py-3" />
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
-                {filtered.length === 0 ? (
+                {sorted.length === 0 ? (
                   <tr>
                     <td colSpan={8} className="px-4 py-6 text-center text-gray-400 text-sm">
                       {`No matches for "${search}"`}
                     </td>
                   </tr>
                 ) : (
-                  filtered.map((c) => {
+                  sorted.map((c) => {
                     const status = computeStatus(c);
                     return (
                       <tr key={c.id}>

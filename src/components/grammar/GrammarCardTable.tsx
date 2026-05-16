@@ -1,3 +1,5 @@
+import { useState } from "react";
+import { FaSort, FaSortUp, FaSortDown } from "react-icons/fa";
 import type { GrammarCard, GrammarCategory, GrammarCardStatus } from "../../utils/grammarCards";
 import { computeGrammarStatus, removeGrammarCard } from "../../utils/grammarCards";
 
@@ -21,6 +23,14 @@ const STATUS_STYLES: Record<GrammarCardStatus, string> = {
   scheduled: `bg-blue-100 text-blue-700`,
   due: `bg-orange-100 text-orange-700`,
   dropped: `bg-gray-100 text-gray-400 line-through`,
+};
+
+const STATUS_ORDER: Record<GrammarCardStatus, number> = {
+  due: 0,
+  learning: 1,
+  new: 2,
+  scheduled: 3,
+  dropped: 4,
 };
 
 const LEVEL_LABELS: Record<number, string> = {
@@ -51,12 +61,104 @@ function formatInterval(ms: number): string {
   return `${days}d`;
 }
 
+type SortCol =
+  | "title"
+  | "category"
+  | "level"
+  | "questions"
+  | "status"
+  | "lastReviewed"
+  | "interval";
+type SortDir = "asc" | "desc";
+
+function sortCards(cards: GrammarCard[], col: SortCol, dir: SortDir): GrammarCard[] {
+  const sign = dir === "asc" ? 1 : -1;
+  return [...cards].sort((a, b) => {
+    let cmp = 0;
+    switch (col) {
+      case "title":
+        cmp = a.title.localeCompare(b.title);
+        break;
+      case "category":
+        cmp = a.category.localeCompare(b.category);
+        break;
+      case "level":
+        cmp = a.level - b.level;
+        break;
+      case "questions":
+        cmp = a.questions.length - b.questions.length;
+        break;
+      case "status":
+        cmp = STATUS_ORDER[computeGrammarStatus(a)] - STATUS_ORDER[computeGrammarStatus(b)];
+        break;
+      case "lastReviewed":
+        cmp = (a.lastReviewed ?? 0) - (b.lastReviewed ?? 0);
+        break;
+      case "interval":
+        cmp = a.currentInterval - b.currentInterval;
+        break;
+    }
+    return cmp * sign;
+  });
+}
+
+function SortableHeader({
+  label,
+  active,
+  dir,
+  onClick,
+}: {
+  label: string;
+  active: boolean;
+  dir: SortDir;
+  onClick: () => void;
+}) {
+  return (
+    <th className="px-4 py-3">
+      <button
+        onClick={onClick}
+        className="flex items-center gap-0.5 uppercase tracking-wide hover:text-gray-700 cursor-pointer"
+      >
+        {label}
+        {active ? (
+          dir === "asc" ? (
+            <FaSortUp className="ml-1 text-xs" />
+          ) : (
+            <FaSortDown className="ml-1 text-xs" />
+          )
+        ) : (
+          <FaSort className="ml-1 text-xs text-gray-300" />
+        )}
+      </button>
+    </th>
+  );
+}
+
 interface Props {
   cards: GrammarCard[];
   onRefresh: () => void;
 }
 
 export function GrammarCardTable({ cards, onRefresh }: Props) {
+  const [sort, setSort] = useState<{ col: SortCol; dir: SortDir } | null>(null);
+
+  function handleSort(col: SortCol) {
+    setSort((prev) =>
+      prev?.col === col ? { col, dir: prev.dir === "asc" ? "desc" : "asc" } : { col, dir: "asc" },
+    );
+  }
+
+  function th(col: SortCol, label: string) {
+    return (
+      <SortableHeader
+        label={label}
+        active={sort?.col === col}
+        dir={sort?.col === col ? sort.dir : "asc"}
+        onClick={() => handleSort(col)}
+      />
+    );
+  }
+
   if (cards.length === 0) {
     return (
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 text-center">
@@ -67,24 +169,26 @@ export function GrammarCardTable({ cards, onRefresh }: Props) {
     );
   }
 
+  const sorted = sort ? sortCards(cards, sort.col, sort.dir) : cards;
+
   return (
     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
-          <thead className="border-b border-gray-100 bg-gray-50">
-            <tr className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">
-              <th className="px-4 py-3">{`Title`}</th>
-              <th className="px-4 py-3">{`Category`}</th>
-              <th className="px-4 py-3">{`Level`}</th>
-              <th className="px-4 py-3">{`Questions`}</th>
-              <th className="px-4 py-3">{`Status`}</th>
-              <th className="px-4 py-3">{`Last reviewed`}</th>
-              <th className="px-4 py-3">{`Interval`}</th>
+          <thead className="border-b border-gray-100 bg-gray-50 text-xs font-semibold text-gray-500">
+            <tr className="text-left">
+              {th("title", "Title")}
+              {th("category", "Category")}
+              {th("level", "Level")}
+              {th("questions", "Questions")}
+              {th("status", "Status")}
+              {th("lastReviewed", "Last reviewed")}
+              {th("interval", "Interval")}
               <th className="px-4 py-3" />
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-50">
-            {cards.map((c) => {
+            {sorted.map((c) => {
               const status = computeGrammarStatus(c);
               return (
                 <tr key={c.id}>

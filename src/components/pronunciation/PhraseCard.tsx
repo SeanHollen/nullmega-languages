@@ -72,7 +72,7 @@ export function PhraseCard({
 
   return (
     <div className={`bg-white rounded-2xl border shadow-sm p-6 space-y-4 ${borderColor}`}>
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex items-center gap-3">
         <span className="text-xs text-gray-400 font-medium">{`Phrase ${index + 1}`}</span>
         <AudioPlayer src={audioUrl} />
       </div>
@@ -119,7 +119,7 @@ export function PhraseCard({
             </button>
           )}
           {userRecordingUrl && !isRecording && (
-            <AudioPlayer src={userRecordingUrl} label={`Your recording`} />
+            <AudioPlayer src={userRecordingUrl} label={`Your recording`} small />
           )}
         </div>
 

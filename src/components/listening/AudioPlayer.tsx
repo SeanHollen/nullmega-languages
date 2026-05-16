@@ -5,9 +5,10 @@ interface Props {
   src: string;
   label?: string;
   autoplay?: boolean;
+  small?: boolean;
 }
 
-export function AudioPlayer({ src, label, autoplay = false }: Props) {
+export function AudioPlayer({ src, label, autoplay = false, small = false }: Props) {
   const [trackedSrc, setTrackedSrc] = useState(src);
   const [playing, setPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -67,32 +68,29 @@ export function AudioPlayer({ src, label, autoplay = false }: Props) {
 
   return (
     <div
-      className="inline-flex items-center gap-3 px-4 py-2 rounded-xl border border-green-200 text-green-700 text-sm font-medium overflow-hidden"
+      className={`inline-flex items-center rounded-xl border border-green-200 text-green-700 font-medium overflow-hidden ${small ? `text-xs` : `text-sm`}`}
       style={{
         background: `linear-gradient(to right, #bbf7d0 ${progress * 100}%, #f0fdf4 ${progress * 100}%)`,
       }}
     >
       <button
         onClick={toggle}
-        className="hover:brightness-90 transition cursor-pointer"
+        className={`flex items-center gap-3 hover:brightness-90 transition cursor-pointer ${small ? `px-3 py-1.5` : `px-4 py-2`}`}
         aria-label={playing ? `Pause` : `Play`}
       >
         {playing ? <FaPause className="shrink-0" /> : <FaPlay className="shrink-0" />}
+        {label && <span>{label}</span>}
       </button>
+      <div className="w-px self-stretch bg-green-200" />
       <button
         onClick={restart}
         disabled={progress === 0}
-        className="transition enabled:hover:brightness-90 enabled:cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+        className={`transition enabled:hover:brightness-90 enabled:cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed ${small ? `px-2 py-1.5` : `px-3 py-2`}`}
         title={`Restart`}
         aria-label={`Restart`}
       >
         <FaUndo className="shrink-0" />
       </button>
-      {label && (
-        <button onClick={toggle} className="cursor-pointer hover:brightness-90 transition">
-          {label}
-        </button>
-      )}
     </div>
   );
 }

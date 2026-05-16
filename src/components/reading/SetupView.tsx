@@ -1,13 +1,5 @@
 import { FaExclamationTriangle } from "react-icons/fa";
 
-function difficultyLabel(d: number) {
-  if (d <= 20) return "Beginner";
-  if (d <= 40) return "Elementary";
-  if (d <= 60) return "Intermediate";
-  if (d <= 80) return "Upper-Intermediate";
-  return "Advanced";
-}
-
 interface Props {
   language: string;
   difficulty: number;
@@ -39,7 +31,6 @@ export function SetupView({
         <label className="block text-sm font-medium text-gray-700 mb-2">
           {`Difficulty: `}
           <span className="text-green-600 font-bold">{difficulty}</span>
-          <span className="text-gray-400 font-normal ml-2">{`(${difficultyLabel(difficulty)})`}</span>
         </label>
         <input
           type="range"

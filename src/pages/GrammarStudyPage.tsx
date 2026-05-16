@@ -27,11 +27,8 @@ export function GrammarStudyPage() {
     Array(sessionData?.current?.questions.length ?? 0).fill(``),
   );
   const [questionResults, setQuestionResults] = useState<boolean[]>([]);
-  const [stats, setStats] = useState({ right: 0, wrong: 0 });
 
   const title = mode === `learn` ? `Learn Grammar` : `Review Grammar`;
-  const sessionDone = current === null && (stats.right > 0 || stats.wrong > 0);
-  const nothingToStudy = current === null && stats.right === 0 && stats.wrong === 0;
 
   const allAnswered = current !== null && answers.every((a) => a.trim() !== ``);
 
@@ -73,8 +70,6 @@ export function GrammarStudyPage() {
       });
     }
 
-    setStats((p) => ({ right: p.right + (right ? 1 : 0), wrong: p.wrong + (right ? 0 : 1) }));
-
     const nextRemaining = right ? remaining.filter((c) => c.id !== current.id) : remaining;
     const nextCard = nextRemaining.length > 0 ? pickRandom(nextRemaining) : null;
 
@@ -103,7 +98,7 @@ export function GrammarStudyPage() {
           )}
         </div>
 
-        {nothingToStudy ? (
+        {current === null ? (
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 text-center">
             <p className="text-gray-500">
               {mode === `learn`
@@ -111,20 +106,7 @@ export function GrammarStudyPage() {
                 : `No cards due for review. Come back later.`}
             </p>
           </div>
-        ) : sessionDone ? (
-          <div className="bg-white rounded-2xl border border-green-100 shadow-sm p-10 text-center space-y-3">
-            <p className="text-2xl font-bold text-gray-800">{`Session complete!`}</p>
-            <p className="text-sm text-gray-500">
-              {`${stats.right} correct · ${stats.wrong} incorrect`}
-            </p>
-            <button
-              onClick={() => navigate(`/grammar`)}
-              className="mt-4 bg-green-600 text-white px-6 py-2 rounded-xl font-semibold hover:bg-green-700 transition cursor-pointer"
-            >
-              {`Back to grammar`}
-            </button>
-          </div>
-        ) : current && phase === `answering` ? (
+        ) : phase === `answering` ? (
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 space-y-6">
             <div className="space-y-1">
               <p className="text-lg font-bold text-gray-800">{current.title}</p>
@@ -177,7 +159,7 @@ export function GrammarStudyPage() {
               {`Check answers →`}
             </button>
           </div>
-        ) : current && phase === `results` ? (
+        ) : phase === `results` ? (
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 space-y-6">
             <div className="space-y-1">
               <p className="text-lg font-bold text-gray-800">{current.title}</p>

@@ -27,7 +27,6 @@ export function StudyPage() {
   const [revealed, setRevealed] = useState(false);
   const [textRevealed, setTextRevealed] = useState(false);
   const [contextIndex, setContextIndex] = useState(() => sessionData?.contextIndex ?? 0);
-  const [stats, setStats] = useState({ right: 0, wrong: 0 });
   const [menuOpen, setMenuOpen] = useState(false);
   const [audioUrl, setAudioUrl] = useState<string | null>(() => sessionData?.audioUrl ?? null);
 
@@ -96,10 +95,6 @@ export function StudyPage() {
         });
       }
     }
-    setStats((p) => ({
-      right: p.right + (right ? 1 : 0),
-      wrong: p.wrong + (right ? 0 : 1),
-    }));
     if (right) {
       advanceCard();
     } else {
@@ -135,7 +130,6 @@ export function StudyPage() {
         dateContextGenerated: null,
       });
     }
-    setStats((p) => ({ right: p.right + 1, wrong: p.wrong }));
     setMenuOpen(false);
     advanceCard();
   }
@@ -148,8 +142,6 @@ export function StudyPage() {
   }
 
   const ctx = current && current.contexts[contextIndex];
-  const sessionDone = current === null && (stats.right > 0 || stats.wrong > 0);
-  const nothingToStudy = current === null && stats.right === 0 && stats.wrong === 0;
   const title = mode === "learn" ? `Learn new words` : `Review`;
 
   return (
@@ -170,7 +162,7 @@ export function StudyPage() {
           )}
         </div>
 
-        {nothingToStudy ? (
+        {current === null ? (
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 text-center">
             <p className="text-gray-500">
               {mode === "learn"
@@ -178,20 +170,7 @@ export function StudyPage() {
                 : `No cards due for review. Come back later.`}
             </p>
           </div>
-        ) : sessionDone ? (
-          <div className="bg-white rounded-2xl border border-green-100 shadow-sm p-10 text-center space-y-3">
-            <p className="text-2xl font-bold text-gray-800">{`Session complete!`}</p>
-            <p className="text-sm text-gray-500">
-              {`${stats.right} correct · ${stats.wrong} incorrect`}
-            </p>
-            <button
-              onClick={() => navigate(`/vocabulary`)}
-              className="mt-4 bg-green-600 text-white px-6 py-2 rounded-xl font-semibold hover:bg-green-700 transition cursor-pointer"
-            >
-              {`Back to vocabulary`}
-            </button>
-          </div>
-        ) : current && ctx ? (
+        ) : ctx ? (
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-10 space-y-6 text-center">
             {settings.showText ? (
               <p className="text-2xl text-gray-800 break-words leading-relaxed">

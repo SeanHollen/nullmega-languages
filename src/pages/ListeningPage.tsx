@@ -10,7 +10,7 @@ import { HistoryList } from "../components/HistoryList";
 import { useGenerateReading } from "../hooks/useGenerateReading";
 import { translateBatch } from "../hooks/useTranslate";
 import type { RatingResult } from "../hooks/useAbility";
-import { loadAbility, computeRating } from "../hooks/useAbility";
+import { loadAbility, computeRating, DEFAULT_LANGUAGE_COMPLEXITY } from "../hooks/useAbility";
 import type { ExerciseAudio } from "../hooks/useTTS";
 import { generateExerciseAudio } from "../hooks/useTTS";
 import { useLanguage } from "../contexts/LanguageContext";
@@ -24,7 +24,9 @@ type Phase = "setup" | "listening" | "results";
 export function ListeningPage() {
   const navigate = useNavigate();
   const { language } = useLanguage();
-  const [difficulty, setDifficulty] = useState(() => loadAbility(language, `listening`) ?? 50);
+  const [languageComplexity, setLanguageComplexity] = useState(
+    () => loadAbility(language, `listening`) ?? DEFAULT_LANGUAGE_COMPLEXITY.listening,
+  );
   const [rated, setRated] = useState(true);
   const [phase, setPhase] = useState<Phase>(`setup`);
   const [exercise, setExercise] = useState<Exercise | null>(null);
@@ -40,7 +42,7 @@ export function ListeningPage() {
   function handleGenerate() {
     setAudioError(``);
     mutate(
-      { language, difficulty, mode: `listening` },
+      { language, languageComplexity, mode: `listening` },
       {
         onSuccess: (data: Exercise) => {
           setExercise(data);
@@ -76,7 +78,7 @@ export function ListeningPage() {
     const total = exercise.questions.length;
     let rr: RatingResult | null = null;
     if (rated) {
-      rr = computeRating(language, correct, total, difficulty, `listening`);
+      rr = computeRating(language, correct, total, languageComplexity, `listening`);
     }
     setRatingResult(rr);
     const completedAt = Date.now();
@@ -84,7 +86,7 @@ export function ListeningPage() {
       mode: `listening`,
       language,
       title: exercise.title,
-      difficulty,
+      difficulty: languageComplexity,
       scoreEarned: correct,
       scoreMax: total,
       ratingBefore: rr?.oldRating ?? null,
@@ -127,7 +129,9 @@ export function ListeningPage() {
     setSelected([]);
     setRatingResult(null);
     setAssessmentId(null);
-    setDifficulty(loadAbility(language, `listening`) ?? 50);
+    setLanguageComplexity(
+      loadAbility(language, `listening`) ?? DEFAULT_LANGUAGE_COMPLEXITY.listening,
+    );
     setPhase(`setup`);
   }
 
@@ -151,12 +155,12 @@ export function ListeningPage() {
           <>
             <SetupView
               language={language}
-              difficulty={difficulty}
+              languageComplexity={languageComplexity}
               rated={rated}
               savedRating={loadAbility(language, `listening`)}
               error={error}
               generateLabel={`Generate Listening Exercise`}
-              onDifficultyChange={setDifficulty}
+              onLanguageComplexityChange={setLanguageComplexity}
               onRatedChange={setRated}
               onGenerate={handleGenerate}
             />
@@ -177,7 +181,7 @@ export function ListeningPage() {
           <ListeningPassageView
             exercise={exercise}
             language={language}
-            difficulty={difficulty}
+            languageComplexity={languageComplexity}
             audio={audio}
             selected={selected}
             onSelect={handleSelect}

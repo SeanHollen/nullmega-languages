@@ -10,7 +10,7 @@ import { HistoryList } from "../components/HistoryList";
 import { useGenerateReading } from "../hooks/useGenerateReading";
 import { translateBatch } from "../hooks/useTranslate";
 import type { RatingResult } from "../hooks/useAbility";
-import { loadAbility, computeRating } from "../hooks/useAbility";
+import { loadAbility, computeRating, DEFAULT_LANGUAGE_COMPLEXITY } from "../hooks/useAbility";
 import { useLanguage } from "../contexts/LanguageContext";
 import { saveAssessment } from "../utils/history";
 import { uploadAssessment } from "../utils/api";
@@ -20,7 +20,9 @@ import type { Exercise, Phase } from "../types";
 export function ReadingPage() {
   const navigate = useNavigate();
   const { language } = useLanguage();
-  const [difficulty, setDifficulty] = useState(() => loadAbility(language) ?? 50);
+  const [languageComplexity, setLanguageComplexity] = useState(
+    () => loadAbility(language) ?? DEFAULT_LANGUAGE_COMPLEXITY.reading,
+  );
   const [rated, setRated] = useState(true);
   const [phase, setPhase] = useState<Phase>(`setup`);
   const [exercise, setExercise] = useState<Exercise | null>(null);
@@ -32,7 +34,7 @@ export function ReadingPage() {
 
   function handleGenerate() {
     mutate(
-      { language, difficulty },
+      { language, languageComplexity },
       {
         onSuccess: (data: Exercise) => {
           setExercise(data);
@@ -57,7 +59,7 @@ export function ReadingPage() {
     const total = exercise.questions.length;
     let rr: RatingResult | null = null;
     if (rated) {
-      rr = computeRating(language, correct, total, difficulty);
+      rr = computeRating(language, correct, total, languageComplexity);
     }
     setRatingResult(rr);
     const completedAt = Date.now();
@@ -65,7 +67,7 @@ export function ReadingPage() {
       mode: `reading`,
       language,
       title: exercise.title,
-      difficulty,
+      difficulty: languageComplexity,
       scoreEarned: correct,
       scoreMax: total,
       ratingBefore: rr?.oldRating ?? null,
@@ -107,7 +109,7 @@ export function ReadingPage() {
     setRatingResult(null);
     setAssessmentId(null);
     setTranslations(null);
-    setDifficulty(loadAbility(language) ?? 50);
+    setLanguageComplexity(loadAbility(language) ?? DEFAULT_LANGUAGE_COMPLEXITY.reading);
     setPhase(`setup`);
   }
 
@@ -128,12 +130,12 @@ export function ReadingPage() {
           <>
             <SetupView
               language={language}
-              difficulty={difficulty}
+              languageComplexity={languageComplexity}
               rated={rated}
               savedRating={loadAbility(language)}
               error={error?.message ?? ``}
               generateLabel={`Generate Reading Exercise`}
-              onDifficultyChange={setDifficulty}
+              onLanguageComplexityChange={setLanguageComplexity}
               onRatedChange={setRated}
               onGenerate={handleGenerate}
             />
@@ -147,7 +149,7 @@ export function ReadingPage() {
           <PassageView
             exercise={exercise}
             language={language}
-            difficulty={difficulty}
+            languageComplexity={languageComplexity}
             selected={selected}
             onSelect={handleSelect}
             onSubmit={handleSubmit}

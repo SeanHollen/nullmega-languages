@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import type { Mode } from "../hooks/useAbility";
 import { getHistory } from "../utils/history";
+import { deltaColor } from "../utils/colors";
 
 interface Props {
   mode: Mode;
@@ -51,8 +52,7 @@ export function HistoryList({ mode, language, limit = 10 }: Props) {
           const showRating = typeof r.ratingAfter === `number`;
           const hasBefore = typeof r.ratingBefore === `number`;
           const delta = showRating && hasBefore ? r.ratingAfter! - r.ratingBefore! : 0;
-          const ratingClass =
-            delta > 0 ? `text-green-600` : delta < 0 ? `text-red-500` : `text-gray-500`;
+          const ratingClass = deltaColor(delta);
           return (
             <div key={r.id} className="flex items-center justify-between gap-3 py-2 text-sm">
               <div className="min-w-0 flex-1">
@@ -60,7 +60,7 @@ export function HistoryList({ mode, language, limit = 10 }: Props) {
                 <p className="text-xs text-gray-400">{relativeTime(r.completedAt)}</p>
               </div>
               <div className="flex items-center gap-4 text-xs shrink-0">
-                <span className="text-gray-500">{`Diff ${r.difficulty}`}</span>
+                <span className="text-gray-500">{`Complexity ${r.difficulty}`}</span>
                 {showRating && (
                   <span className={`font-medium ${ratingClass}`}>
                     {hasBefore ? `${r.ratingBefore} → ${r.ratingAfter}` : `→ ${r.ratingAfter}`}

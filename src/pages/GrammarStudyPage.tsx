@@ -98,7 +98,7 @@ export function GrammarStudyPage() {
           )}
         </div>
 
-        {current === null ? (
+        {current === null && (
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 text-center">
             <p className="text-gray-500">
               {mode === `learn`
@@ -106,7 +106,8 @@ export function GrammarStudyPage() {
                 : `No cards due for review. Come back later.`}
             </p>
           </div>
-        ) : phase === `answering` ? (
+        )}
+        {current !== null && phase === `answering` && (
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 space-y-6">
             <div className="space-y-1">
               <p className="text-lg font-bold text-gray-800">{current.title}</p>
@@ -159,7 +160,8 @@ export function GrammarStudyPage() {
               {`Check answers →`}
             </button>
           </div>
-        ) : phase === `results` ? (
+        )}
+        {current !== null && phase === `results` && (
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 space-y-6">
             <div className="space-y-1">
               <p className="text-lg font-bold text-gray-800">{current.title}</p>
@@ -199,7 +201,7 @@ export function GrammarStudyPage() {
               {`Continue →`}
             </button>
           </div>
-        ) : null}
+        )}
       </div>
     </div>
   );

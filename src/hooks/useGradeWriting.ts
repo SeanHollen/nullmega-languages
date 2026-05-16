@@ -15,7 +15,7 @@ async function gradeAnswers(
   exercise: WritingExercise,
   answers: string[],
   language: string,
-  difficulty: number,
+  languageComplexity: number,
 ): Promise<WritingGrades> {
   const questionBlock = exercise.questions
     .map((q, i) => {
@@ -25,7 +25,7 @@ async function gradeAnswers(
     })
     .join("\n\n");
 
-  const prompt = `You are grading a ${language} writing exercise at difficulty ${difficulty}/100.
+  const prompt = `You are grading a ${language} writing exercise at difficulty ${languageComplexity}/100.
 
 Passage the student read:
 "${exercise.passage}"
@@ -64,12 +64,12 @@ export function useGradeWriting() {
       exercise,
       answers,
       language,
-      difficulty,
+      languageComplexity,
     }: {
       exercise: WritingExercise;
       answers: string[];
       language: string;
-      difficulty: number;
-    }) => gradeAnswers(exercise, answers, language, difficulty),
+      languageComplexity: number;
+    }) => gradeAnswers(exercise, answers, language, languageComplexity),
   });
 }

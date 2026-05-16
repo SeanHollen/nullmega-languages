@@ -1,3 +1,4 @@
+import type { ReactElement } from "react";
 import { FaCheck, FaTimes, FaMinus } from "react-icons/fa";
 import type { PronunciationPhrase } from "../../hooks/useGeneratePronunciation";
 import type { RatingResult } from "../../hooks/useAbility";
@@ -8,6 +9,20 @@ const OUTCOME_STYLE = {
   win: { label: `Win`, color: `text-green-600`, bg: `bg-green-100 border-green-200` },
   draw: { label: `Draw`, color: `text-yellow-600`, bg: `bg-yellow-50 border-yellow-100` },
   loss: { label: `Loss`, color: `text-red-600`, bg: `bg-red-50 border-red-100` },
+};
+
+type PhraseRating = "good" | "medium" | "bad" | null;
+
+const BORDER_BY_RATING: Record<NonNullable<PhraseRating>, string> = {
+  good: `border-green-200`,
+  medium: `border-yellow-200`,
+  bad: `border-red-200`,
+};
+
+const ICON_BY_RATING: Record<NonNullable<PhraseRating>, ReactElement> = {
+  good: <FaCheck className="text-green-500 mt-0.5 shrink-0" />,
+  medium: <FaMinus className="text-yellow-500 mt-0.5 shrink-0" />,
+  bad: <FaTimes className="text-red-500 mt-0.5 shrink-0" />,
 };
 
 interface Props {
@@ -80,21 +95,9 @@ export function PronunciationResultsView({
 
       <div className="space-y-3">
         {phrases.map((p, i) => {
-          const r = ratings[i];
-          const border =
-            r === "good"
-              ? `border-green-200`
-              : r === "medium"
-                ? `border-yellow-200`
-                : `border-red-200`;
-          const icon =
-            r === "good" ? (
-              <FaCheck className="text-green-500 mt-0.5 shrink-0" />
-            ) : r === "medium" ? (
-              <FaMinus className="text-yellow-500 mt-0.5 shrink-0" />
-            ) : (
-              <FaTimes className="text-red-500 mt-0.5 shrink-0" />
-            );
+          const r = ratings[i] ?? `bad`;
+          const border = BORDER_BY_RATING[r];
+          const icon = ICON_BY_RATING[r];
           return (
             <div key={i} className={`bg-white rounded-2xl border shadow-sm p-5 ${border}`}>
               <div className="flex items-start gap-3">

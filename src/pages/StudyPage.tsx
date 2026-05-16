@@ -162,7 +162,7 @@ export function StudyPage() {
           )}
         </div>
 
-        {current === null ? (
+        {current === null && (
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 text-center">
             <p className="text-gray-500">
               {mode === "learn"
@@ -170,17 +170,20 @@ export function StudyPage() {
                 : `No cards due for review. Come back later.`}
             </p>
           </div>
-        ) : ctx ? (
+        )}
+        {current !== null && ctx && (
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-10 space-y-6 text-center">
-            {settings.showText ? (
+            {settings.showText && (
               <p className="text-2xl text-gray-800 break-words leading-relaxed">
                 <BoldWord text={ctx.source} target={current.source} />
               </p>
-            ) : textRevealed ? (
+            )}
+            {!settings.showText && textRevealed && (
               <p className="text-2xl text-gray-800 break-words leading-relaxed opacity-70">
                 <BoldWord text={ctx.source} target={current.source} />
               </p>
-            ) : (
+            )}
+            {!settings.showText && !textRevealed && (
               <button
                 onClick={() => setTextRevealed(true)}
                 className="text-sm text-gray-400 hover:text-gray-600 underline underline-offset-2 transition cursor-pointer"
@@ -253,7 +256,7 @@ export function StudyPage() {
               )}
             </div>
           </div>
-        ) : null}
+        )}
       </div>
     </div>
   );

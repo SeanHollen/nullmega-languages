@@ -11,7 +11,7 @@ import { useGenerateWriting } from "../hooks/useGenerateWriting";
 import type { WritingGrade } from "../hooks/useGradeWriting";
 import { useGradeWriting } from "../hooks/useGradeWriting";
 import type { RatingResult } from "../hooks/useAbility";
-import { loadAbility, computeRating } from "../hooks/useAbility";
+import { loadAbility, computeRating, DEFAULT_LANGUAGE_COMPLEXITY } from "../hooks/useAbility";
 import { useLanguage } from "../contexts/LanguageContext";
 import { saveAssessment } from "../utils/history";
 import { uploadAssessment } from "../utils/api";
@@ -22,7 +22,9 @@ type Phase = "setup" | "writing" | "results";
 export function WritingPage() {
   const navigate = useNavigate();
   const { language } = useLanguage();
-  const [difficulty, setDifficulty] = useState(() => loadAbility(language, `writing`) ?? 50);
+  const [languageComplexity, setLanguageComplexity] = useState(
+    () => loadAbility(language, `writing`) ?? DEFAULT_LANGUAGE_COMPLEXITY.writing,
+  );
   const [rated, setRated] = useState(true);
   const [phase, setPhase] = useState<Phase>(`setup`);
   const [exercise, setExercise] = useState<WritingExercise | null>(null);
@@ -35,7 +37,7 @@ export function WritingPage() {
 
   function handleGenerate() {
     generateWriting.mutate(
-      { language, difficulty },
+      { language, languageComplexity },
       {
         onSuccess: (data: WritingExercise) => {
           setExercise(data);
@@ -57,7 +59,7 @@ export function WritingPage() {
   function handleSubmit() {
     if (!exercise) return;
     gradeWriting.mutate(
-      { exercise, answers, language, difficulty },
+      { exercise, answers, language, languageComplexity },
       {
         onSuccess: (result) => {
           setGrades(result.grades);
@@ -65,7 +67,7 @@ export function WritingPage() {
           const maxScore = result.grades.length * 5;
           let rr: RatingResult | null = null;
           if (rated) {
-            rr = computeRating(language, totalScore, maxScore, difficulty, `writing`);
+            rr = computeRating(language, totalScore, maxScore, languageComplexity, `writing`);
           }
           setRatingResult(rr);
           const completedAt = Date.now();
@@ -73,7 +75,7 @@ export function WritingPage() {
             mode: `writing`,
             language,
             title: exercise.title,
-            difficulty,
+            difficulty: languageComplexity,
             scoreEarned: totalScore,
             scoreMax: maxScore,
             ratingBefore: rr?.oldRating ?? null,
@@ -103,7 +105,7 @@ export function WritingPage() {
     setGrades([]);
     setRatingResult(null);
     setAssessmentId(null);
-    setDifficulty(loadAbility(language, `writing`) ?? 50);
+    setLanguageComplexity(loadAbility(language, `writing`) ?? DEFAULT_LANGUAGE_COMPLEXITY.writing);
     setPhase(`setup`);
   }
 
@@ -126,12 +128,12 @@ export function WritingPage() {
           <>
             <SetupView
               language={language}
-              difficulty={difficulty}
+              languageComplexity={languageComplexity}
               rated={rated}
               savedRating={loadAbility(language, `writing`)}
               error={error}
               generateLabel={`Generate Writing Exercise`}
-              onDifficultyChange={setDifficulty}
+              onLanguageComplexityChange={setLanguageComplexity}
               onRatedChange={setRated}
               onGenerate={handleGenerate}
             />
@@ -147,7 +149,7 @@ export function WritingPage() {
           <WritingPassageView
             exercise={exercise}
             language={language}
-            difficulty={difficulty}
+            languageComplexity={languageComplexity}
             answers={answers}
             onAnswerChange={handleAnswerChange}
             onSubmit={handleSubmit}

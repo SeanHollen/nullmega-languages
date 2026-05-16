@@ -2,24 +2,24 @@ import { FaExclamationTriangle } from "react-icons/fa";
 
 interface Props {
   language: string;
-  difficulty: number;
+  languageComplexity: number;
   rated: boolean;
   savedRating: number | null;
   error: string;
   generateLabel?: string;
-  onDifficultyChange: (d: number) => void;
+  onLanguageComplexityChange: (d: number) => void;
   onRatedChange: (r: boolean) => void;
   onGenerate: () => void;
 }
 
 export function SetupView({
   language,
-  difficulty,
+  languageComplexity,
   rated,
   savedRating,
   error,
   generateLabel = `Generate Passage`,
-  onDifficultyChange,
+  onLanguageComplexityChange,
   onRatedChange,
   onGenerate,
 }: Props) {
@@ -29,15 +29,15 @@ export function SetupView({
     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 space-y-6">
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          {`Difficulty: `}
-          <span className="text-green-600 font-bold">{difficulty}</span>
+          {`Language complexity: `}
+          <span className="text-green-600 font-bold">{languageComplexity}</span>
         </label>
         <input
           type="range"
           min={1}
           max={100}
-          value={difficulty}
-          onChange={(e) => onDifficultyChange(Number(e.target.value))}
+          value={languageComplexity}
+          onChange={(e) => onLanguageComplexityChange(Number(e.target.value))}
           className="w-full accent-green-600 cursor-pointer"
         />
         <div className="flex justify-between text-xs text-gray-400 mt-1">

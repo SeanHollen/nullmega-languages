@@ -10,6 +10,16 @@ const OUTCOME_STYLE = {
   loss: { label: `Loss`, color: `text-red-600`, bg: `bg-red-50 border-red-100` },
 };
 
+function optionClass(
+  optionIndex: number,
+  correctIndex: number,
+  selectedIndex: number | null,
+): string {
+  if (optionIndex === correctIndex) return `bg-green-50 text-green-800 font-medium`;
+  if (optionIndex === selectedIndex) return `bg-red-50 text-red-700`;
+  return `text-gray-500`;
+}
+
 function boldWords(text: string, words: string[]): React.ReactNode {
   if (!words.length) return text;
   const escaped = words.map((w) => w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
@@ -145,13 +155,7 @@ export function ResultsView({
                 {q.options.map((opt, oi) => (
                   <div
                     key={oi}
-                    className={`text-sm px-3 py-2 rounded-lg ${
-                      oi === q.correct
-                        ? `bg-green-50 text-green-800 font-medium`
-                        : oi === selected[qi]
-                          ? `bg-red-50 text-red-700`
-                          : `text-gray-500`
-                    }`}
+                    className={`text-sm px-3 py-2 rounded-lg ${optionClass(oi, q.correct, selected[qi])}`}
                   >
                     <p>
                       <ClickableText text={opt} language={language} />

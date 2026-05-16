@@ -4,10 +4,16 @@ function wordCount(text: string): number {
   return text.trim() === "" ? 0 : text.trim().split(/\s+/).length;
 }
 
+function wordCountColor(count: number, minWords: number, maxWords: number): string {
+  if (count < minWords) return `text-red-400`;
+  if (count > maxWords) return `text-orange-400`;
+  return `text-green-600`;
+}
+
 interface Props {
   exercise: WritingExercise;
   language: string;
-  difficulty: number;
+  languageComplexity: number;
   answers: string[];
   onAnswerChange: (index: number, value: string) => void;
   onSubmit: () => void;
@@ -16,7 +22,7 @@ interface Props {
 export function WritingPassageView({
   exercise,
   language,
-  difficulty,
+  languageComplexity,
   answers,
   onAnswerChange,
   onSubmit,
@@ -34,7 +40,7 @@ export function WritingPassageView({
     <div className="space-y-6">
       <div className="bg-white rounded-2xl border border-green-100 shadow-sm p-8">
         <p className="text-xs text-gray-400 uppercase tracking-wide mb-4">
-          {`${language} · Level ${difficulty}`}
+          {`${language} · Complexity ${languageComplexity}`}
         </p>
         <p className="text-gray-800 leading-relaxed whitespace-pre-wrap">{exercise.passage}</p>
         {exercise.difficultWords.length > 0 && (
@@ -56,12 +62,7 @@ export function WritingPassageView({
       {exercise.questions.map((q, i) => {
         const isEssay = q.type === "essay";
         const count = isEssay ? wordCount(answers[i] ?? "") : 0;
-        const countColor =
-          count < (q.minWords ?? 0)
-            ? `text-red-400`
-            : count > (q.maxWords ?? Infinity)
-              ? `text-orange-400`
-              : `text-green-600`;
+        const countColor = wordCountColor(count, q.minWords ?? 0, q.maxWords ?? Infinity);
 
         return (
           <div

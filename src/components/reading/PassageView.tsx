@@ -4,7 +4,7 @@ import { QuestionCard } from "./QuestionCard";
 interface Props {
   exercise: Exercise;
   language: string;
-  difficulty: number;
+  languageComplexity: number;
   selected: (number | null)[];
   onSelect: (questionIndex: number, optionIndex: number) => void;
   onSubmit: () => void;
@@ -13,7 +13,7 @@ interface Props {
 export function PassageView({
   exercise,
   language,
-  difficulty,
+  languageComplexity,
   selected,
   onSelect,
   onSubmit,
@@ -24,7 +24,7 @@ export function PassageView({
     <div className="space-y-6">
       <div className="bg-white rounded-2xl border border-green-100 shadow-sm p-8">
         <p className="text-xs text-gray-400 uppercase tracking-wide mb-4">
-          {`${language} · Level ${difficulty}`}
+          {`${language} · Complexity ${languageComplexity}`}
         </p>
         <p className="text-gray-800 leading-relaxed whitespace-pre-wrap">{exercise.passage}</p>
       </div>

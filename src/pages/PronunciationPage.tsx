@@ -9,7 +9,7 @@ import { HistoryList } from "../components/HistoryList";
 import type { PronunciationExercise } from "../hooks/useGeneratePronunciation";
 import { useGeneratePronunciation } from "../hooks/useGeneratePronunciation";
 import type { RatingResult } from "../hooks/useAbility";
-import { loadAbility, computeRating } from "../hooks/useAbility";
+import { loadAbility, computeRating, DEFAULT_LANGUAGE_COMPLEXITY } from "../hooks/useAbility";
 import { generatePhrasesAudio } from "../hooks/useTTS";
 import { useLanguage } from "../contexts/LanguageContext";
 import { saveAssessment } from "../utils/history";
@@ -21,7 +21,9 @@ type Phase = "setup" | "exercise" | "results";
 export function PronunciationPage() {
   const navigate = useNavigate();
   const { language } = useLanguage();
-  const [difficulty, setDifficulty] = useState(() => loadAbility(language, `pronunciation`) ?? 50);
+  const [languageComplexity, setLanguageComplexity] = useState(
+    () => loadAbility(language, `pronunciation`) ?? DEFAULT_LANGUAGE_COMPLEXITY.pronunciation,
+  );
   const [rated, setRated] = useState(true);
   const [phase, setPhase] = useState<Phase>(`setup`);
   const [exercise, setExercise] = useState<PronunciationExercise | null>(null);
@@ -36,7 +38,7 @@ export function PronunciationPage() {
   function handleGenerate() {
     setAudioError(``);
     mutate(
-      { language, difficulty },
+      { language, languageComplexity },
       {
         onSuccess: (data: PronunciationExercise) => {
           setExercise(data);
@@ -74,7 +76,7 @@ export function PronunciationPage() {
     const total = exercise.phrases.length;
     let rr: RatingResult | null = null;
     if (rated) {
-      rr = computeRating(language, weighted, total, difficulty, `pronunciation`);
+      rr = computeRating(language, weighted, total, languageComplexity, `pronunciation`);
     }
     setRatingResult(rr);
     const completedAt = Date.now();
@@ -82,7 +84,7 @@ export function PronunciationPage() {
       mode: `pronunciation`,
       language,
       title: exercise.title,
-      difficulty,
+      difficulty: languageComplexity,
       scoreEarned: weighted,
       scoreMax: total,
       ratingBefore: rr?.oldRating ?? null,
@@ -109,7 +111,9 @@ export function PronunciationPage() {
     setRatings([]);
     setRatingResult(null);
     setAssessmentId(null);
-    setDifficulty(loadAbility(language, `pronunciation`) ?? 50);
+    setLanguageComplexity(
+      loadAbility(language, `pronunciation`) ?? DEFAULT_LANGUAGE_COMPLEXITY.pronunciation,
+    );
     setPhase(`setup`);
   }
 
@@ -133,12 +137,12 @@ export function PronunciationPage() {
           <>
             <SetupView
               language={language}
-              difficulty={difficulty}
+              languageComplexity={languageComplexity}
               rated={rated}
               savedRating={loadAbility(language, `pronunciation`)}
               error={error}
               generateLabel={`Generate Pronunciation Exercise`}
-              onDifficultyChange={setDifficulty}
+              onLanguageComplexityChange={setLanguageComplexity}
               onRatedChange={setRated}
               onGenerate={handleGenerate}
             />
@@ -160,7 +164,7 @@ export function PronunciationPage() {
             phrases={exercise.phrases}
             audioUrls={audioUrls}
             language={language}
-            difficulty={difficulty}
+            languageComplexity={languageComplexity}
             ratings={ratings}
             onRate={handleRate}
             onSubmit={handleSubmit}

@@ -14,30 +14,30 @@ export interface PronunciationExercise {
   phrases: PronunciationPhrase[];
 }
 
-function phraseCount(difficulty: number): number {
-  if (difficulty <= 25) return 3;
-  if (difficulty <= 50) return 4;
-  if (difficulty <= 75) return 5;
+function phraseCount(languageComplexity: number): number {
+  if (languageComplexity <= 25) return 3;
+  if (languageComplexity <= 50) return 4;
+  if (languageComplexity <= 75) return 5;
   return 6;
 }
 
-function phraseLengthGuide(difficulty: number): string {
-  if (difficulty <= 20)
+function phraseLengthGuide(languageComplexity: number): string {
+  if (languageComplexity <= 20)
     return "3-6 words each. Use very common vocabulary and basic everyday phrases";
-  if (difficulty <= 40)
+  if (languageComplexity <= 40)
     return "5-10 words each. Use common vocabulary with some variety in tense and structure";
-  if (difficulty <= 60)
+  if (languageComplexity <= 60)
     return "8-15 words each. Include varied grammar, some idioms, and moderately challenging vocabulary";
-  if (difficulty <= 80)
+  if (languageComplexity <= 80)
     return "12-20 words each. Use complex sentence structures, idiomatic language, and nuanced vocabulary";
   return "15-25 words each. Include sophisticated idioms, complex grammar, and advanced vocabulary";
 }
 
 async function fetchPronunciationExercise(
   language: string,
-  difficulty: number,
+  languageComplexity: number,
 ): Promise<PronunciationExercise> {
-  const count = phraseCount(difficulty);
+  const count = phraseCount(languageComplexity);
 
   const recentTitles = getRecentTitles("pronunciation", language, 10);
   const avoidanceBlock =
@@ -46,7 +46,7 @@ async function fetchPronunciationExercise(
 ${recentTitles.map((t) => `- ${t}`).join("\n")}`
       : "";
 
-  const prompt = `Generate a pronunciation practice exercise in ${language} at difficulty ${difficulty}/100.
+  const prompt = `Generate a pronunciation practice exercise in ${language} at difficulty ${languageComplexity}/100.
 
 Return ONLY valid JSON with this exact shape:
 {
@@ -57,7 +57,7 @@ Return ONLY valid JSON with this exact shape:
 }
 
 - Generate exactly ${count} phrases
-- Phrases should be ${phraseLengthGuide(difficulty)}
+- Phrases should be ${phraseLengthGuide(languageComplexity)}
 - Include a variety of types: statements, questions, exclamations
 - Focus on phrases that are practical and natural-sounding in ${language}
 - At low difficulty: prioritise common sounds and basic patterns; at high difficulty: include challenging phoneme combinations, intonation shifts, and less common vocabulary
@@ -67,14 +67,24 @@ Return ONLY valid JSON with this exact shape:
     model: "o4-mini",
     messages: [{ role: "user", content: prompt }],
     response_format: { type: "json_object" },
-    metadata: { mode: "pronunciation", language, difficulty, userId: getUserId() },
+    metadata: {
+      mode: "pronunciation",
+      language,
+      difficulty: languageComplexity,
+      userId: getUserId(),
+    },
   });
   return JSON.parse(data.choices[0].message.content) as PronunciationExercise;
 }
 
 export function useGeneratePronunciation() {
   return useMutation({
-    mutationFn: ({ language, difficulty }: { language: string; difficulty: number }) =>
-      fetchPronunciationExercise(language, difficulty),
+    mutationFn: ({
+      language,
+      languageComplexity,
+    }: {
+      language: string;
+      languageComplexity: number;
+    }) => fetchPronunciationExercise(language, languageComplexity),
   });
 }

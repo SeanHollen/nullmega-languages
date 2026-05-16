@@ -61,14 +61,12 @@ export function PhraseCard({
     setIsRecording(false);
   }
 
-  const borderColor =
-    rating === "good"
-      ? `border-green-200`
-      : rating === "medium"
-        ? `border-yellow-200`
-        : rating === "bad"
-          ? `border-red-200`
-          : `border-gray-100`;
+  const BORDER_BY_RATING = {
+    good: `border-green-200`,
+    medium: `border-yellow-200`,
+    bad: `border-red-200`,
+  };
+  const borderColor = rating ? BORDER_BY_RATING[rating] : `border-gray-100`;
 
   return (
     <div className={`bg-white rounded-2xl border shadow-sm p-6 space-y-4 ${borderColor}`}>

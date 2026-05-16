@@ -3,6 +3,7 @@ import { FaArrowLeft } from "react-icons/fa";
 import type { Mode } from "../hooks/useAbility";
 import { useLanguage } from "../contexts/LanguageContext";
 import { getHistory } from "../utils/history";
+import { deltaColor } from "../utils/colors";
 
 const MODE_LABELS: Record<Mode, string> = {
   reading: `Reading`,
@@ -113,11 +114,7 @@ export function StatsPage() {
                 <span className="text-gray-500">{`Latest: `}</span>
                 <span className="font-semibold text-gray-800">{latest}</span>
                 {first !== latest && (
-                  <span
-                    className={`ml-2 text-xs font-medium ${
-                      delta > 0 ? `text-green-600` : delta < 0 ? `text-red-500` : `text-gray-500`
-                    }`}
-                  >
+                  <span className={`ml-2 text-xs font-medium ${deltaColor(delta)}`}>
                     {delta > 0 ? `+${delta.toFixed(1)}` : delta.toFixed(1)}
                     {` overall`}
                   </span>

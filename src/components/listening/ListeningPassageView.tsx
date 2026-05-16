@@ -6,7 +6,7 @@ import { QuestionCard } from "../reading/QuestionCard";
 interface Props {
   exercise: Exercise;
   language: string;
-  difficulty: number;
+  languageComplexity: number;
   audio: ExerciseAudio;
   selected: (number | null)[];
   onSelect: (qi: number, oi: number) => void;
@@ -16,7 +16,7 @@ interface Props {
 export function ListeningPassageView({
   exercise,
   language,
-  difficulty,
+  languageComplexity,
   audio,
   selected,
   onSelect,
@@ -28,7 +28,7 @@ export function ListeningPassageView({
     <div className="space-y-6">
       <div className="bg-white rounded-2xl border border-green-100 shadow-sm p-8">
         <p className="text-xs text-gray-400 uppercase tracking-wide mb-4">
-          {`${language} · Level ${difficulty}`}
+          {`${language} · Complexity ${languageComplexity}`}
         </p>
         <p className="text-sm text-gray-400 mb-4">
           {`Listen to the passage, then answer the questions below.`}

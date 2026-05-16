@@ -37,10 +37,10 @@ function refBlock(level: number, label: string): string {
   return `${label} (level ${level}):\n  Description: ${r.description}\n${exampleLines}`;
 }
 
-function passageLengthGuide(difficulty: number): string {
-  if (difficulty <= 15) return "100-150 words";
-  if (difficulty <= 30) return "120-170 words";
-  if (difficulty <= 50) return "140-200 words";
+function passageLengthGuide(languageComplexity: number): string {
+  if (languageComplexity <= 15) return "100-150 words";
+  if (languageComplexity <= 30) return "120-170 words";
+  if (languageComplexity <= 50) return "140-200 words";
   return "160-220 words";
 }
 
@@ -48,33 +48,34 @@ function roundTo5(n: number): number {
   return Math.round(n / 5) * 5;
 }
 
-export function essayWordCounts(difficulty: number): { min: number; max: number } {
-  const passageWords =
-    difficulty <= 15
-      ? 125
-      : difficulty <= 30
-        ? 145
-        : difficulty <= 50
-          ? 170
-          : difficulty <= 75
-            ? 185
-            : 200;
-  const target = Math.max(15, Math.round((difficulty / 100) * passageWords));
+function passageWordsFor(languageComplexity: number): number {
+  if (languageComplexity <= 15) return 125;
+  if (languageComplexity <= 30) return 145;
+  if (languageComplexity <= 50) return 170;
+  if (languageComplexity <= 75) return 185;
+  return 200;
+}
+
+export function essayWordCounts(languageComplexity: number): { min: number; max: number } {
+  const target = Math.max(
+    15,
+    Math.round((languageComplexity / 100) * passageWordsFor(languageComplexity)),
+  );
   return { min: roundTo5(Math.round(target * 0.8)), max: roundTo5(Math.round(target * 1.3)) };
 }
 
 async function fetchWritingExercise(
   language: string,
-  difficulty: number,
+  languageComplexity: number,
 ): Promise<WritingExercise> {
-  const lo = Math.max(1, difficulty - 1);
-  const hi = Math.min(100, difficulty + 1);
-  const { min, max } = essayWordCounts(difficulty);
+  const lo = Math.max(1, languageComplexity - 1);
+  const hi = Math.min(100, languageComplexity + 1);
+  const { min, max } = essayWordCounts(languageComplexity);
 
   const referenceBlock = `Difficulty references (these illustrate the difficulty gradient, not the topic):
 ${refBlock(lo, "One level easier")}
 
-${refBlock(difficulty, "Target level")}
+${refBlock(languageComplexity, "Target level")}
 
 ${refBlock(hi, "One level harder")}
 
@@ -98,14 +99,14 @@ Where the form supports it, give the passage genuine interest. Aim for at least 
 - Concrete specifics (names, places, gestures) over abstract description
 Avoid bland "person does activity in pleasant location" filler — passages should be the kind of thing a reader would actually want to keep reading.`;
 
-  const prompt = `Generate a writing exercise in ${language} at difficulty ${difficulty}/100.
+  const prompt = `Generate a writing exercise in ${language} at difficulty ${languageComplexity}/100.
 
 ${referenceBlock}${avoidanceBlock}${narrativeBlock}
 
 Return ONLY valid JSON with this exact shape:
 {
   "title": "3-6 word title in ${language} describing the topic of the passage",
-  "passage": "${passageLengthGuide(difficulty)} passage entirely in ${language}",
+  "passage": "${passageLengthGuide(languageComplexity)} passage entirely in ${language}",
   "translation": "full English translation of the passage",
   "difficultWords": [{ "source": "word in ${language}", "translation": "English equivalent" }],
   "insight": "1-2 sentences in English noting something interesting about the language used in the passage",
@@ -124,7 +125,7 @@ DIFFICULT WORDS: exclude cognates an English speaker could recognise. Include ge
     model: "o4-mini",
     messages: [{ role: "user", content: prompt }],
     response_format: { type: "json_object" },
-    metadata: { mode: "writing", language, difficulty, userId: getUserId() },
+    metadata: { mode: "writing", language, difficulty: languageComplexity, userId: getUserId() },
   });
   const parsed = JSON.parse(data.choices[0].message.content) as WritingExercise;
 
@@ -138,7 +139,12 @@ DIFFICULT WORDS: exclude cognates an English speaker could recognise. Include ge
 
 export function useGenerateWriting() {
   return useMutation({
-    mutationFn: ({ language, difficulty }: { language: string; difficulty: number }) =>
-      fetchWritingExercise(language, difficulty),
+    mutationFn: ({
+      language,
+      languageComplexity,
+    }: {
+      language: string;
+      languageComplexity: number;
+    }) => fetchWritingExercise(language, languageComplexity),
   });
 }

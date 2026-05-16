@@ -55,7 +55,7 @@ export function HomePage() {
       <div className="w-full max-w-lg">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-gray-900 mb-2">{`The Language Lab`}</h1>
-          <p className="text-gray-500">{`Practice at your level, in any language`}</p>
+          <p className="text-gray-500">{`Any language, any level`}</p>
           <button
             onClick={() => navigate(`/goals`)}
             className="text-sm text-green-600 hover:text-green-700 font-medium mt-3 cursor-pointer"

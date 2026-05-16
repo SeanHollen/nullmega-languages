@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { FaCog } from "react-icons/fa";
 import { LANGUAGES, getCustomLanguages, addCustomLanguage } from "../utils/language";
 import { useLanguage } from "../contexts/LanguageContext";
+import { LanguageSelect } from "./LanguageSelect";
 
 const OTHER = `__other__`;
 
@@ -80,19 +81,11 @@ export function LanguageBanner() {
         ) : (
           <div className="flex items-center gap-2 min-w-0">
             <span className="hidden sm:inline text-sm font-medium text-white">{`Language:`}</span>
-            <select
+            <LanguageSelect
               value={language}
-              onChange={(e) => handleSelectChange(e.target.value)}
-              className="border border-green-700 rounded-lg px-3 py-1.5 text-sm text-gray-800 bg-white cursor-pointer focus:outline-none focus:ring-2 focus:ring-green-300 font-medium"
-            >
-              {allLanguages.map((l) => (
-                <option key={l} value={l}>
-                  {l}
-                </option>
-              ))}
-              <option disabled value="">{`──────────`}</option>
-              <option value={OTHER}>{`Other…`}</option>
-            </select>
+              languages={allLanguages}
+              onChange={handleSelectChange}
+            />
           </div>
         )}
 

@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
-import { FaArrowLeft } from "react-icons/fa";
+import { FaArrowLeft, FaEllipsisV } from "react-icons/fa";
 import { patchFlashcard, Flashcard } from "../utils/flashcards";
 import { loadVocabSettings, VocabSettings } from "../utils/vocabSettings";
 import { loadAudio } from "../utils/audioStore";
@@ -10,6 +10,7 @@ import {
   StudySessionData,
   INITIAL_INTERVAL,
   nextInterval,
+  easyInterval,
   pickRandom,
 } from "../utils/studySession";
 
@@ -30,6 +31,7 @@ export function StudyPage() {
   const [textRevealed, setTextRevealed] = useState(false);
   const [contextIndex, setContextIndex] = useState(() => sessionData?.contextIndex ?? 0);
   const [stats, setStats] = useState({ right: 0, wrong: 0 });
+  const [menuOpen, setMenuOpen] = useState(false);
   const [audioUrl, setAudioUrl] = useState<string | null>(() => sessionData?.audioUrl ?? null);
 
   const cancelAudio = useRef<() => void>(() => {});
@@ -102,16 +104,50 @@ export function StudyPage() {
       wrong: p.wrong + (right ? 0 : 1),
     }));
     if (right) {
-      const next = remaining.filter((c) => c.id !== current.id);
-      setRemaining(next);
-      const nextCard = next.length > 0 ? pickRandom(next) : null;
-      setCurrent(nextCard);
-      if (nextCard) showCard(nextCard);
+      advanceCard();
     } else {
       const nextCard = pickRandom(remaining);
       setCurrent(nextCard);
       showCard(nextCard);
     }
+  }
+
+  function advanceCard() {
+    const next = remaining.filter((c) => c.id !== current!.id);
+    setRemaining(next);
+    const nextCard = next.length > 0 ? pickRandom(next) : null;
+    setCurrent(nextCard);
+    if (nextCard) showCard(nextCard);
+  }
+
+  function handleEasy() {
+    if (!current) return;
+    const now = Date.now();
+    if (mode === "learn") {
+      patchFlashcard(current.id, {
+        status: "scheduled",
+        lastReviewed: now,
+        currentInterval: easyInterval(current.currentInterval),
+      });
+    } else {
+      patchFlashcard(current.id, {
+        status: "scheduled",
+        lastReviewed: now,
+        currentInterval: easyInterval(current.currentInterval),
+        contexts: [],
+        dateContextGenerated: null,
+      });
+    }
+    setStats((p) => ({ right: p.right + 1, wrong: p.wrong }));
+    setMenuOpen(false);
+    advanceCard();
+  }
+
+  function handleSuspend() {
+    if (!current) return;
+    patchFlashcard(current.id, { status: "dropped" });
+    setMenuOpen(false);
+    advanceCard();
   }
 
   const ctx = current && current.contexts[contextIndex];
@@ -210,6 +246,33 @@ export function StudyPage() {
                   >
                     {`Right`}
                   </button>
+                  <div className="relative">
+                    {menuOpen && (
+                      <div className="fixed inset-0 z-10" onClick={() => setMenuOpen(false)} />
+                    )}
+                    <button
+                      onClick={() => setMenuOpen((p) => !p)}
+                      className="h-full px-3 border-2 border-gray-400 bg-white text-gray-500 rounded-xl hover:bg-gray-100 transition cursor-pointer"
+                    >
+                      <FaEllipsisV />
+                    </button>
+                    {menuOpen && (
+                      <div className="absolute right-0 bottom-full mb-2 bg-white rounded-xl shadow-lg border border-gray-100 py-1 z-20 min-w-[130px]">
+                        <button
+                          onClick={handleEasy}
+                          className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-800 cursor-pointer"
+                        >
+                          {`Easy`}
+                        </button>
+                        <button
+                          onClick={handleSuspend}
+                          className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-700 cursor-pointer"
+                        >
+                          {`Suspend`}
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
             </div>

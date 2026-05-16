@@ -2,7 +2,6 @@ import { useRef, useState } from "react";
 import { FaPlus, FaFileImport, FaFileExport, FaPen } from "react-icons/fa";
 import {
   updateFlashcardTags,
-  patchFlashcard,
   computeStatus,
   addFlashcard,
   removeFlashcard,
@@ -11,6 +10,7 @@ import {
   Flashcard,
   FlashcardStatus,
 } from "../../utils/flashcards";
+import { EditCardModal } from "./EditCardModal";
 
 const STATUS_STYLES: Record<FlashcardStatus, string> = {
   new: `bg-gray-100 text-gray-600`,
@@ -56,10 +56,7 @@ interface Props {
 
 export function FlashcardTable({ cards, language, onRefresh }: Props) {
   const [search, setSearch] = useState(``);
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [editSource, setEditSource] = useState(``);
-  const [editTranslation, setEditTranslation] = useState(``);
-  const [tagInput, setTagInput] = useState(``);
+  const [editingCard, setEditingCard] = useState<Flashcard | null>(null);
   const [addingCard, setAddingCard] = useState(false);
   const [newSource, setNewSource] = useState(``);
   const [newTranslation, setNewTranslation] = useState(``);
@@ -120,33 +117,6 @@ export function FlashcardTable({ cards, language, onRefresh }: Props) {
       .catch((err) => setActionMessage(`Read failed: ${String(err)}`));
   }
 
-  function startEdit(c: Flashcard) {
-    setEditingId(c.id);
-    setEditSource(c.source);
-    setEditTranslation(c.translation);
-    setTagInput(c.tags.join(`, `));
-  }
-
-  function saveEdit() {
-    if (editingId === null) return;
-    const source = editSource.trim();
-    const translation = editTranslation.trim();
-    if (source) patchFlashcard(editingId, { source, translation: translation || undefined });
-    updateFlashcardTags(editingId, parseTags(tagInput));
-    onRefresh();
-    setEditingId(null);
-    setEditSource(``);
-    setEditTranslation(``);
-    setTagInput(``);
-  }
-
-  function cancelEdit() {
-    setEditingId(null);
-    setEditSource(``);
-    setEditTranslation(``);
-    setTagInput(``);
-  }
-
   const q = search.trim().toLowerCase();
   const filtered = q
     ? cards.filter(
@@ -159,6 +129,16 @@ export function FlashcardTable({ cards, language, onRefresh }: Props) {
 
   return (
     <>
+      {editingCard && (
+        <EditCardModal
+          card={editingCard}
+          onSave={() => {
+            setEditingCard(null);
+            onRefresh();
+          }}
+          onClose={() => setEditingCard(null)}
+        />
+      )}
       <div className="flex flex-wrap items-center gap-2 mb-4">
         <button
           onClick={() => {
@@ -291,40 +271,10 @@ export function FlashcardTable({ cards, language, onRefresh }: Props) {
                 ) : (
                   filtered.map((c) => {
                     const status = computeStatus(c);
-                    const isEditing = editingId === c.id;
                     return (
                       <tr key={c.id}>
-                        <td className="px-4 py-3 font-medium text-gray-800">
-                          {isEditing ? (
-                            <input
-                              autoFocus
-                              value={editSource}
-                              onChange={(e) => setEditSource(e.target.value)}
-                              onKeyDown={(e) => {
-                                if (e.key === `Enter`) saveEdit();
-                                if (e.key === `Escape`) cancelEdit();
-                              }}
-                              className="w-full text-sm border border-green-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-green-500"
-                            />
-                          ) : (
-                            c.source
-                          )}
-                        </td>
-                        <td className="px-4 py-3 text-gray-600 italic">
-                          {isEditing ? (
-                            <input
-                              value={editTranslation}
-                              onChange={(e) => setEditTranslation(e.target.value)}
-                              onKeyDown={(e) => {
-                                if (e.key === `Enter`) saveEdit();
-                                if (e.key === `Escape`) cancelEdit();
-                              }}
-                              className="w-full text-sm border border-green-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-green-500"
-                            />
-                          ) : (
-                            c.translation
-                          )}
-                        </td>
+                        <td className="px-4 py-3 font-medium text-gray-800">{c.source}</td>
+                        <td className="px-4 py-3 text-gray-600 italic">{c.translation}</td>
                         <td className="px-4 py-3">
                           <span
                             className={`text-xs font-medium px-2 py-0.5 rounded-full ${STATUS_STYLES[status]}`}
@@ -339,74 +289,44 @@ export function FlashcardTable({ cards, language, onRefresh }: Props) {
                           {formatInterval(c.currentInterval)}
                         </td>
                         <td className="px-4 py-3 text-xs">
-                          {isEditing ? (
-                            <input
-                              value={tagInput}
-                              onChange={(e) => setTagInput(e.target.value)}
-                              onKeyDown={(e) => {
-                                if (e.key === `Enter`) saveEdit();
-                                if (e.key === `Escape`) cancelEdit();
-                              }}
-                              placeholder={`tag1, tag2`}
-                              className="w-32 text-xs border border-green-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-green-500"
-                            />
-                          ) : (
-                            <span className="flex flex-wrap gap-1">
-                              {c.tags.length === 0 ? (
-                                <span className="text-gray-300">{`—`}</span>
-                              ) : (
-                                c.tags.map((t) => (
-                                  <span
-                                    key={t}
-                                    className="bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded"
-                                  >
-                                    {t}
-                                  </span>
-                                ))
-                              )}
-                            </span>
-                          )}
+                          <span className="flex flex-wrap gap-1">
+                            {c.tags.length === 0 ? (
+                              <span className="text-gray-300">{`—`}</span>
+                            ) : (
+                              c.tags.map((t) => (
+                                <span
+                                  key={t}
+                                  className="bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded"
+                                >
+                                  {t}
+                                </span>
+                              ))
+                            )}
+                          </span>
                         </td>
                         <td className="px-4 py-3 text-gray-500 text-xs">
                           {relativeTime(c.addedAt)}
                         </td>
                         <td className="px-4 py-3">
-                          {isEditing ? (
-                            <div className="flex items-center gap-2">
-                              <button
-                                onClick={saveEdit}
-                                className="text-xs text-green-600 hover:text-green-800 font-medium cursor-pointer transition"
-                              >
-                                {`Save`}
-                              </button>
-                              <button
-                                onClick={cancelEdit}
-                                className="text-xs text-gray-400 hover:text-gray-600 cursor-pointer transition"
-                              >
-                                {`Cancel`}
-                              </button>
-                            </div>
-                          ) : (
-                            <div className="flex items-center gap-2">
-                              <button
-                                onClick={() => startEdit(c)}
-                                className="text-gray-300 hover:text-blue-400 transition cursor-pointer"
-                                title={`Edit card`}
-                              >
-                                <FaPen className="text-xs" />
-                              </button>
-                              <button
-                                onClick={() => {
-                                  removeFlashcard(language, c.source);
-                                  onRefresh();
-                                }}
-                                className="text-gray-300 hover:text-red-400 transition cursor-pointer"
-                                title={`Delete card`}
-                              >
-                                ✕
-                              </button>
-                            </div>
-                          )}
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => setEditingCard(c)}
+                              className="text-gray-300 hover:text-blue-400 transition cursor-pointer"
+                              title={`Edit card`}
+                            >
+                              <FaPen className="text-xs" />
+                            </button>
+                            <button
+                              onClick={() => {
+                                removeFlashcard(language, c.source);
+                                onRefresh();
+                              }}
+                              className="text-gray-300 hover:text-red-400 transition cursor-pointer"
+                              title={`Delete card`}
+                            >
+                              ✕
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     );

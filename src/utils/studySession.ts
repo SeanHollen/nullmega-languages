@@ -17,6 +17,14 @@ export function nextInterval(currentInterval: number): number {
   return idx >= 0 ? INTERVALS[idx] : INTERVALS[INTERVALS.length - 1];
 }
 
+export function easyInterval(currentInterval: number): number {
+  let interval = currentInterval;
+  for (let i = 0; i < 3; i++) {
+    interval = nextInterval(interval);
+  }
+  return interval;
+}
+
 export interface StudySessionData {
   cards: Flashcard[];
   current: Flashcard;

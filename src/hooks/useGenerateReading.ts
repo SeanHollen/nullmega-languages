@@ -3,7 +3,7 @@ import type { Exercise } from "../types";
 import difficultyLevels from "../data/difficulty-levels.json";
 import { callChat } from "../utils/api";
 import { getUserId } from "../utils/user";
-import { getRecentTitles } from "../utils/history";
+import { getTitlesByComplexity } from "../utils/history";
 
 interface ExampleRef {
   passage: string;
@@ -60,11 +60,11 @@ ${refBlock(hi, "One level harder")}
 
 Match the difficulty of the target level. The topic and content of your passage should be chosen independently — do not anchor on the topics in the examples above.`;
 
-  const recentTitles = getRecentTitles(mode, language, 10);
+  const nearbyTitles = getTitlesByComplexity(mode, language, languageComplexity, 500);
   const avoidanceBlock =
-    recentTitles.length > 0
-      ? `\n\nRECENT TOPICS (do not repeat these or cover closely related ground — choose something fresh):
-${recentTitles.map((t) => `- ${t}`).join("\n")}`
+    nearbyTitles.length > 0
+      ? `\n\nPAST TOPICS at similar complexity (do not repeat any of these or cover closely related ground — choose something fresh):
+${nearbyTitles.map((t) => `- ${t}`).join("\n")}`
       : "";
 
   const narrativeBlock = `

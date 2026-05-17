@@ -73,7 +73,10 @@ export function VocabularyPage() {
       settings.newWordsPerDay - getLearnedTodayCount(),
     ),
   );
-  const learningCount = cards.filter((c) => computeStatus(c) === `learning`).length;
+  const learningCount = cards.filter((c) => {
+    const s = computeStatus(c);
+    return s === `learning` || s === `relearning`;
+  }).length;
   const dueCount = cards.filter((c) => computeStatus(c) === `due`).length;
 
   return (

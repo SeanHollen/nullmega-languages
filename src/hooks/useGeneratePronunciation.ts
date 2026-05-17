@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { callChat } from "../utils/api";
 import { getUserId } from "../utils/user";
-import { getRecentTitles } from "../utils/history";
+import { getTitlesByComplexity } from "../utils/history";
 
 export interface PronunciationPhrase {
   phrase: string;
@@ -39,27 +39,29 @@ async function fetchPronunciationExercise(
 ): Promise<PronunciationExercise> {
   const count = phraseCount(languageComplexity);
 
-  const recentTitles = getRecentTitles("pronunciation", language, 10);
+  const nearbyTitles = getTitlesByComplexity("pronunciation", language, languageComplexity, 500);
   const avoidanceBlock =
-    recentTitles.length > 0
-      ? `\n\nRECENT THEMES (do not repeat these or use closely related themes — pick something fresh):
-${recentTitles.map((t) => `- ${t}`).join("\n")}`
+    nearbyTitles.length > 0
+      ? `\n\nPAST THEMES at similar complexity (do not repeat any of these or close variations — pick something fresh):
+${nearbyTitles.map((t) => `- ${t}`).join("\n")}`
       : "";
 
   const prompt = `Generate a pronunciation practice exercise in ${language} at difficulty ${languageComplexity}/100.
 
+THEME: All ${count} phrases must belong to a single coherent topic or theme summarised by the title (e.g. "ordering at a café", "moving day", "weather complaints", "phone call with a friend"). Do not produce a grab-bag of unrelated sentences.
+
 Return ONLY valid JSON with this exact shape:
 {
-  "title": "3-6 word title in ${language} describing the theme of the phrases",
+  "title": "3-6 word title in ${language} describing the theme tying the phrases together",
   "phrases": [
     { "phrase": "...", "translation": "..." }
   ]
 }
 
-- Generate exactly ${count} phrases
+- Generate exactly ${count} phrases, all within the chosen theme
 - Phrases should be ${phraseLengthGuide(languageComplexity)}
-- Include a variety of types: statements, questions, exclamations
-- Focus on phrases that are practical and natural-sounding in ${language}
+- Within the theme, vary the type: statements, questions, exclamations
+- Phrases should be practical and natural-sounding in ${language}
 - At low difficulty: prioritise common sounds and basic patterns; at high difficulty: include challenging phoneme combinations, intonation shifts, and less common vocabulary
 - "translation" is the complete English translation of each phrase${avoidanceBlock}`;
 

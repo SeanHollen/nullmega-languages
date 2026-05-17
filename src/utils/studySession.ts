@@ -38,6 +38,16 @@ export function pickRandom<T>(items: T[]): T {
   return items[Math.floor(Math.random() * items.length)];
 }
 
+// Picks the next card from `cards`, preferring cards that are NOT currently relearning
+// (relearningStartedAt === null). Relearning cards are only shown once no non-relearning
+// cards remain in the session.
+export function pickNextCard(cards: Flashcard[]): Flashcard | null {
+  if (cards.length === 0) return null;
+  const nonRelearning = cards.filter((c) => c.relearningStartedAt === null);
+  const pool = nonRelearning.length > 0 ? nonRelearning : cards;
+  return pickRandom(pool);
+}
+
 function pickInitial(
   cards: Flashcard[],
   mode: "learn" | "review",
@@ -51,7 +61,10 @@ function pickInitial(
       : [...due].sort((a, b) => suffixOf(a.id).localeCompare(suffixOf(b.id)));
   }
   const newCards = cards.filter((c) => computeStatus(c) === "new");
-  const learningCards = cards.filter((c) => computeStatus(c) === "learning");
+  const learningCards = cards.filter((c) => {
+    const s = computeStatus(c);
+    return s === "learning" || s === "relearning";
+  });
   const sortedNew =
     order === "added"
       ? [...newCards].sort((a, b) => b.addedAt - a.addedAt)

@@ -1,8 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { IDBFactory } from "fake-indexeddb";
-import { prepareReviewSession } from "./studySession";
+import { prepareReviewSession, pickNextCard } from "./studySession";
 import type { VocabSettings } from "./vocabSettings";
 import { callTTS } from "./api";
+import type { Flashcard } from "./flashcards";
 import {
   addFlashcard,
   loadFlashcards,
@@ -11,6 +12,24 @@ import {
 } from "./flashcards";
 import { DAY, INITIAL_INTERVAL } from "./studySession";
 import { generateContextsFor } from "./contextOrchestrator";
+
+function makeCard(id: string, relearningStartedAt: number | null): Flashcard {
+  return {
+    id,
+    source: id,
+    translation: id,
+    language: "Spanish",
+    addedAt: 0,
+    lastReviewed: null,
+    currentInterval: 0,
+    tags: [],
+    status: "learning",
+    contexts: [],
+    dateContextGenerated: null,
+    learningCorrectCount: 0,
+    relearningStartedAt,
+  };
+}
 
 vi.mock("./api", () => ({
   callTTS: vi.fn(async () => new Blob(["audio"], { type: "audio/mpeg" })),
@@ -51,6 +70,32 @@ function makeCardDue(id: string): void {
 beforeEach(() => {
   localStorage.clear();
   (globalThis as Record<string, unknown>).indexedDB = new IDBFactory();
+});
+
+describe("pickNextCard", () => {
+  it("returns null for an empty list", () => {
+    expect(pickNextCard([])).toBeNull();
+  });
+
+  it("always returns a non-relearning card when both kinds are present", () => {
+    const cards = [
+      makeCard("a", Date.now()),
+      makeCard("b", null),
+      makeCard("c", Date.now()),
+      makeCard("d", Date.now()),
+    ];
+    for (let i = 0; i < 50; i++) {
+      const picked = pickNextCard(cards);
+      expect(picked?.id).toBe("b");
+    }
+  });
+
+  it("falls back to a relearning card when nothing else is left", () => {
+    const cards = [makeCard("a", 100), makeCard("b", 200)];
+    const picked = pickNextCard(cards);
+    expect(picked).not.toBeNull();
+    expect(picked!.relearningStartedAt).not.toBeNull();
+  });
 });
 
 describe("prepareReviewSession", () => {

@@ -1,4 +1,5 @@
 import type { Mode } from "../hooks/useAbility";
+import { pickClosest } from "./proximity";
 
 export interface AssessmentRecord {
   id: string;
@@ -15,7 +16,7 @@ export interface AssessmentRecord {
 }
 
 const KEY = "assessment_history";
-const MAX_ENTRIES = 200;
+const MAX_ENTRIES = 10000;
 
 function load(): AssessmentRecord[] {
   try {
@@ -72,9 +73,22 @@ export function getHistory(mode: Mode, language: string): AssessmentRecord[] {
     .sort((a, b) => b.completedAt - a.completedAt);
 }
 
-export function getRecentTitles(mode: Mode, language: string, limit: number): string[] {
-  return getHistory(mode, language)
-    .slice(0, limit)
-    .map((r) => r.title)
-    .filter((t): t is string => typeof t === "string" && t.length > 0 && t !== "Untitled");
+export function getTitlesByComplexity(
+  mode: Mode,
+  language: string,
+  languageComplexity: number,
+  limit: number,
+): string[] {
+  const eligible = load()
+    .filter((r) => r.mode === mode && r.language === language)
+    .filter((r) => typeof r.title === "string" && r.title.length > 0 && r.title !== "Untitled");
+  return pickClosest(eligible, (r) => r.difficulty, languageComplexity, limit).map((r) => r.title);
+}
+
+export function pointsForRecord(record: AssessmentRecord): number {
+  if (record.scoreMax <= 0) return 0;
+  const pct = record.scoreEarned / record.scoreMax;
+  if (pct >= 0.9) return record.difficulty;
+  if (pct >= 0.6) return record.difficulty / 2;
+  return 0;
 }

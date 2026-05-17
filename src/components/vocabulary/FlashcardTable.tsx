@@ -1,13 +1,6 @@
 import { useRef, useState } from "react";
-import {
-  FaPlus,
-  FaFileImport,
-  FaFileExport,
-  FaPen,
-  FaSort,
-  FaSortUp,
-  FaSortDown,
-} from "react-icons/fa";
+import { Link } from "react-router-dom";
+import { FaPlus, FaFileImport, FaFileExport, FaPen } from "react-icons/fa";
 import {
   updateFlashcardTags,
   computeStatus,
@@ -17,11 +10,14 @@ import {
   importFlashcards,
 } from "../../utils/flashcards";
 import type { Flashcard, FlashcardStatusDerived } from "../../utils/flashcards";
+import { relativeTime } from "../../utils/relativeTime";
+import { SortableHeader, type SortDir } from "../SortableHeader";
 import { EditCardModal } from "./EditCardModal";
 
 const STATUS_STYLES: Record<FlashcardStatusDerived, string> = {
   new: `bg-gray-100 text-gray-600`,
   learning: `bg-yellow-100 text-yellow-700`,
+  relearning: `bg-red-100 text-red-700`,
   scheduled: `bg-blue-100 text-blue-700`,
   due: `bg-orange-100 text-orange-700`,
   dropped: `bg-gray-100 text-gray-400 line-through`,
@@ -29,24 +25,12 @@ const STATUS_STYLES: Record<FlashcardStatusDerived, string> = {
 
 const STATUS_ORDER: Record<FlashcardStatusDerived, number> = {
   due: 0,
-  learning: 1,
-  new: 2,
-  scheduled: 3,
-  dropped: 4,
+  relearning: 1,
+  learning: 2,
+  new: 3,
+  scheduled: 4,
+  dropped: 5,
 };
-
-function relativeTime(ts: number | null): string {
-  if (ts === null) return `Never`;
-  const diff = Date.now() - ts;
-  const mins = Math.floor(diff / 60000);
-  if (mins < 1) return `Just now`;
-  if (mins < 60) return `${mins}m ago`;
-  const hours = Math.floor(mins / 60);
-  if (hours < 24) return `${hours}h ago`;
-  const days = Math.floor(hours / 24);
-  if (days < 7) return `${days}d ago`;
-  return new Date(ts).toLocaleDateString();
-}
 
 function formatInterval(ms: number): string {
   if (ms === 0) return `—`;
@@ -71,7 +55,6 @@ type SortCol =
   | "interval"
   | "tags"
   | "addedAt";
-type SortDir = "asc" | "desc";
 
 function sortCards(cards: Flashcard[], col: SortCol, dir: SortDir): Flashcard[] {
   const sign = dir === "asc" ? 1 : -1;
@@ -102,38 +85,6 @@ function sortCards(cards: Flashcard[], col: SortCol, dir: SortDir): Flashcard[] 
     }
     return cmp * sign;
   });
-}
-
-function SortableHeader({
-  label,
-  active,
-  dir,
-  onClick,
-}: {
-  label: string;
-  active: boolean;
-  dir: SortDir;
-  onClick: () => void;
-}) {
-  return (
-    <th className="px-4 py-3">
-      <button
-        onClick={onClick}
-        className="flex items-center gap-0.5 uppercase tracking-wide hover:text-gray-700 cursor-pointer"
-      >
-        {label}
-        {active ? (
-          dir === "asc" ? (
-            <FaSortUp className="ml-1 text-xs" />
-          ) : (
-            <FaSortDown className="ml-1 text-xs" />
-          )
-        ) : (
-          <FaSort className="ml-1 text-xs text-gray-300" />
-        )}
-      </button>
-    </th>
-  );
 }
 
 interface Props {
@@ -281,6 +232,12 @@ export function FlashcardTable({ cards, language, onRefresh }: Props) {
           className="hidden"
         />
         {actionMessage && <span className="text-xs text-gray-500 ml-2">{actionMessage}</span>}
+        <Link
+          to={`/vocabulary/stats`}
+          className="ml-auto text-xs text-green-600 hover:text-green-700 font-medium"
+        >
+          {`View stats →`}
+        </Link>
       </div>
 
       {addingCard && (

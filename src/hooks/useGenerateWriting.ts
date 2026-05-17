@@ -2,7 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import difficultyLevels from "../data/difficulty-levels.json";
 import { callChat } from "../utils/api";
 import { getUserId } from "../utils/user";
-import { getRecentTitles } from "../utils/history";
+import { getTitlesByComplexity } from "../utils/history";
 
 interface LevelRef {
   description: string;
@@ -81,11 +81,11 @@ ${refBlock(hi, "One level harder")}
 
 Match the difficulty of the target level. Choose your own topic independently.`;
 
-  const recentTitles = getRecentTitles("writing", language, 10);
+  const nearbyTitles = getTitlesByComplexity("writing", language, languageComplexity, 500);
   const avoidanceBlock =
-    recentTitles.length > 0
-      ? `\n\nRECENT TOPICS (do not repeat these or cover closely related ground — choose something fresh):
-${recentTitles.map((t) => `- ${t}`).join("\n")}`
+    nearbyTitles.length > 0
+      ? `\n\nPAST TOPICS at similar complexity (do not repeat any of these or cover closely related ground — choose something fresh):
+${nearbyTitles.map((t) => `- ${t}`).join("\n")}`
       : "";
 
   const narrativeBlock = `

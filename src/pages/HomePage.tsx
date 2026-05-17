@@ -79,7 +79,10 @@ export function HomePage() {
               ? (() => {
                   const settings = loadVocabSettings();
                   const due = vocabCards.filter((c) => computeStatus(c) === `due`).length;
-                  const learning = vocabCards.filter((c) => computeStatus(c) === `learning`).length;
+                  const learning = vocabCards.filter((c) => {
+                    const s = computeStatus(c);
+                    return s === `learning` || s === `relearning`;
+                  }).length;
                   const availableNew = Math.max(
                     0,
                     Math.min(

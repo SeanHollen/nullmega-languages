@@ -1,5 +1,6 @@
 import { callGrammar } from "./api";
 import type { GrammarCategory, QuizQuestion } from "./grammarCards";
+import { pickClosest } from "./proximity";
 
 export interface RawGrammarCard {
   title: string;
@@ -31,10 +32,9 @@ export async function generateGrammarCards(params: {
   const safeLevel = Math.max(1, Math.min(10, level));
   const levelDesc = LEVEL_DESCRIPTIONS[safeLevel];
 
-  const prioritised = [...existingCards]
-    .sort((a, b) => Math.abs(a.level - safeLevel) - Math.abs(b.level - safeLevel))
-    .slice(0, 500)
-    .map((c) => c.title);
+  const prioritised = pickClosest(existingCards, (c) => c.level, safeLevel, 500).map(
+    (c) => c.title,
+  );
 
   const avoidNote =
     prioritised.length > 0

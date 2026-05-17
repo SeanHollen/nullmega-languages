@@ -181,7 +181,7 @@ export function GrammarPage() {
           </div>
         </div>
 
-        <GrammarCardTable cards={cards} onRefresh={refreshCards} />
+        <GrammarCardTable cards={cards} language={language} onRefresh={refreshCards} />
       </div>
     </div>
   );

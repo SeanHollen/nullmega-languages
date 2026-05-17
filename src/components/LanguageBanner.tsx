@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { FaCog } from "react-icons/fa";
 import { LANGUAGES, getCustomLanguages, addCustomLanguage } from "../utils/language";
 import { useLanguage } from "../contexts/LanguageContext";
@@ -51,13 +51,13 @@ export function LanguageBanner() {
   return (
     <header className="bg-green-600 sticky top-0 z-10 shadow-md">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-center gap-3 sm:gap-8">
-        <button
-          onClick={() => void navigate(`/`)}
+        <Link
+          to={`/`}
           className="shrink-0 cursor-pointer hover:opacity-80 transition"
           title={`Home`}
         >
           <img src={logo} alt={`Logo`} className="h-8 w-8" />
-        </button>
+        </Link>
 
         {addingCustom ? (
           <div className="flex items-center gap-2 flex-1 max-w-md">

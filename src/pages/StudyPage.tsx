@@ -2,14 +2,14 @@ import { useRef, useState } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { FaArrowLeft, FaEllipsisV } from "react-icons/fa";
 import type { Flashcard } from "../utils/flashcards";
-import { patchFlashcard } from "../utils/flashcards";
+import { patchFlashcard, computeStatus } from "../utils/flashcards";
 import type { VocabSettings } from "../utils/vocabSettings";
 import { loadVocabSettings } from "../utils/vocabSettings";
 import { loadAudio } from "../utils/audioStore";
 import { AudioPlayer } from "../components/listening/AudioPlayer";
 import { BoldWord } from "../components/BoldWord";
 import type { StudySessionData } from "../utils/studySession";
-import { INITIAL_INTERVAL, nextInterval, easyInterval, pickRandom } from "../utils/studySession";
+import { INITIAL_INTERVAL, nextInterval, easyInterval, pickNextCard } from "../utils/studySession";
 
 type StudyMode = "learn" | "review";
 
@@ -67,47 +67,74 @@ export function StudyPage() {
     });
   }
 
+  const LEARN_STEPS_REQUIRED = 2;
+
   function handleAnswer(right: boolean) {
     if (!current) return;
     const now = Date.now();
+
+    let patch: Partial<Flashcard>;
+    let graduate: boolean;
+
     if (mode === "learn") {
       if (right) {
-        patchFlashcard(current.id, {
-          status: "scheduled",
-          lastReviewed: now,
-          currentInterval: INITIAL_INTERVAL,
-        });
+        const newCount = current.learningCorrectCount + 1;
+        if (newCount >= LEARN_STEPS_REQUIRED) {
+          graduate = true;
+          patch = {
+            status: "scheduled",
+            lastReviewed: now,
+            currentInterval: INITIAL_INTERVAL,
+            learningCorrectCount: 0,
+            relearningStartedAt: null,
+          };
+        } else {
+          graduate = false;
+          patch = { lastReviewed: now, learningCorrectCount: newCount };
+        }
+      } else {
+        graduate = false;
+        patch = { lastReviewed: now, learningCorrectCount: 0 };
       }
     } else {
       if (right) {
-        patchFlashcard(current.id, {
+        graduate = true;
+        patch = {
           status: "scheduled",
           lastReviewed: now,
           currentInterval: nextInterval(current.currentInterval),
           contexts: [],
           dateContextGenerated: null,
-        });
+        };
       } else {
-        patchFlashcard(current.id, {
+        graduate = false;
+        patch = {
           status: "learning",
           lastReviewed: now,
           currentInterval: INITIAL_INTERVAL,
-        });
+          learningCorrectCount: 0,
+          relearningStartedAt: now,
+        };
       }
     }
-    if (right) {
+
+    patchFlashcard(current.id, patch);
+
+    if (graduate) {
       advanceCard();
     } else {
-      const nextCard = pickRandom(remaining);
+      const updatedRemaining = remaining.map((c) => (c.id === current.id ? { ...c, ...patch } : c));
+      setRemaining(updatedRemaining);
+      const nextCard = pickNextCard(updatedRemaining);
       setCurrent(nextCard);
-      showCard(nextCard);
+      if (nextCard) showCard(nextCard);
     }
   }
 
   function advanceCard() {
     const next = remaining.filter((c) => c.id !== current!.id);
     setRemaining(next);
-    const nextCard = next.length > 0 ? pickRandom(next) : null;
+    const nextCard = pickNextCard(next);
     setCurrent(nextCard);
     if (nextCard) showCard(nextCard);
   }
@@ -120,6 +147,8 @@ export function StudyPage() {
         status: "scheduled",
         lastReviewed: now,
         currentInterval: easyInterval(current.currentInterval),
+        learningCorrectCount: 0,
+        relearningStartedAt: null,
       });
     } else {
       patchFlashcard(current.id, {
@@ -144,6 +173,18 @@ export function StudyPage() {
   const ctx = current && current.contexts[contextIndex];
   const title = mode === "learn" ? `Learn new words` : `Review`;
 
+  const counts = { learning: 0, relearning: 0, reviewing: 0 };
+  for (const c of remaining) {
+    const s = computeStatus(c);
+    if (s === "relearning") counts.relearning++;
+    else if (s === "due") counts.reviewing++;
+    else if (s === "learning" || s === "new") counts.learning++;
+  }
+  const countParts: string[] = [];
+  if (counts.reviewing > 0) countParts.push(`${counts.reviewing} reviewing`);
+  if (counts.learning > 0) countParts.push(`${counts.learning} learning`);
+  if (counts.relearning > 0) countParts.push(`${counts.relearning} relearning`);
+
   return (
     <div className="min-h-screen bg-green-100 py-10 px-4">
       <div className="max-w-2xl mx-auto">
@@ -157,8 +198,8 @@ export function StudyPage() {
             </button>
             <h1 className="text-2xl font-bold text-gray-800">{title}</h1>
           </div>
-          {remaining.length > 0 && (
-            <span className="text-sm text-gray-500">{`${remaining.length} left`}</span>
+          {countParts.length > 0 && (
+            <span className="text-sm text-gray-500">{countParts.join(` · `)}</span>
           )}
         </div>
 
@@ -173,17 +214,14 @@ export function StudyPage() {
         )}
         {current !== null && ctx && (
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-10 space-y-6 text-center">
-            {settings.showText && (
-              <p className="text-2xl text-gray-800 break-words leading-relaxed">
-                <BoldWord text={ctx.source} target={current.source} />
+            {(settings.showText || textRevealed || revealed) && (
+              <p
+                className={`text-2xl text-gray-800 break-words leading-relaxed ${settings.showText ? `` : `opacity-70`}`}
+              >
+                <BoldWord text={ctx.source} />
               </p>
             )}
-            {!settings.showText && textRevealed && (
-              <p className="text-2xl text-gray-800 break-words leading-relaxed opacity-70">
-                <BoldWord text={ctx.source} target={current.source} />
-              </p>
-            )}
-            {!settings.showText && !textRevealed && (
+            {!settings.showText && !textRevealed && !revealed && (
               <button
                 onClick={() => setTextRevealed(true)}
                 className="text-sm text-gray-400 hover:text-gray-600 underline underline-offset-2 transition cursor-pointer"
@@ -199,7 +237,7 @@ export function StudyPage() {
             {revealed && (
               <div className="border-t border-gray-100 pt-6">
                 <p className="text-xl text-gray-600 italic break-words leading-relaxed">
-                  <BoldWord text={ctx.translation} target={current.translation} />
+                  <BoldWord text={ctx.translation} />
                 </p>
               </div>
             )}

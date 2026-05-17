@@ -1,5 +1,5 @@
 export type FlashcardStatus = "new" | "learning" | "scheduled" | "dropped";
-export type FlashcardStatusDerived = FlashcardStatus | "due";
+export type FlashcardStatusDerived = FlashcardStatus | "due" | "relearning";
 
 export interface FlashcardContext {
   source: string;
@@ -19,6 +19,14 @@ export interface Flashcard {
   status: FlashcardStatus;
   contexts: FlashcardContext[];
   dateContextGenerated: number | null;
+  // Number of consecutive correct answers given while in `learning` status. Used to require
+  // multiple correct passes before graduating to `scheduled`. Resets on wrong answer and on
+  // entering relearning.
+  learningCorrectCount: number;
+  // Timestamp of the most recent relearning event (when a `due` card was answered wrong and
+  // dropped back to `learning`). null if the card has never been relearned. Persisted for
+  // future stats; not currently used to drive behavior.
+  relearningStartedAt: number | null;
 }
 
 const KEY = "flashcards";
@@ -59,6 +67,8 @@ function normalize(raw: unknown): Flashcard | null {
       : [],
     dateContextGenerated:
       typeof r.dateContextGenerated === "number" ? r.dateContextGenerated : null,
+    learningCorrectCount: typeof r.learningCorrectCount === "number" ? r.learningCorrectCount : 0,
+    relearningStartedAt: typeof r.relearningStartedAt === "number" ? r.relearningStartedAt : null,
   };
 }
 
@@ -102,6 +112,8 @@ export function addFlashcard(
     status: "new",
     contexts: [],
     dateContextGenerated: null,
+    learningCorrectCount: 0,
+    relearningStartedAt: null,
   };
   cards.push(card);
   persist(cards);
@@ -206,7 +218,9 @@ export function patchFlashcard(id: string, patch: Partial<Flashcard>): boolean {
 export function computeStatus(card: Flashcard): FlashcardStatusDerived {
   if (card.status === "dropped") return "dropped";
   if (card.status === "new") return "new";
-  if (card.status === "learning") return "learning";
+  if (card.status === "learning") {
+    return card.relearningStartedAt !== null ? "relearning" : "learning";
+  }
   if (card.lastReviewed !== null && card.lastReviewed + card.currentInterval <= Date.now())
     return "due";
   return "scheduled";

@@ -145,3 +145,87 @@ export function computeGrammarStatus(card: GrammarCard): GrammarCardStatus {
   if (card.lastReviewed + card.currentInterval <= Date.now()) return `due`;
   return `scheduled`;
 }
+
+export interface ImportableGrammarCard {
+  title: string;
+  prompt: string;
+  category: GrammarCategory;
+  questions: QuizQuestion[];
+  level: number;
+}
+
+export function exportGrammarCards(language: string): string {
+  const cards = loadGrammarCards(language).map<ImportableGrammarCard>((c) => ({
+    title: c.title,
+    prompt: c.prompt,
+    category: c.category,
+    questions: c.questions,
+    level: c.level,
+  }));
+  return JSON.stringify(cards, null, 2);
+}
+
+export function importGrammarCards(
+  language: string,
+  json: string,
+): { added: number; skipped: number } {
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(json);
+  } catch {
+    throw new Error(`Invalid JSON`);
+  }
+  if (!Array.isArray(parsed)) throw new Error(`Expected a JSON array of cards`);
+
+  const existing = load();
+  const existingTitles = new Set(
+    existing.filter((c) => c.language === language).map((c) => c.title.toLowerCase()),
+  );
+
+  let added = 0;
+  let skipped = 0;
+  for (const item of parsed) {
+    if (!item || typeof item !== "object") {
+      skipped++;
+      continue;
+    }
+    const r = item as Record<string, unknown>;
+    if (typeof r.title !== "string" || typeof r.prompt !== "string") {
+      skipped++;
+      continue;
+    }
+    if (existingTitles.has(r.title.toLowerCase())) {
+      skipped++;
+      continue;
+    }
+    const questions = Array.isArray(r.questions)
+      ? r.questions.map(normalizeQuestion).filter((q): q is QuizQuestion => q !== null)
+      : [];
+    if (questions.length === 0) {
+      skipped++;
+      continue;
+    }
+    const category: GrammarCategory = VALID_CATEGORIES.includes(r.category as GrammarCategory)
+      ? (r.category as GrammarCategory)
+      : "misc";
+    const level = typeof r.level === "number" ? r.level : 1;
+    const card: GrammarCard = {
+      id: `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`,
+      language,
+      title: r.title,
+      prompt: r.prompt,
+      category,
+      questions,
+      level,
+      addedAt: Date.now(),
+      lastReviewed: null,
+      currentInterval: 0,
+      status: "learning",
+    };
+    existing.push(card);
+    existingTitles.add(r.title.toLowerCase());
+    added++;
+  }
+  persist(existing);
+  return { added, skipped };
+}

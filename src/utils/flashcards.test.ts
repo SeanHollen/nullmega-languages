@@ -99,6 +99,23 @@ describe("computeStatus", () => {
     const [updated] = loadFlashcards("Spanish");
     expect(computeStatus(updated)).toBe("dropped");
   });
+
+  it("returns 'relearning' for a learning card with relearningStartedAt set", () => {
+    const card = addFlashcard("Spanish", "hola", "hello")!;
+    patchFlashcard(card.id, {
+      status: "learning",
+      relearningStartedAt: Date.now(),
+    });
+    const [updated] = loadFlashcards("Spanish");
+    expect(computeStatus(updated)).toBe("relearning");
+  });
+
+  it("returns 'learning' (not relearning) when relearningStartedAt is null", () => {
+    const card = addFlashcard("Spanish", "hola", "hello")!;
+    patchFlashcard(card.id, { status: "learning", relearningStartedAt: null });
+    const [updated] = loadFlashcards("Spanish");
+    expect(computeStatus(updated)).toBe("learning");
+  });
 });
 
 describe("generateContextsFor", () => {

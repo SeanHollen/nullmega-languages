@@ -35,12 +35,14 @@ export function AudioPlayer({ src, label, autoplay = false, small = false }: Pro
     });
     audioRef.current = audio;
     if (autoplay) {
-      audio
-        .play()
-        .then(() => setPlaying(true))
-        .catch(() => {
+      void (async () => {
+        try {
+          await audio.play();
+          setPlaying(true);
+        } catch {
           // Browser autoplay policies may block; silently ignore — user can press play
-        });
+        }
+      })();
     }
     return () => {
       audio.pause();

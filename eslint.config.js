@@ -13,7 +13,12 @@ export default defineConfig(
       ...reactHooks.configs.recommended.rules,
       "@typescript-eslint/no-unused-vars": ["error", { varsIgnorePattern: "^_", argsIgnorePattern: "^_" }],
       "@typescript-eslint/consistent-type-imports": "error",
-      "no-restricted-syntax": ["error", { selector: "AwaitExpression > ImportExpression", message: "Use a static import instead of await import()." }],
+      "no-restricted-syntax": [
+        "error",
+        { selector: "AwaitExpression > ImportExpression", message: "Use a static import instead of await import()." },
+        { selector: "CallExpression > MemberExpression.callee[property.name='then']", message: "Use async/await instead of .then(). For fire-and-forget, wrap in `void (async () => { ... })()`." },
+        { selector: "TryStatement[finalizer]", message: "Avoid try/finally. Put cleanup after the try/catch block — it runs in both paths anyway." },
+      ],
       "unicorn/no-nested-ternary": "error",
     },
   },

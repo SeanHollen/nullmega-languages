@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { FaArrowLeft, FaEllipsisV } from "react-icons/fa";
 import type { Flashcard } from "../utils/flashcards";
-import { patchFlashcard, computeStatus } from "../utils/flashcards";
+import { patchFlashcard, computeStatus, pickNextContext } from "../utils/flashcards";
 import type { VocabSettings } from "../utils/vocabSettings";
 import { loadVocabSettings } from "../utils/vocabSettings";
 import { loadAudio } from "../utils/audioStore";
@@ -44,7 +44,7 @@ export function StudyPage() {
       });
       return;
     }
-    const ci = Math.floor(Math.random() * card.contexts.length);
+    const ci = pickNextContext(card);
     setContextIndex(ci);
     const key = card.contexts[ci]?.audioKey;
     if (!settings.generateAudio || !key) {
@@ -58,13 +58,14 @@ export function StudyPage() {
     cancelAudio.current = () => {
       cancelled = true;
     };
-    void loadAudio(key).then((blob) => {
+    void (async () => {
+      const blob = await loadAudio(key);
       if (cancelled) return;
       setAudioUrl((prev) => {
         if (prev) URL.revokeObjectURL(prev);
         return blob ? URL.createObjectURL(blob) : null;
       });
-    });
+    })();
   }
 
   function handleAnswer(right: boolean) {

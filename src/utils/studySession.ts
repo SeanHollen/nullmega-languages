@@ -1,5 +1,5 @@
 import type { Flashcard } from "./flashcards";
-import { loadFlashcards, computeStatus } from "./flashcards";
+import { loadFlashcards, computeStatus, pickNextContext } from "./flashcards";
 import type { VocabSettings, VocabOrder } from "./vocabSettings";
 import { getLearnedTodayCount, recordLearnedToday } from "./vocabSettings";
 import { generateContextsFor, addMissingAudioFor } from "./contextOrchestrator";
@@ -176,8 +176,7 @@ export async function prepareLearnSession(
   const finalCards = needAudio.length > 0 ? reloadCards(language, cards) : cards;
 
   const current = pickRandom(finalCards);
-  const contextIndex =
-    current.contexts.length > 0 ? Math.floor(Math.random() * current.contexts.length) : 0;
+  const contextIndex = current.contexts.length > 0 ? pickNextContext(current) : 0;
   const audioUrl = await initialAudioUrl(current, contextIndex, settings.generateAudio);
 
   return { cards: finalCards, current, contextIndex, audioUrl };
@@ -204,8 +203,7 @@ export async function prepareReviewSession(
   const finalCards = needAudio.length > 0 ? reloadCards(language, cards) : cards;
 
   const current = pickRandom(finalCards);
-  const contextIndex =
-    current.contexts.length > 0 ? Math.floor(Math.random() * current.contexts.length) : 0;
+  const contextIndex = current.contexts.length > 0 ? pickNextContext(current) : 0;
   const audioUrl = await initialAudioUrl(current, contextIndex, settings.generateAudio);
 
   return { cards: finalCards, current, contextIndex, audioUrl };

@@ -32,28 +32,28 @@ export function VocabularyPage() {
     setCards(loadFlashcards(language).sort((a, b) => b.addedAt - a.addedAt));
   }
 
-  function handleStartLearn() {
+  async function handleStartLearn() {
     setLearnError(null);
     const done = beginLoading();
-    prepareLearnSession(language, settings)
-      .then((data) => {
-        if (!data) return;
-        void navigate(`/vocabulary/learn`, { state: data });
-      })
-      .catch((err) => setLearnError(String(err)))
-      .finally(done);
+    try {
+      const data = await prepareLearnSession(language, settings);
+      if (data) void navigate(`/vocabulary/learn`, { state: data });
+    } catch (err) {
+      setLearnError(String(err));
+    }
+    done();
   }
 
-  function handleStartReview() {
+  async function handleStartReview() {
     setReviewError(null);
     const done = beginLoading();
-    prepareReviewSession(language, settings)
-      .then((data) => {
-        if (!data) return;
-        void navigate(`/vocabulary/review`, { state: data });
-      })
-      .catch((err) => setReviewError(String(err)))
-      .finally(done);
+    try {
+      const data = await prepareReviewSession(language, settings);
+      if (data) void navigate(`/vocabulary/review`, { state: data });
+    } catch (err) {
+      setReviewError(String(err));
+    }
+    done();
   }
 
   const availableNewCount = Math.max(

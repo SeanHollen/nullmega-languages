@@ -51,28 +51,28 @@ export function GrammarPage() {
     setCards(loadGrammarCards(language).sort((a, b) => b.addedAt - a.addedAt));
   }
 
-  function handleLearn() {
+  async function handleLearn() {
     setLearnError(null);
     const done = beginLoading();
-    prepareGrammarLearnSession(language, settings)
-      .then((data) => {
-        if (!data) return;
-        void navigate(`/grammar/learn`, { state: data });
-      })
-      .catch((err) => setLearnError(String(err)))
-      .finally(done);
+    try {
+      const data = await prepareGrammarLearnSession(language, settings);
+      if (data) void navigate(`/grammar/learn`, { state: data });
+    } catch (err) {
+      setLearnError(String(err));
+    }
+    done();
   }
 
-  function handleReview() {
+  async function handleReview() {
     setReviewError(null);
     const done = beginLoading();
-    prepareGrammarReviewSession(language)
-      .then((data) => {
-        if (!data) return;
-        void navigate(`/grammar/review`, { state: data });
-      })
-      .catch((err) => setReviewError(String(err)))
-      .finally(done);
+    try {
+      const data = await prepareGrammarReviewSession(language);
+      if (data) void navigate(`/grammar/review`, { state: data });
+    } catch (err) {
+      setReviewError(String(err));
+    }
+    done();
   }
 
   function handlePlayCard(card: GrammarCard) {

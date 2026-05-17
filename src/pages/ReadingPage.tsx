@@ -92,7 +92,8 @@ export function ReadingPage() {
       ...exercise.questions.map((q) => q.question),
       ...exercise.questions.flatMap((q) => q.options),
     ];
-    void translateBatch(allTexts).then((results) => {
+    void (async () => {
+      const results = await translateBatch(allTexts);
       const nq = exercise.questions.length;
       const questions = results.slice(0, nq);
       const options: string[][] = [];
@@ -102,7 +103,7 @@ export function ReadingPage() {
         cursor += q.options.length;
       }
       setTranslations({ questions, options });
-    });
+    })();
     setPhase(`results`);
   }
 

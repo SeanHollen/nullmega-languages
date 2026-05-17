@@ -27,6 +27,9 @@ export interface Flashcard {
   // dropped back to `learning`). null if the card has never been relearned. Persisted for
   // future stats; not currently used to drive behavior.
   relearningStartedAt: number | null;
+  // Index of the next context to show. Advances (mod contexts.length) after each
+  // presentation so the user cycles through contexts in order. Treated as 0 when absent.
+  contextCursor?: number;
 }
 
 const KEY = "flashcards";
@@ -69,6 +72,7 @@ function normalize(raw: unknown): Flashcard | null {
       typeof r.dateContextGenerated === "number" ? r.dateContextGenerated : null,
     learningCorrectCount: typeof r.learningCorrectCount === "number" ? r.learningCorrectCount : 0,
     relearningStartedAt: typeof r.relearningStartedAt === "number" ? r.relearningStartedAt : null,
+    ...(typeof r.contextCursor === "number" ? { contextCursor: r.contextCursor } : {}),
   };
 }
 
@@ -213,6 +217,16 @@ export function patchFlashcard(id: string, patch: Partial<Flashcard>): boolean {
   cards[idx] = { ...cards[idx], ...patch };
   persist(cards);
   return true;
+}
+
+export function pickNextContext(card: Flashcard): number {
+  const len = card.contexts.length;
+  if (len === 0) return 0;
+  const fresh = load().find((c) => c.id === card.id);
+  const cursor = fresh?.contextCursor ?? card.contextCursor ?? 0;
+  const idx = cursor % len;
+  patchFlashcard(card.id, { contextCursor: (idx + 1) % len });
+  return idx;
 }
 
 export function computeStatus(card: Flashcard): FlashcardStatusDerived {

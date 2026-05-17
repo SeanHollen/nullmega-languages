@@ -6,6 +6,7 @@ import {
   patchFlashcard,
   updateFlashcardContexts,
   loadFlashcards,
+  pickNextContext,
 } from "./flashcards";
 import { DAY, INITIAL_INTERVAL } from "./studySession";
 import { generateContextsFor } from "./contextOrchestrator";
@@ -142,6 +143,45 @@ describe("generateContextsFor", () => {
 
     const [updated] = loadFlashcards("Spanish");
     expect(updated.contexts.every((c) => c.audioKey !== null)).toBe(true);
+  });
+});
+
+describe("pickNextContext", () => {
+  function withContexts(cursor: number | undefined, n: number) {
+    const card = addFlashcard("Spanish", `w${Math.random()}`, "x")!;
+    const ctxs = Array.from({ length: n }, (_, i) => ({
+      source: `s${i}`,
+      translation: `t${i}`,
+      audioKey: null,
+    }));
+    updateFlashcardContexts(card.id, ctxs, Date.now());
+    if (cursor !== undefined) patchFlashcard(card.id, { contextCursor: cursor });
+    return loadFlashcards("Spanish").find((c) => c.id === card.id)!;
+  }
+
+  it("returns 0 when contextCursor is undefined (brand-new card)", () => {
+    expect(pickNextContext(withContexts(undefined, 3))).toBe(0);
+  });
+
+  it("returns the stored cursor when within bounds", () => {
+    expect(pickNextContext(withContexts(1, 3))).toBe(1);
+    expect(pickNextContext(withContexts(2, 3))).toBe(2);
+  });
+
+  it("wraps via modulo when the stored cursor exceeds contexts length (e.g. after regen)", () => {
+    expect(pickNextContext(withContexts(5, 3))).toBe(2);
+  });
+
+  it("returns 0 safely when the card has no contexts", () => {
+    expect(pickNextContext(withContexts(undefined, 0))).toBe(0);
+  });
+
+  it("cycles through distinct indices on consecutive calls with the same in-memory card", () => {
+    const card = withContexts(undefined, 3);
+    expect(pickNextContext(card)).toBe(0);
+    expect(pickNextContext(card)).toBe(1);
+    expect(pickNextContext(card)).toBe(2);
+    expect(pickNextContext(card)).toBe(0);
   });
 });
 

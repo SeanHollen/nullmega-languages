@@ -48,17 +48,16 @@ export function ListeningPage() {
         onSuccess: (data: Exercise) => {
           setExercise(data);
           setSelected(Array.from({ length: data.questions.length }, () => null));
-          void generateExerciseAudio(data).then(
-            (exerciseAudio) => {
+          void (async () => {
+            try {
+              const exerciseAudio = await generateExerciseAudio(data);
               setAudio(exerciseAudio);
               setPhase(`listening`);
-              done();
-            },
-            () => {
+            } catch {
               setAudioError(`Failed to generate audio. Please try again.`);
-              done();
-            },
-          );
+            }
+            done();
+          })();
         },
         onError: () => done(),
       },
@@ -109,7 +108,8 @@ export function ListeningPage() {
       ...exercise.questions.map((q) => q.question),
       ...exercise.questions.flatMap((q) => q.options),
     ];
-    void translateBatch(allTexts).then((results) => {
+    void (async () => {
+      const results = await translateBatch(allTexts);
       const nq = exercise.questions.length;
       const questions = results.slice(0, nq);
       const options: string[][] = [];
@@ -119,7 +119,7 @@ export function ListeningPage() {
         cursor += q.options.length;
       }
       setTranslations({ questions, options });
-    });
+    })();
     setPhase(`results`);
   }
 

@@ -100,10 +100,11 @@ export function ClickableText({ text, boldWords = [], language }: Props) {
     const x = rect.left + rect.width / 2;
     setPopup({ text: rawText, translation: cached ?? null, x, y: rect.bottom + 4 });
     if (cached) return;
-    void translateOne(rawText).then((t) => {
+    void (async () => {
+      const t = await translateOne(rawText);
       cache.set(key, t);
       setPopup((prev) => (prev?.text === rawText ? { ...prev, translation: t } : prev));
-    });
+    })();
   }
 
   function handleMouseUp(e: React.MouseEvent) {

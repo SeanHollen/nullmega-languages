@@ -44,17 +44,16 @@ export function PronunciationPage() {
         onSuccess: (data: PronunciationExercise) => {
           setExercise(data);
           setRatings(Array.from({ length: data.phrases.length }, () => null));
-          void generatePhrasesAudio(data.phrases.map((p) => p.phrase)).then(
-            (urls) => {
+          void (async () => {
+            try {
+              const urls = await generatePhrasesAudio(data.phrases.map((p) => p.phrase));
               setAudioUrls(urls);
               setPhase(`exercise`);
-              done();
-            },
-            () => {
+            } catch {
               setAudioError(`Failed to generate audio. Please try again.`);
-              done();
-            },
-          );
+            }
+            done();
+          })();
         },
         onError: () => done(),
       },

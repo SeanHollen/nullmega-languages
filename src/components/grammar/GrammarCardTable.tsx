@@ -139,24 +139,26 @@ export function GrammarCardTable({ cards, language, onRefresh }: Props) {
     setActionMessage(`Exported ${cards.length} card${cards.length === 1 ? `` : `s`}`);
   }
 
-  function handleImportFile(e: React.ChangeEvent<HTMLInputElement>) {
+  async function handleImportFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     e.target.value = ``;
     if (!file) return;
-    file
-      .text()
-      .then((json) => {
-        try {
-          const { added, skipped } = importGrammarCards(language, json);
-          setActionMessage(
-            `Imported ${added} card${added === 1 ? `` : `s`}${skipped > 0 ? ` (skipped ${skipped})` : ``}`,
-          );
-          onRefresh();
-        } catch (err) {
-          setActionMessage(`Import failed: ${String(err)}`);
-        }
-      })
-      .catch((err) => setActionMessage(`Read failed: ${String(err)}`));
+    let json: string;
+    try {
+      json = await file.text();
+    } catch (err) {
+      setActionMessage(`Read failed: ${String(err)}`);
+      return;
+    }
+    try {
+      const { added, skipped } = importGrammarCards(language, json);
+      setActionMessage(
+        `Imported ${added} card${added === 1 ? `` : `s`}${skipped > 0 ? ` (skipped ${skipped})` : ``}`,
+      );
+      onRefresh();
+    } catch (err) {
+      setActionMessage(`Import failed: ${String(err)}`);
+    }
   }
 
   const q = search.trim().toLowerCase();

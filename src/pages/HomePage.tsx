@@ -27,7 +27,6 @@ interface ModeConfig {
 
 const MODES: ModeConfig[] = [
   { label: `Reading`, Icon: FaBook, href: `/reading`, mode: `reading`, kind: `exercise` },
-  { label: `Writing`, Icon: FaPen, href: `/writing`, mode: `writing`, kind: `exercise` },
   {
     label: `Listening`,
     Icon: FaHeadphones,
@@ -35,6 +34,7 @@ const MODES: ModeConfig[] = [
     mode: `listening`,
     kind: `exercise`,
   },
+  { label: `Writing`, Icon: FaPen, href: `/writing`, mode: `writing`, kind: `exercise` },
   {
     label: `Pronunciation`,
     Icon: FaMicrophone,

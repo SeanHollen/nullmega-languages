@@ -59,6 +59,16 @@ export function WritingPage() {
     });
   }
 
+  function handleAppendToAnswer(index: number, text: string) {
+    setAnswers((prev) => {
+      const next = [...prev];
+      const existing = next[index] ?? ``;
+      const sep = existing && !/\s$/.test(existing) ? ` ` : ``;
+      next[index] = existing + sep + text;
+      return next;
+    });
+  }
+
   function handleSubmit() {
     if (!exercise) return;
     const done = beginLoading();
@@ -153,6 +163,7 @@ export function WritingPage() {
             languageComplexity={languageComplexity}
             answers={answers}
             onAnswerChange={handleAnswerChange}
+            onAppendToAnswer={handleAppendToAnswer}
             onSubmit={handleSubmit}
           />
         )}

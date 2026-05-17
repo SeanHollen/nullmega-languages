@@ -1,4 +1,7 @@
+import { useState } from "react";
+import { FaMicrophone, FaStop } from "react-icons/fa";
 import type { WritingExercise } from "../../hooks/useGenerateWriting";
+import { useSpeechToText } from "../../hooks/useSpeechToText";
 
 function wordCount(text: string): number {
   return text.trim() === "" ? 0 : text.trim().split(/\s+/).length;
@@ -16,6 +19,7 @@ interface Props {
   languageComplexity: number;
   answers: string[];
   onAnswerChange: (index: number, value: string) => void;
+  onAppendToAnswer: (index: number, text: string) => void;
   onSubmit: () => void;
 }
 
@@ -25,11 +29,37 @@ export function WritingPassageView({
   languageComplexity,
   answers,
   onAnswerChange,
+  onAppendToAnswer,
   onSubmit,
 }: Props) {
   const essayIndex = exercise.questions.findIndex((q) => q.type === "essay");
   const essayQ = exercise.questions[essayIndex];
   const essayCount = wordCount(answers[essayIndex] ?? "");
+  const [sttErrorByIndex, setSttErrorByIndex] = useState<Record<number, string>>({});
+  const stt = useSpeechToText({
+    language,
+    onTranscript: (text, key) => {
+      const idx = parseInt(key, 10);
+      if (Number.isNaN(idx)) return;
+      onAppendToAnswer(idx, text);
+    },
+    onError: (msg, key) => {
+      const idx = parseInt(key, 10);
+      if (Number.isNaN(idx)) return;
+      setSttErrorByIndex((prev) => ({ ...prev, [idx]: msg }));
+    },
+  });
+
+  function toggleRecording(index: number) {
+    setSttErrorByIndex((prev) => {
+      const next = { ...prev };
+      delete next[index];
+      return next;
+    });
+    const key = String(index);
+    if (stt.activeKey === key) stt.stop();
+    else stt.start(key);
+  }
 
   const canSubmit = exercise.questions.every((q, i) => {
     if (q.type === "essay") return wordCount(answers[i] ?? "") >= (q.minWords ?? 0);
@@ -82,11 +112,36 @@ export function WritingPassageView({
               }
               className="w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 resize-none placeholder:text-gray-300"
             />
-            {isEssay && (
-              <p className={`text-xs font-medium ${countColor}`}>
-                {`${count} / ${q.minWords}–${q.maxWords} words`}
-              </p>
-            )}
+            <div className="flex items-center justify-between gap-2 flex-wrap">
+              <div className="flex items-center gap-2 flex-wrap">
+                {stt.isSupported && (
+                  <button
+                    onClick={() => toggleRecording(i)}
+                    className={`cursor-pointer flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg border transition font-medium ${
+                      stt.activeKey === String(i)
+                        ? `bg-red-50 border-red-200 text-red-600 hover:bg-red-100`
+                        : `border-gray-200 text-gray-500 hover:border-gray-300 hover:text-gray-700`
+                    }`}
+                    title={`Dictate in ${language}`}
+                  >
+                    {stt.activeKey === String(i) ? (
+                      <FaStop className="shrink-0" />
+                    ) : (
+                      <FaMicrophone className="shrink-0" />
+                    )}
+                    {stt.activeKey === String(i) ? `Listening…` : `Dictate`}
+                  </button>
+                )}
+                {sttErrorByIndex[i] && (
+                  <span className="text-xs text-red-500 font-medium">{sttErrorByIndex[i]}</span>
+                )}
+              </div>
+              {isEssay && (
+                <p className={`text-xs font-medium ${countColor}`}>
+                  {`${count} / ${q.minWords}–${q.maxWords} words`}
+                </p>
+              )}
+            </div>
           </div>
         );
       })}

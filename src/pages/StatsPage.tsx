@@ -127,7 +127,10 @@ export function StatsPage() {
   const pHigh = Math.max(10, Math.ceil(maxDailyPoints * 1.1));
   const dayTMin = hasDailyData ? dailyPoints[0].t : 0;
   const dayTMax = hasDailyData ? dailyPoints[dailyPoints.length - 1].t : 0;
-  const dayTSpan = Math.max(dayTMax - dayTMin, 1);
+  const DAY_MS = 24 * 60 * 60 * 1000;
+  const totalDaySlots = hasDailyData
+    ? Math.max(1, Math.round((dayTMax - dayTMin) / DAY_MS) + 1)
+    : 1;
 
   const tMin = hasData ? points[0].t : 0;
   const tMax = hasData ? points[points.length - 1].t : 0;
@@ -151,16 +154,18 @@ export function StatsPage() {
     return PAD_T + innerH - ((rating - yLow) / ySpan) * innerH;
   }
 
+  const dayWidth = innerW / totalDaySlots;
+
   function xDay(t: number): number {
-    if (dailyPoints.length <= 1) return PAD_L + innerW / 2;
-    return PAD_L + ((t - dayTMin) / dayTSpan) * innerW;
+    const dayIndex = Math.round((t - dayTMin) / DAY_MS);
+    return PAD_L + dayIndex * dayWidth + dayWidth / 2;
   }
 
   function yPoints(p: number): number {
     return PAD_T + innerH - (p / pHigh) * innerH;
   }
 
-  const barWidth = hasDailyData ? Math.max(4, Math.min(24, innerW / dailyPoints.length / 1.5)) : 4;
+  const barWidth = Math.max(2, dayWidth * 0.7);
   const pTicks = [0, Math.round(pHigh / 2), pHigh];
 
   const yTicks = [yLow, Math.round((yLow + yHigh) / 2), yHigh];
@@ -362,8 +367,7 @@ export function StatsPage() {
                 const barX = xDay(d.t) - barWidth / 2;
                 const barY = yPoints(d.points);
                 const barH = Math.max(0, yPoints(0) - barY);
-                const hitX = xDay(d.t) - Math.max(barWidth, 12) / 2;
-                const hitW = Math.max(barWidth, 12);
+                const hitW = Math.max(dayWidth, 12);
                 return (
                   <g key={d.t}>
                     <rect
@@ -376,7 +380,7 @@ export function StatsPage() {
                       rx="2"
                     />
                     <rect
-                      x={hitX}
+                      x={xDay(d.t) - hitW / 2}
                       y={PAD_T}
                       width={hitW}
                       height={innerH}

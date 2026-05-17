@@ -70,12 +70,8 @@ export function PhraseCard({
 
   return (
     <div className={`bg-white rounded-2xl border shadow-sm p-6 space-y-4 ${borderColor}`}>
-      <div className="flex items-center gap-3">
+      <div className="flex items-center flex-wrap gap-x-3 gap-y-2">
         <span className="text-xs text-gray-400 font-medium">{`Phrase ${index + 1}`}</span>
-        <AudioPlayer src={audioUrl} />
-      </div>
-
-      <div className="flex flex-wrap gap-2">
         <button
           onClick={() => setTextRevealed((p) => !p)}
           className="cursor-pointer text-xs px-3 py-1.5 rounded-lg border border-gray-200 text-gray-500 hover:border-gray-300 hover:text-gray-700 transition"
@@ -97,8 +93,15 @@ export function PhraseCard({
         </div>
       )}
 
+      <div className="flex">
+        <AudioPlayer src={audioUrl} />
+      </div>
+
       <div className="flex items-center justify-between gap-3 pt-2 border-t border-gray-100">
         <div className="flex items-center gap-2 flex-wrap">
+          {userRecordingUrl && !isRecording && (
+            <AudioPlayer src={userRecordingUrl} label={`Your recording`} small />
+          )}
           {isRecording ? (
             <button
               onClick={stopRecording}
@@ -115,9 +118,6 @@ export function PhraseCard({
               <FaMicrophone className="shrink-0" />
               {userRecordingUrl ? `Re-record` : `Record`}
             </button>
-          )}
-          {userRecordingUrl && !isRecording && (
-            <AudioPlayer src={userRecordingUrl} label={`Your recording`} small />
           )}
         </div>
 

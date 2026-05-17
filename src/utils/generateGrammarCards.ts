@@ -47,7 +47,9 @@ Each card tests one specific grammar concept. Include a mix of these categories:
 - tense-conjugation: verb tenses, conjugation rules and patterns
 - word-order: sentence structure, clause ordering, constituent placement
 - parts-of-speech: nouns, adjectives, pronouns, prepositions, articles
-- misc: other grammar topics, punctuation, register, common errors
+- misc: register and formality, honorifics and addressee deference (e.g. tu/vous, du/Sie, Japanese keigo, Korean speech levels), politeness strategies (hedging, softening, indirectness), idioms and set phrases, wordplay and humor (puns, irony, register-mismatch jokes), discourse markers and fillers, sociolinguistic conventions, regional/dialectal variation, connotation, punctuation, orthography, common learner errors, and any other ${language}-specific feature not covered by the categories above
+
+Scale topic choice to the level. Up to level ~5, stay grounded in core grammar (the first three categories). From level ~6 upward, increasingly weight the misc category, and connotation become essential at advanced levels. Only generate honorifics/keigo-style cards for languages that actually have such systems.
 
 Card structure:
 - title: 2-10 words naming the concept (e.g. "Passé Composé vs Imparfait", "Adjective Agreement with Gender")

@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa";
 import { SetupView } from "../components/reading/SetupView";
-import { LoadingView } from "../components/reading/LoadingView";
 import { PassageView } from "../components/reading/PassageView";
 import type { Translations } from "../components/reading/ResultsView";
 import { ResultsView } from "../components/reading/ResultsView";
@@ -12,6 +11,7 @@ import { translateBatch } from "../hooks/useTranslate";
 import type { RatingResult } from "../hooks/useAbility";
 import { loadAbility, computeRating, DEFAULT_LANGUAGE_COMPLEXITY } from "../hooks/useAbility";
 import { useLanguage } from "../contexts/LanguageContext";
+import { useLoading } from "../contexts/LoadingContext";
 import { saveAssessment } from "../utils/history";
 import { uploadAssessment } from "../utils/api";
 import { getUserId } from "../utils/user";
@@ -30,9 +30,11 @@ export function ReadingPage() {
   const [ratingResult, setRatingResult] = useState<RatingResult | null>(null);
   const [assessmentId, setAssessmentId] = useState<string | null>(null);
   const [translations, setTranslations] = useState<Translations | null>(null);
-  const { mutate, isPending, error } = useGenerateReading();
+  const { mutate, error } = useGenerateReading();
+  const { beginLoading } = useLoading();
 
   function handleGenerate() {
+    const done = beginLoading();
     mutate(
       { language, languageComplexity },
       {
@@ -41,6 +43,7 @@ export function ReadingPage() {
           setSelected(Array.from({ length: data.questions.length }, () => null));
           setPhase(`reading`);
         },
+        onSettled: done,
       },
     );
   }
@@ -126,7 +129,7 @@ export function ReadingPage() {
           <h1 className="text-2xl font-bold text-gray-800">{`Reading Comprehension`}</h1>
         </div>
 
-        {phase === `setup` && !isPending && (
+        {phase === `setup` && (
           <>
             <SetupView
               language={language}
@@ -142,8 +145,6 @@ export function ReadingPage() {
             <HistoryList mode={`reading`} language={language} />
           </>
         )}
-
-        {phase === `setup` && isPending && <LoadingView />}
 
         {phase === `reading` && exercise && (
           <PassageView

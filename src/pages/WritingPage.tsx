@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa";
 import { SetupView } from "../components/reading/SetupView";
-import { LoadingView } from "../components/reading/LoadingView";
 import { WritingPassageView } from "../components/writing/WritingPassageView";
 import { WritingResultsView } from "../components/writing/WritingResultsView";
 import { HistoryList } from "../components/HistoryList";
@@ -13,6 +12,7 @@ import { useGradeWriting } from "../hooks/useGradeWriting";
 import type { RatingResult } from "../hooks/useAbility";
 import { loadAbility, computeRating, DEFAULT_LANGUAGE_COMPLEXITY } from "../hooks/useAbility";
 import { useLanguage } from "../contexts/LanguageContext";
+import { useLoading } from "../contexts/LoadingContext";
 import { saveAssessment } from "../utils/history";
 import { uploadAssessment } from "../utils/api";
 import { getUserId } from "../utils/user";
@@ -34,8 +34,10 @@ export function WritingPage() {
   const [assessmentId, setAssessmentId] = useState<string | null>(null);
   const generateWriting = useGenerateWriting();
   const gradeWriting = useGradeWriting();
+  const { beginLoading } = useLoading();
 
   function handleGenerate() {
+    const done = beginLoading();
     generateWriting.mutate(
       { language, languageComplexity },
       {
@@ -44,6 +46,7 @@ export function WritingPage() {
           setAnswers(Array.from({ length: data.questions.length }, () => ""));
           setPhase(`writing`);
         },
+        onSettled: done,
       },
     );
   }
@@ -58,9 +61,11 @@ export function WritingPage() {
 
   function handleSubmit() {
     if (!exercise) return;
+    const done = beginLoading();
     gradeWriting.mutate(
       { exercise, answers, language, languageComplexity },
       {
+        onSettled: done,
         onSuccess: (result) => {
           setGrades(result.grades);
           const totalScore = result.grades.reduce((sum, g) => sum + g.score, 0);
@@ -124,7 +129,7 @@ export function WritingPage() {
           <h1 className="text-2xl font-bold text-gray-800">{`Writing Practice`}</h1>
         </div>
 
-        {phase === `setup` && !generateWriting.isPending && (
+        {phase === `setup` && (
           <>
             <SetupView
               language={language}
@@ -141,11 +146,7 @@ export function WritingPage() {
           </>
         )}
 
-        {phase === `setup` && generateWriting.isPending && (
-          <LoadingView message={`Generating exercise…`} />
-        )}
-
-        {phase === `writing` && exercise && !gradeWriting.isPending && (
+        {phase === `writing` && exercise && (
           <WritingPassageView
             exercise={exercise}
             language={language}
@@ -153,13 +154,6 @@ export function WritingPage() {
             answers={answers}
             onAnswerChange={handleAnswerChange}
             onSubmit={handleSubmit}
-          />
-        )}
-
-        {phase === `writing` && gradeWriting.isPending && (
-          <LoadingView
-            message={`Grading your answers…`}
-            subMessage={`Analysing grammar and vocabulary`}
           />
         )}
 

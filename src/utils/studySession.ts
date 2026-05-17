@@ -48,6 +48,68 @@ export function pickNextCard(cards: Flashcard[]): Flashcard | null {
   return pickRandom(pool);
 }
 
+export const LEARN_STEPS_REQUIRED = 2;
+
+// Pure computation: given a card and an answer, returns the patch to apply and whether
+// this answer graduates the card out of the session. Extracted from StudyPage so the
+// transition logic is testable.
+export function computeAnswerPatch(
+  card: Flashcard,
+  mode: "learn" | "review",
+  right: boolean,
+  now: number,
+): { patch: Partial<Flashcard>; graduate: boolean } {
+  if (mode === "learn") {
+    if (right) {
+      const newCount = card.learningCorrectCount + 1;
+      if (newCount >= LEARN_STEPS_REQUIRED) {
+        return {
+          graduate: true,
+          patch: {
+            status: "scheduled",
+            lastReviewed: now,
+            currentInterval: INITIAL_INTERVAL,
+            learningCorrectCount: 0,
+            relearningStartedAt: null,
+            contexts: [],
+            dateContextGenerated: null,
+          },
+        };
+      }
+      return {
+        graduate: false,
+        patch: { lastReviewed: now, learningCorrectCount: newCount },
+      };
+    }
+    return {
+      graduate: false,
+      patch: { lastReviewed: now, learningCorrectCount: 0 },
+    };
+  }
+  if (right) {
+    return {
+      graduate: true,
+      patch: {
+        status: "scheduled",
+        lastReviewed: now,
+        currentInterval: nextInterval(card.currentInterval),
+        contexts: [],
+        dateContextGenerated: null,
+      },
+    };
+  }
+  return {
+    graduate: false,
+    patch: {
+      status: "learning",
+      lastReviewed: now,
+      currentInterval: INITIAL_INTERVAL,
+      learningCorrectCount: 0,
+      relearningStartedAt: now,
+    },
+  };
+}
+
 function pickInitial(
   cards: Flashcard[],
   mode: "learn" | "review",

@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa";
 import { SetupView } from "../components/reading/SetupView";
-import { LoadingView } from "../components/reading/LoadingView";
 import { PronunciationExerciseView } from "../components/pronunciation/PronunciationExerciseView";
 import { PronunciationResultsView } from "../components/pronunciation/PronunciationResultsView";
 import { HistoryList } from "../components/HistoryList";
@@ -12,6 +11,7 @@ import type { RatingResult } from "../hooks/useAbility";
 import { loadAbility, computeRating, DEFAULT_LANGUAGE_COMPLEXITY } from "../hooks/useAbility";
 import { generatePhrasesAudio } from "../hooks/useTTS";
 import { useLanguage } from "../contexts/LanguageContext";
+import { useLoading } from "../contexts/LoadingContext";
 import { saveAssessment } from "../utils/history";
 import { uploadAssessment } from "../utils/api";
 import { getUserId } from "../utils/user";
@@ -31,31 +31,32 @@ export function PronunciationPage() {
   const [ratings, setRatings] = useState<("good" | "medium" | "bad" | null)[]>([]);
   const [ratingResult, setRatingResult] = useState<RatingResult | null>(null);
   const [assessmentId, setAssessmentId] = useState<string | null>(null);
-  const [loadingAudio, setLoadingAudio] = useState(false);
   const [audioError, setAudioError] = useState(``);
-  const { mutate, isPending, error: genError } = useGeneratePronunciation();
+  const { mutate, error: genError } = useGeneratePronunciation();
+  const { beginLoading } = useLoading();
 
   function handleGenerate() {
     setAudioError(``);
+    const done = beginLoading();
     mutate(
       { language, languageComplexity },
       {
         onSuccess: (data: PronunciationExercise) => {
           setExercise(data);
           setRatings(Array.from({ length: data.phrases.length }, () => null));
-          setLoadingAudio(true);
           void generatePhrasesAudio(data.phrases.map((p) => p.phrase)).then(
             (urls) => {
               setAudioUrls(urls);
               setPhase(`exercise`);
-              setLoadingAudio(false);
+              done();
             },
             () => {
               setAudioError(`Failed to generate audio. Please try again.`);
-              setLoadingAudio(false);
+              done();
             },
           );
         },
+        onError: () => done(),
       },
     );
   }
@@ -117,7 +118,6 @@ export function PronunciationPage() {
     setPhase(`setup`);
   }
 
-  const isLoading = isPending || loadingAudio;
   const error = genError?.message ?? audioError;
 
   return (
@@ -133,7 +133,7 @@ export function PronunciationPage() {
           <h1 className="text-2xl font-bold text-gray-800">{`Pronunciation Practice`}</h1>
         </div>
 
-        {phase === `setup` && !isLoading && (
+        {phase === `setup` && (
           <>
             <SetupView
               language={language}
@@ -148,15 +148,6 @@ export function PronunciationPage() {
             />
             <HistoryList mode={`pronunciation`} language={language} />
           </>
-        )}
-
-        {phase === `setup` && isPending && <LoadingView message={`Generating phrases…`} />}
-
-        {phase === `setup` && loadingAudio && (
-          <LoadingView
-            message={`Preparing audio…`}
-            subMessage={`Synthesising speech for each phrase`}
-          />
         )}
 
         {phase === `exercise` && exercise && (

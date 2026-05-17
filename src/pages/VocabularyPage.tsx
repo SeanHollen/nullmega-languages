@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa";
 import { useLanguage } from "../contexts/LanguageContext";
+import { useLoading } from "../contexts/LoadingContext";
 import type { Flashcard } from "../utils/flashcards";
 import { loadFlashcards, computeStatus } from "../utils/flashcards";
 import type { VocabSettings } from "../utils/vocabSettings";
@@ -13,13 +14,12 @@ import { FlashcardTable } from "../components/vocabulary/FlashcardTable";
 export function VocabularyPage() {
   const navigate = useNavigate();
   const { language } = useLanguage();
+  const { beginLoading } = useLoading();
   const [cards, setCards] = useState<Flashcard[]>(() =>
     loadFlashcards(language).sort((a, b) => b.addedAt - a.addedAt),
   );
   const [settings, setSettingsState] = useState<VocabSettings>(loadVocabSettings);
-  const [learnLoading, setLearnLoading] = useState(false);
   const [learnError, setLearnError] = useState<string | null>(null);
-  const [reviewLoading, setReviewLoading] = useState(false);
   const [reviewError, setReviewError] = useState<string | null>(null);
 
   function updateSettings(patch: Partial<VocabSettings>) {
@@ -33,37 +33,27 @@ export function VocabularyPage() {
   }
 
   function handleStartLearn() {
-    setLearnLoading(true);
     setLearnError(null);
+    const done = beginLoading();
     prepareLearnSession(language, settings)
       .then((data) => {
-        if (!data) {
-          setLearnLoading(false);
-          return;
-        }
+        if (!data) return;
         void navigate(`/vocabulary/learn`, { state: data });
       })
-      .catch((err) => {
-        setLearnError(String(err));
-        setLearnLoading(false);
-      });
+      .catch((err) => setLearnError(String(err)))
+      .finally(done);
   }
 
   function handleStartReview() {
-    setReviewLoading(true);
     setReviewError(null);
+    const done = beginLoading();
     prepareReviewSession(language, settings)
       .then((data) => {
-        if (!data) {
-          setReviewLoading(false);
-          return;
-        }
+        if (!data) return;
         void navigate(`/vocabulary/review`, { state: data });
       })
-      .catch((err) => {
-        setReviewError(String(err));
-        setReviewLoading(false);
-      });
+      .catch((err) => setReviewError(String(err)))
+      .finally(done);
   }
 
   const availableNewCount = Math.max(
@@ -96,10 +86,10 @@ export function VocabularyPage() {
           <div className="flex flex-col items-center gap-1">
             <button
               onClick={handleStartLearn}
-              disabled={(availableNewCount === 0 && learningCount === 0) || learnLoading}
+              disabled={availableNewCount === 0 && learningCount === 0}
               className="bg-white border-2 border-green-400 text-green-700 px-8 py-4 rounded-2xl font-bold text-base hover:bg-green-50 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition text-center min-w-48"
             >
-              <div>{learnLoading ? `Preparing…` : `Learn new cards →`}</div>
+              <div>{`Learn new cards →`}</div>
               <div className="text-sm font-normal text-green-600 mt-1">
                 {`new: ${availableNewCount} · learning: ${learningCount}`}
               </div>
@@ -109,10 +99,10 @@ export function VocabularyPage() {
           <div className="flex flex-col items-center gap-1">
             <button
               onClick={handleStartReview}
-              disabled={dueCount === 0 || reviewLoading}
+              disabled={dueCount === 0}
               className="bg-white border-2 border-green-400 text-green-700 px-8 py-4 rounded-2xl font-bold text-base hover:bg-green-50 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition text-center min-w-48"
             >
-              <div>{reviewLoading ? `Preparing…` : `Review cards →`}</div>
+              <div>{`Review cards →`}</div>
               <div className="text-sm font-normal text-green-600 mt-1">{`due: ${dueCount}`}</div>
             </button>
             {reviewError && <p className="text-xs text-red-500">{reviewError}</p>}

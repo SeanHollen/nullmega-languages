@@ -1,7 +1,9 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { LanguageProvider } from "./contexts/LanguageContext";
+import { LoadingProvider } from "./contexts/LoadingContext";
 import { LanguageBanner } from "./components/LanguageBanner";
+import { LoadingOverlay } from "./components/LoadingOverlay";
 import { HomePage } from "./pages/HomePage";
 import { ReadingPage } from "./pages/ReadingPage";
 import { ListeningPage } from "./pages/ListeningPage";
@@ -24,23 +26,26 @@ export function App() {
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <LanguageProvider>
-          <LanguageBanner />
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/reading" element={<ReadingPage />} />
-            <Route path="/listening" element={<ListeningPage />} />
-            <Route path="/pronunciation" element={<PronunciationPage />} />
-            <Route path="/writing" element={<WritingPage />} />
-            <Route path="/settings" element={<SettingsPage />} />
-            <Route path="/goals" element={<GoalsPage />} />
-            <Route path="/stats/:mode" element={<StatsPage />} />
-            <Route path="/vocabulary" element={<VocabularyPage />} />
-            <Route path="/vocabulary/stats" element={<VocabularyStatsPage />} />
-            <Route path="/vocabulary/:mode" element={<StudyPage />} />
-            <Route path="/grammar" element={<GrammarPage />} />
-            <Route path="/grammar/stats" element={<GrammarStatsPage />} />
-            <Route path="/grammar/:mode" element={<GrammarStudyPage />} />
-          </Routes>
+          <LoadingProvider>
+            <LoadingOverlay />
+            <LanguageBanner />
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/reading" element={<ReadingPage />} />
+              <Route path="/listening" element={<ListeningPage />} />
+              <Route path="/pronunciation" element={<PronunciationPage />} />
+              <Route path="/writing" element={<WritingPage />} />
+              <Route path="/settings" element={<SettingsPage />} />
+              <Route path="/goals" element={<GoalsPage />} />
+              <Route path="/stats/:mode" element={<StatsPage />} />
+              <Route path="/vocabulary" element={<VocabularyPage />} />
+              <Route path="/vocabulary/stats" element={<VocabularyStatsPage />} />
+              <Route path="/vocabulary/:mode" element={<StudyPage />} />
+              <Route path="/grammar" element={<GrammarPage />} />
+              <Route path="/grammar/stats" element={<GrammarStatsPage />} />
+              <Route path="/grammar/:mode" element={<GrammarStudyPage />} />
+            </Routes>
+          </LoadingProvider>
         </LanguageProvider>
       </BrowserRouter>
     </QueryClientProvider>

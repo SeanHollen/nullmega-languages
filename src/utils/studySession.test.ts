@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { IDBFactory } from "fake-indexeddb";
-import { prepareReviewSession, pickNextCard } from "./studySession";
+import { prepareReviewSession, pickNextCard, computeAnswerPatch } from "./studySession";
 import type { VocabSettings } from "./vocabSettings";
 import { callTTS } from "./api";
 import type { Flashcard } from "./flashcards";
@@ -95,6 +95,49 @@ describe("pickNextCard", () => {
     const picked = pickNextCard(cards);
     expect(picked).not.toBeNull();
     expect(picked!.relearningStartedAt).not.toBeNull();
+  });
+});
+
+describe("computeAnswerPatch", () => {
+  function cardWithContexts(overrides: Partial<Flashcard> = {}): Flashcard {
+    return {
+      ...makeCard("c1", null),
+      contexts: [{ source: "src", translation: "tr", audioKey: null }],
+      dateContextGenerated: 100,
+      ...overrides,
+    };
+  }
+
+  it("clears contexts when a learn-mode card graduates (count reaches threshold)", () => {
+    const card = cardWithContexts({ status: "learning", learningCorrectCount: 1 });
+    const { patch, graduate } = computeAnswerPatch(card, "learn", true, 1000);
+    expect(graduate).toBe(true);
+    expect(patch.status).toBe("scheduled");
+    expect(patch.contexts).toEqual([]);
+    expect(patch.dateContextGenerated).toBeNull();
+  });
+
+  it("keeps contexts when a learn-mode card does not yet graduate", () => {
+    const card = cardWithContexts({ status: "learning", learningCorrectCount: 0 });
+    const { patch, graduate } = computeAnswerPatch(card, "learn", true, 1000);
+    expect(graduate).toBe(false);
+    expect(`contexts` in patch).toBe(false);
+    expect(`dateContextGenerated` in patch).toBe(false);
+  });
+
+  it("clears contexts when a review-mode card is answered right", () => {
+    const card = cardWithContexts({ status: "scheduled", currentInterval: DAY });
+    const { patch } = computeAnswerPatch(card, "review", true, 1000);
+    expect(patch.contexts).toEqual([]);
+    expect(patch.dateContextGenerated).toBeNull();
+  });
+
+  it("does not clear contexts when a review-mode card is answered wrong (relearning)", () => {
+    const card = cardWithContexts({ status: "scheduled", currentInterval: DAY });
+    const { patch } = computeAnswerPatch(card, "review", false, 1000);
+    expect(patch.status).toBe("learning");
+    expect(patch.relearningStartedAt).toBe(1000);
+    expect(`contexts` in patch).toBe(false);
   });
 });
 

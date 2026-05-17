@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa";
 import { SetupView } from "../components/reading/SetupView";
-import { LoadingView } from "../components/reading/LoadingView";
 import { ListeningPassageView } from "../components/listening/ListeningPassageView";
 import type { Translations } from "../components/reading/ResultsView";
 import { ResultsView } from "../components/reading/ResultsView";
@@ -14,6 +13,7 @@ import { loadAbility, computeRating, DEFAULT_LANGUAGE_COMPLEXITY } from "../hook
 import type { ExerciseAudio } from "../hooks/useTTS";
 import { generateExerciseAudio } from "../hooks/useTTS";
 import { useLanguage } from "../contexts/LanguageContext";
+import { useLoading } from "../contexts/LoadingContext";
 import { saveAssessment } from "../utils/history";
 import { uploadAssessment } from "../utils/api";
 import { getUserId } from "../utils/user";
@@ -35,31 +35,32 @@ export function ListeningPage() {
   const [ratingResult, setRatingResult] = useState<RatingResult | null>(null);
   const [assessmentId, setAssessmentId] = useState<string | null>(null);
   const [translations, setTranslations] = useState<Translations | null>(null);
-  const [loadingAudio, setLoadingAudio] = useState(false);
   const [audioError, setAudioError] = useState(``);
-  const { mutate, isPending, error: genError } = useGenerateReading();
+  const { mutate, error: genError } = useGenerateReading();
+  const { beginLoading } = useLoading();
 
   function handleGenerate() {
     setAudioError(``);
+    const done = beginLoading();
     mutate(
       { language, languageComplexity, mode: `listening` },
       {
         onSuccess: (data: Exercise) => {
           setExercise(data);
           setSelected(Array.from({ length: data.questions.length }, () => null));
-          setLoadingAudio(true);
           void generateExerciseAudio(data).then(
             (exerciseAudio) => {
               setAudio(exerciseAudio);
               setPhase(`listening`);
-              setLoadingAudio(false);
+              done();
             },
             () => {
               setAudioError(`Failed to generate audio. Please try again.`);
-              setLoadingAudio(false);
+              done();
             },
           );
         },
+        onError: () => done(),
       },
     );
   }
@@ -135,7 +136,6 @@ export function ListeningPage() {
     setPhase(`setup`);
   }
 
-  const isLoading = isPending || loadingAudio;
   const error = genError?.message ?? audioError;
 
   return (
@@ -151,7 +151,7 @@ export function ListeningPage() {
           <h1 className="text-2xl font-bold text-gray-800">{`Listening Comprehension`}</h1>
         </div>
 
-        {phase === `setup` && !isLoading && (
+        {phase === `setup` && (
           <>
             <SetupView
               language={language}
@@ -166,15 +166,6 @@ export function ListeningPage() {
             />
             <HistoryList mode={`listening`} language={language} />
           </>
-        )}
-
-        {phase === `setup` && isPending && <LoadingView message={`Generating passage…`} />}
-
-        {phase === `setup` && loadingAudio && (
-          <LoadingView
-            message={`Preparing audio…`}
-            subMessage={`Synthesising speech for passage and questions`}
-          />
         )}
 
         {phase === `listening` && exercise && audio && (

@@ -9,7 +9,7 @@ import { loadAudio } from "../utils/audioStore";
 import { AudioPlayer } from "../components/listening/AudioPlayer";
 import { BoldWord } from "../components/BoldWord";
 import type { StudySessionData } from "../utils/studySession";
-import { INITIAL_INTERVAL, nextInterval, easyInterval, pickNextCard } from "../utils/studySession";
+import { easyInterval, pickNextCard, computeAnswerPatch } from "../utils/studySession";
 
 type StudyMode = "learn" | "review";
 
@@ -67,57 +67,9 @@ export function StudyPage() {
     });
   }
 
-  const LEARN_STEPS_REQUIRED = 2;
-
   function handleAnswer(right: boolean) {
     if (!current) return;
-    const now = Date.now();
-
-    let patch: Partial<Flashcard>;
-    let graduate: boolean;
-
-    if (mode === "learn") {
-      if (right) {
-        const newCount = current.learningCorrectCount + 1;
-        if (newCount >= LEARN_STEPS_REQUIRED) {
-          graduate = true;
-          patch = {
-            status: "scheduled",
-            lastReviewed: now,
-            currentInterval: INITIAL_INTERVAL,
-            learningCorrectCount: 0,
-            relearningStartedAt: null,
-          };
-        } else {
-          graduate = false;
-          patch = { lastReviewed: now, learningCorrectCount: newCount };
-        }
-      } else {
-        graduate = false;
-        patch = { lastReviewed: now, learningCorrectCount: 0 };
-      }
-    } else {
-      if (right) {
-        graduate = true;
-        patch = {
-          status: "scheduled",
-          lastReviewed: now,
-          currentInterval: nextInterval(current.currentInterval),
-          contexts: [],
-          dateContextGenerated: null,
-        };
-      } else {
-        graduate = false;
-        patch = {
-          status: "learning",
-          lastReviewed: now,
-          currentInterval: INITIAL_INTERVAL,
-          learningCorrectCount: 0,
-          relearningStartedAt: now,
-        };
-      }
-    }
-
+    const { patch, graduate } = computeAnswerPatch(current, mode, right, Date.now());
     patchFlashcard(current.id, patch);
 
     if (graduate) {
@@ -149,6 +101,8 @@ export function StudyPage() {
         currentInterval: easyInterval(current.currentInterval),
         learningCorrectCount: 0,
         relearningStartedAt: null,
+        contexts: [],
+        dateContextGenerated: null,
       });
     } else {
       patchFlashcard(current.id, {

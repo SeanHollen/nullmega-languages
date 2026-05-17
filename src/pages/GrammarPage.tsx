@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa";
 import { useLanguage } from "../contexts/LanguageContext";
+import { useLoading } from "../contexts/LoadingContext";
 import type { GrammarCard } from "../utils/grammarCards";
 import { loadGrammarCards, computeGrammarStatus } from "../utils/grammarCards";
 import type { GrammarSettings } from "../utils/grammarSettings";
@@ -32,13 +33,12 @@ const LEVEL_LABELS: Record<number, string> = {
 export function GrammarPage() {
   const navigate = useNavigate();
   const { language } = useLanguage();
+  const { beginLoading } = useLoading();
   const [cards, setCards] = useState<GrammarCard[]>(() =>
     loadGrammarCards(language).sort((a, b) => b.addedAt - a.addedAt),
   );
   const [settings, setSettingsState] = useState<GrammarSettings>(loadGrammarSettings);
-  const [learnLoading, setLearnLoading] = useState(false);
   const [learnError, setLearnError] = useState<string | null>(null);
-  const [reviewLoading, setReviewLoading] = useState(false);
   const [reviewError, setReviewError] = useState<string | null>(null);
 
   function updateSettings(patch: Partial<GrammarSettings>) {
@@ -52,37 +52,27 @@ export function GrammarPage() {
   }
 
   function handleLearn() {
-    setLearnLoading(true);
     setLearnError(null);
+    const done = beginLoading();
     prepareGrammarLearnSession(language, settings)
       .then((data) => {
-        if (!data) {
-          setLearnLoading(false);
-          return;
-        }
+        if (!data) return;
         void navigate(`/grammar/learn`, { state: data });
       })
-      .catch((err) => {
-        setLearnError(String(err));
-        setLearnLoading(false);
-      });
+      .catch((err) => setLearnError(String(err)))
+      .finally(done);
   }
 
   function handleReview() {
-    setReviewLoading(true);
     setReviewError(null);
+    const done = beginLoading();
     prepareGrammarReviewSession(language)
       .then((data) => {
-        if (!data) {
-          setReviewLoading(false);
-          return;
-        }
+        if (!data) return;
         void navigate(`/grammar/review`, { state: data });
       })
-      .catch((err) => {
-        setReviewError(String(err));
-        setReviewLoading(false);
-      });
+      .catch((err) => setReviewError(String(err)))
+      .finally(done);
   }
 
   function handlePlayCard(card: GrammarCard) {
@@ -95,7 +85,7 @@ export function GrammarPage() {
   const learningCount = cards.filter((c) => computeGrammarStatus(c) === `learning`).length;
   const dueCount = cards.filter((c) => computeGrammarStatus(c) === `due`).length;
   const canGenerate = Math.max(0, settings.newCardsPerDay - getGeneratedTodayCount());
-  const learnDisabled = (learningCount === 0 && canGenerate === 0) || learnLoading;
+  const learnDisabled = learningCount === 0 && canGenerate === 0;
 
   const activeCards = cards.filter((c) => {
     const s = computeGrammarStatus(c);
@@ -123,7 +113,7 @@ export function GrammarPage() {
                 disabled={learnDisabled}
                 className="bg-white border-2 border-green-400 text-green-700 px-8 py-4 rounded-2xl font-bold text-base hover:bg-green-50 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition text-center min-w-48"
               >
-                <div>{learnLoading ? `Preparing…` : `Learn new cards →`}</div>
+                <div>{`Learn new cards →`}</div>
                 <div className="text-sm font-normal text-green-600 mt-1">
                   {`learning: ${learningCount} · generate: ${canGenerate}`}
                 </div>
@@ -134,10 +124,10 @@ export function GrammarPage() {
             <div className="flex flex-col items-center gap-1">
               <button
                 onClick={handleReview}
-                disabled={dueCount === 0 || reviewLoading}
+                disabled={dueCount === 0}
                 className="bg-white border-2 border-green-400 text-green-700 px-8 py-4 rounded-2xl font-bold text-base hover:bg-green-50 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition text-center min-w-48"
               >
-                <div>{reviewLoading ? `Preparing…` : `Review cards →`}</div>
+                <div>{`Review cards →`}</div>
                 <div className="text-sm font-normal text-green-600 mt-1">{`due: ${dueCount}`}</div>
               </button>
               {reviewError && <p className="text-xs text-red-500">{reviewError}</p>}

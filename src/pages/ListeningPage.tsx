@@ -80,7 +80,7 @@ export function ListeningPage() {
 
   function handleGenerate() {
     setAudioError(``);
-    const task = beginLoading(`Generating listening passage…`);
+    const task = beginLoading(`Generating passage…`);
     mutate(
       { language, languageComplexity, mode: `listening` },
       {
@@ -257,6 +257,14 @@ export function ListeningPage() {
             ratingResult={ratingResult}
             assessmentId={assessmentId}
             translations={translations}
+            audio={
+              audio
+                ? {
+                    passageUrl: audio.passageUrl || null,
+                    questionUrls: audio.questionUrls.map((u) => u || null),
+                  }
+                : undefined
+            }
             onGoAgain={handleGoAgain}
             onHome={() => navigate(`/`)}
           />

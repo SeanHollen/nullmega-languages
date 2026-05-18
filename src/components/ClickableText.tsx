@@ -4,7 +4,6 @@ import { loadFlashcards, addFlashcard, removeFlashcard } from "../utils/flashcar
 
 interface Props {
   text: string;
-  boldWords?: string[];
   language?: string;
 }
 
@@ -72,13 +71,12 @@ function buildFlashcardMask(text: string, sources: string[]): boolean[] {
   return mask;
 }
 
-export function ClickableText({ text, boldWords = [], language }: Props) {
+export function ClickableText({ text, language }: Props) {
   const [popup, setPopup] = useState<Popup | null>(null);
   const [savedSources, setSavedSources] = useState<string[]>(() =>
     language ? loadFlashcards(language).map((f) => f.source) : [],
   );
   const containerRef = useRef<HTMLSpanElement>(null);
-  const boldSet = new Set(boldWords.map((w) => w.toLowerCase()));
   const tokens = tokenize(text);
   const flashcardMask = buildFlashcardMask(text, savedSources);
 
@@ -157,13 +155,12 @@ export function ClickableText({ text, boldWords = [], language }: Props) {
             </span>
           );
         }
-        const isBold = boldSet.has(token.text.toLowerCase());
         const isFlashcarded = flashcardMask.slice(token.start, token.end).some(Boolean);
         return (
           <span
             key={i}
             data-word="true"
-            className={`cursor-pointer rounded ${isFlashcarded ? `bg-blue-100 text-blue-900` : `hover:bg-yellow-100`} ${isBold ? `font-semibold text-gray-900` : ``}`}
+            className={`cursor-pointer rounded ${isFlashcarded ? `bg-blue-100 text-blue-900` : `hover:bg-yellow-100`}`}
           >
             {token.text}
           </span>

@@ -3,6 +3,7 @@ import { FaCheck, FaTimes, FaMinus } from "react-icons/fa";
 import type { PronunciationPhrase } from "../../hooks/useGeneratePronunciation";
 import type { RatingResult } from "../../hooks/useAbility";
 import { AssessmentFeedback } from "../AssessmentFeedback";
+import { AudioPlayer } from "../listening/AudioPlayer";
 import { ClickableText } from "../ClickableText";
 
 const OUTCOME_STYLE = {
@@ -28,9 +29,11 @@ const ICON_BY_RATING: Record<NonNullable<PhraseRating>, ReactElement> = {
 interface Props {
   phrases: PronunciationPhrase[];
   language: string;
+  title?: string;
   ratings: ("good" | "medium" | "bad" | null)[];
   ratingResult: RatingResult | null;
   assessmentId: string | null;
+  audioUrls?: (string | null)[];
   onGoAgain: () => void;
   onHome: () => void;
 }
@@ -42,9 +45,11 @@ function formatScore(n: number): string {
 export function PronunciationResultsView({
   phrases,
   language,
+  title,
   ratings,
   ratingResult,
   assessmentId,
+  audioUrls,
   onGoAgain,
   onHome,
 }: Props) {
@@ -60,6 +65,7 @@ export function PronunciationResultsView({
       <div
         className={`bg-white rounded-2xl border shadow-sm p-8 text-center ${outcome ? outcome.bg : `border-gray-100`}`}
       >
+        {title && <h2 className="text-lg font-semibold text-gray-700 mb-2">{title}</h2>}
         {outcome && (
           <p className={`text-sm font-semibold uppercase tracking-widest mb-2 ${outcome.color}`}>
             {outcome.label}
@@ -98,17 +104,18 @@ export function PronunciationResultsView({
           const r = ratings[i] ?? `bad`;
           const border = BORDER_BY_RATING[r];
           const icon = ICON_BY_RATING[r];
+          const audioUrl = audioUrls?.[i];
           return (
             <div key={i} className={`bg-white rounded-2xl border shadow-sm p-5 ${border}`}>
-              <div className="flex items-start gap-3">
-                {icon}
-                <div>
-                  <p className="font-medium text-gray-800">
-                    <ClickableText text={p.phrase} language={language} />
-                  </p>
-                  <p className="text-sm text-gray-400 italic mt-0.5">{p.translation}</p>
-                </div>
+              <div className="flex items-center gap-3 mb-2">
+                <span className="text-xs text-gray-400 font-medium">{`Phrase ${i + 1}`}</span>
+                {audioUrl && <AudioPlayer src={audioUrl} small />}
+                <span className="ml-auto">{icon}</span>
               </div>
+              <p className="font-medium text-gray-800">
+                <ClickableText text={p.phrase} language={language} />
+              </p>
+              <p className="text-sm text-gray-400 italic mt-0.5">{p.translation}</p>
             </div>
           );
         })}

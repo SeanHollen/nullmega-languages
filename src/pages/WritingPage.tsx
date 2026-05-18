@@ -64,7 +64,7 @@ export function WritingPage() {
   }
 
   function handleGenerate() {
-    const task = beginLoading(`Generating writing exercise…`);
+    const task = beginLoading(`Generating passage…`);
     generateWriting.mutate(
       { language, languageComplexity },
       {

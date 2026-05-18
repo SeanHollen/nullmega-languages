@@ -23,6 +23,9 @@ export function PassageView({
   return (
     <div className="space-y-6">
       <div className="bg-white rounded-2xl border border-green-100 shadow-sm p-8">
+        {exercise.title && (
+          <h2 className="text-xl font-semibold text-gray-800 mb-1">{exercise.title}</h2>
+        )}
         <p className="text-xs text-gray-400 uppercase tracking-wide mb-4">
           {`${language} · Complexity ${languageComplexity}`}
         </p>

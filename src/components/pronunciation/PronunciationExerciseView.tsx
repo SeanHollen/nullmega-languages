@@ -7,6 +7,7 @@ interface Props {
   audioUrls: string[];
   language: string;
   languageComplexity: number;
+  title?: string;
   ratings: ("good" | "medium" | "bad" | null)[];
   onRate: (index: number, rating: "good" | "medium" | "bad") => void;
   onSubmit: () => void;
@@ -17,6 +18,7 @@ export function PronunciationExerciseView({
   audioUrls,
   language,
   languageComplexity,
+  title,
   ratings,
   onRate,
   onSubmit,
@@ -27,6 +29,7 @@ export function PronunciationExerciseView({
   return (
     <div className="space-y-6">
       <div className="bg-white rounded-2xl border border-green-100 shadow-sm px-6 py-4">
+        {title && <h2 className="text-xl font-semibold text-gray-800 mb-1">{title}</h2>}
         <p className="text-xs text-gray-400 uppercase tracking-wide">
           {`${language} · Complexity ${languageComplexity}`}
         </p>

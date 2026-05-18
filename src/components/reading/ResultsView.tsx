@@ -2,7 +2,13 @@ import { FaCheck, FaTimes } from "react-icons/fa";
 import type { Exercise } from "../../types";
 import type { RatingResult } from "../../hooks/useAbility";
 import { AssessmentFeedback } from "../AssessmentFeedback";
+import { AudioPlayer } from "../listening/AudioPlayer";
 import { ClickableText } from "../ClickableText";
+
+export interface ResultsAudio {
+  passageUrl: string | null;
+  questionUrls: (string | null)[];
+}
 
 const OUTCOME_STYLE = {
   win: { label: `Win`, color: `text-green-600`, bg: `bg-green-100 border-green-200` },
@@ -20,22 +26,6 @@ function optionClass(
   return `text-gray-500`;
 }
 
-function boldWords(text: string, words: string[]): React.ReactNode {
-  if (!words.length) return text;
-  const escaped = words.map((w) => w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
-  const pattern = new RegExp(`(${escaped.join("|")})`, "gi");
-  const parts = text.split(pattern);
-  return parts.map((part, i) =>
-    i % 2 === 1 ? (
-      <strong key={i} className="font-semibold text-gray-900">
-        {part}
-      </strong>
-    ) : (
-      <span key={i}>{part}</span>
-    ),
-  );
-}
-
 export interface Translations {
   questions: string[];
   options: string[][];
@@ -48,6 +38,7 @@ interface Props {
   ratingResult: RatingResult | null;
   assessmentId: string | null;
   translations: Translations | null;
+  audio?: ResultsAudio;
   onGoAgain: () => void;
   onHome: () => void;
 }
@@ -59,6 +50,7 @@ export function ResultsView({
   ratingResult,
   assessmentId,
   translations,
+  audio,
   onGoAgain,
   onHome,
 }: Props) {
@@ -71,6 +63,9 @@ export function ResultsView({
       <div
         className={`bg-white rounded-2xl border shadow-sm p-8 text-center ${outcome ? outcome.bg : `border-green-100`}`}
       >
+        {exercise.title && (
+          <h2 className="text-lg font-semibold text-gray-700 mb-2">{exercise.title}</h2>
+        )}
         {outcome && (
           <p className={`text-sm font-semibold uppercase tracking-widest mb-2 ${outcome.color}`}>
             {outcome.label}
@@ -103,20 +98,14 @@ export function ResultsView({
 
       <div className="bg-white rounded-2xl border border-green-100 shadow-sm p-8 space-y-4">
         <p className="text-xs text-gray-400 uppercase tracking-wide">{`Passage`}</p>
+        {audio?.passageUrl && <AudioPlayer src={audio.passageUrl} label={`Play passage`} />}
         <p className="text-gray-800 leading-relaxed">
-          <ClickableText
-            text={exercise.passage}
-            boldWords={exercise.difficultWords.map((w) => w.source)}
-            language={language}
-          />
+          <ClickableText text={exercise.passage} language={language} />
         </p>
         <div className="border-t border-green-100 pt-4">
           <p className="text-xs text-gray-400 uppercase tracking-wide mb-2">{`English Translation`}</p>
           <p className="text-gray-500 leading-relaxed italic text-sm whitespace-pre-wrap">
-            {boldWords(
-              exercise.translation,
-              exercise.difficultWords.map((w) => w.translation),
-            )}
+            {exercise.translation}
           </p>
         </div>
         {exercise.insight && (
@@ -132,6 +121,7 @@ export function ResultsView({
           const correct = selected[qi] === q.correct;
           const tq = translations?.questions[qi];
           const topts = translations?.options[qi];
+          const qAudio = audio?.questionUrls[qi];
           return (
             <div
               key={qi}
@@ -143,12 +133,17 @@ export function ResultsView({
                 ) : (
                   <FaTimes className="text-red-500 mt-1 shrink-0" />
                 )}
-                <div>
+                <div className="flex-1">
                   <p className="font-medium text-gray-800">
                     {`${qi + 1}. `}
                     <ClickableText text={q.question} language={language} />
                   </p>
                   {tq && <p className="text-xs text-gray-400 mt-0.5">{tq}</p>}
+                  {qAudio && (
+                    <div className="mt-2">
+                      <AudioPlayer src={qAudio} label={`Replay question`} small />
+                    </div>
+                  )}
                 </div>
               </div>
               <div className="space-y-1 pl-6 mt-3">

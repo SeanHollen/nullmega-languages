@@ -48,6 +48,9 @@ export function WritingResultsView({
       <div
         className={`bg-white rounded-2xl border shadow-sm p-8 text-center ${outcome ? outcome.bg : `border-green-100`}`}
       >
+        {exercise.title && (
+          <h2 className="text-lg font-semibold text-gray-700 mb-2">{exercise.title}</h2>
+        )}
         {outcome && (
           <p className={`text-sm font-semibold uppercase tracking-widest mb-2 ${outcome.color}`}>
             {outcome.label}

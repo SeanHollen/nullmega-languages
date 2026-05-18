@@ -56,7 +56,7 @@ export function ReadingPage() {
   }
 
   function handleGenerate() {
-    const task = beginLoading(`Generating reading exercise…`);
+    const task = beginLoading(`Generating passage…`);
     mutate(
       { language, languageComplexity },
       {

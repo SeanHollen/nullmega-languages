@@ -216,6 +216,7 @@ export function PronunciationPage() {
             audioUrls={audioUrls}
             language={language}
             languageComplexity={languageComplexity}
+            title={exercise.title}
             ratings={ratings}
             onRate={handleRate}
             onSubmit={handleSubmit}
@@ -226,9 +227,11 @@ export function PronunciationPage() {
           <PronunciationResultsView
             phrases={exercise.phrases}
             language={language}
+            title={exercise.title}
             ratings={ratings}
             ratingResult={ratingResult}
             assessmentId={assessmentId}
+            audioUrls={audioUrls.map((u) => u || null)}
             onGoAgain={handleGoAgain}
             onHome={() => navigate(`/`)}
           />

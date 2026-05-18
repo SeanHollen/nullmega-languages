@@ -106,14 +106,27 @@ export async function callGrammar(body: ChatBody): Promise<ChatResponse> {
 export async function callTTS(body: TTSBody): Promise<Blob> {
   const { tts } = loadSettings();
 
-  const url = tts ? "https://api.openai.com/v1/audio/speech" : `${resolvedBackendUrl()}/api/speak`;
+  if (tts) {
+    const res = await fetch("https://api.openai.com/v1/audio/speech", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${tts.key}` },
+      body: JSON.stringify(body),
+    });
+    if (!res.ok) throw new Error(`TTS error: ${res.status}`);
+    return res.blob();
+  }
 
-  const headers: Record<string, string> = { "Content-Type": "application/json" };
-  if (tts) headers["Authorization"] = `Bearer ${tts.key}`;
-
-  const res = await fetch(url, { method: "POST", headers, body: JSON.stringify(body) });
+  // Convex backend returns { url } pointing at a stored MP3 in Convex file storage.
+  const res = await fetch(`${resolvedBackendUrl()}/api/speak`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
   if (!res.ok) throw new Error(`TTS error: ${res.status}`);
-  return res.blob();
+  const { url } = (await res.json()) as { url: string };
+  const audioRes = await fetch(url);
+  if (!audioRes.ok) throw new Error(`TTS audio fetch error: ${audioRes.status}`);
+  return audioRes.blob();
 }
 
 function isBYOK(): boolean {

@@ -94,6 +94,27 @@ function getOutcome(correct: number, total: number): Outcome {
   return "loss";
 }
 
+// Rebuilds a RatingResult from a stored AssessmentRecord. Used by HistoryViewPage to
+// render the same outcome card / before→after delta the live results page shows.
+export function rebuildRatingResult(record: {
+  scoreEarned: number;
+  scoreMax: number;
+  ratingBefore: number | null;
+  ratingAfter: number | null;
+}): RatingResult | null {
+  if (record.ratingAfter === null) return null;
+  const outcome = record.scoreMax > 0 ? getOutcome(record.scoreEarned, record.scoreMax) : "draw";
+  const isPlacement = record.ratingBefore === null;
+  const change = isPlacement ? 0 : record.ratingAfter - record.ratingBefore!;
+  return {
+    outcome,
+    oldRating: record.ratingBefore,
+    newRating: record.ratingAfter,
+    change,
+    isPlacement,
+  };
+}
+
 function actualScore(outcome: Outcome): number {
   if (outcome === "win") return 1.0;
   if (outcome === "draw") return 0.5;

@@ -34,7 +34,7 @@ export function VocabularyPage() {
 
   async function handleStartLearn() {
     setLearnError(null);
-    const task = beginLoading(`Preparing learn session…`);
+    const task = beginLoading(`Generating contexts…`);
     try {
       const data = await prepareLearnSession(language, settings);
       if (data) void navigate(`/vocabulary/learn`, { state: data });
@@ -46,7 +46,7 @@ export function VocabularyPage() {
 
   async function handleStartReview() {
     setReviewError(null);
-    const task = beginLoading(`Preparing review session…`);
+    const task = beginLoading(`Regenerating contexts…`);
     try {
       const data = await prepareReviewSession(language, settings);
       if (data) void navigate(`/vocabulary/review`, { state: data });

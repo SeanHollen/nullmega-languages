@@ -115,6 +115,32 @@
     ]
   },
   "6": {
+    "description": "Pre-A1. First week. Simple declarative sentences using 'I have,' 'I like,' and 'I see.' Vocabulary of roughly 50 common concrete nouns and basic verbs. No negation, no questions yet. The learner can name things in their environment.",
+    "examples": [
+      {
+        "passage": "I see a cat. I have a dog. I like apples. She has a book. He is happy. I see a bird. I have a hat. I like bread. I see the sun. I see the sky. She has a pen. She has a bag. He has a ball. He has a cup. I like milk. I like tea. I like rice. He is kind. She is nice. I am happy. The cat is small. The dog is big. The bird is red. The book is new. The bag is old. I see my mom. I see my dad. I have a sister. I have a brother. I like my home. I like my school. She is my friend. He is my friend. I am here. They are here.",
+        "question": {
+          "question": "Which statement best describes what the speaker owns?",
+          "options": [
+            "A) A cat and a book",
+            "B) A dog only",
+            "C) Apples and a book",
+            "D) A cat and a dog"
+          ],
+          "answer": 1
+        }
+      },
+      {
+        "passage": "I see a tree. I have a ball. I like the sea. The bird is small. The fish is big. I see a flower. I see a leaf. I see a rock. I have a box. I have a key. I like the sun. I like the rain. The cat is small. The dog is small. The cow is small. The bee is small. The frog is small. The horse is small. The fish is big. The sky is blue. The sea is blue. The grass is green. The flower is red. I see the moon. I see a star. I have a friend. I like my friend. He is kind. She is nice. The boy is happy. The girl is happy. I am here. They are here too.",
+        "question": {
+          "question": "Which animal in the passage is described as big?",
+          "options": ["A) The cat", "B) The bird", "C) The fish", "D) The dog"],
+          "answer": 2
+        }
+      }
+    ]
+  },
+  "7": {
     "description": "A1 entry. First week. Simple yes/no questions and short answers. Introduces 'do you like' and 'what is this.' Vocabulary expands to 75 words. Sentences are 4–6 words. Present tense with common verbs: eat, drink, walk, sit.",
     "examples": [
       {
@@ -140,7 +166,7 @@
       }
     ]
   },
-  "7": {
+  "8": {
     "description": "A1 entry. Days 7–10. Short dialogues with basic questions and answers. Introduces possessives (my, your, his, her) and simple plurals. Vocabulary of about 100 words. Family members and household objects appear.",
     "examples": [
       {
@@ -166,7 +192,7 @@
       }
     ]
   },
-  "8": {
+  "9": {
     "description": "A1 entry. Second week. Present continuous introduced ('I am eating'). Simple descriptions of ongoing actions. Vocabulary around 125 words. Sentences remain very short but actions are now depicted in progress.",
     "examples": [
       {
@@ -192,7 +218,7 @@
       }
     ]
   },
-  "9": {
+  "10": {
     "description": "A1 entry. Weeks 2–3. Simple negation ('I don't like') and basic 'where' questions. Prepositions of place: in, on, under, next to. Vocabulary of roughly 150 words. Spatial relationships between simple objects.",
     "examples": [
       {
@@ -218,7 +244,7 @@
       }
     ]
   },
-  "10": {
+  "11": {
     "description": "A1 entry. Third week. Introduces 'there is / there are' and simple 'how many' questions. Counting objects in simple scenes. Numbers to 20. Vocabulary near 175 words. Sentences are still one clause each.",
     "examples": [
       {
@@ -244,7 +270,7 @@
       }
     ]
   },
-  "11": {
+  "12": {
     "description": "A1. Weeks 3–4. Days of the week and basic time expressions (today, tomorrow, yesterday). Simple routines described in present tense. Vocabulary of about 200 words. Short paragraphs of two or three closely related sentences.",
     "examples": [
       {
@@ -270,7 +296,7 @@
       }
     ]
   },
-  "12": {
+  "13": {
     "description": "A1. Week 4. Telling time and discussing daily schedules. Numbers to 100. Basic ordinals (first, second, third). Vocabulary near 225 words. Simple question words: when, what time.",
     "examples": [
       {
@@ -291,7 +317,7 @@
       }
     ]
   },
-  "13": {
+  "14": {
     "description": "A1. End of first month. Simple past tense introduced with regular verbs ('walked,' 'talked'). Describing what happened yesterday. Vocabulary approaching 275 words. Two or three simple sentences about a past event.",
     "examples": [
       {
@@ -322,7 +348,38 @@
       }
     ]
   },
-  "14": {
+  "15": {
+    "description": "A1. End of first month. Simple past tense introduced with regular verbs ('walked,' 'talked'). Describing what happened yesterday. Vocabulary approaching 275 words. Two or three simple sentences about a past event.",
+    "examples": [
+      {
+        "passage": "Yesterday I walked to school. I talked to my friend. We played in the park. It was fun. In the morning, I walked with my sister. We talked about our day. At school, I worked very hard. I learned new words. I helped my friend with her work. At lunch, we shared our food. After school, we walked to the park. We played for one hour. We jumped on the grass. We laughed a lot. Then I walked home. My mom cooked dinner. I helped her in the kitchen. We talked about my day. I told her about the park. After dinner, I called my friend. We talked on the phone. I finished my homework. I watched a film with my dad. We laughed at the funny parts. I brushed my teeth. I went to bed at ten.",
+        "question": {
+          "question": "What can we infer about the speaker's day yesterday?",
+          "options": [
+            "A) They stayed inside all day",
+            "B) They spent time with at least one other person",
+            "C) They went to school by bus",
+            "D) They played a sport by themselves"
+          ],
+          "answer": 1
+        }
+      },
+      {
+        "passage": "Yesterday it rained all morning. The garden looked very green. The flowers opened slowly. I watched them from the window. The rain washed the leaves. The trees looked clean and bright. The grass shined in the soft light. Birds did not sing in the morning. They waited in the trees. A small cat walked under a bush. The cat stayed dry there. In the afternoon, the rain stopped. The sun came out slowly. The clouds moved away. Birds started to sing. The cat walked into the garden. It looked at the wet flowers. I opened the window. I smelled the fresh air. The garden smelled very nice. I walked outside. I picked one wet flower. I put it in a small cup of water. I placed the cup on my desk.",
+        "question": {
+          "question": "Based on the passage, what most likely caused the garden to look very green?",
+          "options": [
+            "A) The flowers opening slowly",
+            "B) The window being clean",
+            "C) The rain in the morning",
+            "D) The speaker watching it"
+          ],
+          "answer": 2
+        }
+      }
+    ]
+  },
+  "16": {
     "description": "A1. Month 1, weeks 3–4. Irregular past tense verbs (went, saw, had, ate). Short narratives about familiar events. Vocabulary near 325 words. Simple conjunctions 'and' and 'but' connect two clauses.",
     "examples": [
       {
@@ -353,7 +410,7 @@
       }
     ]
   },
-  "15": {
+  "17": {
     "description": "A1. End of first month. Simple connected sentences about daily life, with 'and,' 'but,' and 'because.' Past and present tenses used. Vocabulary of about 375 words. Picture-book level — simple, concrete, and personal. Equivalent to children's earliest readers.",
     "examples": [
       {
@@ -384,7 +441,7 @@
       }
     ]
   },
-  "16": {
+  "18": {
     "description": "A1. Month 2. Introducing simple future with 'will' and 'going to.' Making plans and predictions. Vocabulary near 425 words. Short, concrete paragraphs about familiar future events.",
     "examples": [
       {
@@ -410,7 +467,7 @@
       }
     ]
   },
-  "17": {
+  "19": {
     "description": "A1. Month 2. Describing people's appearance and personality with basic adjectives (tall, short, kind, funny). Simple comparatives (bigger, faster). Vocabulary around 475 words. Very short personal descriptions.",
     "examples": [
       {
@@ -436,7 +493,7 @@
       }
     ]
   },
-  "18": {
+  "20": {
     "description": "A1. Month 2. Simple directions and location vocabulary (turn left, go straight, next to the library). Asking and giving basic directions. Vocabulary near 525 words. Commands and imperatives appear.",
     "examples": [
       {
@@ -462,7 +519,7 @@
       }
     ]
   },
-  "19": {
+  "21": {
     "description": "A1. Month 2–3. Shopping and money vocabulary. Simple transactional dialogues. Prices, quantities, and requests. Vocabulary around 575 words. Very short functional exchanges.",
     "examples": [
       {
@@ -483,7 +540,7 @@
       }
     ]
   },
-  "20": {
+  "22": {
     "description": "A1. Month 3. Weather and seasons vocabulary. Describing current and seasonal weather. Modal 'can' introduced for ability. Vocabulary near 625 words. Short descriptive passages about the natural world.",
     "examples": [
       {
@@ -514,7 +571,7 @@
       }
     ]
   },
-  "21": {
+  "23": {
     "description": "A1. Month 3. Food and meals — describing what people eat and when. Simple 'would like' for polite requests. Cooking verbs (cook, boil, fry). Vocabulary around 675 words. A simple scene at a table or in a kitchen.",
     "examples": [
       {
@@ -545,7 +602,38 @@
       }
     ]
   },
-  "22": {
+  "24": {
+    "description": "A1. Month 3. Food and meals — describing what people eat and when. Simple 'would like' for polite requests. Cooking verbs (cook, boil, fry). Vocabulary around 675 words. A simple scene at a table or in a kitchen.",
+    "examples": [
+      {
+        "passage": "For breakfast I eat eggs and bread. My mother cooks dinner every night. Would you like some soup? Yes, please. I like soup a lot. In our family, we eat three meals a day. For breakfast, I eat eggs and bread, and I drink tea. My father eats only fruit. My sister eats cereal with milk. My mother does not eat much in the morning. For lunch, we usually eat at school or at work. I take a sandwich and an apple in my bag. After school, I sometimes have a small snack at home. My mother cooks dinner every night. She is a very good cook. She often boils vegetables and fries fish. Sometimes she makes soup with rice. Tonight she is making chicken soup. My mother asks me, Would you like some soup? Yes, please. I like soup a lot, especially when it is cold outside. We sit at the table together and talk about our day.",
+        "question": {
+          "question": "Who is responsible for preparing the evening meal in this household?",
+          "options": [
+            "A) The speaker alone",
+            "B) The speaker's mother",
+            "C) Both the speaker and the mother",
+            "D) The person being offered soup"
+          ],
+          "answer": 1
+        }
+      },
+      {
+        "passage": "Long ago, people did not have stoves. They cooked their food over a fire outside. They boiled water in a heavy pot. Today we have many easy ways to cook, but some people still like to cook over a fire. In old times, every family had a small fire pit near their house. They put wood in the pit and lit it every morning. They hung a large pot over the fire. They boiled water in this heavy pot for soup, for tea, and for washing. They fried meat on a flat hot stone next to the fire. They baked bread in a clay box. Cooking took many hours every day. Today most people use modern stoves. We can boil water in just a few minutes. We can cook a meal very fast. But some people still like to cook over a fire on weekends. They say food cooked over a fire has a special taste that no stove can give.",
+        "question": {
+          "question": "What does the passage suggest about cooking over a fire today?",
+          "options": [
+            "A) It is no longer possible to cook over a fire",
+            "B) Everyone uses a stove now and not a fire",
+            "C) Some people still choose to cook over a fire by preference",
+            "D) People cannot boil water in a pot anymore"
+          ],
+          "answer": 2
+        }
+      }
+    ]
+  },
+  "25": {
     "description": "A1. Month 3. Hobbies and free-time activities. Frequency adverbs (always, sometimes, never, often). Simple sentences about personal preferences and habits. Vocabulary near 725 words.",
     "examples": [
       {
@@ -576,7 +664,7 @@
       }
     ]
   },
-  "23": {
+  "26": {
     "description": "A1. Month 3–4. Describing a home — rooms, furniture, and layout. There is/are with more detail. Simple relative clauses beginning with 'that' or 'which.' Vocabulary around 775 words.",
     "examples": [
       {
@@ -607,7 +695,7 @@
       }
     ]
   },
-  "24": {
+  "27": {
     "description": "A1. Month 4. Talking about health and body — how you feel, simple ailments. Present and past tense mixed in short narrative. Modal 'should' introduced. Vocabulary near 825 words.",
     "examples": [
       {
@@ -638,7 +726,7 @@
       }
     ]
   },
-  "25": {
+  "28": {
     "description": "A1. End of month 4. Short personal narrative about a familiar event combining present, past, and simple future. Vocabulary of about 875 words. Equivalent to a simple picture-book story or the easiest level of graded readers. Sentences have one or two clauses; content is entirely concrete and personal.",
     "examples": [
       {
@@ -669,7 +757,7 @@
       }
     ]
   },
-  "26": {
+  "29": {
     "description": "A2. Month 4–5. Graded reader level 1. Short paragraphs about familiar everyday topics. Simple past narrative with time connectors (first, then, after that). Vocabulary around 1,000 words. Compound sentences with 'and,' 'but,' 'so,' 'because.'",
     "examples": [
       {
@@ -700,7 +788,7 @@
       }
     ]
   },
-  "27": {
+  "30": {
     "description": "A2. Month 5. Comparing and contrasting using comparatives and superlatives. Describing differences between places, people, and things. Vocabulary near 1,100 words. Two or three sentences with comparative structures.",
     "examples": [
       {
@@ -731,7 +819,7 @@
       }
     ]
   },
-  "28": {
+  "31": {
     "description": "A2. Month 5. Talking about past experiences with 'have you ever.' Present perfect introduced for experience. Vocabulary around 1,200 words. Short personal anecdotes.",
     "examples": [
       {
@@ -762,7 +850,7 @@
       }
     ]
   },
-  "29": {
+  "32": {
     "description": "A2. Month 5–6. Describing routines and habitual actions in the past using 'used to.' Contrasting past and present habits. Vocabulary near 1,300 words. A short descriptive paragraph about change over time.",
     "examples": [
       {
@@ -793,7 +881,38 @@
       }
     ]
   },
-  "30": {
+  "33": {
+    "description": "A2. Month 5–6. Describing routines and habitual actions in the past using 'used to.' Contrasting past and present habits. Vocabulary near 1,300 words. A short descriptive paragraph about change over time.",
+    "examples": [
+      {
+        "passage": "When I was young, my life was very different from how it is now. I used to play outside every day after school. My friends and I would run in the park, climb the trees, and play football until it got dark. Now I work in an office from nine to five, and I sit at a desk for most of the day. I used to eat a lot of sweets, especially chocolate and cake. My grandmother used to bake every weekend. Now I try to eat healthy food, with more vegetables and fruit. I used to sleep ten hours every night. Now I am happy if I get seven. I used to read comic books for hours. Now I usually read the news on my phone. Some of these changes feel sad, but others feel right for the person I have become.",
+        "question": {
+          "question": "What overall change does the passage suggest has occurred in the speaker's life?",
+          "options": [
+            "A) They now enjoy eating sweets even more than they did when they were younger",
+            "B) Their lifestyle has become more physically active and centered on the outdoors",
+            "C) Their habits have shifted toward a more settled and health-conscious adult life",
+            "D) They have come to prefer working outdoors to working in an office environment"
+          ],
+          "answer": 2
+        }
+      },
+      {
+        "passage": "A hundred years ago, cities looked very different from the way they look today. Cities used to be much smaller, with only a few main streets and not many houses. People used to walk everywhere because there were no cars, and most things they needed were close to home. Schools, churches, shops, and homes were all in the same small area. Markets used to be the center of every town. People would meet there to buy food, sell their goods, and share news with their neighbors. Now most people drive, and shopping happens in big stores far from where they live. The streets are quieter because few people walk for shopping. Many small markets have closed, and the new big stores are usually outside the city. People often do not know their neighbors as well as they used to.",
+        "question": {
+          "question": "What broad change in city life does the passage describe?",
+          "options": [
+            "A) Cities have grown smaller, and walking has become much more common again",
+            "B) Daily life has moved away from a compact, walkable center toward a spread-out one",
+            "C) Big stores have replaced cars as the main way that people travel within cities",
+            "D) Markets remain the center of city life, though people now drive to reach them"
+          ],
+          "answer": 1
+        }
+      }
+    ]
+  },
+  "34": {
     "description": "A2. Month 6. Writing simple letters and messages — informal register, greetings, and closings. Giving news and asking about someone's life. Vocabulary around 1,400 words. Friendly, conversational tone.",
     "examples": [
       {
@@ -824,7 +943,7 @@
       }
     ]
   },
-  "31": {
+  "35": {
     "description": "A2. Month 6–7. Describing a journey or trip — past tense narrative with places, transport, and impressions. Vocabulary near 1,500 words. A short connected paragraph with a clear beginning, middle, and end.",
     "examples": [
       {
@@ -855,7 +974,7 @@
       }
     ]
   },
-  "32": {
+  "36": {
     "description": "A2. Month 7. Giving opinions and making simple arguments. 'I think that,' 'In my opinion,' 'I agree / disagree.' Vocabulary around 1,600 words. Short opinion paragraph on a familiar topic.",
     "examples": [
       {
@@ -886,7 +1005,7 @@
       }
     ]
   },
-  "33": {
+  "37": {
     "description": "A2. Month 7–8. Conditionals type 1 (real and possible). 'If it rains, I will stay home.' Planning around possibilities. Vocabulary near 1,700 words. Short practical paragraphs.",
     "examples": [
       {
@@ -917,7 +1036,7 @@
       }
     ]
   },
-  "34": {
+  "38": {
     "description": "A2. Month 8. Describing a process or how to do something. Sequence markers and imperative instructions. Vocabulary around 1,800 words. A simple how-to or process description.",
     "examples": [
       {
@@ -948,7 +1067,7 @@
       }
     ]
   },
-  "35": {
+  "39": {
     "description": "A2. End of month 9. A connected short paragraph on a familiar topic with past, present, and future tenses, comparatives, simple conditionals, and basic conjunctions. Vocabulary of about 2,000 words. Equivalent to graded reader level 2 or a simple magazine article for learners. Sentences are short to medium length, and the content is concrete with emerging personal opinions.",
     "examples": [
       {
@@ -979,7 +1098,7 @@
       }
     ]
   },
-  "36": {
+  "40": {
     "description": "B1 entry. Month 9–10. Graded reader level 3 / simple young adult text. Paragraphs with multiple clauses, subordination, and some embedded phrases. Vocabulary near 2,200 words. Moderate descriptive detail; emerging narrative complexity.",
     "examples": [
       {
@@ -1010,7 +1129,7 @@
       }
     ]
   },
-  "37": {
+  "41": {
     "description": "B1 entry. Month 10. Discussing advantages and disadvantages. Balanced paragraphs with concessive clauses ('although,' 'even though,' 'however'). Vocabulary near 2,400 words.",
     "examples": [
       {
@@ -1041,7 +1160,38 @@
       }
     ]
   },
-  "38": {
+  "42": {
+    "description": "B1 entry. Month 10. Discussing advantages and disadvantages. Balanced paragraphs with concessive clauses ('although,' 'even though,' 'however'). Vocabulary near 2,400 words.",
+    "examples": [
+      {
+        "passage": "Although living in a large city offers many opportunities, including better jobs and easier access to education, it can also be stressful and expensive. Rents in big cities are often two or three times higher than in smaller towns, and the cost of basic food and transport is rising every year. The pace of daily life can be exhausting, and many people complain that they have no time for friends or family. However, for young people looking for work, especially those who have just finished their studies, the advantages often outweigh the difficulties. Cities offer the kinds of jobs and professional networks that are simply not available in smaller places. Even so, many people eventually prefer a quieter life. By the time they have a family, the noise, the cost, and the pressure of the city begin to feel less like an exciting challenge and more like a daily burden they would rather not carry.",
+        "question": {
+          "question": "What does the phrase 'Even so, many people eventually prefer a quieter life' imply about the appeal of cities?",
+          "options": [
+            "A) Cities are always the best place to live long-term",
+            "B) The benefits of city life are permanent for most people",
+            "C) The advantages of cities may matter less to people over time",
+            "D) A quiet life is only for people who cannot find work"
+          ],
+          "answer": 2
+        }
+      },
+      {
+        "passage": "Although solar panels can produce clean energy for many decades, they are not without their own environmental cost. They require rare materials, including certain metals that are difficult to mine responsibly. Many of these materials come from a small number of countries, and the working conditions in some of the mines are poor. However, the alternative — continuing to burn fossil fuels — causes far greater long-term harm to the environment, including rising temperatures and serious damage to the air quality in our cities. Compared to that, the problems associated with solar panels are real but manageable. Even so, the search for cleaner ways to produce solar panels remains an urgent task. Engineers and scientists are now working on new designs that use cheaper materials, and on better methods for recycling old panels at the end of their lives.",
+        "question": {
+          "question": "What is the writer's central position on solar panels?",
+          "options": [
+            "A) Solar panels should be abandoned because of their reliance on rare materials",
+            "B) Solar panels are clearly the best option and need no further improvement at all",
+            "C) Solar panels are preferable to fossil fuels but their own problems still need addressing",
+            "D) Mining concerns matter more than the long-term effects of using fossil fuels"
+          ],
+          "answer": 2
+        }
+      }
+    ]
+  },
+  "43": {
     "description": "B1 entry. Month 10–11. Narrative past tense with more complex sequencing and embedded description. Past perfect introduced ('had left,' 'had forgotten'). Vocabulary around 2,600 words.",
     "examples": [
       {
@@ -1072,7 +1222,7 @@
       }
     ]
   },
-  "39": {
+  "44": {
     "description": "B1 entry. Month 11. Describing emotions and abstract states with some nuance. Vocabulary for inner life: relieved, frustrated, anxious, content. Vocabulary around 2,800 words. A short introspective paragraph.",
     "examples": [
       {
@@ -1103,7 +1253,7 @@
       }
     ]
   },
-  "40": {
+  "45": {
     "description": "B1 entry. Month 11–12. Simple reporting and indirect speech ('He said that,' 'She told me'). Summarizing what others said or wrote. Vocabulary near 3,000 words. A short journalistic or informational paragraph.",
     "examples": [
       {
@@ -1134,7 +1284,7 @@
       }
     ]
   },
-  "41": {
+  "46": {
     "description": "B1. Month 12. Simple argumentative writing — a clear position supported by two or three reasons. Discourse markers: 'firstly,' 'secondly,' 'in addition,' 'to conclude.' Vocabulary near 3,200 words.",
     "examples": [
       {
@@ -1165,7 +1315,7 @@
       }
     ]
   },
-  "42": {
+  "47": {
     "description": "B1. Month 12–13. Describing social issues with basic analysis. Cause and effect language ('as a result,' 'this leads to'). Vocabulary around 3,400 words. A short expository paragraph on a familiar topic.",
     "examples": [
       {
@@ -1196,7 +1346,7 @@
       }
     ]
   },
-  "43": {
+  "48": {
     "description": "B1. Month 13. Reading and producing simple news-style text. Active and passive voice used naturally. Vocabulary near 3,600 words. A short news paragraph with basic journalistic structure.",
     "examples": [
       {
@@ -1227,7 +1377,7 @@
       }
     ]
   },
-  "44": {
+  "49": {
     "description": "B1. Month 13–14. Hypothetical situations with type 2 conditional ('If I were,' 'I would'). Discussing wishes and imagined scenarios. Vocabulary around 3,800 words.",
     "examples": [
       {
@@ -1258,7 +1408,7 @@
       }
     ]
   },
-  "45": {
+  "50": {
     "description": "B1. Month 14–15. A sustained paragraph on a familiar topic with clear structure, varied sentence length, and some subordinate clauses. Vocabulary of about 4,000 words. Equivalent to a young adult novel or a straightforward news article. Some idiomatic language, clear logical flow, and moderate descriptive detail.",
     "examples": [
       {
@@ -1289,7 +1439,38 @@
       }
     ]
   },
-  "46": {
+  "51": {
+    "description": "B1. Month 14–15. A sustained paragraph on a familiar topic with clear structure, varied sentence length, and some subordinate clauses. Vocabulary of about 4,000 words. Equivalent to a young adult novel or a straightforward news article. Some idiomatic language, clear logical flow, and moderate descriptive detail.",
+    "examples": [
+      {
+        "passage": "Living abroad for the first time is both exciting and unsettling. You discover things about yourself that you never expected — your habits, your fears, and your need for familiarity. At first everything feels different, from the food to the way people greet each other. But slowly, if you give it time, the feeling shifts. You begin to feel at home in a place that once seemed impossible to understand.",
+        "question": {
+          "question": "According to the passage, what is the key condition for eventually feeling at home abroad?",
+          "options": [
+            "A) Learning the local language as quickly as possible",
+            "B) Changing your habits to match the local culture",
+            "C) Allowing enough time to pass without rushing it",
+            "D) Finding familiar food and recognizable greetings"
+          ],
+          "answer": 2
+        }
+      },
+      {
+        "passage": "The discovery of penicillin in 1928 was famously accidental. A scientist returned from holiday to find that a mold had grown in one of his dishes and had killed the bacteria around it. Many others might have thrown the dish away. What made the difference was not luck alone but the kind of attention that was prepared to notice what luck had set in front of it.",
+        "question": {
+          "question": "What does the writer ultimately credit for the discovery of penicillin?",
+          "options": [
+            "A) Pure luck, since the scientist had no real role in the events that took place",
+            "B) The scientist's foreign travel, which had given him enough time to think clearly",
+            "C) A trained mind that was ready to recognize what an accident had revealed",
+            "D) The mold itself, which had killed the bacteria without any scientific help"
+          ],
+          "answer": 2
+        }
+      }
+    ]
+  },
+  "52": {
     "description": "B1. Month 15. Nuanced personal narrative with reflection. Complex sentences with multiple subordinate clauses. Vocabulary near 4,300 words. Emerging personal voice and observation.",
     "examples": [
       {
@@ -1320,7 +1501,7 @@
       }
     ]
   },
-  "47": {
+  "53": {
     "description": "B1. Month 16. Explaining a concept or process to a general audience. Clear exposition with examples. Technical vocabulary is minimal but accurately used. Vocabulary around 4,600 words.",
     "examples": [
       {
@@ -1351,7 +1532,7 @@
       }
     ]
   },
-  "48": {
+  "54": {
     "description": "B1. Month 16–17. Discussing cultural topics — traditions, customs, and values — with some comparison between cultures. Vocabulary near 4,900 words. A balanced, descriptive paragraph.",
     "examples": [
       {
@@ -1382,7 +1563,7 @@
       }
     ]
   },
-  "49": {
+  "55": {
     "description": "B1–B2 boundary. Month 17. A passage with moderate complexity and fluency, some idiomatic language, and varied sentence structures. Vocabulary around 5,200 words. The writing feels natural and connected rather than constructed.",
     "examples": [
       {
@@ -1413,7 +1594,7 @@
       }
     ]
   },
-  "50": {
+  "56": {
     "description": "B1. About 18 months of study. Standard news article or short popular nonfiction. Vocabulary of roughly 5,500 words active. Varied sentence structures, clear argumentation, and emerging idioms. The prose is fluent, direct, and efficient — not yet literary, but fully functional for adult reading.",
     "examples": [
       {
@@ -1444,7 +1625,7 @@
       }
     ]
   },
-  "51": {
+  "57": {
     "description": "B1–B2. Month 18–20. Slightly richer vocabulary and more sustained argument. A longer paragraph with a clear thesis, evidence, and a concluding observation. Vocabulary near 5,800 words.",
     "examples": [
       {
@@ -1475,7 +1656,7 @@
       }
     ]
   },
-  "52": {
+  "58": {
     "description": "B1–B2. Month 20. Popular science or nature writing. Accessible explanation of complex ideas with concrete illustrations. Vocabulary around 6,100 words. Clear prose with some figurative language.",
     "examples": [
       {
@@ -1506,7 +1687,7 @@
       }
     ]
   },
-  "53": {
+  "59": {
     "description": "B2 approach. Month 21. Personal essay style with observation, reflection, and a small argumentative thread. Vocabulary near 6,400 words. Sentence variety increases; the prose has rhythm.",
     "examples": [
       {
@@ -1537,7 +1718,38 @@
       }
     ]
   },
-  "54": {
+  "60": {
+    "description": "B2 approach. Month 21. Personal essay style with observation, reflection, and a small argumentative thread. Vocabulary near 6,400 words. Sentence variety increases; the prose has rhythm.",
+    "examples": [
+      {
+        "passage": "There is something particular about the quiet of a library — not the absence of sound exactly, but the active suppression of it, as if everyone present has agreed to a shared form of consideration. It is one of the few public spaces where silence is still taken seriously.",
+        "question": {
+          "question": "How does the author distinguish library quiet from ordinary silence?",
+          "options": [
+            "A) Libraries are completely soundproofed, unlike other public buildings",
+            "B) The quiet in a library is passively present rather than actively kept up",
+            "C) It is a collectively upheld behavior, not simply the absence of noise",
+            "D) Libraries stay quiet because very few people visit them regularly"
+          ],
+          "answer": 2
+        }
+      },
+      {
+        "passage": "Long-distance running is often described as a sport, but it has always seemed to me more like a form of negotiation. The runner is not really competing with the others on the course; they are bargaining with their own body, asking it for one more kilometer in exchange for the brief illusion of being in control. The body usually agrees. Until, one day, it does not.",
+        "question": {
+          "question": "What does the writer's framing of running as 'negotiation' rather than 'sport' chiefly emphasize?",
+          "options": [
+            "A) Running races are won through clever bargaining with one's competitors on the course",
+            "B) The real contest is internal, and the body's eventual refusal is part of its terms",
+            "C) Long-distance runners do not compete against each other in any meaningful sense",
+            "D) Control of one's body is fully attainable through proper training and preparation"
+          ],
+          "answer": 1
+        }
+      }
+    ]
+  },
+  "61": {
     "description": "B2 approach. Month 22. Sustained analytical paragraph on a social or cultural topic. Abstract nouns and more formal register emerge. Vocabulary around 6,700 words. The prose is confident and varied.",
     "examples": [
       {
@@ -1568,7 +1780,7 @@
       }
     ]
   },
-  "55": {
+  "62": {
     "description": "B2. About 2 years of study. Quality newspaper writing or accessible popular nonfiction (think The Atlantic, The Economist, or a well-written history book). Vocabulary of roughly 7,000–8,000 words. Sustained argumentation, figurative language, subordinate clauses, and moderate stylistic complexity. The reader handles abstraction, inference, and nuanced register with comfort.",
     "examples": [
       {
@@ -1599,7 +1811,7 @@
       }
     ]
   },
-  "56": {
+  "63": {
     "description": "B2. 2 years. The prose becomes more assured and varied. Longer sentences balanced against short ones for effect. A clear authorial voice begins to emerge. Vocabulary near 8,500 words.",
     "examples": [
       {
@@ -1630,7 +1842,7 @@
       }
     ]
   },
-  "57": {
+  "64": {
     "description": "B2. 2–2.5 years. Accessible literary nonfiction or well-written memoir. Sensory detail, metaphor, and reflection integrated into the prose. Vocabulary around 9,000 words.",
     "examples": [
       {
@@ -1661,7 +1873,7 @@
       }
     ]
   },
-  "58": {
+  "65": {
     "description": "B2. 2.5 years. Longer analytical argument with counterarguments acknowledged. Concessive and conditional structures used skillfully. Vocabulary near 9,500 words. The prose handles complex ideas without becoming opaque.",
     "examples": [
       {
@@ -1692,7 +1904,7 @@
       }
     ]
   },
-  "59": {
+  "66": {
     "description": "B2. 2.5–3 years. A passage of literary quality, drawing on observation, specific detail, and controlled emotion. Vocabulary around 10,000 words. The prose is polished without being academic.",
     "examples": [
       {
@@ -1723,7 +1935,7 @@
       }
     ]
   },
-  "60": {
+  "67": {
     "description": "B2. 3 years. Confident literary or journalistic prose. Rich vocabulary, metaphor, and syntactic variety used purposefully. Equivalent to a quality novel aimed at general adult readers or a long-form magazine piece in a publication like The New Yorker. Vocabulary of roughly 10,000–12,000 words actively used.",
     "examples": [
       {
@@ -1754,7 +1966,7 @@
       }
     ]
   },
-  "61": {
+  "68": {
     "description": "B2–C1 boundary. 3–3.5 years. The prose handles abstraction and ambiguity with ease. Subtext begins to operate beneath the surface of the writing. Vocabulary near 12,000 words.",
     "examples": [
       {
@@ -1785,7 +1997,38 @@
       }
     ]
   },
-  "62": {
+  "69": {
+    "description": "B2–C1 boundary. 3–3.5 years. The prose handles abstraction and ambiguity with ease. Subtext begins to operate beneath the surface of the writing. Vocabulary near 12,000 words.",
+    "examples": [
+      {
+        "passage": "What we call common sense is usually nothing more than the unexamined assumptions of our particular time and place dressed up in the language of inevitability. Every era believes its prejudices to be observations. It takes unusual courage — or unusual distance — to see the difference.",
+        "question": {
+          "question": "Why does the author present 'courage' and 'distance' as alternative routes to the same insight?",
+          "options": [
+            "A) Courage means ignoring common sense, while distance means moving to a new place",
+            "B) One must either actively resist the assumptions of one's era or be removed from them to see their contingency",
+            "C) Courage is what it takes to accept common sense, while distance lends perspective on it",
+            "D) Both words describe the same emotional state that follows an intellectual discovery"
+          ],
+          "answer": 1
+        }
+      },
+      {
+        "passage": "Mountains are, in some sense, our most honest landscapes. They do not pretend to be useful. They cannot be cultivated, persuaded, or hurried. What they offer is a glimpse of duration in a form that humbles ordinary timescales: ranges that were rising while our species was still arboreal, summits that will be ground down to nothing while our descendants, if any, are doing things we could not now imagine. The proper response, I have always thought, is not awe so much as a kind of quiet relief.",
+        "question": {
+          "question": "What unusual emotional response to mountains does the writer endorse, and why?",
+          "options": [
+            "A) Awe, because mountains stand as a vivid demonstration of nature's overwhelming and decorative power",
+            "B) Relief, because the geological scale of mountains liberates the observer from the inflation of human concerns",
+            "C) Disappointment, because mountains turn out to be useful and persuadable in ways the writer dislikes",
+            "D) Indifference, because mountains have no relevant relationship to the lives of ordinary modern people"
+          ],
+          "answer": 1
+        }
+      }
+    ]
+  },
+  "70": {
     "description": "B2–C1. 3.5 years. A passage with layered meaning and sophisticated sentence construction. Complex nominal phrases, embedded relative clauses. Vocabulary around 12,500 words.",
     "examples": [
       {
@@ -1816,7 +2059,7 @@
       }
     ]
   },
-  "63": {
+  "71": {
     "description": "C1 approach. 4 years. Dense analytical or critical prose. Argument unfolds across multiple sentences with qualifications, concessions, and precise distinctions. Vocabulary near 13,000 words.",
     "examples": [
       {
@@ -1847,7 +2090,7 @@
       }
     ]
   },
-  "64": {
+  "72": {
     "description": "C1 approach. 4–4.5 years. Literary fiction with psychological depth. Complex interior monologue or free indirect discourse. Vocabulary around 13,500 words. The prose rewards close attention.",
     "examples": [
       {
@@ -1878,7 +2121,7 @@
       }
     ]
   },
-  "65": {
+  "73": {
     "description": "C1. About 5 years of study. Literary fiction, academic writing, or quality long-form journalism. Vocabulary of roughly 14,000–16,000 words. Complex syntax, nuanced register, embedded irony, and sustained argument across a multi-sentence unit. The prose requires inferential reading — not everything is stated. Equivalent to Orwell's essays, quality literary fiction, or a serious academic introduction.",
     "examples": [
       {
@@ -1909,7 +2152,7 @@
       }
     ]
   },
-  "66": {
+  "74": {
     "description": "C1. 5–5.5 years. Sophisticated literary prose with irony, moral complexity, and precise observation. The sentences are long and carefully weighted. Vocabulary near 16,000 words.",
     "examples": [
       {
@@ -1940,7 +2183,7 @@
       }
     ]
   },
-  "67": {
+  "75": {
     "description": "C1. 5.5 years. Academic humanities or social science writing. Technical vocabulary used precisely. Argument builds on previous paragraphs in a chain of reasoning. Vocabulary around 16,500 words.",
     "examples": [
       {
@@ -1971,7 +2214,7 @@
       }
     ]
   },
-  "68": {
+  "76": {
     "description": "C1. 6 years. Dense literary criticism or intellectual journalism. The prose assumes a well-read audience and does not pause to explain allusions. Vocabulary near 17,000 words.",
     "examples": [
       {
@@ -2002,7 +2245,7 @@
       }
     ]
   },
-  "69": {
+  "77": {
     "description": "C1–C2 boundary. 6–7 years. A passage of considerable intellectual and stylistic density. Abstract ideas handled with precision and some elegance. Vocabulary around 17,500 words.",
     "examples": [
       {
@@ -2033,7 +2276,38 @@
       }
     ]
   },
-  "70": {
+  "78": {
+    "description": "C1–C2 boundary. 6–7 years. A passage of considerable intellectual and stylistic density. Abstract ideas handled with precision and some elegance. Vocabulary around 17,500 words.",
+    "examples": [
+      {
+        "passage": "The fear of death is not a simple thing. It is compounded of several distinct anxieties — the fear of pain, of loss, of non-existence, of irrelevance — and these are not always distinguishable from one another in the moment of experiencing them. Philosophy has tried, repeatedly and without complete success, to disentangle them, perhaps because they resist disentangling.",
+        "question": {
+          "question": "What does the author suggest about philosophy's project of analyzing the fear of death?",
+          "options": [
+            "A) Philosophy has fully succeeded in separating each distinct anxiety involved in it",
+            "B) The fear of death is too simple a topic to benefit from philosophical examination",
+            "C) These anxieties may resist neat separation because of how they are lived from the inside",
+            "D) Philosophy ought to give up on this question entirely since it remains unanswerable"
+          ],
+          "answer": 2
+        }
+      },
+      {
+        "passage": "There is a peculiar pleasure in watching an old building come down. It is not, exactly, schadenfreude — the building has done no one any harm — but a more ambiguous emotion, in which one's interest in continuity is briefly overruled by a delight in the rare spectacle of irreversibility. We who spend our lives undoing minor errors, restoring drafts, and amending sentences are made strangely cheerful by an act that cannot be taken back, and the cheer outlasts our knowledge that we will, by tomorrow, have forgotten the building entirely.",
+        "question": {
+          "question": "What does the writer suggest is the deeper source of the pleasure of watching a demolition?",
+          "options": [
+            "A) A genuine hostility toward the building, which had quietly offended the watcher in some indirect way",
+            "B) The rarity, for people whose lives are governed by revisable acts, of witnessing something genuinely irreversible",
+            "C) A nostalgic mourning for the building, made poignant by the certainty of its imminent and final disappearance",
+            "D) The visual interest of the spectacle, which provides ordinary entertainment without much further significance"
+          ],
+          "answer": 1
+        }
+      }
+    ]
+  },
+  "79": {
     "description": "C1–C2. 7 years. Confident, sophisticated prose that handles complexity with apparent ease. Long sentences with balanced constructions, embedded qualifications, and precise word choices. Vocabulary near 18,000 words.",
     "examples": [
       {
@@ -2064,7 +2338,7 @@
       }
     ]
   },
-  "71": {
+  "80": {
     "description": "C1–C2. 7–8 years. Literary fiction at a high level — complex characters, moral ambiguity, and precise psychological observation. The syntax is demanding; meaning sometimes arrives obliquely. Vocabulary around 18,500 words.",
     "examples": [
       {
@@ -2095,7 +2369,7 @@
       }
     ]
   },
-  "72": {
+  "81": {
     "description": "C2 approach. 8 years. Dense political or philosophical argument with a strong authorial voice. Complex periodic sentences. The prose makes demands on the reader's patience and attention. Vocabulary near 19,000 words.",
     "examples": [
       {
@@ -2126,7 +2400,7 @@
       }
     ]
   },
-  "73": {
+  "82": {
     "description": "C2. 8–9 years. Sustained literary or critical essay with a high density of ideas per sentence. The prose assumes considerable cultural literacy. Allusions operate without signposting. Vocabulary around 19,500 words.",
     "examples": [
       {
@@ -2157,7 +2431,7 @@
       }
     ]
   },
-  "74": {
+  "83": {
     "description": "C2. 9 years. A passage of real literary complexity — long sentences with multiple embedded clauses, precise and sometimes unusual vocabulary, and a subtly ironic narrator. The prose rewards re-reading. Vocabulary near 20,000 words.",
     "examples": [
       {
@@ -2188,7 +2462,7 @@
       }
     ]
   },
-  "75": {
+  "84": {
     "description": "C2. 10+ years / near-native. Dense, complex, stylistically assured literary prose. Vocabulary of roughly 20,000–25,000 words. The writing demands high cultural literacy, tolerance for ambiguity, and the ability to hold multiple meanings in suspension. Equivalent to Hemingway, Fitzgerald, Orwell at his most demanding, or a serious academic monograph in the humanities. Syntax is complex and purposeful; the meaning of sentences is sometimes revealed only in retrospect.",
     "examples": [
       {
@@ -2219,7 +2493,7 @@
       }
     ]
   },
-  "76": {
+  "85": {
     "description": "C2. 10–12 years near-native. Academic humanities writing at the monograph level. Dense footnotes-worthy argument with precise technical vocabulary from philosophy, literary theory, or history. Complex sentence architecture. Vocabulary near 22,000 words.",
     "examples": [
       {
@@ -2250,7 +2524,7 @@
       }
     ]
   },
-  "77": {
+  "86": {
     "description": "C2. 11 years. Legal or contractual prose — highly formal, precise, and embedded with qualifications. Designed to be unambiguous at the expense of elegance. Vocabulary around 22,500 words.",
     "examples": [
       {
@@ -2281,7 +2555,38 @@
       }
     ]
   },
-  "78": {
+  "87": {
+    "description": "C2. 11 years. Legal or contractual prose — highly formal, precise, and embedded with qualifications. Designed to be unambiguous at the expense of elegance. Vocabulary around 22,500 words.",
+    "examples": [
+      {
+        "passage": "Notwithstanding any provision to the contrary contained herein, the indemnifying party shall defend, indemnify, and hold harmless the indemnified party from and against any and all claims, damages, losses, costs, and expenses, including reasonable attorneys' fees, arising out of or related to any breach of the representations and warranties set forth in Section 4.2 of this Agreement.",
+        "question": {
+          "question": "What is the legal effect of the phrase 'notwithstanding any provision to the contrary contained herein'?",
+          "options": [
+            "A) It confines the indemnification solely to claims arising under Section 4.2 of the Agreement",
+            "B) It signals that this indemnification clause overrides any conflicting term found elsewhere in the same document",
+            "C) It removes attorneys' fees from the overall scope of the indemnification obligation entirely",
+            "D) It permits either contracting party to waive the indemnification requirement by reaching mutual agreement"
+          ],
+          "answer": 1
+        }
+      },
+      {
+        "passage": "The Borrower hereby irrevocably and unconditionally waives, to the fullest extent permitted by applicable law, any and all rights of set-off, counterclaim, recoupment, or similar defense which the Borrower may have against the Lender in respect of payments due under this Note, provided, however, that nothing in this Section shall be construed as a waiver by the Borrower of any direct cause of action which the Borrower may otherwise possess against the Lender for fraud or willful misconduct.",
+        "question": {
+          "question": "What is the legal effect of the proviso clause beginning 'provided, however'?",
+          "options": [
+            "A) It nullifies the entire waiver clause, restoring the Borrower's full right to assert set-off and counterclaim defenses against payments due",
+            "B) It carves out an exception preserving the Borrower's separate right to bring a direct claim for fraud or willful misconduct, without reviving the waived defenses",
+            "C) It expands the waiver by adding fraud and willful misconduct to the categories of defense that the Borrower has agreed to give up under the Note",
+            "D) It limits the waiver to apply only when the Lender has acted in good faith, requiring the Lender to prove the absence of misconduct in any dispute"
+          ],
+          "answer": 1
+        }
+      }
+    ]
+  },
+  "88": {
     "description": "C2. 11–12 years. Advanced scientific or technical writing for a specialist audience. Methodological precision, passive constructions, and discipline-specific jargon used without apology. Vocabulary near 23,000 words.",
     "examples": [
       {
@@ -2312,7 +2617,7 @@
       }
     ]
   },
-  "79": {
+  "89": {
     "description": "C2. 12 years. Literary fiction of the highest technical sophistication — long periodic sentences, embedded irony, unreliable narration, and vocabulary drawn from multiple registers. Vocabulary around 23,500 words.",
     "examples": [
       {
@@ -2343,7 +2648,7 @@
       }
     ]
   },
-  "80": {
+  "90": {
     "description": "Beyond C2. 15+ years / educated native speaker. The prose operates at the level of a serious literary novelist or public intellectual. Vocabulary of over 25,000 words. Sentences are long, weighted, and precisely controlled. Allusions expect literary and historical literacy. Equivalent to the better essays of Orwell or Baldwin, the prose of Fitzgerald or Wharton at full stretch.",
     "examples": [
       {
@@ -2374,7 +2679,7 @@
       }
     ]
   },
-  "81": {
+  "91": {
     "description": "Beyond C2. 15 years. Complex political philosophy or critical theory. Sustained argumentation across many sentences, building a cumulative case. Vocabulary near 26,000 words. The prose is dense with qualifications and distinctions.",
     "examples": [
       {
@@ -2405,7 +2710,7 @@
       }
     ]
   },
-  "82": {
+  "92": {
     "description": "Beyond C2. 16 years. Late Jamesian or Proustian prose — the sentence as an instrument of precise psychological investigation, branching and self-correcting as it moves. Vocabulary around 26,500 words.",
     "examples": [
       {
@@ -2436,7 +2741,7 @@
       }
     ]
   },
-  "83": {
+  "93": {
     "description": "Beyond C2. 17 years. Dense philosophical prose — Nietzsche, Hegel, or their contemporary descendants. The argument moves through aphorism, paradox, and reversal. Vocabulary near 27,000 words.",
     "examples": [
       {
@@ -2467,7 +2772,7 @@
       }
     ]
   },
-  "84": {
+  "94": {
     "description": "Beyond C2. 17–18 years. Dense literary criticism or theory written for specialists. Every sentence assumes fluency in the relevant discourse and does considerable conceptual work. Vocabulary around 27,500 words.",
     "examples": [
       {
@@ -2498,7 +2803,7 @@
       }
     ]
   },
-  "85": {
+  "95": {
     "description": "Beyond C2. 20 years / fully educated native speaker or specialist. The level of Dostoevsky in translation, Thomas Hardy, or George Eliot — dense moral intelligence, complex syntax, and a large cast of psychologically realized characters. Vocabulary of roughly 28,000–30,000 words. Long periodic sentences carry significant weight; the reader must hold the full architecture of a sentence in mind to resolve its meaning.",
     "examples": [
       {
@@ -2529,7 +2834,38 @@
       }
     ]
   },
-  "86": {
+  "96": {
+    "description": "Beyond C2. 20 years / fully educated native speaker or specialist. The level of Dostoevsky in translation, Thomas Hardy, or George Eliot — dense moral intelligence, complex syntax, and a large cast of psychologically realized characters. Vocabulary of roughly 28,000–30,000 words. Long periodic sentences carry significant weight; the reader must hold the full architecture of a sentence in mind to resolve its meaning.",
+    "examples": [
+      {
+        "passage": "It had not occurred to him, until this moment, that the quality he had most admired in her was precisely the quality that made her unavailable to him — not her beauty, which was real but not extraordinary, nor her intelligence, which he had initially overestimated, but her fundamental self-sufficiency, the way she seemed to require nothing from anyone, including him, which he had misread, for a long time, as an invitation rather than what it actually was: a statement of fact.",
+        "question": {
+          "question": "What is the nature of his fundamental misreading of her self-sufficiency?",
+          "options": [
+            "A) He took her for indifferent to him when she was secretly in love with him all along",
+            "B) He read her self-containment as desire — a gap she wanted filled — when it was simply her settled condition needing nothing",
+            "C) He overestimated her intelligence and so misjudged the depth and nature of her emotional needs",
+            "D) He saw in her the qualities he recognized in himself and was therefore unconsciously projecting onto her"
+          ],
+          "answer": 1
+        }
+      },
+      {
+        "passage": "Mrs. Halverston had passed, in her later years, into that condition of moral observation in which the people around her appeared to her not as separate individuals to be judged on their own terms but as variations on themes she had already encountered too often, and her conversation had taken on, in consequence, the slightly weary inflection of someone reading aloud a text she had once found absorbing and now consulted, when she consulted it at all, for the sake of the few footnotes she had not yet annotated, with the result that her younger interlocutors, who came expecting to be examined, often left feeling that they had not, in any sense that mattered, been seen at all.",
+        "question": {
+          "question": "What is the deeper consequence the passage attributes to Mrs. Halverston's habit of typological perception?",
+          "options": [
+            "A) Her judgments of younger people had become more incisive and accurate over the years, with the result that her interlocutors came to fear her examinations and to avoid her social company entirely whenever they could",
+            "B) Her readiness to assimilate each new person to a pattern she already knew meant that her younger interlocutors received her attention without receiving the recognition they had come hoping to find from her in conversation",
+            "C) She had become incapable of judging anyone fairly because of the cumulative weight of her past disappointments, and her younger interlocutors correctly perceived that her assessments of them could not be trusted in any way",
+            "D) Her conversational manner had grown so reserved that her younger interlocutors mistook it for hostility, when in fact she was attending to them with greater care than she had ever extended to others before"
+          ],
+          "answer": 1
+        }
+      }
+    ]
+  },
+  "97": {
     "description": "Expert level. 20+ years. Academic philosophy or legal scholarship at the frontier of its discipline. Arguments require familiarity with the existing literature and the ability to track closely reasoned distinctions over many sentences. Vocabulary near 30,000 words.",
     "examples": [
       {
@@ -2560,7 +2896,7 @@
       }
     ]
   },
-  "87": {
+  "98": {
     "description": "Expert level. 20+ years. Late Henry James — the novel of consciousness taken to its furthest elaboration, where the sentence itself becomes a drama of qualification, retraction, and recovered perception. Vocabulary around 30,500 words.",
     "examples": [
       {
@@ -2591,7 +2927,7 @@
       }
     ]
   },
-  "88": {
+  "99": {
     "description": "Expert level. 20+ years. Medical or scientific writing at the journal article level — dense methodology, statistical language, and discipline-specific conventions. Vocabulary near 31,000 words.",
     "examples": [
       {
@@ -2622,7 +2958,7 @@
       }
     ]
   },
-  "89": {
+  "100": {
     "description": "Expert literary. 20+ years. Dense, philosophically inflected literary fiction — Musil, Broch, or their contemporaries in translation. The novel of ideas where argument and narrative are inseparable. Vocabulary around 31,500 words.",
     "examples": [
       {
@@ -2649,347 +2985,6 @@
             "D) Each party has internalized so accurate a model of the other that genuine listening has become unnecessary, and the resulting communication is more efficient than direct attention to one another would be"
           ],
           "answer": 1
-        }
-      }
-    ]
-  },
-  "90": {
-    "description": "Expert level. 20+ years. Continental philosophy or critical theory in its most demanding form — Heidegger, Adorno, or Lacan. The prose does not simplify; it uses difficulty as a feature, not a flaw, insisting that the subject matter resists ordinary language. Vocabulary near 32,000 words.",
-    "examples": [
-      {
-        "passage": "The question of Being cannot be raised from within the horizon of beings, for any interrogation that proceeds by asking 'what is it?' has already presupposed the givenness of the 'is' whose sense is precisely what remains to be thought. Dasein is the entity for whom its own Being is an issue — the entity that, in existing, has always already taken a stand, explicitly or not, on what it means to be.",
-        "question": {
-          "question": "Why, according to the passage, is the question of Being structurally unavailable to ordinary interrogative methods?",
-          "options": [
-            "A) Being is too abstract a concept for ordinary human language to approach or express adequately, so any interrogation must fail by reducing it",
-            "B) Ordinary questioning already assumes the very thing — the sense of 'is' — that the question of Being is trying to determine, making it circular",
-            "C) The question of Being properly requires empirical and scientific methods of investigation rather than philosophical ones, which cannot accommodate it",
-            "D) Dasein cannot reflect on its own Being because the brute fact of existence always precedes thought, leaving the questioner one step behind the condition asked about"
-          ],
-          "answer": 1
-        }
-      },
-      {
-        "passage": "The culture industry, in administering the very gestures of refusal that an earlier critical tradition had identified as the preserve of authentic art, accomplishes a more thorough integration than mere conformism could ever have achieved: it offers to the consumer, in the form of pre-fabricated rebellion, the consoling sense of having seen through the system that produced the rebellion's distribution channels — a sense whose function is not to liberate the consumer from the system but to reconcile the consumer to it, by transferring the energy of dissent into a circuit in which it may be safely expended without effect.",
-        "question": {
-          "question": "What is the central operation the passage attributes to the culture industry's incorporation of refusal?",
-          "options": [
-            "A) The culture industry suppresses authentic refusal entirely, leaving consumers without any means of expressing dissent and producing a passive conformism that earlier critical tradition had correctly identified as its principal danger to the autonomous subject",
-            "B) The culture industry packages and distributes the form of dissent so that the consumer's energy of refusal is exhausted within a circuit of its own design, producing reconciliation while preserving the appearance of critical distance",
-            "C) The culture industry encourages genuine refusal as a means of identifying potential dissenters for later targeting, using the channels of distribution as instruments of surveillance rather than as channels of integration into the existing system",
-            "D) The culture industry has been substantially reformed by the incorporation of dissent and now genuinely transmits authentic critical content to its consumers, with the result that the older critique of mass culture is no longer applicable in its original form"
-          ],
-          "answer": 1
-        }
-      }
-    ]
-  },
-  "91": {
-    "description": "Expert literary. 20+ years. Poetry or poetic prose — dense, allusive, and resistant to paraphrase. Each sentence carries multiple layers of meaning; the sound and rhythm of the prose are as important as its semantic content. Vocabulary around 32,500 words.",
-    "examples": [
-      {
-        "passage": "The river moves through the city without acknowledgment, as rivers do, neither mourning nor celebrating the bridges laid across it — patient with a patience that is simply the absence of impatience, indifferent with an indifference that does not know it is being contrasted with something.",
-        "question": {
-          "question": "What does the final qualification — 'an indifference that does not know it is being contrasted with something' — add to the passage's treatment of the river's indifference?",
-          "options": [
-            "A) It implies the river is capable of full awareness but has actively chosen not to exercise that capacity, treating its silence as a deliberate stance rather than a natural condition of the thing itself",
-            "B) It deepens the river's indifference by removing even the relational awareness that contrast requires — pure indifference cannot register the act of comparison at all",
-            "C) It suggests the author is mistakenly projecting a form of human self-awareness onto the river, and is in the act of correcting that projection while staging it for the reader to notice",
-            "D) It shows that the relationship between the city and the river is one of complete and mutual ignorance, with each going about its existence as though the other were not there at all to be acknowledged"
-          ],
-          "answer": 1
-        }
-      },
-      {
-        "passage": "What the wind learns, and what it cannot teach, are the same lesson: that to pass through a thing without being marked is to have, in the end, passed through nothing — that the leaf which moves under one's hand is also the hand, the tree which holds its place against the gust is also the gust, and the stillness one finds at the heart of motion, when one finds it, is not the absence of the wind but the form the wind takes when there is at last no place left for it to be other than where it already, and always, was.",
-        "question": {
-          "question": "What is the central paradox about motion and stillness that the passage develops through its treatment of the wind?",
-          "options": [
-            "A) Apparent stillness is a temporary illusion produced by limitations of human perception, and the wind in reality is never still even for the briefest instant of observable time",
-            "B) Genuine stillness is reached only by removing oneself from the path of all motion, and the wind illustrates the principle by always being elsewhere than the place where one happens to be standing",
-            "C) The deepest stillness is not the cessation of motion but the condition in which motion has become indistinguishable from the place it occupies, so that to move and to be is the same act",
-            "D) Stillness and motion are opposed conditions that the wind successively occupies in turn, and the lesson is that one must learn to recognize the moments at which the transition from one to the other has occurred"
-          ],
-          "answer": 2
-        }
-      }
-    ]
-  },
-  "92": {
-    "description": "Expert level. 20+ years. Legal judgment or constitutional opinion written at the highest court level — the maximum density of formal legal reasoning, precedent citation, and syntactic subordination deployed in the service of an argument that must bear the weight of binding authority. Vocabulary near 33,000 words.",
-    "examples": [
-      {
-        "passage": "Insofar as the appellant's contention that the doctrine of promissory estoppel may operate as a sword rather than merely as a shield is advanced in reliance on Combe v Combe [1951], it must be observed that the Court of Appeal in that case expressly held, contra the appellant's submission, that the doctrine cannot found an independent cause of action divorced from the pre-existing legal relationship to which the representation was collateral — a limitation reaffirmed, with greater precision, in Baird Textile Holdings Ltd v Marks & Spencer plc [2001].",
-        "question": {
-          "question": "What is the fatal flaw in the appellant's reliance on Combe v Combe for the proposition that promissory estoppel can operate as a sword?",
-          "options": [
-            "A) Combe v Combe was decided before promissory estoppel was formally recognized as a doctrine in English law",
-            "B) The very case the appellant cites held the opposite of what they claim — that the doctrine cannot independently ground a cause of action on its own",
-            "C) Combe v Combe concerned the formation of new contracts rather than the enforcement of pre-existing legal obligations",
-            "D) Baird Textile Holdings expressly overruled Combe v Combe, rendering the earlier authority entirely inapplicable here"
-          ],
-          "answer": 1
-        }
-      },
-      {
-        "passage": "It is now necessary to address the respondent's submission that the principle articulated in Caparo Industries plc v Dickman [1990] should be confined to the specific context of professional negligence in the preparation of audited financial statements. While the speeches of their Lordships in Caparo were undoubtedly delivered with the particular factual matrix of statutory audit reports in mind, it would be an unduly impoverished reading of the threefold test there enunciated — foreseeability, proximity, and what is fair, just, and reasonable — to suppose that the test was thereby restricted in its application to the analogous category of pure economic loss arising from negligent misstatement; the subsequent reception of Caparo across a broad range of duty-of-care cases, including but by no means limited to those discussed in Customs and Excise Commissioners v Barclays Bank plc [2006], affords decisive evidence to the contrary.",
-        "question": {
-          "question": "On what basis does the court reject the respondent's submission that Caparo should be narrowly confined?",
-          "options": [
-            "A) The threefold test articulated in Caparo has subsequently been overruled by later House of Lords authority, and the respondent's reliance on its alleged scope is therefore based on a doctrinal position that no longer reflects the law as it now stands",
-            "B) The wider judicial reception of Caparo's threefold test in subsequent cases extending beyond pure economic loss demonstrates that its application was never intended to be confined to the audit context, despite the particular facts before the court that originally decided it",
-            "C) The respondent has misidentified the ratio of Caparo, which the court holds was actually concerned with the formulation of a duty of disclosure rather than with the elements of the duty of care in negligence as the respondent's argument has assumed throughout",
-            "D) Caparo addressed only foreseeability and proximity but did not include the third limb of the test, and the court therefore declines to treat the respondent's submission as engaging with the legal authority that it purports to invoke"
-          ],
-          "answer": 1
-        }
-      }
-    ]
-  },
-  "93": {
-    "description": "Expert literary — demanding style. 25+ years. Faulknerian prose: long, syntactically tortured sentences that enact the psychological and temporal complexity of their subject. The grammar strains; the meaning accumulates through repetition, apposition, and recursive qualification. Vocabulary around 33,500 words.",
-    "examples": [
-      {
-        "passage": "And she would think: why. Not why did he leave, because she knew why, had always known, had known it before she knew his name, the way you know a winter coming in the weight of the air before the cold arrives, before the first leaf falls, before anyone else has admitted it — but why did knowing not prevent the not preventing, why did the foreknowledge offer itself as comfort and come to nothing.",
-        "question": {
-          "question": "What is the deeper question the passage turns on, once the surface question of his departure is set aside?",
-          "options": [
-            "A) Why he left without any explanation, denying her the understanding she would need to move forward",
-            "B) Why foreknowledge of an inevitable loss offered no protection against it — why fully understanding something does not allow one to stop it",
-            "C) Why she went on loving someone she had known from the very start would eventually leave her",
-            "D) Why the arrival of winter functions so reliably as a metaphor for emotional loss in human experience"
-          ],
-          "answer": 1
-        }
-      },
-      {
-        "passage": "And the land remembered. Not the way a man remembers, not as image or word, but in the way a fence remembers the post that was driven through it, the post long since rotted out and the fence still bowed where the post had been, the bowing a kind of memory, the only kind perhaps that lasts, which is the kind that does not know it is remembering, that has become the shape of what it remembers, that cannot, even if it wished to, undo the bend, because the bend is what it now is, was made of the bending, took the form the bending gave it and kept that form.",
-        "question": {
-          "question": "What is the conception of memory the passage develops through the figure of the fence?",
-          "options": [
-            "A) Memory is essentially a deliberate cognitive act of recollection, and the land's lack of consciousness means the passage's central figure is intended ironically rather than as a serious account of how memory actually works",
-            "B) Genuine memory is a structural deformation rather than a representation — what is remembered is preserved as the present shape of the remembering thing, with no separation between the rememberer and what is remembered",
-            "C) Memory is a process of intentional preservation requiring the active maintenance of an inner image of the past, and the fence example shows how unmaintained memories inevitably degrade over the passage of time",
-            "D) Memory is fundamentally narrative, requiring the construction of a story about the past, and the passage suggests that the land has its own narratives that human beings can learn to read with sufficient attention"
-          ],
-          "answer": 1
-        }
-      }
-    ]
-  },
-  "94": {
-    "description": "Expert literary — demanding style. 25+ years. Henry James at his most extreme — the novel of consciousness in which perception, qualification, and retraction have become the primary subject and the sentence their arena. Vocabulary near 34,000 words.",
-    "examples": [
-      {
-        "passage": "He had, he supposed — if supposing were the right word for what was, after all, less an act of cognition than a long residue of provisional accommodations to a situation he had never explicitly agreed to inhabit — he had, as he was saying, what might with reasonable charity be described as an understanding of her position, though what the understanding amounted to in practice was something he found, in proportion as he examined it, increasingly difficult to specify.",
-        "question": {
-          "question": "What does the phrase 'in proportion as he examined it, increasingly difficult to specify' reveal about the nature of his 'understanding'?",
-          "options": [
-            "A) His understanding is real and felt but he simply lacks the vocabulary to articulate it to others",
-            "B) The understanding dissolves under scrutiny — what seemed like comprehension reveals itself as indeterminate the closer it is approached",
-            "C) He is deliberately concealing his understanding to avoid being pinned down to any clear commitment",
-            "D) His method of self-examination is itself flawed in a way that produces confusion rather than genuine clarity"
-          ],
-          "answer": 1
-        }
-      },
-      {
-        "passage": "It would have been, she felt — if the verb 'feel' were not, in this instance, perhaps too crude an instrument for what was rather a kind of slow internal weather than any single sensation she could have named — it would have been, she felt, less troubling to discover that her hostess had deliberately omitted her from the invitation than to discover, as she now had cause to suspect, that the omission had been so casual, so unmarked by any particular intention either to include or to exclude, that her presence and her absence had been, throughout, equally invisible to the consideration of the person whose regard she had, until this small revelation, supposed she possessed.",
-        "question": {
-          "question": "What is the precise distinction between two possible injuries that the passage develops?",
-          "options": [
-            "A) Between the lesser injury of a deliberate exclusion, which would at least have confirmed the hostess's awareness of her, and the deeper injury of an exclusion so thoughtless that it implies she had never figured in the hostess's regard at all",
-            "B) Between the injury of being invited only out of obligation rather than genuine warmth and the more serious injury of not being invited at all by a hostess who has come to actively prefer the company of others over hers",
-            "C) Between the injury of public humiliation, which would have been visible to others present at the gathering, and the smaller injury of private exclusion, which she alone is positioned to know about and to suffer the consequences of",
-            "D) Between the injury inflicted by the hostess herself, which she might in time forgive, and the injury inflicted by the friends who failed to inform her of the gathering she had been omitted from in the first place"
-          ],
-          "answer": 0
-        }
-      }
-    ]
-  },
-  "95": {
-    "description": "Expert literary — maximum stylistic complexity. 25+ years. Nabokov — the prose where every word is a calculated choice, where the surface is dazzling and the depths are darker. Allusions stratify the text; the narrator is brilliant, unreliable, and performing. Vocabulary of roughly 35,000+ words. The text resists passive reading; it is a game played with a reader who must be paying attention.",
-    "examples": [
-      {
-        "passage": "She was, if one is to be fastidious about such things — and one is always to be fastidious about such things — not beautiful in any way that a painting would have recognized, but possessed of a quality that paintings are poorly equipped to capture: the quality of being, at every moment, precisely herself, which sounds like a tautology and is in fact the rarest form of grace.",
-        "question": {
-          "question": "The narrator insists the phrase 'the quality of being precisely herself' 'sounds like a tautology.' What is the rhetorical effect of anticipating and dismissing that objection?",
-          "options": [
-            "A) It concedes that the phrase is essentially empty and prepares the reader to receive, in the very next clause, a cleaner and far more precise redefinition that will replace the apparent tautology entirely",
-            "B) It performs the narrator's fastidiousness — acknowledging the phrase's apparent emptiness while insisting on its real content, making the narrator at once self-aware and earnest",
-            "C) It signals that the narrator is being ironic throughout the passage and does not genuinely admire the woman at all, and that the elaborate praise is meant to be read as covertly mocking",
-            "D) It invites the reader to reject the narrator's characterization as philosophically confused and self-contradictory, exposing him as a stylist whose elegance has outrun his actual capacity for clear thought"
-          ],
-          "answer": 1
-        }
-      },
-      {
-        "passage": "The reader who arrives at this point in the narrative — and reaches it, I trust, with the slight breathlessness that the preceding paragraphs were calculated, not without a certain authorial pleasure, to induce — will perhaps already have begun to suspect what I have until this moment refrained, with the patience of a stage magician declining to anticipate his own effect, from making explicit: namely, that the unreliability of the narrator (whose existence the reader has been invited, throughout, to consider) was itself a deliberate construction of a second narrator standing behind the first, and that the second narrator is not, despite the ease with which the assumption may be reached, the figure who is now addressing you.",
-        "question": {
-          "question": "What is the rhetorical effect of the narrator's final qualification — that the second narrator 'is not, despite the ease with which the assumption may be reached, the figure who is now addressing you'?",
-          "options": [
-            "A) It clarifies a potential confusion by reassuring the reader that the present narrator is reliable and that the layered narration described in the passage is therefore something the reader can finally take at face value, without further interpretive complication",
-            "B) It opens a third level of narration by denying that the present voice is the one in control, leaving the reader to infer the existence of yet another figure standing behind the speaker who has just disclaimed authority — a regress the passage refuses to terminate",
-            "C) It signals that the narrator has lost track of the structure of his own narrative and is improvising the disclaimers in real time, with the result that the apparent layering of narration is in fact a series of unintentional contradictions on the speaker's part",
-            "D) It invites the reader to identify the addressed 'you' with the first narrator, on the grounds that the second narrator could not address the first narrator without thereby revealing himself, which the speaker is at pains here to avoid doing prematurely"
-          ],
-          "answer": 1
-        }
-      }
-    ]
-  },
-  "96": {
-    "description": "Exceptional difficulty. 30+ years / specialist scholar. Densely allusive modernist prose — T.S. Eliot's criticism, Virginia Woolf at her most abstract, or Walter Benjamin. Every sentence assumes a vast and specific literary and philosophical education. Meaning is layered, compressed, and sometimes deliberately withheld. Vocabulary around 36,000 words.",
-    "examples": [
-      {
-        "passage": "History, Benjamin observed, is not a sequence of events but a constellation — the past and present held in a charged relationship that illuminates both only at the moment of collision, which is also the moment of danger: the moment when the image that crystallizes the dialectic can be seized or lost forever, when redemption is available or has passed into the irrecoverable.",
-        "question": {
-          "question": "Why does Benjamin's model make historical illumination inseparable from danger?",
-          "options": [
-            "A) Because the collision of past and present destabilizes social order and can ignite real political violence, turning historical interpretation into a force with concrete consequences",
-            "B) Because the moment of dialectical crystallization is also the moment of maximum instability — redemption is available then and only then, and if that instant passes unseized it is gone for good",
-            "C) Because historical constellations are visible only to scholars who risk professional isolation for unorthodox readings, and the danger is the marginalization of those who see what others refuse",
-            "D) Because Benjamin was writing under fascism and the danger he describes is therefore biographical rather than structural, reflecting his personal circumstances rather than the dialectical method itself"
-          ],
-          "answer": 1
-        }
-      },
-      {
-        "passage": "The poem, Eliot reminds us, is not the embodiment of an emotion but the formula for it; not the personality of the poet but its escape, the medium in which impressions and experiences combine in peculiar and unexpected ways, although it is precisely the people who have personality and emotions who know what it means to want to escape from these things. The objection that this view licenses a coldness in art is to be met not with denial but with the further observation that what we call coldness in poetry is most often the absence of any pressure of feeling against which the formula was constructed — the chill of a vacuum where there should have been a force.",
-        "question": {
-          "question": "How does the passage answer the objection that Eliot's impersonal theory of poetry licenses coldness in art?",
-          "options": [
-            "A) By rejecting the objection as a misunderstanding of the impersonal theory, which the passage maintains has nothing to do with emotional content and concerns only the formal techniques by which the poem is constructed on the page for the reader to encounter",
-            "B) By accepting the objection but insisting that coldness is in fact a virtue in serious poetry, since strong feeling distorts the medium and the disciplined withholding of personality is what distinguishes major poets from sentimentalists",
-            "C) By redirecting the objection: what readers experience as coldness is the absence of an underlying emotional pressure that the formal escape was meant to organize, not the achievement of impersonality itself, which by contrast presupposes such pressure",
-            "D) By conceding the objection and acknowledging that Eliot's theory was a youthful overstatement which the mature Eliot subsequently abandoned in favor of a more conventional account of the relationship between poetic form and personal feeling"
-          ],
-          "answer": 2
-        }
-      }
-    ]
-  },
-  "97": {
-    "description": "Exceptional difficulty. 30+ years. Late modernist or experimental fiction at the edge of readability — Beckett in prose, late Bernhard, or Sebald. The text collapses distinctions between genres, times, and voices. The difficulty is not ornamental but ontological. Vocabulary near 37,000 words, though the vocabulary may also be deliberately depleted — difficulty through reduction rather than expansion.",
-    "examples": [
-      {
-        "passage": "I have been trying, for some time now, to remember the name of the town — not the town itself, which is perfectly clear to me, too clear perhaps, but its name, which has the quality of all names in that it simultaneously identifies and estranges, points toward its object and stands between the word and the thing in a relation that is not so much a bridge as a closed door with no discernible handle.",
-        "question": {
-          "question": "What is the narrator suggesting about language through the image of 'a closed door with no discernible handle'?",
-          "options": [
-            "A) The narrator's memory failure is caused by a neurological condition that impairs word retrieval specifically",
-            "B) Names do not connect language to reality — they seal the gap, an obstacle that cannot be bypassed from either side",
-            "C) The narrator's method of recollection is inefficient and would work better if it proceeded by free association",
-            "D) The town's name is unknowable because the narrator never actually visited it in person"
-          ],
-          "answer": 1
-        }
-      },
-      {
-        "passage": "The afternoon, as I sat in the room which was no longer mine and had perhaps never quite been mine, the room I had occupied for some twenty-three years and which had, throughout that period, retained the air of belonging to someone else who was on the point of returning, the afternoon, I say, came on slowly, as afternoons in that country always did, with the grey deliberation of something arriving without expectation of being received; and I understood, at last and without surprise, that I had been waiting for the afternoon to arrive in this manner for the entire span of my residence, that the waiting itself had been the residence, and that to leave the room now would be neither a departure nor a continuation but only the cessation of a posture that had, all along, been mistaken for a life.",
-        "question": {
-          "question": "What is the narrator's final understanding about the nature of his life in the room?",
-          "options": [
-            "A) The room had become so familiar to him over the twenty-three years that leaving it would constitute the loss of his only stable point of orientation, and the afternoon's arrival has now made him realize how dependent on the room he has gradually become",
-            "B) His occupation of the room was never a life in any genuine sense but only a sustained posture of expectancy, and the realization arrives without surprise because the recognition completes what the waiting itself had structurally been all along",
-            "C) The owner of the room is now imminently expected to return, and the narrator must accordingly begin to make arrangements for his departure from a residence that he had always known, in some form, was not properly his own to occupy",
-            "D) The room has become uninhabitable for reasons connected to the afternoon's arrival, and the narrator has at last understood that the conditions of the country in which the room is located are no longer such as to permit his continued residence"
-          ],
-          "answer": 1
-        }
-      }
-    ]
-  },
-  "98": {
-    "description": "Exceptional difficulty. Joyce's Ulysses level. The prose deliberately exceeds normal conventions of readability. Stream of consciousness, interior monologue, and parody of multiple styles coexist. The reader must work to construct meaning from fragmentary, allusive, and sometimes grammatically dissolved sentences. Vocabulary near 38,000 words, drawn from every register.",
-    "examples": [
-      {
-        "passage": "Stately, plump — no, not that, the other thing: the gray morning feeling, stones, seawrack, the snot-green sea (snotgreen, scrotumtightening) and he thinking of her again or not thinking of her but held in the amber of her, the way light holds dust visible only in light — Agenbite of inwit. Conscience. Yet here.",
-        "question": {
-          "question": "The phrase 'held in the amber of her' reframes his relationship to thoughts of 'her.' What does this reframing imply?",
-          "options": [
-            "A) He is deliberately summoning thoughts of her to comfort himself through a difficult gray morning, using memory as a chosen distraction from his harsh surroundings",
-            "B) He is not actively recalling her; rather, he is passively suspended within a state defined by her — thinking is not something he does but a condition he inhabits",
-            "C) Amber functions throughout the passage as the central symbol of grief and unresolved mourning, with the suspended dust standing in for sorrow he can neither work through nor release",
-            "D) The phrase shows he is trying to preserve his memories of her the way a collector preserves specimens in resin, fixing a living attachment into a lifeless artifact he can examine at will"
-          ],
-          "answer": 1
-        }
-      },
-      {
-        "passage": "yes the rain on the roof and the breadcart rattling and that one time in Gibraltar with the mules and the mountain and the sailors with their songs nobody understood not even them yes and would I if he asked again would I say yes and pull him down to me and his heart was going like mad and yes I said yes I will Yes — but who said it and to whom and which time it was she could no longer have said only that the saying was the saying and the saying was the same.",
-        "question": {
-          "question": "What is the deeper effect achieved by the passage's collapse of distinct moments of saying 'yes' into one indistinguishable affirmation?",
-          "options": [
-            "A) The collapse exposes the unreliability of the speaker's memory in a manner that requires the reader to question whether any of the recalled scenes occurred and to look elsewhere for a stable account of her past",
-            "B) The collapse subordinates the historical particularity of distinct affirmations to the recurrent act of affirmation itself, presenting consent as a continuous state whose individual instances become exchangeable instances of one act",
-            "C) The collapse demonstrates that the speaker has used the same word in radically different contexts and that her affirmations have therefore meant entirely different things at different times in her life history",
-            "D) The collapse signals that the narrator is rapidly losing consciousness and that the apparent equivalence of her past affirmations is a product of dissolving cognition rather than any deliberate observation about the structure of consent"
-          ],
-          "answer": 1
-        }
-      }
-    ]
-  },
-  "99": {
-    "description": "Exceptional difficulty. Finnegans Wake level — language itself is the subject. Words are portmanteaux, polyglot puns, and compressed mythological references. The prose cannot be understood by sequential reading; it requires scholarship, patience, and the willingness to accept partial comprehension as a kind of meaning. Vocabulary is effectively unlimited, as new words are created throughout.",
-    "examples": [
-      {
-        "passage": "Riverrun, past Eve and Adam's, from swerve of shore to bend of bay, brings us by a commodius vicus of recirculation back to Howth Castle and Environs — the fall (bababadalgharaghtakamminarronnkonnbronntonnerronntuonnthunntrovarrhounawnskawntoohoohoordenenthurnuk!) of a once wallstrait oldparr.",
-        "question": {
-          "question": "The phrase 'commodius vicus of recirculation' conflates Giambattista Vico's cyclical theory of history with a Roman road. What does this conflation suggest about the book's structural logic?",
-          "options": [
-            "A) The book is essentially a travel narrative that traces the route of an ancient Roman commercial road through the eastern coastal regions of Ireland",
-            "B) History is a circular path already underway — the journey and the return are indistinguishable, and the text enacts this by looping back to where it does not begin",
-            "C) Vico's cyclical philosophy is the explicit subject and the river functions as a symbol of straight-line time, against which the cyclical theory is deliberately contrasted",
-            "D) The word 'commodius' signals that the narrative will be easy and comfortable to follow despite its difficult surface, promising hidden accessibility beneath the linguistic strangeness"
-          ],
-          "answer": 1
-        }
-      },
-      {
-        "passage": "Sosie sesthers wroth, tonsure of toughs. Thingcrooklyexineverypasturesixsixchinkenchin chickenchin chicken chin. Hen as the firefoxholler hilts the hellhole hollers, and quark for muster mark — three quarks, threequark, threequarkquark — what cheek of finnegan is feignin' fenian feeneean fanaan, and who shall waken him, the wakingwaker, since wake is the only word that wakes the waker who already, in being woken, was the waking?",
-        "question": {
-          "question": "What linguistic operation most centrally organizes the passage's portmanteau and recursive constructions?",
-          "options": [
-            "A) The compression of multiple semantic and phonetic layers into single units in which the boundary between word and word and between language and language has been deliberately dissolved, producing a surface that demands simultaneous reading on several registers at once and refuses to settle on any one of them as primary",
-            "B) The systematic substitution of one language for another at predictable intervals, allowing the reader to reconstruct the underlying meaning by translating each foreign substitution back into English at the corresponding place in the line of text where the original word had previously stood",
-            "C) The use of nonsense syllables as decorative ornament around a stable English narrative, with the apparent linguistic difficulty serving primarily as a stylistic device that does not affect the underlying story being told beneath the surface complexity of the passage",
-            "D) The deliberate violation of standard English grammar to produce a kind of poetic sound-pattern that has no semantic content at all and asks to be read purely for its musical and rhythmic qualities rather than for any meaning that might be assigned to its individual lexical units"
-          ],
-          "answer": 0
-        }
-      }
-    ]
-  },
-  "100": {
-    "description": "Maximum difficulty. Beyond any standard framework. Archaic English, reconstructed Anglo-Saxon, scholarly apparatus so dense it overwhelms the text, or experimental prose that has entirely abandoned the conventions of meaning-making. This level represents texts that resist interpretation by design — not communication but cryptography, not language but language's limit. Effectively impossible for any learner and challenging even for specialists.",
-    "examples": [
-      {
-        "passage": "Hwæt! We Gardena in geardagum, þeodcyninga þrym gefrunon — or else this: the palimpsest beneath the palimpsest, the word that cancels itself in being uttered, the sentence that eats its own tail and leaves only the sound of chewing, which is, perhaps, the sound all language makes, given long enough.",
-        "question": {
-          "question": "The passage pivots from Old English to an abstract meditation on self-canceling language. What does the phrase 'the word that cancels itself in being uttered' most precisely describe?",
-          "options": [
-            "A) Words in dead languages lose their referential power when spoken aloud by non-native speakers, and the Old English opening is meant to illustrate this loss in action through its very unintelligibility",
-            "B) A performative contradiction in which the act of uttering a word destroys the referential stability it attempts to create — meaning consuming itself in the moment of its production",
-            "C) The common everyday experience of forgetting a word at exactly the moment you need it most urgently, when memory and language fail in coordination at the same instant of communicative pressure",
-            "D) The Old English passage, which cancels meaning for modern readers simply by being grammatically and lexically inaccessible to anyone outside the small community of trained medievalist scholars"
-          ],
-          "answer": 1
-        }
-      },
-      {
-        "passage": "[fragment, recto, lacuna ca. 17 chars] ...οὐδὲν γὰρ τῶν ὄντων⟨†⟩ ([the rest of the line illegible; cf. apparatus]) — and below, in a hand later than the main text and in a script that may or may not be the same as the marginalia on f. 14v: 'whereof one cannot speak / one must not / cannot / must.' ([editorial conjecture: the second hand is glossing the lacuna; the third reading 'must' is canceled by an overstrike that may itself be a fourth hand. See discussion of the stemma in the introduction, §3.2, where the question of whether any of these hands is to be identified with the author of the underlying text remains, in our view, undecidable on the present state of the evidence.])",
-        "question": {
-          "question": "What is the editorial situation that the apparatus most precisely describes?",
-          "options": [
-            "A) The base text contains a damaged passage; a later glossator has attempted to supply the missing material; a subsequent hand has emended the gloss; and a possible fourth hand has canceled the emendation, with the result that the relationship between any of the interpretive layers and the original authorial intention cannot be reconstructed from the surviving witness alone",
-            "B) The base text is fully preserved but has been overwritten by successive glossators in a series of progressively more recent hands, each of whom has supplied a competing reading of the underlying passage that the editors are now in a position to evaluate against the original authorial wording recovered from a separate manuscript witness held elsewhere",
-            "C) The base text is itself a forgery in which the lacunae and successive hands have been deliberately introduced by a single later compiler in order to create the appearance of a long history of transmission for a work that was in fact composed in a single act of fabrication of relatively recent date in the history of the document",
-            "D) The base text contains no lacuna at all; the apparent gaps in the manuscript are the result of editorial decisions to omit material that the editors regard as inauthentic, and the marginalia represent the editors' own provisional reconstructions of the omitted material rather than the work of any historical hand"
-          ],
-          "answer": 0
         }
       }
     ]

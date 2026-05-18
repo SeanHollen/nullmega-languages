@@ -1,3 +1,5 @@
+import { migrateGrammarLevelsToHundredScale } from "./grammarSettings";
+
 export type GrammarCardStatus = "new" | "learning" | "scheduled" | "due" | "dropped";
 export type GrammarCategory = "tense-conjugation" | "word-order" | "parts-of-speech" | "misc";
 
@@ -73,6 +75,7 @@ function normalize(raw: unknown): GrammarCard | null {
 }
 
 function load(): GrammarCard[] {
+  migrateGrammarLevelsToHundredScale();
   try {
     const raw = JSON.parse(localStorage.getItem(KEY) ?? `[]`);
     if (!Array.isArray(raw)) return [];

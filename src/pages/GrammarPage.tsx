@@ -12,22 +12,25 @@ import {
   getGeneratedTodayCount,
   NEW_CARDS_PER_DAY_MIN,
   NEW_CARDS_PER_DAY_MAX,
+  GRAMMAR_LEVEL_MIN,
+  GRAMMAR_LEVEL_MAX,
+  GRAMMAR_LEVEL_STEP,
 } from "../utils/grammarSettings";
 import { prepareGrammarLearnSession, prepareGrammarReviewSession } from "../utils/grammarSession";
 import { ActiveCardsList } from "../components/grammar/ActiveCardsList";
 import { GrammarCardTable } from "../components/grammar/GrammarCardTable";
 
 const LEVEL_LABELS: Record<number, string> = {
-  1: `Absolute Beginner`,
-  2: `Beginner`,
-  3: `Beginner+`,
-  4: `Elementary`,
-  5: `Lower Intermediate`,
-  6: `Intermediate`,
-  7: `Upper Intermediate`,
-  8: `Advanced`,
-  9: `Proficient`,
-  10: `Expert`,
+  10: `Absolute Beginner`,
+  20: `Beginner`,
+  30: `Beginner+`,
+  40: `Elementary`,
+  50: `Lower Intermediate`,
+  60: `Intermediate`,
+  70: `Upper Intermediate`,
+  80: `Advanced`,
+  90: `Proficient`,
+  100: `Expert`,
 };
 
 export function GrammarPage() {
@@ -160,8 +163,9 @@ export function GrammarPage() {
               <span className="text-gray-600">{`Level`}</span>
               <input
                 type="range"
-                min={1}
-                max={10}
+                min={GRAMMAR_LEVEL_MIN}
+                max={GRAMMAR_LEVEL_MAX}
+                step={GRAMMAR_LEVEL_STEP}
                 value={settings.level}
                 onChange={(e) => updateSettings({ level: parseInt(e.target.value, 10) })}
                 className="w-48 accent-green-500 cursor-pointer"

@@ -29,8 +29,10 @@ export async function generateGrammarCards(params: {
   existingCards: { title: string; level: number }[];
 }): Promise<RawGrammarCard[]> {
   const { language, level, count, existingCards } = params;
-  const safeLevel = Math.max(1, Math.min(10, level));
-  const levelDesc = LEVEL_DESCRIPTIONS[safeLevel];
+  const safeLevel = Math.max(10, Math.min(100, level));
+  // Descriptions are bucketed in 10s (keys 1..10). Map the 1-100 input to the bucket.
+  const bucket = Math.max(1, Math.min(10, Math.round(safeLevel / 10)));
+  const levelDesc = LEVEL_DESCRIPTIONS[bucket];
 
   const prioritised = pickClosest(existingCards, (c) => c.level, safeLevel, 500).map(
     (c) => c.title,
@@ -41,7 +43,7 @@ export async function generateGrammarCards(params: {
       ? `\n\nAvoid redundancy with these previously generated quiz titles:\n${prioritised.join(`, `)}`
       : ``;
 
-  const prompt = `Generate ${count} grammar quiz card${count === 1 ? `` : `s`} for a ${language} learner at difficulty level ${safeLevel}/10 (${levelDesc}).
+  const prompt = `Generate ${count} grammar quiz card${count === 1 ? `` : `s`} for a ${language} learner at difficulty level ${safeLevel}/100 (${levelDesc}).
 
 Each card tests one specific grammar concept. Include a mix of these categories:
 - tense-conjugation: verb tenses, conjugation rules and patterns
@@ -49,7 +51,7 @@ Each card tests one specific grammar concept. Include a mix of these categories:
 - parts-of-speech: nouns, adjectives, pronouns, prepositions, articles
 - misc: register and formality, honorifics and addressee deference (e.g. tu/vous, du/Sie, Japanese keigo, Korean speech levels), politeness strategies (hedging, softening, indirectness), idioms and set phrases, wordplay and humor (puns, irony, register-mismatch jokes), discourse markers and fillers, sociolinguistic conventions, regional/dialectal variation, connotation, punctuation, orthography, common learner errors, and any other ${language}-specific feature not covered by the categories above
 
-Scale topic choice to the level. Up to level ~5, stay grounded in core grammar (the first three categories). From level ~6 upward, increasingly weight the misc category, and connotation become essential at advanced levels. Only generate honorifics/keigo-style cards for languages that actually have such systems.
+Scale topic choice to the level. Up to level ~50, stay grounded in core grammar (the first three categories). From level ~60 upward, increasingly weight the misc category, and connotation becomes essential at advanced levels. Only generate honorifics/keigo-style cards for languages that actually have such systems.
 
 Card structure:
 - title: 2-10 words naming the concept (e.g. "Passé Composé vs Imparfait", "Adjective Agreement with Gender")

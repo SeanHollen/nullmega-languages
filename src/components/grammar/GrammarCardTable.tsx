@@ -42,11 +42,16 @@ const STATUS_ORDER: Record<GrammarCardStatus, number> = {
 };
 
 const LEVEL_LABELS: Record<number, string> = {
-  1: `Beginner`,
-  2: `Elementary`,
-  3: `Intermediate`,
-  4: `Advanced`,
-  5: `Expert`,
+  10: `Absolute Beginner`,
+  20: `Beginner`,
+  30: `Beginner+`,
+  40: `Elementary`,
+  50: `Lower Intermediate`,
+  60: `Intermediate`,
+  70: `Upper Intermediate`,
+  80: `Advanced`,
+  90: `Proficient`,
+  100: `Expert`,
 };
 
 function formatInterval(ms: number): string {

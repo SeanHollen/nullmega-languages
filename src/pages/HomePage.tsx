@@ -53,7 +53,7 @@ interface ModeState {
 }
 
 function computeDayState(language: string): { hadObligations: boolean; complete: boolean } {
-  const goals = loadGoals();
+  const goals = loadGoals(language);
   const states: ModeState[] = [];
 
   for (const m of MODES) {
@@ -101,7 +101,7 @@ function computeDayState(language: string): { hadObligations: boolean; complete:
 export function HomePage() {
   const navigate = useNavigate();
   const { language } = useLanguage();
-  const goals = loadGoals();
+  const goals = loadGoals(language);
 
   // Visiting the home page records today's progress. Idempotent — safe to call every render.
   const { hadObligations, complete } = computeDayState(language);
@@ -125,9 +125,14 @@ export function HomePage() {
               onClick={() => navigate(`/streaks`)}
               className="text-sm text-green-600 hover:text-green-700 font-medium cursor-pointer"
             >
-              {`View streaks (${currentStreak}) →`}
+              {`View streaks →`}
             </button>
           </div>
+          {currentStreak > 0 && (
+            <p className="text-sm text-gray-500 mt-2">
+              {`Current streak: ${currentStreak} ${currentStreak === 1 ? `day` : `days`}`}
+            </p>
+          )}
         </div>
 
         <div className="grid grid-cols-1 min-[420px]:grid-cols-2 gap-4">

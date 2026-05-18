@@ -4,6 +4,7 @@ import { FaArrowLeft } from "react-icons/fa";
 import type { Mode } from "../hooks/useAbility";
 import type { Goals } from "../utils/goals";
 import { loadGoals, saveGoals, GOAL_MIN, GOAL_MAX } from "../utils/goals";
+import { useLanguage } from "../contexts/LanguageContext";
 
 const MODE_LABELS: Record<Mode, string> = {
   reading: `Reading`,
@@ -16,12 +17,18 @@ const MODES: Mode[] = [`reading`, `listening`, `pronunciation`, `writing`];
 
 export function GoalsPage() {
   const navigate = useNavigate();
-  const [goals, setGoalsState] = useState<Goals>(loadGoals);
+  const { language } = useLanguage();
+  const [goals, setGoalsState] = useState<Goals>(() => loadGoals(language));
+  const [loadedFor, setLoadedFor] = useState(language);
+  if (language !== loadedFor) {
+    setLoadedFor(language);
+    setGoalsState(loadGoals(language));
+  }
 
   function update(mode: Mode, value: number) {
     const next = { ...goals, [mode]: value };
     setGoalsState(next);
-    saveGoals(next);
+    saveGoals(language, next);
   }
 
   return (

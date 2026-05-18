@@ -1,5 +1,6 @@
 import { useState, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { useLiveQuery } from "dexie-react-hooks";
 import { FaCog } from "react-icons/fa";
 import { LANGUAGES, getCustomLanguages, addCustomLanguage } from "../utils/language";
 import { useLanguage } from "../contexts/LanguageContext";
@@ -11,7 +12,7 @@ const OTHER = `__other__`;
 export function LanguageBanner() {
   const navigate = useNavigate();
   const { language, setLanguage } = useLanguage();
-  const [customLanguages, setCustomLanguages] = useState(getCustomLanguages);
+  const customLanguages = useLiveQuery(() => getCustomLanguages(), []) ?? [];
   const [addingCustom, setAddingCustom] = useState(false);
   const [customInput, setCustomInput] = useState(``);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -36,8 +37,7 @@ export function LanguageBanner() {
   function handleAddCustom() {
     const lang = customInput.trim();
     if (!lang) return;
-    const updated = addCustomLanguage(lang);
-    setCustomLanguages(updated);
+    void addCustomLanguage(lang);
     setCustomInput(``);
     setAddingCustom(false);
     applyLanguage(lang);

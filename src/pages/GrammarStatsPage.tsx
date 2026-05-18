@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { useLiveQuery } from "dexie-react-hooks";
 import { FaArrowLeft } from "react-icons/fa";
 import { useLanguage } from "../contexts/LanguageContext";
 import { loadGrammarCards, computeGrammarStatus } from "../utils/grammarCards";
@@ -8,11 +9,16 @@ export function GrammarStatsPage() {
   const navigate = useNavigate();
   const { language } = useLanguage();
 
-  const cards = loadGrammarCards(language).map((c) => ({
-    status: computeGrammarStatus(c),
-    lastReviewed: c.lastReviewed,
-    currentInterval: c.currentInterval,
-  }));
+  const cards =
+    useLiveQuery(
+      async () =>
+        (await loadGrammarCards(language)).map((c) => ({
+          status: computeGrammarStatus(c),
+          lastReviewed: c.lastReviewed,
+          currentInterval: c.currentInterval,
+        })),
+      [language],
+    ) ?? [];
 
   return (
     <div className="min-h-screen bg-green-100 py-10 px-4">

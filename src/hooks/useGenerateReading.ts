@@ -24,7 +24,7 @@ ${referenceBlocks(languageComplexity, { includeQuestion: true })}
 
 Match the difficulty of the target level. The topic and content of your passage should be chosen independently — do not anchor on the topics in the examples above.`;
 
-  const nearbyTitles = getTitlesByComplexity(mode, language, languageComplexity, 500);
+  const nearbyTitles = await getTitlesByComplexity(mode, language, languageComplexity, 500);
   const avoidanceBlock =
     nearbyTitles.length > 0
       ? `\n\nPAST TOPICS at similar complexity (do not repeat any of these or cover closely related ground — choose something fresh):

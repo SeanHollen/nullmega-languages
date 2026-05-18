@@ -1,4 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
+import { useLiveQuery } from "dexie-react-hooks";
 import type { Mode } from "../hooks/useAbility";
 import {
   getHistory,
@@ -8,7 +9,7 @@ import {
   type PronunciationBody,
 } from "../utils/history";
 import { deltaColor } from "../utils/colors";
-import { loadAudio } from "../utils/audioStore";
+import { loadAudio } from "../utils/db";
 import { useLoading } from "../contexts/LoadingContext";
 
 interface Props {
@@ -51,7 +52,11 @@ export interface ResumeState {
 }
 
 export function HistoryList({ mode, language, limit = 10 }: Props) {
-  const records = getHistory(mode, language).slice(0, limit);
+  const records =
+    useLiveQuery(
+      async () => (await getHistory(mode, language)).slice(0, limit),
+      [mode, language, limit],
+    ) ?? [];
   const navigate = useNavigate();
   const { beginLoading } = useLoading();
   if (records.length === 0) return null;

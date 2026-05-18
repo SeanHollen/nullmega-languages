@@ -1,11 +1,11 @@
 import { useRef, useState } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
+import { useLiveQuery } from "dexie-react-hooks";
 import { FaArrowLeft, FaEllipsisV } from "react-icons/fa";
 import type { Flashcard } from "../utils/flashcards";
 import { patchFlashcard, computeStatus, pickNextContext } from "../utils/flashcards";
-import type { VocabSettings } from "../utils/vocabSettings";
 import { loadVocabSettings } from "../utils/vocabSettings";
-import { loadAudio, deleteAudio } from "../utils/audioStore";
+import { loadAudio, deleteAudio } from "../utils/db";
 import { AudioPlayer } from "../components/listening/AudioPlayer";
 import { BoldWord } from "../components/BoldWord";
 import type { StudySessionData } from "../utils/studySession";
@@ -24,7 +24,7 @@ export function StudyPage() {
   const { mode: modeParam } = useParams<{ mode: string }>();
   const mode: StudyMode = modeParam === "review" ? "review" : "learn";
 
-  const [settings] = useState<VocabSettings>(() => loadVocabSettings());
+  const settings = useLiveQuery(() => loadVocabSettings(), []);
   const sessionData = location.state as StudySessionData | null;
 
   const [remaining, setRemaining] = useState<Flashcard[]>(() => sessionData?.cards ?? []);
@@ -49,21 +49,22 @@ export function StudyPage() {
       });
       return;
     }
-    const ci = pickNextContext(card);
-    setContextIndex(ci);
-    const key = card.contexts[ci]?.audioKey;
-    if (!settings.generateAudio || !key) {
-      setAudioUrl((prev) => {
-        if (prev) URL.revokeObjectURL(prev);
-        return null;
-      });
-      return;
-    }
     let cancelled = false;
     cancelAudio.current = () => {
       cancelled = true;
     };
     void (async () => {
+      const ci = await pickNextContext(card);
+      if (cancelled) return;
+      setContextIndex(ci);
+      const key = card.contexts[ci]?.audioKey;
+      if (!settings?.generateAudio || !key) {
+        setAudioUrl((prev) => {
+          if (prev) URL.revokeObjectURL(prev);
+          return null;
+        });
+        return;
+      }
       const blob = await loadAudio(key);
       if (cancelled) return;
       setAudioUrl((prev) => {
@@ -76,7 +77,7 @@ export function StudyPage() {
   function handleAnswer(right: boolean) {
     if (!current) return;
     const { patch, graduate } = computeAnswerPatch(current, mode, right, Date.now());
-    patchFlashcard(current.id, patch);
+    void patchFlashcard(current.id, patch);
 
     if (graduate) {
       advanceCard();
@@ -101,7 +102,7 @@ export function StudyPage() {
     if (!current) return;
     const now = Date.now();
     if (mode === "learn") {
-      patchFlashcard(current.id, {
+      void patchFlashcard(current.id, {
         status: "scheduled",
         lastReviewed: now,
         currentInterval: easyInterval(current.currentInterval),
@@ -111,7 +112,7 @@ export function StudyPage() {
         dateContextGenerated: null,
       });
     } else {
-      patchFlashcard(current.id, {
+      void patchFlashcard(current.id, {
         status: "scheduled",
         lastReviewed: now,
         currentInterval: easyInterval(current.currentInterval),
@@ -125,7 +126,7 @@ export function StudyPage() {
 
   function handleSuspend() {
     if (!current) return;
-    patchFlashcard(current.id, { status: "dropped" });
+    void patchFlashcard(current.id, { status: "dropped" });
     setMenuOpen(false);
     advanceCard();
   }
@@ -136,7 +137,7 @@ export function StudyPage() {
     setMenuOpen(false);
     const { patch, removedAudioKey } = computeRemoveContextPatch(current, contextIndex);
     if (removedAudioKey) void deleteAudio(removedAudioKey);
-    patchFlashcard(current.id, patch);
+    void patchFlashcard(current.id, patch);
     if ((patch.contexts ?? []).length === 0) {
       advanceCard();
       return;
@@ -161,6 +162,8 @@ export function StudyPage() {
   if (counts.reviewing > 0) countParts.push(`${counts.reviewing} reviewing`);
   if (counts.learning > 0) countParts.push(`${counts.learning} learning`);
   if (counts.relearning > 0) countParts.push(`${counts.relearning} relearning`);
+
+  if (!settings) return null;
 
   return (
     <div className="min-h-screen bg-green-100 py-10 px-4">

@@ -1,4 +1,5 @@
 import { getHistory } from "../utils/history";
+import { db, type AbilityRow } from "../utils/db";
 
 // ELO tuning: K_MAX is the K factor when confidence is 0 (no prior data, or all prior data
 // has fully decayed). DIVISOR controls sensitivity to rating gaps. PLACEMENT_K is the small
@@ -11,13 +12,6 @@ const TAU_MS = 180 * 24 * 60 * 60 * 1000;
 
 export type Mode = "reading" | "listening" | "pronunciation" | "writing";
 
-const STORAGE_PREFIX: Record<Mode, string> = {
-  reading: "ability",
-  listening: "listening_ability",
-  pronunciation: "pronunciation_ability",
-  writing: "writing_ability",
-};
-
 export const DEFAULT_LANGUAGE_COMPLEXITY: Record<Mode, number> = {
   reading: 50,
   listening: 40,
@@ -25,12 +19,17 @@ export const DEFAULT_LANGUAGE_COMPLEXITY: Record<Mode, number> = {
   writing: 20,
 };
 
-function storageKey(language: string, mode: Mode) {
-  return `${STORAGE_PREFIX[mode]}_${language.toLowerCase().replace(/\s+/g, "_")}`;
+function abilityId(language: string, mode: Mode): string {
+  return `${language}|${mode}`;
 }
 
-function confidenceKey(language: string, mode: Mode) {
-  return `${storageKey(language, mode)}_confidence`;
+async function loadRow(language: string, mode: Mode): Promise<AbilityRow | null> {
+  const row = await db().abilities.get(abilityId(language, mode));
+  return row ?? null;
+}
+
+async function upsertRow(row: AbilityRow): Promise<void> {
+  await db().abilities.put(row);
 }
 
 interface ConfidenceState {
@@ -38,20 +37,15 @@ interface ConfidenceState {
   updatedAt: number;
 }
 
-function loadConfidence(language: string, mode: Mode): ConfidenceState {
-  const raw = localStorage.getItem(confidenceKey(language, mode));
-  if (raw) {
-    try {
-      const parsed = JSON.parse(raw) as ConfidenceState;
-      if (typeof parsed.value === "number" && typeof parsed.updatedAt === "number") {
-        return parsed;
-      }
-    } catch {
-      // fall through to bootstrap
-    }
-  }
-  const completed = getHistory(mode, language).filter(
-    (r): r is typeof r & { completedAt: number } => typeof r.completedAt === "number",
+// If the user has assessment history but no stored confidence (pre-feature data), seed
+// confidence from that history.
+async function bootstrapConfidenceFromHistory(
+  language: string,
+  mode: Mode,
+): Promise<ConfidenceState> {
+  const history = await getHistory(mode, language);
+  const completed = history.filter(
+    (r): r is typeof r & { completedAt: number } => typeof r.completedAt === `number`,
   );
   if (completed.length === 0) return { value: 0, updatedAt: 0 };
   const now = Date.now();
@@ -63,18 +57,27 @@ function loadConfidence(language: string, mode: Mode): ConfidenceState {
   return { value, updatedAt };
 }
 
-function saveConfidence(language: string, mode: Mode, conf: ConfidenceState) {
-  localStorage.setItem(confidenceKey(language, mode), JSON.stringify(conf));
+export async function loadAbility(
+  language: string,
+  mode: Mode = `reading`,
+): Promise<number | null> {
+  const row = await loadRow(language, mode);
+  return row?.rating ?? null;
 }
 
-export function loadAbility(language: string, mode: Mode = "reading"): number | null {
-  const stored = localStorage.getItem(storageKey(language, mode));
-  return stored === null ? null : parseFloat(stored);
-}
-
-export function saveAbility(language: string, value: number, mode: Mode) {
+export async function saveAbility(language: string, value: number, mode: Mode): Promise<void> {
   const clamped = Math.max(1, Math.min(100, value));
-  localStorage.setItem(storageKey(language, mode), String(Math.round(clamped * 10) / 10));
+  const rounded = Math.round(clamped * 10) / 10;
+  const id = abilityId(language, mode);
+  const existing = await db().abilities.get(id);
+  await upsertRow({
+    id,
+    language,
+    mode,
+    rating: rounded,
+    confidenceValue: existing?.confidenceValue ?? 0,
+    confidenceUpdatedAt: existing?.confidenceUpdatedAt ?? 0,
+  });
 }
 
 export type Outcome = "win" | "draw" | "loss";
@@ -89,13 +92,13 @@ export interface RatingResult {
 
 function getOutcome(correct: number, total: number): Outcome {
   const pct = correct / total;
-  if (pct >= 0.9) return "win";
-  if (pct >= 0.6) return "draw";
-  return "loss";
+  if (pct >= 0.9) return `win`;
+  if (pct >= 0.6) return `draw`;
+  return `loss`;
 }
 
 // Rebuilds a RatingResult from a stored AssessmentRecord. Used by HistoryViewPage to
-// render the same outcome card / before→after delta the live results page shows.
+// render the same outcome card / before→after delta the live results page shows. Pure.
 export function rebuildRatingResult(record: {
   scoreEarned: number;
   scoreMax: number;
@@ -103,7 +106,7 @@ export function rebuildRatingResult(record: {
   ratingAfter: number | null;
 }): RatingResult | null {
   if (record.ratingAfter === null) return null;
-  const outcome = record.scoreMax > 0 ? getOutcome(record.scoreEarned, record.scoreMax) : "draw";
+  const outcome = record.scoreMax > 0 ? getOutcome(record.scoreEarned, record.scoreMax) : `draw`;
   const isPlacement = record.ratingBefore === null;
   const change = isPlacement ? 0 : record.ratingAfter - record.ratingBefore!;
   return {
@@ -116,8 +119,8 @@ export function rebuildRatingResult(record: {
 }
 
 function actualScore(outcome: Outcome): number {
-  if (outcome === "win") return 1.0;
-  if (outcome === "draw") return 0.5;
+  if (outcome === `win`) return 1.0;
+  if (outcome === `draw`) return 0.5;
   return 0.0;
 }
 
@@ -125,16 +128,18 @@ function expectedScore(playerRating: number, languageComplexity: number): number
   return 1 / (1 + Math.pow(10, (languageComplexity - playerRating) / DIVISOR));
 }
 
-export function computeRating(
+export async function computeRating(
   language: string,
   correct: number,
   total: number,
   languageComplexity: number,
-  mode: Mode = "reading",
-): RatingResult {
-  const oldRating = loadAbility(language, mode);
+  mode: Mode = `reading`,
+): Promise<RatingResult> {
+  const existing = await loadRow(language, mode);
+  const oldRating = existing?.rating ?? null;
   const outcome = getOutcome(correct, total);
   const now = Date.now();
+  const id = abilityId(language, mode);
 
   if (oldRating === null) {
     const change = PLACEMENT_K * (actualScore(outcome) - 0.5);
@@ -142,8 +147,14 @@ export function computeRating(
       1,
       Math.min(100, Math.round((languageComplexity + change) * 10) / 10),
     );
-    saveAbility(language, newRating, mode);
-    saveConfidence(language, mode, { value: 1, updatedAt: now });
+    await upsertRow({
+      id,
+      language,
+      mode,
+      rating: newRating,
+      confidenceValue: 1,
+      confidenceUpdatedAt: now,
+    });
     return {
       outcome,
       oldRating: null,
@@ -153,14 +164,32 @@ export function computeRating(
     };
   }
 
-  const prior = loadConfidence(language, mode);
+  const priorValue = existing?.confidenceValue ?? 0;
+  const priorUpdatedAt = existing?.confidenceUpdatedAt ?? 0;
+  let confidenceValue = priorValue;
+  let confidenceUpdatedAt = priorUpdatedAt;
+  // Seed from history on the very first ranked assessment after the user has been using
+  // the app long enough to have history but no confidence row.
+  if (priorValue === 0 && priorUpdatedAt === 0) {
+    const bootstrap = await bootstrapConfidenceFromHistory(language, mode);
+    confidenceValue = bootstrap.value;
+    confidenceUpdatedAt = bootstrap.updatedAt;
+  }
   const decayed =
-    prior.updatedAt > 0 ? prior.value * Math.exp(-(now - prior.updatedAt) / TAU_MS) : prior.value;
+    confidenceUpdatedAt > 0
+      ? confidenceValue * Math.exp(-(now - confidenceUpdatedAt) / TAU_MS)
+      : confidenceValue;
   const K = K_MAX / (decayed + 1);
   const change = K * (actualScore(outcome) - expectedScore(oldRating, languageComplexity));
   const newRating = Math.max(1, Math.min(100, Math.round((oldRating + change) * 10) / 10));
-  saveAbility(language, newRating, mode);
-  saveConfidence(language, mode, { value: decayed + 1, updatedAt: now });
+  await upsertRow({
+    id,
+    language,
+    mode,
+    rating: newRating,
+    confidenceValue: decayed + 1,
+    confidenceUpdatedAt: now,
+  });
   return {
     outcome,
     oldRating,

@@ -4,6 +4,7 @@ import { LanguageProvider } from "./contexts/LanguageContext";
 import { LoadingProvider } from "./contexts/LoadingContext";
 import { LanguageBanner } from "./components/LanguageBanner";
 import { LoadingOverlay } from "./components/LoadingOverlay";
+import { DbReady } from "./components/DbReady";
 import { HomePage } from "./pages/HomePage";
 import { ReadingPage } from "./pages/ReadingPage";
 import { ListeningPage } from "./pages/ListeningPage";
@@ -31,24 +32,26 @@ export function App() {
           <LoadingProvider>
             <LoadingOverlay />
             <LanguageBanner />
-            <Routes>
-              <Route path="/" element={<HomePage />} />
-              <Route path="/reading" element={<ReadingPage />} />
-              <Route path="/listening" element={<ListeningPage />} />
-              <Route path="/pronunciation" element={<PronunciationPage />} />
-              <Route path="/writing" element={<WritingPage />} />
-              <Route path="/settings" element={<SettingsPage />} />
-              <Route path="/goals" element={<GoalsPage />} />
-              <Route path="/streaks" element={<StreaksPage />} />
-              <Route path="/stats/:mode" element={<StatsPage />} />
-              <Route path="/history/:id" element={<HistoryViewPage />} />
-              <Route path="/vocabulary" element={<VocabularyPage />} />
-              <Route path="/vocabulary/stats" element={<VocabularyStatsPage />} />
-              <Route path="/vocabulary/:mode" element={<StudyPage />} />
-              <Route path="/grammar" element={<GrammarPage />} />
-              <Route path="/grammar/stats" element={<GrammarStatsPage />} />
-              <Route path="/grammar/:mode" element={<GrammarStudyPage />} />
-            </Routes>
+            <DbReady>
+              <Routes>
+                <Route path="/" element={<HomePage />} />
+                <Route path="/reading" element={<ReadingPage />} />
+                <Route path="/listening" element={<ListeningPage />} />
+                <Route path="/pronunciation" element={<PronunciationPage />} />
+                <Route path="/writing" element={<WritingPage />} />
+                <Route path="/settings" element={<SettingsPage />} />
+                <Route path="/goals" element={<GoalsPage />} />
+                <Route path="/streaks" element={<StreaksPage />} />
+                <Route path="/stats/:mode" element={<StatsPage />} />
+                <Route path="/history/:id" element={<HistoryViewPage />} />
+                <Route path="/vocabulary" element={<VocabularyPage />} />
+                <Route path="/vocabulary/stats" element={<VocabularyStatsPage />} />
+                <Route path="/vocabulary/:mode" element={<StudyPage />} />
+                <Route path="/grammar" element={<GrammarPage />} />
+                <Route path="/grammar/stats" element={<GrammarStatsPage />} />
+                <Route path="/grammar/:mode" element={<GrammarStudyPage />} />
+              </Routes>
+            </DbReady>
           </LoadingProvider>
         </LanguageProvider>
       </BrowserRouter>

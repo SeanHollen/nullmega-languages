@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useLiveQuery } from "dexie-react-hooks";
 import { FaArrowLeft } from "react-icons/fa";
 import { SetupView } from "../components/reading/SetupView";
 import { WritingPassageView } from "../components/writing/WritingPassageView";
@@ -29,11 +30,9 @@ export function WritingPage() {
       ? (location.state as ResumeState)
       : null;
   const resumeBody = resume ? (resume.record.body as WritingBody | undefined) : undefined;
+  const savedRating = useLiveQuery(() => loadAbility(language, `writing`), [language]) ?? null;
   const [languageComplexity, setLanguageComplexity] = useState(
-    () =>
-      resume?.record.difficulty ??
-      loadAbility(language, `writing`) ??
-      DEFAULT_LANGUAGE_COMPLEXITY.writing,
+    () => resume?.record.difficulty ?? DEFAULT_LANGUAGE_COMPLEXITY.writing,
   );
   const [rated, setRated] = useState(true);
   const [phase, setPhase] = useState<Phase>(() => (resumeBody ? `writing` : `setup`));
@@ -69,23 +68,25 @@ export function WritingPage() {
       { language, languageComplexity },
       {
         onSuccess: (data: WritingExercise) => {
-          const initialAnswers = Array.from({ length: data.questions.length }, () => "");
-          const id = saveAssessment({
-            mode: `writing`,
-            language,
-            title: data.title,
-            difficulty: languageComplexity,
-            scoreEarned: 0,
-            scoreMax: data.questions.length * 5,
-            ratingBefore: null,
-            ratingAfter: null,
-            completedAt: null,
-            body: { exercise: data, answers: initialAnswers, grades: [] },
-          });
-          setAssessmentId(id);
-          setExercise(data);
-          setAnswers(initialAnswers);
-          setPhase(`writing`);
+          void (async () => {
+            const initialAnswers = Array.from({ length: data.questions.length }, () => "");
+            const id = await saveAssessment({
+              mode: `writing`,
+              language,
+              title: data.title,
+              difficulty: languageComplexity,
+              scoreEarned: 0,
+              scoreMax: data.questions.length * 5,
+              ratingBefore: null,
+              ratingAfter: null,
+              completedAt: null,
+              body: { exercise: data, answers: initialAnswers, grades: [] },
+            });
+            setAssessmentId(id);
+            setExercise(data);
+            setAnswers(initialAnswers);
+            setPhase(`writing`);
+          })();
         },
         onSettled: () => task.done(),
       },
@@ -118,33 +119,41 @@ export function WritingPage() {
       {
         onSettled: () => task.done(),
         onSuccess: (result) => {
-          setGrades(result.grades);
-          const totalScore = result.grades.reduce((sum, g) => sum + g.score, 0);
-          const maxScore = result.grades.length * 5;
-          let rr: RatingResult | null = null;
-          if (rated) {
-            rr = computeRating(language, totalScore, maxScore, languageComplexity, `writing`);
-          }
-          setRatingResult(rr);
-          const completedAt = Date.now();
-          updateAssessment(assessmentId, {
-            scoreEarned: totalScore,
-            scoreMax: maxScore,
-            ratingBefore: rr?.oldRating ?? null,
-            ratingAfter: rr?.newRating ?? null,
-            completedAt,
-            body: { exercise, answers, grades: result.grades },
-          });
-          if (exercise.id) {
-            uploadAssessment({
-              id: exercise.id,
-              userId: getUserId(),
+          void (async () => {
+            setGrades(result.grades);
+            const totalScore = result.grades.reduce((sum, g) => sum + g.score, 0);
+            const maxScore = result.grades.length * 5;
+            let rr: RatingResult | null = null;
+            if (rated) {
+              rr = await computeRating(
+                language,
+                totalScore,
+                maxScore,
+                languageComplexity,
+                `writing`,
+              );
+            }
+            setRatingResult(rr);
+            const completedAt = Date.now();
+            await updateAssessment(assessmentId, {
               scoreEarned: totalScore,
               scoreMax: maxScore,
+              ratingBefore: rr?.oldRating ?? null,
+              ratingAfter: rr?.newRating ?? null,
               completedAt,
+              body: { exercise, answers, grades: result.grades },
             });
-          }
-          setPhase(`results`);
+            if (exercise.id) {
+              uploadAssessment({
+                id: exercise.id,
+                userId: await getUserId(),
+                scoreEarned: totalScore,
+                scoreMax: maxScore,
+                completedAt,
+              });
+            }
+            setPhase(`results`);
+          })();
         },
       },
     );
@@ -156,7 +165,7 @@ export function WritingPage() {
     setGrades([]);
     setRatingResult(null);
     setAssessmentId(null);
-    setLanguageComplexity(loadAbility(language, `writing`) ?? DEFAULT_LANGUAGE_COMPLEXITY.writing);
+    setLanguageComplexity(savedRating ?? DEFAULT_LANGUAGE_COMPLEXITY.writing);
     setPhase(`setup`);
   }
 
@@ -181,7 +190,7 @@ export function WritingPage() {
               language={language}
               languageComplexity={languageComplexity}
               rated={rated}
-              savedRating={loadAbility(language, `writing`)}
+              savedRating={savedRating}
               error={error}
               generateLabel={`Generate Writing Exercise`}
               onLanguageComplexityChange={setLanguageComplexity}

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useLiveQuery } from "dexie-react-hooks";
 import { FaArrowLeft } from "react-icons/fa";
 import { SetupView } from "../components/reading/SetupView";
 import { PassageView } from "../components/reading/PassageView";
@@ -27,8 +28,9 @@ export function ReadingPage() {
       ? (location.state as ResumeState)
       : null;
   const resumeBody = resume ? (resume.record.body as ReadingBody | undefined) : undefined;
+  const savedRating = useLiveQuery(() => loadAbility(language, `reading`), [language]) ?? null;
   const [languageComplexity, setLanguageComplexity] = useState(
-    () => resume?.record.difficulty ?? loadAbility(language) ?? DEFAULT_LANGUAGE_COMPLEXITY.reading,
+    () => resume?.record.difficulty ?? DEFAULT_LANGUAGE_COMPLEXITY.reading,
   );
   const [rated, setRated] = useState(true);
   const [phase, setPhase] = useState<Phase>(() => (resumeBody ? `reading` : `setup`));
@@ -61,26 +63,28 @@ export function ReadingPage() {
       { language, languageComplexity },
       {
         onSuccess: (data: Exercise) => {
-          const initialSelected = Array.from(
-            { length: data.questions.length },
-            () => null as number | null,
-          );
-          const id = saveAssessment({
-            mode: `reading`,
-            language,
-            title: data.title,
-            difficulty: languageComplexity,
-            scoreEarned: 0,
-            scoreMax: data.questions.length,
-            ratingBefore: null,
-            ratingAfter: null,
-            completedAt: null,
-            body: { exercise: data, selected: initialSelected },
-          });
-          setAssessmentId(id);
-          setExercise(data);
-          setSelected(initialSelected);
-          setPhase(`reading`);
+          void (async () => {
+            const initialSelected = Array.from(
+              { length: data.questions.length },
+              () => null as number | null,
+            );
+            const id = await saveAssessment({
+              mode: `reading`,
+              language,
+              title: data.title,
+              difficulty: languageComplexity,
+              scoreEarned: 0,
+              scoreMax: data.questions.length,
+              ratingBefore: null,
+              ratingAfter: null,
+              completedAt: null,
+              body: { exercise: data, selected: initialSelected },
+            });
+            setAssessmentId(id);
+            setExercise(data);
+            setSelected(initialSelected);
+            setPhase(`reading`);
+          })();
         },
         onSettled: () => task.done(),
       },
@@ -95,17 +99,17 @@ export function ReadingPage() {
     });
   }
 
-  function handleSubmit() {
+  async function handleSubmit() {
     if (!exercise || !assessmentId) return;
     const correct = selected.filter((s, i) => s === exercise.questions[i].correct).length;
     const total = exercise.questions.length;
     let rr: RatingResult | null = null;
     if (rated) {
-      rr = computeRating(language, correct, total, languageComplexity);
+      rr = await computeRating(language, correct, total, languageComplexity);
     }
     setRatingResult(rr);
     const completedAt = Date.now();
-    updateAssessment(assessmentId, {
+    void updateAssessment(assessmentId, {
       scoreEarned: correct,
       scoreMax: total,
       ratingBefore: rr?.oldRating ?? null,
@@ -116,7 +120,7 @@ export function ReadingPage() {
     if (exercise.id) {
       uploadAssessment({
         id: exercise.id,
-        userId: getUserId(),
+        userId: await getUserId(),
         scoreEarned: correct,
         scoreMax: total,
         completedAt,
@@ -147,7 +151,7 @@ export function ReadingPage() {
     setRatingResult(null);
     setAssessmentId(null);
     setTranslations(null);
-    setLanguageComplexity(loadAbility(language) ?? DEFAULT_LANGUAGE_COMPLEXITY.reading);
+    setLanguageComplexity(savedRating ?? DEFAULT_LANGUAGE_COMPLEXITY.reading);
     setPhase(`setup`);
   }
 
@@ -170,7 +174,7 @@ export function ReadingPage() {
               language={language}
               languageComplexity={languageComplexity}
               rated={rated}
-              savedRating={loadAbility(language)}
+              savedRating={savedRating}
               error={error?.message ?? ``}
               generateLabel={`Generate Reading Exercise`}
               onLanguageComplexityChange={setLanguageComplexity}

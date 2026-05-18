@@ -2,8 +2,8 @@ import { loadSettings } from "./settings";
 
 const DEFAULT_BACKEND = (import.meta.env.VITE_BACKEND_URL as string) ?? "";
 
-function resolvedBackendUrl(): string {
-  const { backendUrl } = loadSettings();
+async function resolvedBackendUrl(): Promise<string> {
+  const { backendUrl } = await loadSettings();
   return backendUrl || DEFAULT_BACKEND;
 }
 
@@ -37,7 +37,7 @@ export interface TTSBody {
 }
 
 export async function callChat(body: ChatBody): Promise<ChatResponse> {
-  const { textGen } = loadSettings();
+  const { textGen } = await loadSettings();
 
   let url: string;
   let outgoingBody: object;
@@ -50,7 +50,7 @@ export async function callChat(body: ChatBody): Promise<ChatResponse> {
     const { metadata: _metadata, ...rest } = body;
     outgoingBody = rest;
   } else {
-    url = `${resolvedBackendUrl()}/api/generate`;
+    url = `${await resolvedBackendUrl()}/api/generate`;
     outgoingBody = body;
   }
 
@@ -60,7 +60,7 @@ export async function callChat(body: ChatBody): Promise<ChatResponse> {
 }
 
 export async function callContexts(body: ChatBody): Promise<ChatResponse> {
-  const { textGen } = loadSettings();
+  const { textGen } = await loadSettings();
 
   let url: string;
   let outgoingBody: object;
@@ -72,7 +72,7 @@ export async function callContexts(body: ChatBody): Promise<ChatResponse> {
     const { metadata: _metadata, ...rest } = body;
     outgoingBody = rest;
   } else {
-    url = `${resolvedBackendUrl()}/api/contexts`;
+    url = `${await resolvedBackendUrl()}/api/contexts`;
     outgoingBody = body;
   }
 
@@ -82,7 +82,7 @@ export async function callContexts(body: ChatBody): Promise<ChatResponse> {
 }
 
 export async function callGrammar(body: ChatBody): Promise<ChatResponse> {
-  const { textGen } = loadSettings();
+  const { textGen } = await loadSettings();
 
   let url: string;
   let outgoingBody: object;
@@ -94,7 +94,7 @@ export async function callGrammar(body: ChatBody): Promise<ChatResponse> {
     const { metadata: _metadata, ...rest } = body;
     outgoingBody = rest;
   } else {
-    url = `${resolvedBackendUrl()}/api/grammar`;
+    url = `${await resolvedBackendUrl()}/api/grammar`;
     outgoingBody = body;
   }
 
@@ -104,7 +104,7 @@ export async function callGrammar(body: ChatBody): Promise<ChatResponse> {
 }
 
 export async function callTTS(body: TTSBody): Promise<Blob> {
-  const { tts } = loadSettings();
+  const { tts } = await loadSettings();
 
   if (tts) {
     const res = await fetch("https://api.openai.com/v1/audio/speech", {
@@ -117,7 +117,7 @@ export async function callTTS(body: TTSBody): Promise<Blob> {
   }
 
   // Convex backend returns { url } pointing at a stored MP3 in Convex file storage.
-  const res = await fetch(`${resolvedBackendUrl()}/api/speak`, {
+  const res = await fetch(`${await resolvedBackendUrl()}/api/speak`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
@@ -129,12 +129,12 @@ export async function callTTS(body: TTSBody): Promise<Blob> {
   return audioRes.blob();
 }
 
-function isBYOK(): boolean {
-  return loadSettings().textGen !== null;
+async function isBYOK(): Promise<boolean> {
+  return (await loadSettings()).textGen !== null;
 }
 
 async function postJsonFireAndForget(path: string, payload: object): Promise<void> {
-  const url = `${resolvedBackendUrl()}${path}`;
+  const url = `${await resolvedBackendUrl()}${path}`;
   if (!url || url.startsWith(path)) return;
   try {
     await fetch(url, {
@@ -148,11 +148,15 @@ async function postJsonFireAndForget(path: string, payload: object): Promise<voi
 }
 
 export function uploadAssessment(payload: object): void {
-  if (isBYOK()) return;
-  void postJsonFireAndForget("/api/history", payload);
+  void (async () => {
+    if (await isBYOK()) return;
+    await postJsonFireAndForget("/api/history", payload);
+  })();
 }
 
 export function submitFeedback(payload: object): void {
-  if (isBYOK()) return;
-  void postJsonFireAndForget("/api/feedback", payload);
+  void (async () => {
+    if (await isBYOK()) return;
+    await postJsonFireAndForget("/api/feedback", payload);
+  })();
 }

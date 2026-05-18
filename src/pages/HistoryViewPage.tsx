@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { useLiveQuery } from "dexie-react-hooks";
 import { FaArrowLeft } from "react-icons/fa";
 import { useLanguage } from "../contexts/LanguageContext";
 import { ResultsView } from "../components/reading/ResultsView";
@@ -14,7 +15,7 @@ import {
   type PronunciationBody,
 } from "../utils/history";
 import { rebuildRatingResult } from "../hooks/useAbility";
-import { loadAudio } from "../utils/audioStore";
+import { loadAudio } from "../utils/db";
 
 // Loads audio Blobs from IndexedDB into URLs once per unique key array. Pattern: track the
 // "loaded for" key signature and re-run when it changes — no useEffect needed since the
@@ -166,7 +167,11 @@ export function HistoryViewPage() {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const { language } = useLanguage();
-  const record = id ? getAssessment(id) : null;
+  const record = useLiveQuery(async () => (id ? await getAssessment(id) : null), [id]);
+
+  // useLiveQuery returns undefined until the first read resolves; treat that as "loading"
+  // separately from "not found" so we don't flash the not-found state on initial paint.
+  if (record === undefined) return null;
 
   if (!record) {
     return (

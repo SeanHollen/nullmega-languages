@@ -90,10 +90,9 @@ function sortCards(cards: Flashcard[], col: SortCol, dir: SortDir): Flashcard[] 
 interface Props {
   cards: Flashcard[];
   language: string;
-  onRefresh: () => void;
 }
 
-export function FlashcardTable({ cards, language, onRefresh }: Props) {
+export function FlashcardTable({ cards, language }: Props) {
   const [search, setSearch] = useState(``);
   const [editingCard, setEditingCard] = useState<Flashcard | null>(null);
   const [addingCard, setAddingCard] = useState(false);
@@ -125,33 +124,36 @@ export function FlashcardTable({ cards, language, onRefresh }: Props) {
     const source = newSource.trim();
     const translation = newTranslation.trim();
     if (!source || !translation) return;
-    const card = addFlashcard(language, source, translation);
-    if (card) {
-      const tags = parseTags(newTags);
-      if (tags.length > 0) updateFlashcardTags(card.id, tags);
-      setActionMessage(`Added "${source}"`);
-    } else {
-      setActionMessage(`"${source}" already exists`);
-    }
-    setNewSource(``);
-    setNewTranslation(``);
-    setNewTags(``);
-    setAddingCard(false);
-    onRefresh();
+    void (async () => {
+      const card = await addFlashcard(language, source, translation);
+      if (card) {
+        const tags = parseTags(newTags);
+        if (tags.length > 0) await updateFlashcardTags(card.id, tags);
+        setActionMessage(`Added "${source}"`);
+      } else {
+        setActionMessage(`"${source}" already exists`);
+      }
+      setNewSource(``);
+      setNewTranslation(``);
+      setNewTags(``);
+      setAddingCard(false);
+    })();
   }
 
   function handleExport() {
-    const json = exportFlashcards(language);
-    const blob = new Blob([json], { type: `application/json` });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement(`a`);
-    const slug = language.toLowerCase().replace(/[^a-z0-9]+/g, `-`);
-    const date = new Date().toISOString().slice(0, 10);
-    a.href = url;
-    a.download = `flashcards-${slug}-${date}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-    setActionMessage(`Exported ${cards.length} card${cards.length === 1 ? `` : `s`}`);
+    void (async () => {
+      const json = await exportFlashcards(language);
+      const blob = new Blob([json], { type: `application/json` });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement(`a`);
+      const slug = language.toLowerCase().replace(/[^a-z0-9]+/g, `-`);
+      const date = new Date().toISOString().slice(0, 10);
+      a.href = url;
+      a.download = `flashcards-${slug}-${date}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      setActionMessage(`Exported ${cards.length} card${cards.length === 1 ? `` : `s`}`);
+    })();
   }
 
   async function handleImportFile(e: React.ChangeEvent<HTMLInputElement>) {
@@ -166,11 +168,10 @@ export function FlashcardTable({ cards, language, onRefresh }: Props) {
       return;
     }
     try {
-      const { added, skipped } = importFlashcards(language, json);
+      const { added, skipped } = await importFlashcards(language, json);
       setActionMessage(
         `Imported ${added} card${added === 1 ? `` : `s`}${skipped > 0 ? ` (skipped ${skipped})` : ``}`,
       );
-      onRefresh();
     } catch (err) {
       setActionMessage(`Import failed: ${String(err)}`);
     }
@@ -195,7 +196,6 @@ export function FlashcardTable({ cards, language, onRefresh }: Props) {
           card={editingCard}
           onSave={() => {
             setEditingCard(null);
-            onRefresh();
           }}
           onClose={() => setEditingCard(null)}
         />
@@ -385,8 +385,7 @@ export function FlashcardTable({ cards, language, onRefresh }: Props) {
                             </button>
                             <button
                               onClick={() => {
-                                removeFlashcard(language, c.source);
-                                onRefresh();
+                                void removeFlashcard(language, c.source);
                               }}
                               className="text-gray-300 hover:text-red-400 transition cursor-pointer"
                               title={`Delete card`}

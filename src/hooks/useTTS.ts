@@ -1,6 +1,6 @@
 import type { Exercise } from "../types";
 import { callTTS } from "../utils/api";
-import { saveAudio } from "../utils/audioStore";
+import { saveAudio } from "../utils/db";
 
 const VOICES = ["alloy", "echo", "fable", "onyx", "nova", "shimmer"] as const;
 

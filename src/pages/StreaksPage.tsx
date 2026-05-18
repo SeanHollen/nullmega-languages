@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa";
+import { useLiveQuery } from "dexie-react-hooks";
 import { loadStreaks, computeCurrentStreak, dateStr, type StreakRecord } from "../utils/streaks";
 
 const WEEKS = 26;
@@ -45,7 +46,7 @@ function cellTitle(cell: Cell): string {
 
 export function StreaksPage() {
   const navigate = useNavigate();
-  const records = loadStreaks();
+  const records = useLiveQuery(() => loadStreaks(), []) ?? [];
   const byDate = new Map(records.map((r) => [r.date, r]));
   const currentStreak = computeCurrentStreak(records);
 

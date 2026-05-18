@@ -1,10 +1,10 @@
+import { db } from "./db";
+
 export interface StreakRecord {
   date: string; // YYYY-MM-DD (local time)
   hadObligations: boolean;
   complete: boolean;
 }
-
-const KEY = `streak_history`;
 
 function pad2(n: number): string {
   return n < 10 ? `0${n}` : String(n);
@@ -18,41 +18,17 @@ export function todayStr(): string {
   return dateStr(new Date());
 }
 
-function loadAll(): StreakRecord[] {
-  try {
-    const raw = localStorage.getItem(KEY);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw) as unknown;
-    if (!Array.isArray(parsed)) return [];
-    return parsed.filter(
-      (r): r is StreakRecord =>
-        r !== null &&
-        typeof r === `object` &&
-        typeof (r as StreakRecord).date === `string` &&
-        typeof (r as StreakRecord).complete === `boolean` &&
-        typeof (r as StreakRecord).hadObligations === `boolean`,
-    );
-  } catch {
-    return [];
-  }
+export async function loadStreaks(): Promise<StreakRecord[]> {
+  const all = await db().streaks.toArray();
+  return all.sort((a, b) => a.date.localeCompare(b.date));
 }
 
-function saveAll(records: StreakRecord[]): void {
-  localStorage.setItem(KEY, JSON.stringify(records));
-}
-
-export function loadStreaks(): StreakRecord[] {
-  return loadAll().sort((a, b) => a.date.localeCompare(b.date));
-}
-
-export function recordToday(complete: boolean, hadObligations: boolean): StreakRecord {
-  const date = todayStr();
-  const all = loadAll();
-  const idx = all.findIndex((r) => r.date === date);
-  const rec: StreakRecord = { date, hadObligations, complete };
-  if (idx >= 0) all[idx] = rec;
-  else all.push(rec);
-  saveAll(all);
+export async function recordToday(
+  complete: boolean,
+  hadObligations: boolean,
+): Promise<StreakRecord> {
+  const rec: StreakRecord = { date: todayStr(), hadObligations, complete };
+  await db().streaks.put(rec);
   return rec;
 }
 

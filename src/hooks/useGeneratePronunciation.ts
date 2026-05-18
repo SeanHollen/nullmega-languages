@@ -39,7 +39,12 @@ async function fetchPronunciationExercise(
 ): Promise<PronunciationExercise> {
   const count = phraseCount(languageComplexity);
 
-  const nearbyTitles = getTitlesByComplexity("pronunciation", language, languageComplexity, 500);
+  const nearbyTitles = await getTitlesByComplexity(
+    "pronunciation",
+    language,
+    languageComplexity,
+    500,
+  );
   const avoidanceBlock =
     nearbyTitles.length > 0
       ? `\n\nPAST THEMES at similar complexity (do not repeat any of these or close variations — pick something fresh):
@@ -73,7 +78,7 @@ Return ONLY valid JSON with this exact shape:
       mode: "pronunciation",
       language,
       difficulty: languageComplexity,
-      userId: getUserId(),
+      userId: await getUserId(),
     },
   });
   return JSON.parse(data.choices[0].message.content) as PronunciationExercise;

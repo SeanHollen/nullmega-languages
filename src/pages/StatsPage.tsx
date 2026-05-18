@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { useLiveQuery } from "dexie-react-hooks";
 import { FaArrowLeft } from "react-icons/fa";
 import type { Mode } from "../hooks/useAbility";
 import { useLanguage } from "../contexts/LanguageContext";
@@ -82,7 +83,18 @@ export function StatsPage() {
   const [hoveredRating, setHoveredRating] = useState<number | null>(null);
   const [hoveredDay, setHoveredDay] = useState<number | null>(null);
 
-  if (!modeParam || !VALID_MODES.includes(modeParam as Mode)) {
+  const validMode = modeParam && VALID_MODES.includes(modeParam as Mode);
+  const mode = (validMode ? (modeParam as Mode) : `reading`) as Mode;
+  const history =
+    useLiveQuery(
+      async () =>
+        (await getHistory(mode, language)).filter(
+          (r): r is typeof r & { completedAt: number } => typeof r.completedAt === `number`,
+        ),
+      [mode, language],
+    ) ?? [];
+
+  if (!validMode) {
     return (
       <div className="min-h-screen bg-green-100 py-10 px-4">
         <div className="max-w-3xl mx-auto">
@@ -99,13 +111,8 @@ export function StatsPage() {
     );
   }
 
-  const mode = modeParam as Mode;
   const color = MODE_COLORS[mode];
   const label = MODE_LABELS[mode];
-
-  const history = getHistory(mode, language).filter(
-    (r): r is typeof r & { completedAt: number } => typeof r.completedAt === "number",
-  );
 
   const points: Point[] = history
     .filter((r) => typeof r.ratingAfter === `number`)

@@ -34,14 +34,16 @@ export function EditCardModal({ card, onSave, onClose }: Props) {
     const trimmedSource = source.trim();
     const trimmedTranslation = translation.trim();
     const days = intervalDays;
-    patchFlashcard(card.id, {
-      ...(trimmedSource ? { source: trimmedSource } : {}),
-      ...(trimmedTranslation ? { translation: trimmedTranslation } : {}),
-      status,
-      currentInterval: days * DAY,
-    });
-    updateFlashcardTags(card.id, parseTags(tags));
-    onSave();
+    void (async () => {
+      await patchFlashcard(card.id, {
+        ...(trimmedSource ? { source: trimmedSource } : {}),
+        ...(trimmedTranslation ? { translation: trimmedTranslation } : {}),
+        status,
+        currentInterval: days * DAY,
+      });
+      await updateFlashcardTags(card.id, parseTags(tags));
+      onSave();
+    })();
   }
 
   return (

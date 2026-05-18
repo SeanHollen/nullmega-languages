@@ -1,3 +1,5 @@
+import { db } from "./db";
+
 export type Provider = "openai";
 
 export interface ProviderConfig {
@@ -12,44 +14,40 @@ export interface AppSettings {
 }
 
 const KEYS = {
-  textGen: "settings_textGen",
-  tts: "settings_tts",
-  backendUrl: "settings_backendUrl",
+  textGen: `settings_textGen`,
+  tts: `settings_tts`,
+  backendUrl: `settings_backendUrl`,
 };
 
-function parseJson<T>(key: string): T | null {
-  try {
-    const raw = localStorage.getItem(key);
-    return raw ? (JSON.parse(raw) as T) : null;
-  } catch {
-    return null;
-  }
+async function getValue<T>(key: string): Promise<T | null> {
+  const row = await db().kv.get(key);
+  return row ? ((row.value ?? null) as T | null) : null;
 }
 
-export function loadSettings(): AppSettings {
-  const envKey = (import.meta.env.VITE_OPENAI_API_KEY as string | undefined) ?? "";
-  const envFallback: ProviderConfig | null = envKey ? { provider: "openai", key: envKey } : null;
+async function putValue(key: string, value: unknown): Promise<void> {
+  await db().kv.put({ key, value });
+}
+
+export async function loadSettings(): Promise<AppSettings> {
+  const envKey = (import.meta.env.VITE_OPENAI_API_KEY as string | undefined) ?? ``;
+  const envFallback: ProviderConfig | null = envKey ? { provider: `openai`, key: envKey } : null;
+  const [textGen, tts, backendUrl] = await Promise.all([
+    getValue<ProviderConfig>(KEYS.textGen),
+    getValue<ProviderConfig>(KEYS.tts),
+    getValue<string>(KEYS.backendUrl),
+  ]);
   return {
-    textGen: parseJson<ProviderConfig>(KEYS.textGen) ?? envFallback,
-    tts: parseJson<ProviderConfig>(KEYS.tts) ?? envFallback,
-    backendUrl: localStorage.getItem(KEYS.backendUrl) ?? "",
+    textGen: textGen ?? envFallback,
+    tts: tts ?? envFallback,
+    backendUrl: backendUrl ?? ``,
   };
 }
 
-export function saveSettings(s: AppSettings): void {
-  if (s.textGen) {
-    localStorage.setItem(KEYS.textGen, JSON.stringify(s.textGen));
-  } else {
-    localStorage.removeItem(KEYS.textGen);
-  }
-  if (s.tts) {
-    localStorage.setItem(KEYS.tts, JSON.stringify(s.tts));
-  } else {
-    localStorage.removeItem(KEYS.tts);
-  }
-  if (s.backendUrl) {
-    localStorage.setItem(KEYS.backendUrl, s.backendUrl);
-  } else {
-    localStorage.removeItem(KEYS.backendUrl);
-  }
+export async function saveSettings(s: AppSettings): Promise<void> {
+  if (s.textGen) await putValue(KEYS.textGen, s.textGen);
+  else await db().kv.delete(KEYS.textGen);
+  if (s.tts) await putValue(KEYS.tts, s.tts);
+  else await db().kv.delete(KEYS.tts);
+  if (s.backendUrl) await putValue(KEYS.backendUrl, s.backendUrl);
+  else await db().kv.delete(KEYS.backendUrl);
 }

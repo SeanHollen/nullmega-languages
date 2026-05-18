@@ -15,10 +15,10 @@ export async function prepareGrammarLearnSession(
   language: string,
   settings: GrammarSettings,
 ): Promise<GrammarSessionData | null> {
-  const toGenerate = Math.max(0, settings.newCardsPerDay - getGeneratedTodayCount());
+  const toGenerate = Math.max(0, settings.newCardsPerDay - (await getGeneratedTodayCount()));
 
   if (toGenerate > 0) {
-    const existing = loadGrammarCards(language);
+    const existing = await loadGrammarCards(language);
     const rawCards = await generateGrammarCards({
       language,
       level: settings.level,
@@ -26,12 +26,12 @@ export async function prepareGrammarLearnSession(
       existingCards: existing.map((c) => ({ title: c.title, level: c.level })),
     });
     if (rawCards.length > 0) {
-      addGrammarCards(language, rawCards, settings.level);
-      recordGeneratedToday(rawCards.length);
+      await addGrammarCards(language, rawCards, settings.level);
+      await recordGeneratedToday(rawCards.length);
     }
   }
 
-  const all = loadGrammarCards(language);
+  const all = await loadGrammarCards(language);
   const learning = all.filter((c) => computeGrammarStatus(c) === `learning`);
   if (learning.length === 0) return null;
 
@@ -41,7 +41,7 @@ export async function prepareGrammarLearnSession(
 export async function prepareGrammarReviewSession(
   language: string,
 ): Promise<GrammarSessionData | null> {
-  const all = loadGrammarCards(language);
+  const all = await loadGrammarCards(language);
   const due = all.filter((c) => computeGrammarStatus(c) === `due`);
   if (due.length === 0) return null;
 

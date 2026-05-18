@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useLiveQuery } from "dexie-react-hooks";
 import { translateOne } from "../hooks/useTranslate";
 import { loadFlashcards, addFlashcard, removeFlashcard } from "../utils/flashcards";
 
@@ -73,9 +74,11 @@ function buildFlashcardMask(text: string, sources: string[]): boolean[] {
 
 export function ClickableText({ text, language }: Props) {
   const [popup, setPopup] = useState<Popup | null>(null);
-  const [savedSources, setSavedSources] = useState<string[]>(() =>
-    language ? loadFlashcards(language).map((f) => f.source) : [],
-  );
+  const savedSources =
+    useLiveQuery(
+      async () => (language ? (await loadFlashcards(language)).map((f) => f.source) : []),
+      [language],
+    ) ?? [];
   const containerRef = useRef<HTMLSpanElement>(null);
   const tokens = tokenize(text);
   const flashcardMask = buildFlashcardMask(text, savedSources);
@@ -129,18 +132,13 @@ export function ClickableText({ text, language }: Props) {
 
   function handleAddFlashcard() {
     if (!language || !popup || !popup.translation) return;
-    const added = addFlashcard(language, popup.text, popup.translation);
-    if (added) setSavedSources((prev) => [...prev, added.source]);
+    void addFlashcard(language, popup.text, popup.translation);
     setPopup(null);
   }
 
   function handleRemoveFlashcard() {
     if (!language || !popup) return;
-    const removed = removeFlashcard(language, popup.text);
-    if (removed) {
-      const lower = popup.text.toLowerCase();
-      setSavedSources((prev) => prev.filter((s) => s.toLowerCase() !== lower));
-    }
+    void removeFlashcard(language, popup.text);
     setPopup(null);
   }
 

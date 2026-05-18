@@ -3,7 +3,7 @@ import { updateFlashcardContexts, patchFlashcard } from "./flashcards";
 import type { VocabSettings } from "./vocabSettings";
 import { generateContexts } from "../hooks/useGenerateContexts";
 import { callTTS } from "./api";
-import { saveAudio, deleteAudioByPrefix } from "./audioStore";
+import { saveAudio, deleteAudioByPrefix } from "./db";
 
 const VOICES = ["alloy", "echo", "fable", "onyx", "nova", "shimmer"] as const;
 
@@ -39,7 +39,7 @@ export async function addMissingAudioFor(card: Flashcard, settings: VocabSetting
       }
     }),
   );
-  updateFlashcardContexts(card.id, updated, card.dateContextGenerated);
+  await updateFlashcardContexts(card.id, updated, card.dateContextGenerated);
 }
 
 export async function generateContextsFor(card: Flashcard, settings: VocabSettings): Promise<void> {
@@ -70,6 +70,6 @@ export async function generateContextsFor(card: Flashcard, settings: VocabSettin
     }),
   );
 
-  updateFlashcardContexts(card.id, contexts, Date.now());
-  if (card.status === "new") patchFlashcard(card.id, { status: "learning" });
+  await updateFlashcardContexts(card.id, contexts, Date.now());
+  if (card.status === "new") await patchFlashcard(card.id, { status: "learning" });
 }

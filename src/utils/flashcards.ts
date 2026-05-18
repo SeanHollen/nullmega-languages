@@ -1,3 +1,5 @@
+import { db } from "./db";
+
 export type FlashcardStatus = "new" | "learning" | "scheduled" | "dropped";
 export type FlashcardStatusDerived = FlashcardStatus | "due" | "relearning";
 
@@ -32,78 +34,26 @@ export interface Flashcard {
   contextCursor?: number;
 }
 
-const KEY = "flashcards";
-
-function normalizeContext(raw: unknown): FlashcardContext | null {
-  if (!raw || typeof raw !== "object") return null;
-  const r = raw as Record<string, unknown>;
-  if (typeof r.source !== "string" || typeof r.translation !== "string") return null;
-  return {
-    source: r.source,
-    translation: r.translation,
-    audioKey: typeof r.audioKey === "string" ? r.audioKey : null,
-  };
+export async function loadFlashcards(language: string): Promise<Flashcard[]> {
+  return await db().flashcards.where(`language`).equals(language).toArray();
 }
 
-function normalize(raw: unknown): Flashcard | null {
-  if (!raw || typeof raw !== "object") return null;
-  const r = raw as Record<string, unknown>;
-  if (typeof r.id !== "string" || typeof r.source !== "string") return null;
-  return {
-    id: r.id,
-    source: r.source,
-    translation: typeof r.translation === "string" ? r.translation : "",
-    language: typeof r.language === "string" ? r.language : "",
-    addedAt: typeof r.addedAt === "number" ? r.addedAt : Date.now(),
-    lastReviewed: typeof r.lastReviewed === "number" ? r.lastReviewed : null,
-    currentInterval: typeof r.currentInterval === "number" ? r.currentInterval : 0,
-    tags: Array.isArray(r.tags) ? (r.tags as string[]).filter((t) => typeof t === "string") : [],
-    status:
-      r.status === "new" ||
-      r.status === "learning" ||
-      r.status === "scheduled" ||
-      r.status === "dropped"
-        ? r.status
-        : "new",
-    contexts: Array.isArray(r.contexts)
-      ? r.contexts.map(normalizeContext).filter((c): c is FlashcardContext => c !== null)
-      : [],
-    dateContextGenerated:
-      typeof r.dateContextGenerated === "number" ? r.dateContextGenerated : null,
-    learningCorrectCount: typeof r.learningCorrectCount === "number" ? r.learningCorrectCount : 0,
-    relearningStartedAt: typeof r.relearningStartedAt === "number" ? r.relearningStartedAt : null,
-    ...(typeof r.contextCursor === "number" ? { contextCursor: r.contextCursor } : {}),
-  };
+async function loadCard(id: string): Promise<Flashcard | undefined> {
+  return await db().flashcards.get(id);
 }
 
-function load(): Flashcard[] {
-  try {
-    const raw = JSON.parse(localStorage.getItem(KEY) ?? "[]");
-    if (!Array.isArray(raw)) return [];
-    return raw.map(normalize).filter((c): c is Flashcard => c !== null);
-  } catch {
-    return [];
-  }
-}
-
-function persist(cards: Flashcard[]): void {
-  localStorage.setItem(KEY, JSON.stringify(cards));
-}
-
-export function loadFlashcards(language: string): Flashcard[] {
-  return load().filter((f) => f.language === language);
-}
-
-export function addFlashcard(
+export async function addFlashcard(
   language: string,
   source: string,
   translation: string,
-): Flashcard | null {
-  const cards = load();
-  const exists = cards.find(
-    (f) => f.language === language && f.source.toLowerCase() === source.toLowerCase(),
-  );
-  if (exists) return null;
+): Promise<Flashcard | null> {
+  const lower = source.toLowerCase();
+  const existing = await db()
+    .flashcards.where(`[language+source]`)
+    .between([language, ``], [language, `￿`])
+    .filter((f) => f.source.toLowerCase() === lower)
+    .first();
+  if (existing) return null;
   const card: Flashcard = {
     id: `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`,
     source,
@@ -113,47 +63,43 @@ export function addFlashcard(
     lastReviewed: null,
     currentInterval: 0,
     tags: [],
-    status: "new",
+    status: `new`,
     contexts: [],
     dateContextGenerated: null,
     learningCorrectCount: 0,
     relearningStartedAt: null,
   };
-  cards.push(card);
-  persist(cards);
+  await db().flashcards.put(card);
   return card;
 }
 
-export function removeFlashcard(language: string, source: string): boolean {
-  const cards = load();
-  const idx = cards.findIndex(
-    (f) => f.language === language && f.source.toLowerCase() === source.toLowerCase(),
-  );
-  if (idx === -1) return false;
-  cards.splice(idx, 1);
-  persist(cards);
+export async function removeFlashcard(language: string, source: string): Promise<boolean> {
+  const lower = source.toLowerCase();
+  const card = await db()
+    .flashcards.where(`language`)
+    .equals(language)
+    .filter((f) => f.source.toLowerCase() === lower)
+    .first();
+  if (!card) return false;
+  await db().flashcards.delete(card.id);
   return true;
 }
 
-export function updateFlashcardTags(id: string, tags: string[]): boolean {
-  const cards = load();
-  const idx = cards.findIndex((f) => f.id === id);
-  if (idx === -1) return false;
-  cards[idx] = { ...cards[idx], tags };
-  persist(cards);
+export async function updateFlashcardTags(id: string, tags: string[]): Promise<boolean> {
+  const card = await loadCard(id);
+  if (!card) return false;
+  await db().flashcards.put({ ...card, tags });
   return true;
 }
 
-export function updateFlashcardContexts(
+export async function updateFlashcardContexts(
   id: string,
   contexts: FlashcardContext[],
   dateContextGenerated: number | null,
-): boolean {
-  const cards = load();
-  const idx = cards.findIndex((f) => f.id === id);
-  if (idx === -1) return false;
-  cards[idx] = { ...cards[idx], contexts, dateContextGenerated };
-  persist(cards);
+): Promise<boolean> {
+  const card = await loadCard(id);
+  if (!card) return false;
+  await db().flashcards.put({ ...card, contexts, dateContextGenerated });
   return true;
 }
 
@@ -163,19 +109,20 @@ export interface ImportableCard {
   tags?: string[];
 }
 
-export function exportFlashcards(language: string): string {
-  const cards = loadFlashcards(language).map<ImportableCard>((c) => ({
+export async function exportFlashcards(language: string): Promise<string> {
+  const cards = await loadFlashcards(language);
+  const out = cards.map<ImportableCard>((c) => ({
     source: c.source,
     translation: c.translation,
     tags: c.tags.length > 0 ? c.tags : undefined,
   }));
-  return JSON.stringify(cards, null, 2);
+  return JSON.stringify(out, null, 2);
 }
 
-export function importFlashcards(
+export async function importFlashcards(
   language: string,
   json: string,
-): { added: number; skipped: number } {
+): Promise<{ added: number; skipped: number }> {
   let parsed: unknown;
   try {
     parsed = JSON.parse(json);
@@ -187,55 +134,53 @@ export function importFlashcards(
   let added = 0;
   let skipped = 0;
   for (const item of parsed) {
-    if (!item || typeof item !== "object") {
+    if (!item || typeof item !== `object`) {
       skipped++;
       continue;
     }
     const r = item as Record<string, unknown>;
-    if (typeof r.source !== "string" || typeof r.translation !== "string") {
+    if (typeof r.source !== `string` || typeof r.translation !== `string`) {
       skipped++;
       continue;
     }
-    const card = addFlashcard(language, r.source, r.translation);
+    const card = await addFlashcard(language, r.source, r.translation);
     if (!card) {
       skipped++;
       continue;
     }
     if (Array.isArray(r.tags)) {
-      const tags = (r.tags as unknown[]).filter((t): t is string => typeof t === "string");
-      if (tags.length > 0) updateFlashcardTags(card.id, tags);
+      const tags = (r.tags as unknown[]).filter((t): t is string => typeof t === `string`);
+      if (tags.length > 0) await updateFlashcardTags(card.id, tags);
     }
     added++;
   }
   return { added, skipped };
 }
 
-export function patchFlashcard(id: string, patch: Partial<Flashcard>): boolean {
-  const cards = load();
-  const idx = cards.findIndex((f) => f.id === id);
-  if (idx === -1) return false;
-  cards[idx] = { ...cards[idx], ...patch };
-  persist(cards);
+export async function patchFlashcard(id: string, patch: Partial<Flashcard>): Promise<boolean> {
+  const card = await loadCard(id);
+  if (!card) return false;
+  await db().flashcards.put({ ...card, ...patch });
   return true;
 }
 
-export function pickNextContext(card: Flashcard): number {
+export async function pickNextContext(card: Flashcard): Promise<number> {
   const len = card.contexts.length;
   if (len === 0) return 0;
-  const fresh = load().find((c) => c.id === card.id);
+  const fresh = await loadCard(card.id);
   const cursor = fresh?.contextCursor ?? card.contextCursor ?? 0;
   const idx = cursor % len;
-  patchFlashcard(card.id, { contextCursor: (idx + 1) % len });
+  await patchFlashcard(card.id, { contextCursor: (idx + 1) % len });
   return idx;
 }
 
 export function computeStatus(card: Flashcard): FlashcardStatusDerived {
-  if (card.status === "dropped") return "dropped";
-  if (card.status === "new") return "new";
-  if (card.status === "learning") {
-    return card.relearningStartedAt !== null ? "relearning" : "learning";
+  if (card.status === `dropped`) return `dropped`;
+  if (card.status === `new`) return `new`;
+  if (card.status === `learning`) {
+    return card.relearningStartedAt !== null ? `relearning` : `learning`;
   }
   if (card.lastReviewed !== null && card.lastReviewed + card.currentInterval <= Date.now())
-    return "due";
-  return "scheduled";
+    return `due`;
+  return `scheduled`;
 }

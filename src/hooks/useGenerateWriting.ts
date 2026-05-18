@@ -59,7 +59,7 @@ ${referenceBlocks(languageComplexity)}
 
 Match the difficulty of the target level. Choose your own topic independently.`;
 
-  const nearbyTitles = getTitlesByComplexity("writing", language, languageComplexity, 500);
+  const nearbyTitles = await getTitlesByComplexity("writing", language, languageComplexity, 500);
   const avoidanceBlock =
     nearbyTitles.length > 0
       ? `\n\nPAST TOPICS at similar complexity (do not repeat any of these or cover closely related ground — choose something fresh):

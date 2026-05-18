@@ -1,4 +1,4 @@
-import { migrateGrammarLevelsToHundredScale } from "./grammarSettings";
+import { db } from "./db";
 
 export type GrammarCardStatus = "new" | "learning" | "scheduled" | "due" | "dropped";
 export type GrammarCategory = "tense-conjugation" | "word-order" | "parts-of-speech" | "misc";
@@ -24,8 +24,6 @@ export interface GrammarCard {
   currentInterval: number;
 }
 
-const KEY = `grammar_cards`;
-
 const VALID_CATEGORIES: GrammarCategory[] = [
   `tense-conjugation`,
   `word-order`,
@@ -45,55 +43,11 @@ function normalizeQuestion(raw: unknown): QuizQuestion | null {
   return q;
 }
 
-function normalize(raw: unknown): GrammarCard | null {
-  if (!raw || typeof raw !== `object`) return null;
-  const r = raw as Record<string, unknown>;
-  if (typeof r.id !== `string` || typeof r.title !== `string`) return null;
-  return {
-    id: r.id,
-    language: typeof r.language === `string` ? r.language : ``,
-    title: r.title,
-    prompt: typeof r.prompt === `string` ? r.prompt : ``,
-    category: VALID_CATEGORIES.includes(r.category as GrammarCategory)
-      ? (r.category as GrammarCategory)
-      : `misc`,
-    questions: Array.isArray(r.questions)
-      ? r.questions.map(normalizeQuestion).filter((q): q is QuizQuestion => q !== null)
-      : [],
-    level: typeof r.level === `number` ? r.level : 1,
-    status:
-      r.status === `learning` ||
-      r.status === `scheduled` ||
-      r.status === `due` ||
-      r.status === `dropped`
-        ? r.status
-        : `new`,
-    addedAt: typeof r.addedAt === `number` ? r.addedAt : Date.now(),
-    lastReviewed: typeof r.lastReviewed === `number` ? r.lastReviewed : null,
-    currentInterval: typeof r.currentInterval === `number` ? r.currentInterval : 0,
-  };
+export async function loadGrammarCards(language: string): Promise<GrammarCard[]> {
+  return await db().grammarCards.where(`language`).equals(language).toArray();
 }
 
-function load(): GrammarCard[] {
-  migrateGrammarLevelsToHundredScale();
-  try {
-    const raw = JSON.parse(localStorage.getItem(KEY) ?? `[]`);
-    if (!Array.isArray(raw)) return [];
-    return raw.map(normalize).filter((c): c is GrammarCard => c !== null);
-  } catch {
-    return [];
-  }
-}
-
-function persist(cards: GrammarCard[]): void {
-  localStorage.setItem(KEY, JSON.stringify(cards));
-}
-
-export function loadGrammarCards(language: string): GrammarCard[] {
-  return load().filter((c) => c.language === language);
-}
-
-export function addGrammarCards(
+export async function addGrammarCards(
   language: string,
   raw: Array<{
     title: string;
@@ -102,8 +56,7 @@ export function addGrammarCards(
     questions: QuizQuestion[];
   }>,
   level: number,
-): GrammarCard[] {
-  const all = load();
+): Promise<GrammarCard[]> {
   const added: GrammarCard[] = [];
   for (const c of raw) {
     const card: GrammarCard = {
@@ -116,28 +69,23 @@ export function addGrammarCards(
       currentInterval: 0,
       status: `learning`,
     };
-    all.push(card);
     added.push(card);
   }
-  persist(all);
+  if (added.length > 0) await db().grammarCards.bulkPut(added);
   return added;
 }
 
-export function removeGrammarCard(id: string): boolean {
-  const cards = load();
-  const idx = cards.findIndex((c) => c.id === id);
-  if (idx === -1) return false;
-  cards.splice(idx, 1);
-  persist(cards);
+export async function removeGrammarCard(id: string): Promise<boolean> {
+  const existing = await db().grammarCards.get(id);
+  if (!existing) return false;
+  await db().grammarCards.delete(id);
   return true;
 }
 
-export function patchGrammarCard(id: string, patch: Partial<GrammarCard>): boolean {
-  const cards = load();
-  const idx = cards.findIndex((c) => c.id === id);
-  if (idx === -1) return false;
-  cards[idx] = { ...cards[idx], ...patch };
-  persist(cards);
+export async function patchGrammarCard(id: string, patch: Partial<GrammarCard>): Promise<boolean> {
+  const existing = await db().grammarCards.get(id);
+  if (!existing) return false;
+  await db().grammarCards.put({ ...existing, ...patch });
   return true;
 }
 
@@ -157,21 +105,22 @@ export interface ImportableGrammarCard {
   level: number;
 }
 
-export function exportGrammarCards(language: string): string {
-  const cards = loadGrammarCards(language).map<ImportableGrammarCard>((c) => ({
+export async function exportGrammarCards(language: string): Promise<string> {
+  const cards = await loadGrammarCards(language);
+  const out = cards.map<ImportableGrammarCard>((c) => ({
     title: c.title,
     prompt: c.prompt,
     category: c.category,
     questions: c.questions,
     level: c.level,
   }));
-  return JSON.stringify(cards, null, 2);
+  return JSON.stringify(out, null, 2);
 }
 
-export function importGrammarCards(
+export async function importGrammarCards(
   language: string,
   json: string,
-): { added: number; skipped: number } {
+): Promise<{ added: number; skipped: number }> {
   let parsed: unknown;
   try {
     parsed = JSON.parse(json);
@@ -180,20 +129,19 @@ export function importGrammarCards(
   }
   if (!Array.isArray(parsed)) throw new Error(`Expected a JSON array of cards`);
 
-  const existing = load();
-  const existingTitles = new Set(
-    existing.filter((c) => c.language === language).map((c) => c.title.toLowerCase()),
-  );
+  const existing = await loadGrammarCards(language);
+  const existingTitles = new Set(existing.map((c) => c.title.toLowerCase()));
 
   let added = 0;
   let skipped = 0;
+  const toInsert: GrammarCard[] = [];
   for (const item of parsed) {
-    if (!item || typeof item !== "object") {
+    if (!item || typeof item !== `object`) {
       skipped++;
       continue;
     }
     const r = item as Record<string, unknown>;
-    if (typeof r.title !== "string" || typeof r.prompt !== "string") {
+    if (typeof r.title !== `string` || typeof r.prompt !== `string`) {
       skipped++;
       continue;
     }
@@ -210,8 +158,8 @@ export function importGrammarCards(
     }
     const category: GrammarCategory = VALID_CATEGORIES.includes(r.category as GrammarCategory)
       ? (r.category as GrammarCategory)
-      : "misc";
-    const level = typeof r.level === "number" ? r.level : 1;
+      : `misc`;
+    const level = typeof r.level === `number` ? r.level : 1;
     const card: GrammarCard = {
       id: `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`,
       language,
@@ -223,12 +171,12 @@ export function importGrammarCards(
       addedAt: Date.now(),
       lastReviewed: null,
       currentInterval: 0,
-      status: "learning",
+      status: `learning`,
     };
-    existing.push(card);
+    toInsert.push(card);
     existingTitles.add(r.title.toLowerCase());
     added++;
   }
-  persist(existing);
+  if (toInsert.length > 0) await db().grammarCards.bulkPut(toInsert);
   return { added, skipped };
 }

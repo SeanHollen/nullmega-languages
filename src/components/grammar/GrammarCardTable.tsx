@@ -104,10 +104,9 @@ function sortCards(cards: GrammarCard[], col: SortCol, dir: SortDir): GrammarCar
 interface Props {
   cards: GrammarCard[];
   language: string;
-  onRefresh: () => void;
 }
 
-export function GrammarCardTable({ cards, language, onRefresh }: Props) {
+export function GrammarCardTable({ cards, language }: Props) {
   const [search, setSearch] = useState(``);
   const [actionMessage, setActionMessage] = useState<string | null>(null);
   const [sort, setSort] = useState<{ col: SortCol; dir: SortDir } | null>(null);
@@ -131,17 +130,19 @@ export function GrammarCardTable({ cards, language, onRefresh }: Props) {
   }
 
   function handleExport() {
-    const json = exportGrammarCards(language);
-    const blob = new Blob([json], { type: `application/json` });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement(`a`);
-    const slug = language.toLowerCase().replace(/[^a-z0-9]+/g, `-`);
-    const date = new Date().toISOString().slice(0, 10);
-    a.href = url;
-    a.download = `grammar-${slug}-${date}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-    setActionMessage(`Exported ${cards.length} card${cards.length === 1 ? `` : `s`}`);
+    void (async () => {
+      const json = await exportGrammarCards(language);
+      const blob = new Blob([json], { type: `application/json` });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement(`a`);
+      const slug = language.toLowerCase().replace(/[^a-z0-9]+/g, `-`);
+      const date = new Date().toISOString().slice(0, 10);
+      a.href = url;
+      a.download = `grammar-${slug}-${date}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      setActionMessage(`Exported ${cards.length} card${cards.length === 1 ? `` : `s`}`);
+    })();
   }
 
   async function handleImportFile(e: React.ChangeEvent<HTMLInputElement>) {
@@ -156,11 +157,10 @@ export function GrammarCardTable({ cards, language, onRefresh }: Props) {
       return;
     }
     try {
-      const { added, skipped } = importGrammarCards(language, json);
+      const { added, skipped } = await importGrammarCards(language, json);
       setActionMessage(
         `Imported ${added} card${added === 1 ? `` : `s`}${skipped > 0 ? ` (skipped ${skipped})` : ``}`,
       );
-      onRefresh();
     } catch (err) {
       setActionMessage(`Import failed: ${String(err)}`);
     }
@@ -283,8 +283,7 @@ export function GrammarCardTable({ cards, language, onRefresh }: Props) {
                         <td className="px-4 py-3">
                           <button
                             onClick={() => {
-                              removeGrammarCard(c.id);
-                              onRefresh();
+                              void removeGrammarCard(c.id);
                             }}
                             className="text-gray-300 hover:text-red-400 transition cursor-pointer"
                             title={`Delete card`}

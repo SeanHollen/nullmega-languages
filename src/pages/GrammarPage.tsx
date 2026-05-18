@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useLiveQuery } from "dexie-react-hooks";
 import { FaArrowLeft } from "react-icons/fa";
 import { useLanguage } from "../contexts/LanguageContext";
 import { useLoading } from "../contexts/LoadingContext";
@@ -37,24 +38,23 @@ export function GrammarPage() {
   const navigate = useNavigate();
   const { language } = useLanguage();
   const { beginLoading } = useLoading();
-  const [cards, setCards] = useState<GrammarCard[]>(() =>
-    loadGrammarCards(language).sort((a, b) => b.addedAt - a.addedAt),
-  );
-  const [settings, setSettingsState] = useState<GrammarSettings>(loadGrammarSettings);
+  const cards =
+    useLiveQuery(
+      async () => (await loadGrammarCards(language)).sort((a, b) => b.addedAt - a.addedAt),
+      [language],
+    ) ?? [];
+  const settings = useLiveQuery(() => loadGrammarSettings(), []);
+  const generatedToday = useLiveQuery(() => getGeneratedTodayCount(), []) ?? 0;
   const [learnError, setLearnError] = useState<string | null>(null);
   const [reviewError, setReviewError] = useState<string | null>(null);
 
   function updateSettings(patch: Partial<GrammarSettings>) {
-    const next = { ...settings, ...patch };
-    setSettingsState(next);
-    saveGrammarSettings(next);
-  }
-
-  function refreshCards() {
-    setCards(loadGrammarCards(language).sort((a, b) => b.addedAt - a.addedAt));
+    if (!settings) return;
+    void saveGrammarSettings({ ...settings, ...patch });
   }
 
   async function handleLearn() {
+    if (!settings) return;
     setLearnError(null);
     const task = beginLoading(`Generating grammar cards…`);
     try {
@@ -87,8 +87,8 @@ export function GrammarPage() {
 
   const learningCount = cards.filter((c) => computeGrammarStatus(c) === `learning`).length;
   const dueCount = cards.filter((c) => computeGrammarStatus(c) === `due`).length;
-  const canGenerate = Math.max(0, settings.newCardsPerDay - getGeneratedTodayCount());
-  const learnDisabled = learningCount === 0 && canGenerate === 0;
+  const canGenerate = settings ? Math.max(0, settings.newCardsPerDay - generatedToday) : 0;
+  const learnDisabled = !settings || (learningCount === 0 && canGenerate === 0);
 
   const activeCards = cards.filter((c) => {
     const s = computeGrammarStatus(c);
@@ -151,11 +151,12 @@ export function GrammarPage() {
                 type="number"
                 min={NEW_CARDS_PER_DAY_MIN}
                 max={NEW_CARDS_PER_DAY_MAX}
-                value={settings.newCardsPerDay}
+                value={settings?.newCardsPerDay ?? 0}
                 onChange={(e) =>
                   updateSettings({ newCardsPerDay: parseInt(e.target.value, 10) || 1 })
                 }
                 onWheel={(e) => e.currentTarget.blur()}
+                disabled={!settings}
                 className="w-16 border border-gray-200 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-green-500"
               />
             </div>
@@ -166,16 +167,19 @@ export function GrammarPage() {
                 min={GRAMMAR_LEVEL_MIN}
                 max={GRAMMAR_LEVEL_MAX}
                 step={GRAMMAR_LEVEL_STEP}
-                value={settings.level}
+                value={settings?.level ?? GRAMMAR_LEVEL_MIN}
                 onChange={(e) => updateSettings({ level: parseInt(e.target.value, 10) })}
+                disabled={!settings}
                 className="w-48 accent-green-500 cursor-pointer"
               />
-              <span className="text-xs text-gray-400">{`${settings.level} — ${LEVEL_LABELS[settings.level]}`}</span>
+              <span className="text-xs text-gray-400">
+                {settings ? `${settings.level} — ${LEVEL_LABELS[settings.level]}` : `—`}
+              </span>
             </div>
           </div>
         </div>
 
-        <GrammarCardTable cards={cards} language={language} onRefresh={refreshCards} />
+        <GrammarCardTable cards={cards} language={language} />
       </div>
     </div>
   );

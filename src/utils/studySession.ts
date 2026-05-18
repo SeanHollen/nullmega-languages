@@ -3,7 +3,7 @@ import { loadFlashcards, computeStatus, pickNextContext } from "./flashcards";
 import type { VocabSettings, VocabOrder } from "./vocabSettings";
 import { getLearnedTodayCount, recordLearnedToday } from "./vocabSettings";
 import { generateContextsFor, addMissingAudioFor } from "./contextOrchestrator";
-import { loadAudio } from "./audioStore";
+import { loadAudio } from "./db";
 
 export const DAY = 24 * 60 * 60 * 1000;
 export const INTERVALS = [1, 3, 7, 14, 30, 90, 180, 365].map((d) => d * DAY);
@@ -155,8 +155,8 @@ function pickInitial(
   return [...sortedNew.slice(0, newLimit), ...learningCards];
 }
 
-function reloadCards(language: string, cards: Flashcard[]): Flashcard[] {
-  const refreshed = loadFlashcards(language);
+async function reloadCards(language: string, cards: Flashcard[]): Promise<Flashcard[]> {
+  const refreshed = await loadFlashcards(language);
   const byId = new Map(refreshed.map((c) => [c.id, c]));
   return cards.map((c) => byId.get(c.id) ?? c);
 }
@@ -176,8 +176,8 @@ export async function prepareLearnSession(
   language: string,
   settings: VocabSettings,
 ): Promise<StudySessionData | null> {
-  const all = loadFlashcards(language);
-  const availableNew = Math.max(0, settings.newWordsPerDay - getLearnedTodayCount());
+  const all = await loadFlashcards(language);
+  const availableNew = Math.max(0, settings.newWordsPerDay - (await getLearnedTodayCount()));
   const picked = pickInitial(all, "learn", settings.order, availableNew);
   if (picked.length === 0) return null;
 
@@ -185,19 +185,19 @@ export async function prepareLearnSession(
   const needContexts = picked.filter((c) => c.contexts.length === 0);
   await Promise.all(needContexts.map((c) => generateContextsFor(c, settings)));
 
-  if (newCount > 0) recordLearnedToday(newCount);
+  if (newCount > 0) await recordLearnedToday(newCount);
 
-  const cards = reloadCards(language, picked);
+  const cards = await reloadCards(language, picked);
 
   const needAudio = cards.filter(
     (c) => c.contexts.length > 0 && c.contexts.some((ctx) => !ctx.audioKey),
   );
   await Promise.all(needAudio.map((c) => addMissingAudioFor(c, settings)));
 
-  const finalCards = needAudio.length > 0 ? reloadCards(language, cards) : cards;
+  const finalCards = needAudio.length > 0 ? await reloadCards(language, cards) : cards;
 
   const current = pickRandom(finalCards);
-  const contextIndex = current.contexts.length > 0 ? pickNextContext(current) : 0;
+  const contextIndex = current.contexts.length > 0 ? await pickNextContext(current) : 0;
   const audioUrl = await initialAudioUrl(current, contextIndex, settings.generateAudio);
 
   return { cards: finalCards, current, contextIndex, audioUrl };
@@ -207,24 +207,24 @@ export async function prepareReviewSession(
   language: string,
   settings: VocabSettings,
 ): Promise<StudySessionData | null> {
-  const all = loadFlashcards(language);
+  const all = await loadFlashcards(language);
   const picked = pickInitial(all, "review", settings.order, 0);
   if (picked.length === 0) return null;
 
   const needContexts = picked.filter((c) => c.contexts.length === 0);
   await Promise.all(needContexts.map((c) => generateContextsFor(c, settings)));
 
-  const cards = reloadCards(language, picked);
+  const cards = await reloadCards(language, picked);
 
   const needAudio = cards.filter(
     (c) => c.contexts.length > 0 && c.contexts.some((ctx) => !ctx.audioKey),
   );
   await Promise.all(needAudio.map((c) => addMissingAudioFor(c, settings)));
 
-  const finalCards = needAudio.length > 0 ? reloadCards(language, cards) : cards;
+  const finalCards = needAudio.length > 0 ? await reloadCards(language, cards) : cards;
 
   const current = pickRandom(finalCards);
-  const contextIndex = current.contexts.length > 0 ? pickNextContext(current) : 0;
+  const contextIndex = current.contexts.length > 0 ? await pickNextContext(current) : 0;
   const audioUrl = await initialAudioUrl(current, contextIndex, settings.generateAudio);
 
   return { cards: finalCards, current, contextIndex, audioUrl };

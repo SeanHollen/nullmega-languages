@@ -25,8 +25,10 @@ export function AssessmentFeedback({ assessmentId }: Props) {
   function vote(helpful: boolean) {
     if (voted !== null) return;
     setVoted(helpful);
-    updateFeedback(assessmentId, helpful);
-    submitFeedback({ id: assessmentId, userId: getUserId(), helpful });
+    void (async () => {
+      await updateFeedback(assessmentId, helpful);
+      submitFeedback({ id: assessmentId, userId: await getUserId(), helpful });
+    })();
   }
 
   const unvoted = voted === null;

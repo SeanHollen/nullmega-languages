@@ -1,3 +1,5 @@
+import { db } from "./db";
+
 export const LANGUAGES = [
   "English",
   "French",
@@ -17,30 +19,33 @@ export const LANGUAGES = [
   "Hindi",
 ];
 
-const KEY = "selectedLanguage";
-const CUSTOM_KEY = "customLanguages";
-const DEFAULT = "French";
+const SELECTED_KEY = `selectedLanguage`;
+const DEFAULT = `French`;
 
-export function getStoredLanguage(): string {
-  return localStorage.getItem(KEY) ?? DEFAULT;
+export async function getStoredLanguage(): Promise<string> {
+  const row = await db().kv.get(SELECTED_KEY);
+  const value = row?.value;
+  return typeof value === `string` && value.length > 0 ? value : DEFAULT;
 }
 
-export function setStoredLanguage(lang: string): void {
-  localStorage.setItem(KEY, lang);
+export async function setStoredLanguage(lang: string): Promise<void> {
+  await db().kv.put({ key: SELECTED_KEY, value: lang });
 }
 
-export function getCustomLanguages(): string[] {
-  try {
-    return JSON.parse(localStorage.getItem(CUSTOM_KEY) ?? "[]") as string[];
-  } catch {
-    return [];
-  }
+interface CustomRow {
+  name: string;
+  order: number;
 }
 
-export function addCustomLanguage(lang: string): string[] {
-  const current = getCustomLanguages();
-  if (current.includes(lang)) return current;
-  const updated = [...current, lang];
-  localStorage.setItem(CUSTOM_KEY, JSON.stringify(updated));
-  return updated;
+export async function getCustomLanguages(): Promise<string[]> {
+  const rows = (await db().customLanguages.toArray()) as CustomRow[];
+  return rows.sort((a, b) => a.order - b.order).map((r) => r.name);
+}
+
+export async function addCustomLanguage(lang: string): Promise<string[]> {
+  const existing = await db().customLanguages.get(lang);
+  if (existing) return getCustomLanguages();
+  const count = await db().customLanguages.count();
+  await db().customLanguages.put({ name: lang, order: count } as never);
+  return getCustomLanguages();
 }

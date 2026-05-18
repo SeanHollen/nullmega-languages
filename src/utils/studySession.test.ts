@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { IDBFactory } from "fake-indexeddb";
+import Dexie from "dexie";
 import {
   prepareReviewSession,
   pickNextCard,
@@ -64,17 +64,16 @@ const settings: VocabSettings = {
   showText: true,
 };
 
-function makeCardDue(id: string): void {
-  patchFlashcard(id, {
+async function makeCardDue(id: string): Promise<void> {
+  await patchFlashcard(id, {
     status: "scheduled",
     lastReviewed: Date.now() - 2 * DAY,
     currentInterval: INITIAL_INTERVAL,
   });
 }
 
-beforeEach(() => {
-  localStorage.clear();
-  (globalThis as Record<string, unknown>).indexedDB = new IDBFactory();
+beforeEach(async () => {
+  await Dexie.delete(`language-lab`);
 });
 
 describe("pickNextCard", () => {
@@ -198,13 +197,13 @@ describe("computeRemoveContextPatch", () => {
 
 describe("prepareReviewSession", () => {
   it("fills in missing audio for cards with contexts but no audioKey", async () => {
-    const card = addFlashcard("Spanish", "hola", "hello")!;
-    updateFlashcardContexts(
+    const card = (await addFlashcard("Spanish", "hola", "hello"))!;
+    await updateFlashcardContexts(
       card.id,
       [{ source: "Hola, ¿cómo estás?", translation: "Hello, how are you?", audioKey: null }],
       Date.now(),
     );
-    makeCardDue(card.id);
+    await makeCardDue(card.id);
 
     const session = await prepareReviewSession("Spanish", settings);
 
@@ -216,20 +215,16 @@ describe("prepareReviewSession", () => {
   });
 
   it("adds audio when generateAudio was off during context generation but on during review", async () => {
-    // Simulate: user had generateAudio off, contexts were regenerated (no audio stored),
-    // then user turns generateAudio on and starts a review session.
-    const card = addFlashcard("Spanish", "gracias", "thank you")!;
-    makeCardDue(card.id);
-    const dueCard = loadFlashcards("Spanish").find((c) => c.id === card.id)!;
+    const card = (await addFlashcard("Spanish", "gracias", "thank you"))!;
+    await makeCardDue(card.id);
+    const dueCard = (await loadFlashcards("Spanish")).find((c) => c.id === card.id)!;
 
     await generateContextsFor(dueCard, { ...settings, generateAudio: false });
 
-    // Confirm contexts exist but have no audio
-    const [stored] = loadFlashcards("Spanish").filter((c) => c.id === card.id);
+    const stored = (await loadFlashcards("Spanish")).find((c) => c.id === card.id)!;
     expect(stored.contexts.length).toBeGreaterThan(0);
     expect(stored.contexts.every((ctx) => ctx.audioKey === null)).toBe(true);
 
-    // Now review with generateAudio on — should fill in the missing audio
     const session = await prepareReviewSession("Spanish", settings);
 
     expect(session).not.toBeNull();
@@ -242,13 +237,13 @@ describe("prepareReviewSession", () => {
   it("does not call TTS when generateAudio is false", async () => {
     vi.mocked(callTTS).mockClear();
 
-    const card = addFlashcard("Spanish", "adios", "goodbye")!;
-    updateFlashcardContexts(
+    const card = (await addFlashcard("Spanish", "adios", "goodbye"))!;
+    await updateFlashcardContexts(
       card.id,
       [{ source: "Adiós, hasta luego.", translation: "Goodbye, see you later.", audioKey: null }],
       Date.now(),
     );
-    makeCardDue(card.id);
+    await makeCardDue(card.id);
 
     await prepareReviewSession("Spanish", { ...settings, generateAudio: false });
 

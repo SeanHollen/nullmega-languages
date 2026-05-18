@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useLiveQuery } from "dexie-react-hooks";
 import { FaArrowLeft } from "react-icons/fa";
 import { SetupView } from "../components/reading/SetupView";
 import { ListeningPassageView } from "../components/listening/ListeningPassageView";
@@ -31,11 +32,9 @@ export function ListeningPage() {
       ? (location.state as ResumeState)
       : null;
   const resumeBody = resume ? (resume.record.body as ListeningBody | undefined) : undefined;
+  const savedRating = useLiveQuery(() => loadAbility(language, `listening`), [language]) ?? null;
   const [languageComplexity, setLanguageComplexity] = useState(
-    () =>
-      resume?.record.difficulty ??
-      loadAbility(language, `listening`) ??
-      DEFAULT_LANGUAGE_COMPLEXITY.listening,
+    () => resume?.record.difficulty ?? DEFAULT_LANGUAGE_COMPLEXITY.listening,
   );
   const [rated, setRated] = useState(true);
   const [phase, setPhase] = useState<Phase>(() => (resumeBody ? `listening` : `setup`));
@@ -85,35 +84,35 @@ export function ListeningPage() {
       { language, languageComplexity, mode: `listening` },
       {
         onSuccess: (data: Exercise) => {
-          const initialSelected = Array.from(
-            { length: data.questions.length },
-            () => null as number | null,
-          );
-          const id = saveAssessment({
-            mode: `listening`,
-            language,
-            title: data.title,
-            difficulty: languageComplexity,
-            scoreEarned: 0,
-            scoreMax: data.questions.length,
-            ratingBefore: null,
-            ratingAfter: null,
-            completedAt: null,
-          });
-          const audioKeyPassage = `assessment-${id}-passage`;
-          const audioKeyQuestions = data.questions.map((_, i) => `assessment-${id}-q-${i}`);
-          setAssessmentId(id);
-          setExercise(data);
-          setSelected(initialSelected);
-          task.update(`Generating audio…`);
           void (async () => {
+            const initialSelected = Array.from(
+              { length: data.questions.length },
+              () => null as number | null,
+            );
+            const id = await saveAssessment({
+              mode: `listening`,
+              language,
+              title: data.title,
+              difficulty: languageComplexity,
+              scoreEarned: 0,
+              scoreMax: data.questions.length,
+              ratingBefore: null,
+              ratingAfter: null,
+              completedAt: null,
+            });
+            const audioKeyPassage = `assessment-${id}-passage`;
+            const audioKeyQuestions = data.questions.map((_, i) => `assessment-${id}-q-${i}`);
+            setAssessmentId(id);
+            setExercise(data);
+            setSelected(initialSelected);
+            task.update(`Generating audio…`);
             try {
               const exerciseAudio = await generateExerciseAudio(data, {
                 passage: audioKeyPassage,
                 questions: audioKeyQuestions,
               });
               setAudio(exerciseAudio);
-              updateAssessment(id, {
+              await updateAssessment(id, {
                 body: {
                   exercise: data,
                   selected: initialSelected,
@@ -141,17 +140,17 @@ export function ListeningPage() {
     });
   }
 
-  function handleSubmit() {
+  async function handleSubmit() {
     if (!exercise || !assessmentId) return;
     const correct = selected.filter((s, i) => s === exercise.questions[i].correct).length;
     const total = exercise.questions.length;
     let rr: RatingResult | null = null;
     if (rated) {
-      rr = computeRating(language, correct, total, languageComplexity, `listening`);
+      rr = await computeRating(language, correct, total, languageComplexity, `listening`);
     }
     setRatingResult(rr);
     const completedAt = Date.now();
-    updateAssessment(assessmentId, {
+    void updateAssessment(assessmentId, {
       scoreEarned: correct,
       scoreMax: total,
       ratingBefore: rr?.oldRating ?? null,
@@ -167,7 +166,7 @@ export function ListeningPage() {
     if (exercise.id) {
       uploadAssessment({
         id: exercise.id,
-        userId: getUserId(),
+        userId: await getUserId(),
         scoreEarned: correct,
         scoreMax: total,
         completedAt,
@@ -199,9 +198,7 @@ export function ListeningPage() {
     setSelected([]);
     setRatingResult(null);
     setAssessmentId(null);
-    setLanguageComplexity(
-      loadAbility(language, `listening`) ?? DEFAULT_LANGUAGE_COMPLEXITY.listening,
-    );
+    setLanguageComplexity(savedRating ?? DEFAULT_LANGUAGE_COMPLEXITY.listening);
     setPhase(`setup`);
   }
 
@@ -226,7 +223,7 @@ export function ListeningPage() {
               language={language}
               languageComplexity={languageComplexity}
               rated={rated}
-              savedRating={loadAbility(language, `listening`)}
+              savedRating={savedRating}
               error={error}
               generateLabel={`Generate Listening Exercise`}
               onLanguageComplexityChange={setLanguageComplexity}

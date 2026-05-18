@@ -57,13 +57,13 @@ export function GrammarStudyPage() {
     if (right) {
       const interval =
         cardStatus === `due` ? nextInterval(current.currentInterval) : INITIAL_INTERVAL;
-      patchGrammarCard(current.id, {
+      void patchGrammarCard(current.id, {
         status: `scheduled`,
         lastReviewed: now,
         currentInterval: interval,
       });
     } else if (cardStatus === `due`) {
-      patchGrammarCard(current.id, {
+      void patchGrammarCard(current.id, {
         status: `learning`,
         lastReviewed: now,
         currentInterval: INITIAL_INTERVAL,

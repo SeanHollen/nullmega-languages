@@ -9,14 +9,15 @@ import {
 } from "react-icons/fa";
 import type { IconType } from "react-icons";
 import type { Mode } from "../hooks/useAbility";
-import { loadAbility } from "../hooks/useAbility";
+import { loadAbility, DEFAULT_LANGUAGE_COMPLEXITY } from "../hooks/useAbility";
 import { useLanguage } from "../contexts/LanguageContext";
 import { getCompletedToday } from "../utils/history";
-import { loadGoals } from "../utils/goals";
-import { loadFlashcards, computeStatus } from "../utils/flashcards";
+import { loadGoals, type Goals } from "../utils/goals";
+import { loadFlashcards, computeStatus, type Flashcard } from "../utils/flashcards";
 import { loadVocabSettings, getLearnedTodayCount } from "../utils/vocabSettings";
-import { loadGrammarCards, computeGrammarStatus } from "../utils/grammarCards";
+import { loadGrammarCards, computeGrammarStatus, type GrammarCard } from "../utils/grammarCards";
 import { recordToday, loadStreaks, computeCurrentStreak } from "../utils/streaks";
+import { useLiveQuery } from "dexie-react-hooks";
 
 interface ModeConfig {
   label: string;
@@ -52,39 +53,42 @@ interface ModeState {
   met: boolean;
 }
 
-function computeDayState(language: string): { hadObligations: boolean; complete: boolean } {
-  const goals = loadGoals(language);
+function computeDayState(
+  goals: Goals,
+  vocabNewLimit: number,
+  learnedToday: number,
+  vocabCards: Flashcard[],
+  grammarCards: GrammarCard[],
+  completedTodayByMode: Record<Mode, number>,
+): { hadObligations: boolean; complete: boolean } {
   const states: ModeState[] = [];
 
   for (const m of MODES) {
     if (m.kind === `exercise` && m.mode) {
       const goal = goals[m.mode];
       if (goal > 0) {
-        states.push({ hasObligation: true, met: getCompletedToday(m.mode) >= goal });
+        states.push({ hasObligation: true, met: completedTodayByMode[m.mode] >= goal });
       }
     } else if (m.kind === `vocab`) {
-      const cards = loadFlashcards(language);
-      if (cards.length > 0) {
-        const settings = loadVocabSettings();
-        const due = cards.filter((c) => computeStatus(c) === `due`).length;
-        const learning = cards.filter((c) => {
+      if (vocabCards.length > 0) {
+        const due = vocabCards.filter((c) => computeStatus(c) === `due`).length;
+        const learning = vocabCards.filter((c) => {
           const s = computeStatus(c);
           return s === `learning` || s === `relearning`;
         }).length;
         const availableNew = Math.max(
           0,
           Math.min(
-            cards.filter((c) => computeStatus(c) === `new`).length,
-            settings.newWordsPerDay - getLearnedTodayCount(),
+            vocabCards.filter((c) => computeStatus(c) === `new`).length,
+            vocabNewLimit - learnedToday,
           ),
         );
         const studyCount = due + learning + availableNew;
         states.push({ hasObligation: true, met: studyCount === 0 });
       }
     } else if (m.kind === `grammar`) {
-      const cards = loadGrammarCards(language);
-      if (cards.length > 0) {
-        const studyCount = cards.filter((c) => {
+      if (grammarCards.length > 0) {
+        const studyCount = grammarCards.filter((c) => {
           const s = computeGrammarStatus(c);
           return s === `learning` || s === `due`;
         }).length;
@@ -101,12 +105,41 @@ function computeDayState(language: string): { hadObligations: boolean; complete:
 export function HomePage() {
   const navigate = useNavigate();
   const { language } = useLanguage();
-  const goals = loadGoals(language);
+  const goals = useLiveQuery(() => loadGoals(language), [language]);
+  const vocabSettings = useLiveQuery(() => loadVocabSettings(), []);
+  const learnedToday = useLiveQuery(() => getLearnedTodayCount(), []) ?? 0;
+  const vocabCards = useLiveQuery(() => loadFlashcards(language), [language]) ?? [];
+  const grammarCards = useLiveQuery(() => loadGrammarCards(language), [language]) ?? [];
+  const allModes = Object.keys(DEFAULT_LANGUAGE_COMPLEXITY) as Mode[];
+  const completedTodayByMode = useLiveQuery(async () => {
+    const entries = await Promise.all(
+      allModes.map(async (m) => [m, await getCompletedToday(m)] as const),
+    );
+    return Object.fromEntries(entries) as Record<Mode, number>;
+  }, []) ?? { reading: 0, listening: 0, writing: 0, pronunciation: 0 };
+  const ratingsByMode = useLiveQuery(async () => {
+    const entries = await Promise.all(
+      allModes.map(async (m) => [m, await loadAbility(language, m)] as const),
+    );
+    return Object.fromEntries(entries) as Record<Mode, number | null>;
+  }, [language]) ?? { reading: null, listening: null, writing: null, pronunciation: null };
 
-  // Visiting the home page records today's progress. Idempotent — safe to call every render.
-  const { hadObligations, complete } = computeDayState(language);
-  recordToday(complete, hadObligations);
-  const currentStreak = computeCurrentStreak(loadStreaks());
+  // Visiting the home page records today's progress. Fire-and-forget — Dexie put is
+  // idempotent by primary key so repeated renders just overwrite today's record. Only
+  // run once async state has loaded so we don't snapshot a stale "no obligations" state.
+  if (goals && vocabSettings) {
+    const { hadObligations, complete } = computeDayState(
+      goals,
+      vocabSettings.newWordsPerDay,
+      learnedToday,
+      vocabCards,
+      grammarCards,
+      completedTodayByMode,
+    );
+    void recordToday(complete, hadObligations);
+  }
+  const streakRecords = useLiveQuery(() => loadStreaks(), []);
+  const currentStreak = streakRecords ? computeCurrentStreak(streakRecords) : 0;
 
   return (
     <div className="min-h-screen bg-green-100 flex flex-col items-center px-4 pt-12">
@@ -137,41 +170,40 @@ export function HomePage() {
 
         <div className="grid grid-cols-1 min-[420px]:grid-cols-2 gap-4">
           {MODES.map(({ label, Icon, href, mode, kind }) => {
-            const rating = mode ? loadAbility(language, mode) : null;
-            const completedToday = mode ? getCompletedToday(mode) : 0;
-            const goal = mode ? goals[mode] : 0;
+            const rating = mode ? ratingsByMode[mode] : null;
+            const completedToday = mode ? completedTodayByMode[mode] : 0;
+            const goal = mode && goals ? goals[mode] : 0;
             const met = completedToday >= goal;
             const showBadge = mode && (goal > 0 || completedToday > 0);
 
-            const vocabCards = kind === `vocab` ? loadFlashcards(language) : null;
-            const cardCount = vocabCards ? vocabCards.length : null;
-            const studyCount = vocabCards
-              ? (() => {
-                  const settings = loadVocabSettings();
-                  const due = vocabCards.filter((c) => computeStatus(c) === `due`).length;
-                  const learning = vocabCards.filter((c) => {
-                    const s = computeStatus(c);
-                    return s === `learning` || s === `relearning`;
-                  }).length;
-                  const availableNew = Math.max(
-                    0,
-                    Math.min(
-                      vocabCards.filter((c) => computeStatus(c) === `new`).length,
-                      settings.newWordsPerDay - getLearnedTodayCount(),
-                    ),
-                  );
-                  return due + learning + availableNew;
-                })()
-              : null;
+            const cardCount = kind === `vocab` ? vocabCards.length : null;
+            const studyCount =
+              kind === `vocab` && vocabSettings
+                ? (() => {
+                    const due = vocabCards.filter((c) => computeStatus(c) === `due`).length;
+                    const learning = vocabCards.filter((c) => {
+                      const s = computeStatus(c);
+                      return s === `learning` || s === `relearning`;
+                    }).length;
+                    const availableNew = Math.max(
+                      0,
+                      Math.min(
+                        vocabCards.filter((c) => computeStatus(c) === `new`).length,
+                        vocabSettings.newWordsPerDay - learnedToday,
+                      ),
+                    );
+                    return due + learning + availableNew;
+                  })()
+                : null;
 
-            const grammarCards = kind === `grammar` ? loadGrammarCards(language) : null;
-            const grammarCount = grammarCards ? grammarCards.length : null;
-            const grammarStudyCount = grammarCards
-              ? grammarCards.filter((c) => {
-                  const s = computeGrammarStatus(c);
-                  return s === `learning` || s === `due`;
-                }).length
-              : null;
+            const grammarCount = kind === `grammar` ? grammarCards.length : null;
+            const grammarStudyCount =
+              kind === `grammar`
+                ? grammarCards.filter((c) => {
+                    const s = computeGrammarStatus(c);
+                    return s === `learning` || s === `due`;
+                  }).length
+                : null;
             return (
               <button
                 key={label}

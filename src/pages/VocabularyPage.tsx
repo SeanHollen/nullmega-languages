@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useLiveQuery } from "dexie-react-hooks";
 import { FaArrowLeft } from "react-icons/fa";
 import { useLanguage } from "../contexts/LanguageContext";
 import { useLoading } from "../contexts/LoadingContext";
-import type { Flashcard } from "../utils/flashcards";
 import { loadFlashcards, computeStatus } from "../utils/flashcards";
 import type { VocabSettings } from "../utils/vocabSettings";
 import { loadVocabSettings, saveVocabSettings, getLearnedTodayCount } from "../utils/vocabSettings";
@@ -15,24 +15,23 @@ export function VocabularyPage() {
   const navigate = useNavigate();
   const { language } = useLanguage();
   const { beginLoading } = useLoading();
-  const [cards, setCards] = useState<Flashcard[]>(() =>
-    loadFlashcards(language).sort((a, b) => b.addedAt - a.addedAt),
-  );
-  const [settings, setSettingsState] = useState<VocabSettings>(loadVocabSettings);
+  const cards =
+    useLiveQuery(
+      async () => (await loadFlashcards(language)).sort((a, b) => b.addedAt - a.addedAt),
+      [language],
+    ) ?? [];
+  const settings = useLiveQuery(() => loadVocabSettings(), []);
+  const learnedToday = useLiveQuery(() => getLearnedTodayCount(), []) ?? 0;
   const [learnError, setLearnError] = useState<string | null>(null);
   const [reviewError, setReviewError] = useState<string | null>(null);
 
   function updateSettings(patch: Partial<VocabSettings>) {
-    const next = { ...settings, ...patch };
-    setSettingsState(next);
-    saveVocabSettings(next);
-  }
-
-  function refreshCards() {
-    setCards(loadFlashcards(language).sort((a, b) => b.addedAt - a.addedAt));
+    if (!settings) return;
+    void saveVocabSettings({ ...settings, ...patch });
   }
 
   async function handleStartLearn() {
+    if (!settings) return;
     setLearnError(null);
     const task = beginLoading(`Generating contexts…`);
     try {
@@ -45,6 +44,7 @@ export function VocabularyPage() {
   }
 
   async function handleStartReview() {
+    if (!settings) return;
     setReviewError(null);
     const task = beginLoading(`Regenerating contexts…`);
     try {
@@ -56,13 +56,15 @@ export function VocabularyPage() {
     task.done();
   }
 
-  const availableNewCount = Math.max(
-    0,
-    Math.min(
-      cards.filter((c) => computeStatus(c) === `new`).length,
-      settings.newWordsPerDay - getLearnedTodayCount(),
-    ),
-  );
+  const availableNewCount = settings
+    ? Math.max(
+        0,
+        Math.min(
+          cards.filter((c) => computeStatus(c) === `new`).length,
+          settings.newWordsPerDay - learnedToday,
+        ),
+      )
+    : 0;
   const learningCount = cards.filter((c) => {
     const s = computeStatus(c);
     return s === `learning` || s === `relearning`;
@@ -86,7 +88,7 @@ export function VocabularyPage() {
           <div className="flex flex-col items-center gap-1">
             <button
               onClick={handleStartLearn}
-              disabled={availableNewCount === 0 && learningCount === 0}
+              disabled={!settings || (availableNewCount === 0 && learningCount === 0)}
               className="bg-white border-2 border-green-400 text-green-700 px-8 py-4 rounded-2xl font-bold text-base hover:bg-green-50 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition text-center min-w-48"
             >
               <div>{`Learn new cards →`}</div>
@@ -99,7 +101,7 @@ export function VocabularyPage() {
           <div className="flex flex-col items-center gap-1">
             <button
               onClick={handleStartReview}
-              disabled={dueCount === 0}
+              disabled={!settings || dueCount === 0}
               className="bg-white border-2 border-green-400 text-green-700 px-8 py-4 rounded-2xl font-bold text-base hover:bg-green-50 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition text-center min-w-48"
             >
               <div>{`Review cards →`}</div>
@@ -109,8 +111,8 @@ export function VocabularyPage() {
           </div>
         </div>
 
-        <VocabSettingsPanel settings={settings} onUpdate={updateSettings} />
-        <FlashcardTable cards={cards} language={language} onRefresh={refreshCards} />
+        {settings && <VocabSettingsPanel settings={settings} onUpdate={updateSettings} />}
+        <FlashcardTable cards={cards} language={language} />
       </div>
     </div>
   );

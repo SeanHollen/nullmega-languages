@@ -1,8 +1,7 @@
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa";
+import { useLiveQuery } from "dexie-react-hooks";
 import type { Mode } from "../hooks/useAbility";
-import type { Goals } from "../utils/goals";
 import { loadGoals, saveGoals, GOAL_MIN, GOAL_MAX } from "../utils/goals";
 import { useLanguage } from "../contexts/LanguageContext";
 
@@ -18,17 +17,11 @@ const MODES: Mode[] = [`reading`, `listening`, `pronunciation`, `writing`];
 export function GoalsPage() {
   const navigate = useNavigate();
   const { language } = useLanguage();
-  const [goals, setGoalsState] = useState<Goals>(() => loadGoals(language));
-  const [loadedFor, setLoadedFor] = useState(language);
-  if (language !== loadedFor) {
-    setLoadedFor(language);
-    setGoalsState(loadGoals(language));
-  }
+  const goals = useLiveQuery(() => loadGoals(language), [language]);
 
   function update(mode: Mode, value: number) {
-    const next = { ...goals, [mode]: value };
-    setGoalsState(next);
-    saveGoals(language, next);
+    if (!goals) return;
+    void saveGoals(language, { ...goals, [mode]: value });
   }
 
   return (
@@ -53,16 +46,17 @@ export function GoalsPage() {
               <div className="flex items-center justify-between">
                 <span className="font-medium text-gray-700">{MODE_LABELS[mode]}</span>
                 <span className="text-sm font-semibold text-green-600">
-                  {goals[mode] === 0 ? `Off` : `${goals[mode]} / day`}
+                  {goals ? (goals[mode] === 0 ? `Off` : `${goals[mode]} / day`) : `—`}
                 </span>
               </div>
               <input
                 type="range"
                 min={GOAL_MIN}
                 max={GOAL_MAX}
-                value={goals[mode]}
+                value={goals?.[mode] ?? 0}
                 onChange={(e) => update(mode, parseInt(e.target.value, 10))}
                 className="w-full accent-green-600 cursor-pointer"
+                disabled={!goals}
               />
               <div className="flex justify-between text-xs text-gray-400">
                 <span>{GOAL_MIN}</span>

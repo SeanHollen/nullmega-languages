@@ -1,3 +1,5 @@
+import { db } from "./db";
+
 export type VocabOrder = "added" | "random";
 
 export interface VocabSettings {
@@ -9,12 +11,13 @@ export interface VocabSettings {
   showText: boolean;
 }
 
-const KEY = "vocab_settings";
+const SETTINGS_KEY = `vocab_settings`;
+const LEARN_SESSION_KEY = `vocab_learn_session`;
 
 const DEFAULTS: VocabSettings = {
   newWordsPerDay: 5,
   contextsPerCard: 3,
-  order: "random",
+  order: `random`,
   generateAudio: true,
   autoplayAudio: true,
   showText: true,
@@ -29,38 +32,6 @@ function clamp(n: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, Math.round(n)));
 }
 
-export function loadVocabSettings(): VocabSettings {
-  try {
-    const raw = localStorage.getItem(KEY);
-    if (!raw) return { ...DEFAULTS };
-    const parsed = JSON.parse(raw) as Partial<VocabSettings>;
-    return {
-      newWordsPerDay:
-        typeof parsed.newWordsPerDay === "number"
-          ? clamp(parsed.newWordsPerDay, NEW_WORDS_PER_DAY_MIN, NEW_WORDS_PER_DAY_MAX)
-          : DEFAULTS.newWordsPerDay,
-      contextsPerCard:
-        typeof parsed.contextsPerCard === "number"
-          ? clamp(parsed.contextsPerCard, CONTEXTS_PER_CARD_MIN, CONTEXTS_PER_CARD_MAX)
-          : DEFAULTS.contextsPerCard,
-      order: parsed.order === "added" ? "added" : "random",
-      generateAudio:
-        typeof parsed.generateAudio === "boolean" ? parsed.generateAudio : DEFAULTS.generateAudio,
-      autoplayAudio:
-        typeof parsed.autoplayAudio === "boolean" ? parsed.autoplayAudio : DEFAULTS.autoplayAudio,
-      showText: typeof parsed.showText === "boolean" ? parsed.showText : DEFAULTS.showText,
-    };
-  } catch {
-    return { ...DEFAULTS };
-  }
-}
-
-export function saveVocabSettings(settings: VocabSettings): void {
-  localStorage.setItem(KEY, JSON.stringify(settings));
-}
-
-const LEARN_SESSION_KEY = "vocab_learn_session";
-
 interface LearnSession {
   date: string;
   count: number;
@@ -70,35 +41,64 @@ function todayString(): string {
   return new Date().toISOString().slice(0, 10);
 }
 
-export function getLearnedTodayCount(): number {
-  try {
-    const raw = localStorage.getItem(LEARN_SESSION_KEY);
-    if (!raw) return 0;
-    const session = JSON.parse(raw) as LearnSession;
-    return session.date === todayString() ? session.count : 0;
-  } catch {
-    return 0;
-  }
+function normalize(raw: Partial<VocabSettings> | null | undefined): VocabSettings {
+  if (!raw) return { ...DEFAULTS };
+  return {
+    newWordsPerDay:
+      typeof raw.newWordsPerDay === `number`
+        ? clamp(raw.newWordsPerDay, NEW_WORDS_PER_DAY_MIN, NEW_WORDS_PER_DAY_MAX)
+        : DEFAULTS.newWordsPerDay,
+    contextsPerCard:
+      typeof raw.contextsPerCard === `number`
+        ? clamp(raw.contextsPerCard, CONTEXTS_PER_CARD_MIN, CONTEXTS_PER_CARD_MAX)
+        : DEFAULTS.contextsPerCard,
+    order: raw.order === `added` ? `added` : `random`,
+    generateAudio:
+      typeof raw.generateAudio === `boolean` ? raw.generateAudio : DEFAULTS.generateAudio,
+    autoplayAudio:
+      typeof raw.autoplayAudio === `boolean` ? raw.autoplayAudio : DEFAULTS.autoplayAudio,
+    showText: typeof raw.showText === `boolean` ? raw.showText : DEFAULTS.showText,
+  };
 }
 
-export function recordLearnedToday(count: number): void {
-  const current = getLearnedTodayCount();
-  localStorage.setItem(
-    LEARN_SESSION_KEY,
-    JSON.stringify({ date: todayString(), count: current + count }),
-  );
+export async function loadVocabSettings(): Promise<VocabSettings> {
+  const row = await db().kv.get(SETTINGS_KEY);
+  return normalize(row?.value as Partial<VocabSettings> | undefined);
 }
 
-export function shiftLearnSessionDate(days: number): void {
-  try {
-    const raw = localStorage.getItem(LEARN_SESSION_KEY);
-    if (!raw) return;
-    const session = JSON.parse(raw) as LearnSession;
-    const d = new Date(session.date);
-    d.setDate(d.getDate() - days);
-    session.date = d.toISOString().slice(0, 10);
-    localStorage.setItem(LEARN_SESSION_KEY, JSON.stringify(session));
-  } catch {
-    // ignore
-  }
+export async function saveVocabSettings(settings: VocabSettings): Promise<void> {
+  await db().kv.put({ key: SETTINGS_KEY, value: settings });
+}
+
+async function loadLearnSession(): Promise<LearnSession | null> {
+  const row = await db().kv.get(LEARN_SESSION_KEY);
+  if (!row) return null;
+  const s = row.value as Partial<LearnSession> | null;
+  if (!s || typeof s.date !== `string` || typeof s.count !== `number`) return null;
+  return { date: s.date, count: s.count };
+}
+
+export async function getLearnedTodayCount(): Promise<number> {
+  const session = await loadLearnSession();
+  if (!session) return 0;
+  return session.date === todayString() ? session.count : 0;
+}
+
+export async function recordLearnedToday(count: number): Promise<void> {
+  const current = await getLearnedTodayCount();
+  await db().kv.put({
+    key: LEARN_SESSION_KEY,
+    value: { date: todayString(), count: current + count },
+  });
+}
+
+export async function shiftLearnSessionDate(days: number): Promise<void> {
+  const session = await loadLearnSession();
+  if (!session) return;
+  const d = new Date(session.date);
+  d.setDate(d.getDate() - days);
+  await db().kv.put({
+    key: LEARN_SESSION_KEY,
+    value: { date: d.toISOString().slice(0, 10), count: session.count },
+  });
 }

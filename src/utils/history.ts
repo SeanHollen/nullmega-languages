@@ -4,6 +4,7 @@ import type { WritingExercise } from "../hooks/useGenerateWriting";
 import type { WritingGrade } from "../hooks/useGradeWriting";
 import type { PronunciationPhrase } from "../hooks/useGeneratePronunciation";
 import { pickClosest } from "./proximity";
+import { db } from "./db";
 
 export interface ReadingBody {
   exercise: Exercise;
@@ -53,93 +54,83 @@ export interface AssessmentRecord {
   body?: AssessmentBody;
 }
 
-const KEY = "assessment_history";
-const MAX_ENTRIES = 10000;
-
-function load(): AssessmentRecord[] {
-  try {
-    const raw = localStorage.getItem(KEY);
-    if (!raw) return [];
-    const arr = JSON.parse(raw) as AssessmentRecord[];
-    // Backfill createdAt for legacy records (added after this field existed).
-    for (const r of arr) {
-      if (typeof r.createdAt !== "number") {
-        r.createdAt = r.completedAt ?? 0;
-      }
-    }
-    return arr;
-  } catch {
-    return [];
-  }
-}
-
-function persist(records: AssessmentRecord[]): void {
-  const trimmed = records.slice(-MAX_ENTRIES);
-  localStorage.setItem(KEY, JSON.stringify(trimmed));
-}
-
 function genId(): string {
   return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
 }
 
-export function saveAssessment(
+export async function saveAssessment(
   rec: Omit<AssessmentRecord, "id" | "helpful" | "createdAt"> & { createdAt?: number },
-): string {
+): Promise<string> {
   const id = genId();
-  const records = load();
-  records.push({ ...rec, id, helpful: null, createdAt: rec.createdAt ?? Date.now() });
-  persist(records);
+  const record: AssessmentRecord = {
+    ...rec,
+    id,
+    helpful: null,
+    createdAt: rec.createdAt ?? Date.now(),
+  };
+  await db().assessments.put(record);
   return id;
 }
 
-export function updateAssessment(id: string, patch: Partial<AssessmentRecord>): void {
-  const records = load();
-  const idx = records.findIndex((r) => r.id === id);
-  if (idx === -1) return;
-  records[idx] = { ...records[idx], ...patch };
-  persist(records);
+export async function updateAssessment(
+  id: string,
+  patch: Partial<AssessmentRecord>,
+): Promise<void> {
+  const existing = await db().assessments.get(id);
+  if (!existing) return;
+  await db().assessments.put({ ...existing, ...patch });
 }
 
-export function getAssessment(id: string): AssessmentRecord | null {
-  return load().find((r) => r.id === id) ?? null;
+export async function getAssessment(id: string): Promise<AssessmentRecord | null> {
+  const row = await db().assessments.get(id);
+  return row ?? null;
 }
 
-export function updateFeedback(id: string, helpful: boolean): void {
-  updateAssessment(id, { helpful });
+export async function updateFeedback(id: string, helpful: boolean): Promise<void> {
+  await updateAssessment(id, { helpful });
 }
 
 function sameDay(a: number, b: number): boolean {
   const da = new Date(a);
-  const db = new Date(b);
+  const db_ = new Date(b);
   return (
-    da.getFullYear() === db.getFullYear() &&
-    da.getMonth() === db.getMonth() &&
-    da.getDate() === db.getDate()
+    da.getFullYear() === db_.getFullYear() &&
+    da.getMonth() === db_.getMonth() &&
+    da.getDate() === db_.getDate()
   );
 }
 
-export function getCompletedToday(mode: Mode): number {
+export async function getCompletedToday(mode: Mode): Promise<number> {
   const now = Date.now();
-  return load().filter(
-    (r) => r.mode === mode && typeof r.completedAt === "number" && sameDay(r.completedAt, now),
-  ).length;
+  const records = await db()
+    .assessments.where(`[mode+language]`)
+    .between([mode, ``], [mode, `￿`])
+    .toArray();
+  return records.filter((r) => typeof r.completedAt === `number` && sameDay(r.completedAt, now))
+    .length;
 }
 
-export function getHistory(mode: Mode, language: string): AssessmentRecord[] {
-  return load()
-    .filter((r) => r.mode === mode && r.language === language)
-    .sort((a, b) => (b.completedAt ?? b.createdAt) - (a.completedAt ?? a.createdAt));
+export async function getHistory(mode: Mode, language: string): Promise<AssessmentRecord[]> {
+  const records = await db()
+    .assessments.where(`[mode+language]`)
+    .equals([mode, language])
+    .toArray();
+  return records.sort((a, b) => (b.completedAt ?? b.createdAt) - (a.completedAt ?? a.createdAt));
 }
 
-export function getTitlesByComplexity(
+export async function getTitlesByComplexity(
   mode: Mode,
   language: string,
   languageComplexity: number,
   limit: number,
-): string[] {
-  const eligible = load()
-    .filter((r) => r.mode === mode && r.language === language)
-    .filter((r) => typeof r.title === "string" && r.title.length > 0 && r.title !== "Untitled");
+): Promise<string[]> {
+  const records = await db()
+    .assessments.where(`[mode+language]`)
+    .equals([mode, language])
+    .toArray();
+  const eligible = records.filter(
+    (r) => typeof r.title === `string` && r.title.length > 0 && r.title !== `Untitled`,
+  );
   return pickClosest(eligible, (r) => r.difficulty, languageComplexity, limit).map((r) => r.title);
 }
 

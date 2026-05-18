@@ -1,9 +1,11 @@
-const KEY = "user_id";
+import { db } from "./db";
 
-export function getUserId(): string {
-  const existing = localStorage.getItem(KEY);
-  if (existing) return existing;
+const KEY = `user_id`;
+
+export async function getUserId(): Promise<string> {
+  const row = await db().kv.get(KEY);
+  if (typeof row?.value === `string` && row.value.length > 0) return row.value;
   const id = crypto.randomUUID();
-  localStorage.setItem(KEY, id);
+  await db().kv.put({ key: KEY, value: id });
   return id;
 }

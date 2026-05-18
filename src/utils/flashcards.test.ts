@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { IDBFactory } from "fake-indexeddb";
+import Dexie from "dexie";
 import {
   addFlashcard,
   computeStatus,
@@ -40,109 +40,108 @@ const settings: VocabSettings = {
   showText: true,
 };
 
-beforeEach(() => {
-  localStorage.clear();
-  (globalThis as Record<string, unknown>).indexedDB = new IDBFactory();
+beforeEach(async () => {
+  await Dexie.delete(`language-lab`);
 });
 
 describe("addFlashcard", () => {
-  it("creates a card with status 'new'", () => {
-    const card = addFlashcard("Spanish", "hola", "hello");
+  it("creates a card with status 'new'", async () => {
+    const card = await addFlashcard("Spanish", "hola", "hello");
     expect(card).not.toBeNull();
     expect(card!.status).toBe("new");
     expect(card!.lastReviewed).toBeNull();
     expect(card!.currentInterval).toBe(0);
   });
 
-  it("returns null for a duplicate source (case-insensitive)", () => {
-    addFlashcard("Spanish", "hola", "hello");
-    expect(addFlashcard("Spanish", "HOLA", "hello")).toBeNull();
+  it("returns null for a duplicate source (case-insensitive)", async () => {
+    await addFlashcard("Spanish", "hola", "hello");
+    expect(await addFlashcard("Spanish", "HOLA", "hello")).toBeNull();
   });
 });
 
 describe("computeStatus", () => {
-  it("returns 'new' for a card with status 'new'", () => {
-    const card = addFlashcard("Spanish", "hola", "hello")!;
+  it("returns 'new' for a card with status 'new'", async () => {
+    const card = (await addFlashcard("Spanish", "hola", "hello"))!;
     expect(computeStatus(card)).toBe("new");
   });
 
-  it("returns 'learning' for a card with status 'learning'", () => {
-    const card = addFlashcard("Spanish", "hola", "hello")!;
-    patchFlashcard(card.id, { status: "learning" });
-    const [updated] = loadFlashcards("Spanish");
+  it("returns 'learning' for a card with status 'learning'", async () => {
+    const card = (await addFlashcard("Spanish", "hola", "hello"))!;
+    await patchFlashcard(card.id, { status: "learning" });
+    const [updated] = await loadFlashcards("Spanish");
     expect(computeStatus(updated)).toBe("learning");
   });
 
-  it("returns 'scheduled' for a card with a future interval", () => {
-    const card = addFlashcard("Spanish", "hola", "hello")!;
-    patchFlashcard(card.id, {
+  it("returns 'scheduled' for a card with a future interval", async () => {
+    const card = (await addFlashcard("Spanish", "hola", "hello"))!;
+    await patchFlashcard(card.id, {
       status: "scheduled",
       lastReviewed: Date.now(),
       currentInterval: 7 * DAY,
     });
-    const [updated] = loadFlashcards("Spanish");
+    const [updated] = await loadFlashcards("Spanish");
     expect(computeStatus(updated)).toBe("scheduled");
   });
 
-  it("returns 'due' for a scheduled card past its interval", () => {
-    const card = addFlashcard("Spanish", "hola", "hello")!;
-    patchFlashcard(card.id, {
+  it("returns 'due' for a scheduled card past its interval", async () => {
+    const card = (await addFlashcard("Spanish", "hola", "hello"))!;
+    await patchFlashcard(card.id, {
       status: "scheduled",
       lastReviewed: Date.now() - 2 * DAY,
       currentInterval: INITIAL_INTERVAL,
     });
-    const [updated] = loadFlashcards("Spanish");
+    const [updated] = await loadFlashcards("Spanish");
     expect(computeStatus(updated)).toBe("due");
   });
 
-  it("returns 'dropped' for a dropped card", () => {
-    const card = addFlashcard("Spanish", "hola", "hello")!;
-    patchFlashcard(card.id, { status: "dropped" });
-    const [updated] = loadFlashcards("Spanish");
+  it("returns 'dropped' for a dropped card", async () => {
+    const card = (await addFlashcard("Spanish", "hola", "hello"))!;
+    await patchFlashcard(card.id, { status: "dropped" });
+    const [updated] = await loadFlashcards("Spanish");
     expect(computeStatus(updated)).toBe("dropped");
   });
 
-  it("returns 'relearning' for a learning card with relearningStartedAt set", () => {
-    const card = addFlashcard("Spanish", "hola", "hello")!;
-    patchFlashcard(card.id, {
+  it("returns 'relearning' for a learning card with relearningStartedAt set", async () => {
+    const card = (await addFlashcard("Spanish", "hola", "hello"))!;
+    await patchFlashcard(card.id, {
       status: "learning",
       relearningStartedAt: Date.now(),
     });
-    const [updated] = loadFlashcards("Spanish");
+    const [updated] = await loadFlashcards("Spanish");
     expect(computeStatus(updated)).toBe("relearning");
   });
 
-  it("returns 'learning' (not relearning) when relearningStartedAt is null", () => {
-    const card = addFlashcard("Spanish", "hola", "hello")!;
-    patchFlashcard(card.id, { status: "learning", relearningStartedAt: null });
-    const [updated] = loadFlashcards("Spanish");
+  it("returns 'learning' (not relearning) when relearningStartedAt is null", async () => {
+    const card = (await addFlashcard("Spanish", "hola", "hello"))!;
+    await patchFlashcard(card.id, { status: "learning", relearningStartedAt: null });
+    const [updated] = await loadFlashcards("Spanish");
     expect(computeStatus(updated)).toBe("learning");
   });
 });
 
 describe("generateContextsFor", () => {
   it("generates contexts and stores them", async () => {
-    const card = addFlashcard("Spanish", "hola", "hello")!;
+    const card = (await addFlashcard("Spanish", "hola", "hello"))!;
     await generateContextsFor(card, settings);
 
-    const [updated] = loadFlashcards("Spanish");
+    const [updated] = await loadFlashcards("Spanish");
     expect(updated.contexts.length).toBeGreaterThan(0);
     expect(updated.dateContextGenerated).not.toBeNull();
   });
 
   it("skips TTS and leaves audioKey null when generateAudio is false", async () => {
-    const card = addFlashcard("Spanish", "hola", "hello")!;
+    const card = (await addFlashcard("Spanish", "hola", "hello"))!;
     await generateContextsFor(card, { ...settings, generateAudio: false });
 
-    const [updated] = loadFlashcards("Spanish");
+    const [updated] = await loadFlashcards("Spanish");
     expect(updated.contexts.every((c) => c.audioKey === null)).toBe(true);
   });
 
   it("stores audio keys when generateAudio is true", async () => {
-    const card = addFlashcard("Spanish", "hola", "hello")!;
+    const card = (await addFlashcard("Spanish", "hola", "hello"))!;
     await generateContextsFor(card, settings);
 
-    const [updated] = loadFlashcards("Spanish");
+    const [updated] = await loadFlashcards("Spanish");
     expect(updated.contexts.every((c) => c.audioKey !== null)).toBe(true);
   });
 
@@ -161,7 +160,7 @@ describe("generateContextsFor", () => {
         },
       ],
     });
-    const card = addFlashcard("Spanish", "esconder", "to hide")!;
+    const card = (await addFlashcard("Spanish", "esconder", "to hide"))!;
     await generateContextsFor(card, settings);
 
     expect(callTTS).toHaveBeenCalled();
@@ -170,7 +169,7 @@ describe("generateContextsFor", () => {
     expect(ttsInput).toBe("El gato se esconde aquí");
 
     // The stored context still keeps the ** so the UI can render bold
-    const [updated] = loadFlashcards("Spanish");
+    const [updated] = await loadFlashcards("Spanish");
     expect(updated.contexts[0].source).toBe("El gato **se esconde** aquí");
   });
 });
@@ -178,8 +177,8 @@ describe("generateContextsFor", () => {
 describe("addMissingAudioFor", () => {
   it("strips ** markers from text before sending to TTS", async () => {
     vi.mocked(callTTS).mockClear();
-    const card = addFlashcard("Spanish", "esconder", "to hide")!;
-    updateFlashcardContexts(
+    const card = (await addFlashcard("Spanish", "esconder", "to hide"))!;
+    await updateFlashcardContexts(
       card.id,
       [
         {
@@ -190,7 +189,7 @@ describe("addMissingAudioFor", () => {
       ],
       Date.now(),
     );
-    const [stored] = loadFlashcards("Spanish");
+    const [stored] = await loadFlashcards("Spanish");
 
     await addMissingAudioFor(stored, settings);
 
@@ -202,55 +201,56 @@ describe("addMissingAudioFor", () => {
 });
 
 describe("pickNextContext", () => {
-  function withContexts(cursor: number | undefined, n: number) {
-    const card = addFlashcard("Spanish", `w${Math.random()}`, "x")!;
+  async function withContexts(cursor: number | undefined, n: number) {
+    const card = (await addFlashcard("Spanish", `w${Math.random()}`, "x"))!;
     const ctxs = Array.from({ length: n }, (_, i) => ({
       source: `s${i}`,
       translation: `t${i}`,
       audioKey: null,
     }));
-    updateFlashcardContexts(card.id, ctxs, Date.now());
-    if (cursor !== undefined) patchFlashcard(card.id, { contextCursor: cursor });
-    return loadFlashcards("Spanish").find((c) => c.id === card.id)!;
+    await updateFlashcardContexts(card.id, ctxs, Date.now());
+    if (cursor !== undefined) await patchFlashcard(card.id, { contextCursor: cursor });
+    const all = await loadFlashcards("Spanish");
+    return all.find((c) => c.id === card.id)!;
   }
 
-  it("returns 0 when contextCursor is undefined (brand-new card)", () => {
-    expect(pickNextContext(withContexts(undefined, 3))).toBe(0);
+  it("returns 0 when contextCursor is undefined (brand-new card)", async () => {
+    expect(await pickNextContext(await withContexts(undefined, 3))).toBe(0);
   });
 
-  it("returns the stored cursor when within bounds", () => {
-    expect(pickNextContext(withContexts(1, 3))).toBe(1);
-    expect(pickNextContext(withContexts(2, 3))).toBe(2);
+  it("returns the stored cursor when within bounds", async () => {
+    expect(await pickNextContext(await withContexts(1, 3))).toBe(1);
+    expect(await pickNextContext(await withContexts(2, 3))).toBe(2);
   });
 
-  it("wraps via modulo when the stored cursor exceeds contexts length (e.g. after regen)", () => {
-    expect(pickNextContext(withContexts(5, 3))).toBe(2);
+  it("wraps via modulo when the stored cursor exceeds contexts length (e.g. after regen)", async () => {
+    expect(await pickNextContext(await withContexts(5, 3))).toBe(2);
   });
 
-  it("returns 0 safely when the card has no contexts", () => {
-    expect(pickNextContext(withContexts(undefined, 0))).toBe(0);
+  it("returns 0 safely when the card has no contexts", async () => {
+    expect(await pickNextContext(await withContexts(undefined, 0))).toBe(0);
   });
 
-  it("cycles through distinct indices on consecutive calls with the same in-memory card", () => {
-    const card = withContexts(undefined, 3);
-    expect(pickNextContext(card)).toBe(0);
-    expect(pickNextContext(card)).toBe(1);
-    expect(pickNextContext(card)).toBe(2);
-    expect(pickNextContext(card)).toBe(0);
+  it("cycles through distinct indices on consecutive calls with the same in-memory card", async () => {
+    const card = await withContexts(undefined, 3);
+    expect(await pickNextContext(card)).toBe(0);
+    expect(await pickNextContext(card)).toBe(1);
+    expect(await pickNextContext(card)).toBe(2);
+    expect(await pickNextContext(card)).toBe(0);
   });
 });
 
 describe("updateFlashcardContexts", () => {
-  it("replaces contexts and updates dateContextGenerated", () => {
-    const card = addFlashcard("Spanish", "hola", "hello")!;
+  it("replaces contexts and updates dateContextGenerated", async () => {
+    const card = (await addFlashcard("Spanish", "hola", "hello"))!;
     const now = Date.now();
-    updateFlashcardContexts(
+    await updateFlashcardContexts(
       card.id,
       [{ source: "Hola mundo", translation: "Hello world", audioKey: null }],
       now,
     );
 
-    const [updated] = loadFlashcards("Spanish");
+    const [updated] = await loadFlashcards("Spanish");
     expect(updated.contexts).toHaveLength(1);
     expect(updated.contexts[0].source).toBe("Hola mundo");
     expect(updated.dateContextGenerated).toBe(now);

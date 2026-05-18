@@ -108,6 +108,20 @@ export function ResultsView({
             {exercise.translation}
           </p>
         </div>
+        {exercise.difficultWords.length > 0 && (
+          <div className="border-t border-green-100 pt-4">
+            <p className="text-xs text-gray-400 uppercase tracking-wide mb-2">{`Vocabulary`}</p>
+            <div className="flex flex-wrap gap-x-4 gap-y-1">
+              {exercise.difficultWords.map((w, i) => (
+                <span key={i} className="text-sm text-gray-500">
+                  <span className="text-gray-700">{w.source}</span>
+                  {` — `}
+                  {w.translation}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
         {exercise.insight && (
           <div className="border-t border-green-100 pt-4">
             <p className="text-xs text-gray-400 uppercase tracking-wide mb-2">{`Language Note`}</p>

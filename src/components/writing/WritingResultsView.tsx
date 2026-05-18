@@ -81,6 +81,41 @@ export function WritingResultsView({
         )}
       </div>
 
+      <div className="bg-white rounded-2xl border border-green-100 shadow-sm p-8 space-y-4">
+        <p className="text-xs text-gray-400 uppercase tracking-wide">{`Passage`}</p>
+        <p className="text-gray-800 leading-relaxed whitespace-pre-wrap">
+          <ClickableText text={exercise.passage} language={language} />
+        </p>
+        {exercise.translation && (
+          <div className="border-t border-green-100 pt-4">
+            <p className="text-xs text-gray-400 uppercase tracking-wide mb-2">{`English Translation`}</p>
+            <p className="text-gray-500 leading-relaxed italic text-sm whitespace-pre-wrap">
+              {exercise.translation}
+            </p>
+          </div>
+        )}
+        {exercise.insight && (
+          <div className="border-t border-green-100 pt-4">
+            <p className="text-xs text-gray-400 uppercase tracking-wide mb-2">{`Language Note`}</p>
+            <p className="text-gray-600 text-sm leading-relaxed">{exercise.insight}</p>
+          </div>
+        )}
+        {exercise.difficultWords.length > 0 && (
+          <div className="border-t border-green-100 pt-4">
+            <p className="text-xs text-gray-400 uppercase tracking-wide mb-2">{`Vocabulary`}</p>
+            <div className="flex flex-wrap gap-x-4 gap-y-1">
+              {exercise.difficultWords.map((w, i) => (
+                <span key={i} className="text-sm text-gray-500">
+                  <span className="text-gray-700">{w.source}</span>
+                  {` — `}
+                  {w.translation}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
       <div className="space-y-4">
         {exercise.questions.map((q, i) => {
           const grade = grades[i];

@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa";
 import { SetupView } from "../components/reading/SetupView";
 import { WritingPassageView } from "../components/writing/WritingPassageView";
 import { WritingResultsView } from "../components/writing/WritingResultsView";
-import { HistoryList } from "../components/HistoryList";
+import { HistoryList, type ResumeState } from "../components/HistoryList";
+import type { WritingBody } from "../utils/history";
 import type { WritingExercise } from "../hooks/useGenerateWriting";
 import { useGenerateWriting } from "../hooks/useGenerateWriting";
 import type { WritingGrade } from "../hooks/useGradeWriting";
@@ -13,7 +14,7 @@ import type { RatingResult } from "../hooks/useAbility";
 import { loadAbility, computeRating, DEFAULT_LANGUAGE_COMPLEXITY } from "../hooks/useAbility";
 import { useLanguage } from "../contexts/LanguageContext";
 import { useLoading } from "../contexts/LoadingContext";
-import { saveAssessment } from "../utils/history";
+import { saveAssessment, updateAssessment } from "../utils/history";
 import { uploadAssessment } from "../utils/api";
 import { getUserId } from "../utils/user";
 
@@ -21,32 +22,72 @@ type Phase = "setup" | "writing" | "results";
 
 export function WritingPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { language } = useLanguage();
+  const resume =
+    (location.state as ResumeState | null)?.record?.mode === `writing`
+      ? (location.state as ResumeState)
+      : null;
+  const resumeBody = resume ? (resume.record.body as WritingBody | undefined) : undefined;
   const [languageComplexity, setLanguageComplexity] = useState(
-    () => loadAbility(language, `writing`) ?? DEFAULT_LANGUAGE_COMPLEXITY.writing,
+    () =>
+      resume?.record.difficulty ??
+      loadAbility(language, `writing`) ??
+      DEFAULT_LANGUAGE_COMPLEXITY.writing,
   );
   const [rated, setRated] = useState(true);
-  const [phase, setPhase] = useState<Phase>(`setup`);
-  const [exercise, setExercise] = useState<WritingExercise | null>(null);
-  const [answers, setAnswers] = useState<string[]>([]);
+  const [phase, setPhase] = useState<Phase>(() => (resumeBody ? `writing` : `setup`));
+  const [exercise, setExercise] = useState<WritingExercise | null>(
+    () => resumeBody?.exercise ?? null,
+  );
+  const [answers, setAnswers] = useState<string[]>(() => resumeBody?.answers ?? []);
   const [grades, setGrades] = useState<WritingGrade[]>([]);
   const [ratingResult, setRatingResult] = useState<RatingResult | null>(null);
-  const [assessmentId, setAssessmentId] = useState<string | null>(null);
+  const [assessmentId, setAssessmentId] = useState<string | null>(() => resume?.record.id ?? null);
   const generateWriting = useGenerateWriting();
   const gradeWriting = useGradeWriting();
   const { beginLoading } = useLoading();
+  const [activeResumeId, setActiveResumeId] = useState<string | null>(resume?.record.id ?? null);
+
+  const incomingResumeId = resume?.record.id ?? null;
+  if (incomingResumeId !== activeResumeId) {
+    setActiveResumeId(incomingResumeId);
+    if (resume && resumeBody) {
+      setExercise(resumeBody.exercise);
+      setAnswers(resumeBody.answers);
+      setAssessmentId(resume.record.id);
+      setPhase(`writing`);
+      setLanguageComplexity(resume.record.difficulty);
+      setGrades([]);
+      setRatingResult(null);
+    }
+  }
 
   function handleGenerate() {
-    const done = beginLoading();
+    const task = beginLoading(`Generating writing exercise…`);
     generateWriting.mutate(
       { language, languageComplexity },
       {
         onSuccess: (data: WritingExercise) => {
+          const initialAnswers = Array.from({ length: data.questions.length }, () => "");
+          const id = saveAssessment({
+            mode: `writing`,
+            language,
+            title: data.title,
+            difficulty: languageComplexity,
+            scoreEarned: 0,
+            scoreMax: data.questions.length * 5,
+            ratingBefore: null,
+            ratingAfter: null,
+            completedAt: null,
+            body: { exercise: data, answers: initialAnswers, grades: [] },
+          });
+          setAssessmentId(id);
           setExercise(data);
-          setAnswers(Array.from({ length: data.questions.length }, () => ""));
+          setAnswers(initialAnswers);
           setPhase(`writing`);
         },
-        onSettled: done,
+        onSettled: () => task.done(),
       },
     );
   }
@@ -70,12 +111,12 @@ export function WritingPage() {
   }
 
   function handleSubmit() {
-    if (!exercise) return;
-    const done = beginLoading();
+    if (!exercise || !assessmentId) return;
+    const task = beginLoading(`Grading your answers…`);
     gradeWriting.mutate(
       { exercise, answers, language, languageComplexity },
       {
-        onSettled: done,
+        onSettled: () => task.done(),
         onSuccess: (result) => {
           setGrades(result.grades);
           const totalScore = result.grades.reduce((sum, g) => sum + g.score, 0);
@@ -86,19 +127,14 @@ export function WritingPage() {
           }
           setRatingResult(rr);
           const completedAt = Date.now();
-          const localId = saveAssessment({
-            mode: `writing`,
-            language,
-            title: exercise.title,
-            difficulty: languageComplexity,
+          updateAssessment(assessmentId, {
             scoreEarned: totalScore,
             scoreMax: maxScore,
             ratingBefore: rr?.oldRating ?? null,
             ratingAfter: rr?.newRating ?? null,
             completedAt,
+            body: { exercise, answers, grades: result.grades },
           });
-          const id = exercise.id ?? localId;
-          setAssessmentId(id);
           if (exercise.id) {
             uploadAssessment({
               id: exercise.id,

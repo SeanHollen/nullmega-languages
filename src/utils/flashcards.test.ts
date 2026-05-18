@@ -9,7 +9,8 @@ import {
   pickNextContext,
 } from "./flashcards";
 import { DAY, INITIAL_INTERVAL } from "./studySession";
-import { generateContextsFor } from "./contextOrchestrator";
+import { generateContextsFor, addMissingAudioFor } from "./contextOrchestrator";
+import { callTTS, callContexts } from "./api";
 import type { VocabSettings } from "./vocabSettings";
 
 vi.mock("./api", () => ({
@@ -143,6 +144,60 @@ describe("generateContextsFor", () => {
 
     const [updated] = loadFlashcards("Spanish");
     expect(updated.contexts.every((c) => c.audioKey !== null)).toBe(true);
+  });
+
+  it("strips ** markers from text before sending to TTS", async () => {
+    vi.mocked(callTTS).mockClear();
+    vi.mocked(callContexts).mockResolvedValueOnce({
+      choices: [
+        {
+          message: {
+            content: JSON.stringify({
+              contexts: [
+                { source: "El gato **se esconde** aquí", translation: "The cat hides here" },
+              ],
+            }),
+          },
+        },
+      ],
+    });
+    const card = addFlashcard("Spanish", "esconder", "to hide")!;
+    await generateContextsFor(card, settings);
+
+    expect(callTTS).toHaveBeenCalled();
+    const ttsInput = vi.mocked(callTTS).mock.calls[0][0].input;
+    expect(ttsInput).not.toContain("**");
+    expect(ttsInput).toBe("El gato se esconde aquí");
+
+    // The stored context still keeps the ** so the UI can render bold
+    const [updated] = loadFlashcards("Spanish");
+    expect(updated.contexts[0].source).toBe("El gato **se esconde** aquí");
+  });
+});
+
+describe("addMissingAudioFor", () => {
+  it("strips ** markers from text before sending to TTS", async () => {
+    vi.mocked(callTTS).mockClear();
+    const card = addFlashcard("Spanish", "esconder", "to hide")!;
+    updateFlashcardContexts(
+      card.id,
+      [
+        {
+          source: "El gato **se esconde** aquí",
+          translation: "The cat hides here",
+          audioKey: null,
+        },
+      ],
+      Date.now(),
+    );
+    const [stored] = loadFlashcards("Spanish");
+
+    await addMissingAudioFor(stored, settings);
+
+    expect(callTTS).toHaveBeenCalledTimes(1);
+    const ttsInput = vi.mocked(callTTS).mock.calls[0][0].input;
+    expect(ttsInput).not.toContain("**");
+    expect(ttsInput).toBe("El gato se esconde aquí");
   });
 });
 

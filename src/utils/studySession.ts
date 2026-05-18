@@ -110,6 +110,27 @@ export function computeAnswerPatch(
   };
 }
 
+// Pure computation: returns the patch for removing a single context from a card.
+// When the removed context is the last one, also clears dateContextGenerated so the
+// card will regenerate fresh contexts the next time it is studied.
+export function computeRemoveContextPatch(
+  card: Flashcard,
+  contextIndex: number,
+): { patch: Partial<Flashcard>; removedAudioKey: string | null } {
+  const removed = card.contexts[contextIndex] ?? null;
+  const newContexts = card.contexts.filter((_, i) => i !== contextIndex);
+  if (newContexts.length === 0) {
+    return {
+      patch: { contexts: [], dateContextGenerated: null },
+      removedAudioKey: removed?.audioKey ?? null,
+    };
+  }
+  return {
+    patch: { contexts: newContexts },
+    removedAudioKey: removed?.audioKey ?? null,
+  };
+}
+
 function pickInitial(
   cards: Flashcard[],
   mode: "learn" | "review",

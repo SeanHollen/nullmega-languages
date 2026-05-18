@@ -103,7 +103,9 @@ export function StatsPage() {
   const color = MODE_COLORS[mode];
   const label = MODE_LABELS[mode];
 
-  const history = getHistory(mode, language);
+  const history = getHistory(mode, language).filter(
+    (r): r is typeof r & { completedAt: number } => typeof r.completedAt === "number",
+  );
 
   const points: Point[] = history
     .filter((r) => typeof r.ratingAfter === `number`)

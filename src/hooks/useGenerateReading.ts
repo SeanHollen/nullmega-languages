@@ -1,38 +1,9 @@
 import { useMutation } from "@tanstack/react-query";
 import type { Exercise } from "../types";
-import difficultyLevels from "../data/difficulty-levels.json";
 import { callChat } from "../utils/api";
 import { getUserId } from "../utils/user";
 import { getTitlesByComplexity } from "../utils/history";
-
-interface ExampleRef {
-  passage: string;
-  question?: { question: string; options: string[]; answer: number };
-}
-
-interface LevelRef {
-  description: string;
-  examples: ExampleRef[];
-}
-
-const levels = difficultyLevels as Record<string, LevelRef>;
-
-function refBlock(level: number, label: string): string {
-  const r = levels[String(level)];
-  if (!r) return "";
-  const exampleLines = r.examples
-    .map((e, i) => {
-      const letter = String.fromCharCode(65 + i);
-      const qLine = e.question
-        ? `\n  Question ${letter}: "${e.question.question}" — correct answer: "${e.question.options[e.question.answer ?? 0]}"`
-        : "";
-      return `  Example ${letter}: "${e.passage}"${qLine}`;
-    })
-    .join("\n");
-  return `${label} (level ${level}):
-  Description: ${r.description}
-${exampleLines}`;
-}
+import { referenceBlocks } from "../utils/levelReferences";
 
 function passageLengthGuide(languageComplexity: number): string {
   if (languageComplexity <= 15)
@@ -48,15 +19,8 @@ async function fetchExercise(
   languageComplexity: number,
   mode: "reading" | "listening",
 ): Promise<Exercise> {
-  const lo = Math.max(1, languageComplexity - 1);
-  const hi = Math.min(100, languageComplexity + 1);
-
   const referenceBlock = `Difficulty references (based on English examples — these illustrate the difficulty gradient, not the topic):
-${refBlock(lo, "One level easier")}
-
-${refBlock(languageComplexity, "Target level")}
-
-${refBlock(hi, "One level harder")}
+${referenceBlocks(languageComplexity, { includeQuestion: true })}
 
 Match the difficulty of the target level. The topic and content of your passage should be chosen independently — do not anchor on the topics in the examples above.`;
 
@@ -108,7 +72,7 @@ DIFFICULT WORDS — what to include and what to exclude:
 - Scale the list to the difficulty level: at low levels, even a few genuinely opaque words count; at high levels, include subtler vocabulary like register-specific or idiomatic terms
 
 QUESTION QUALITY:
-Before finalising each question, apply this test: "Could someone answer this correctly by searching for the question's key noun or verb in the passage and picking the option whose words appear nearby?" If yes, rewrite it. Specifically:
+Before writing each question, apply this test: "Could someone answer this correctly by searching for the question's key noun or verb in the passage and picking the option whose words appear nearby?" If yes, rewrite it. Specifically:
 - Use paraphrase and synonyms in questions and answer choices rather than lifting phrases verbatim from the passage
 - Require inference, logical conclusion, understanding of word meaning in context, or recognition of tone/intent — not just recall
 - Wrong options must be plausible: either true statements from the passage that don't actually answer the question, or near-correct conclusions that fail on a subtle point

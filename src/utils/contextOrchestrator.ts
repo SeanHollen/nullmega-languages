@@ -11,6 +11,12 @@ function pickVoice(): string {
   return VOICES[Math.floor(Math.random() * VOICES.length)];
 }
 
+// ** markers are stored on the source text so the UI can render the target word in bold,
+// but they would be read aloud as "asterisk asterisk" by TTS — strip them in transit only.
+function stripBold(text: string): string {
+  return text.split("**").join("");
+}
+
 function audioKey(cardId: string, contextIndex: number): string {
   return `flashcard-${cardId}-ctx-${contextIndex}`;
 }
@@ -24,7 +30,7 @@ export async function addMissingAudioFor(card: Flashcard, settings: VocabSetting
     card.contexts.map(async (ctx, i) => {
       if (ctx.audioKey) return ctx;
       try {
-        const blob = await callTTS({ model: `tts-1`, voice, input: ctx.source });
+        const blob = await callTTS({ model: `tts-1`, voice, input: stripBold(ctx.source) });
         const key = audioKey(card.id, i);
         await saveAudio(key, blob);
         return { ...ctx, audioKey: key };
@@ -53,7 +59,7 @@ export async function generateContextsFor(card: Flashcard, settings: VocabSettin
       let key: string | null = null;
       if (settings.generateAudio) {
         try {
-          const blob = await callTTS({ model: "tts-1", voice, input: g.source });
+          const blob = await callTTS({ model: "tts-1", voice, input: stripBold(g.source) });
           key = audioKey(card.id, i);
           await saveAudio(key, blob);
         } catch {

@@ -34,26 +34,26 @@ export function VocabularyPage() {
 
   async function handleStartLearn() {
     setLearnError(null);
-    const done = beginLoading();
+    const task = beginLoading(`Preparing learn session…`);
     try {
       const data = await prepareLearnSession(language, settings);
       if (data) void navigate(`/vocabulary/learn`, { state: data });
     } catch (err) {
       setLearnError(String(err));
     }
-    done();
+    task.done();
   }
 
   async function handleStartReview() {
     setReviewError(null);
-    const done = beginLoading();
+    const task = beginLoading(`Preparing review session…`);
     try {
       const data = await prepareReviewSession(language, settings);
       if (data) void navigate(`/vocabulary/review`, { state: data });
     } catch (err) {
       setReviewError(String(err));
     }
-    done();
+    task.done();
   }
 
   const availableNewCount = Math.max(

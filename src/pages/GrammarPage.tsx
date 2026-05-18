@@ -53,26 +53,26 @@ export function GrammarPage() {
 
   async function handleLearn() {
     setLearnError(null);
-    const done = beginLoading();
+    const task = beginLoading(`Generating grammar cards…`);
     try {
       const data = await prepareGrammarLearnSession(language, settings);
       if (data) void navigate(`/grammar/learn`, { state: data });
     } catch (err) {
       setLearnError(String(err));
     }
-    done();
+    task.done();
   }
 
   async function handleReview() {
     setReviewError(null);
-    const done = beginLoading();
+    const task = beginLoading(`Preparing grammar review…`);
     try {
       const data = await prepareGrammarReviewSession(language);
       if (data) void navigate(`/grammar/review`, { state: data });
     } catch (err) {
       setReviewError(String(err));
     }
-    done();
+    task.done();
   }
 
   function handlePlayCard(card: GrammarCard) {

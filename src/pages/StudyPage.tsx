@@ -5,11 +5,16 @@ import type { Flashcard } from "../utils/flashcards";
 import { patchFlashcard, computeStatus, pickNextContext } from "../utils/flashcards";
 import type { VocabSettings } from "../utils/vocabSettings";
 import { loadVocabSettings } from "../utils/vocabSettings";
-import { loadAudio } from "../utils/audioStore";
+import { loadAudio, deleteAudio } from "../utils/audioStore";
 import { AudioPlayer } from "../components/listening/AudioPlayer";
 import { BoldWord } from "../components/BoldWord";
 import type { StudySessionData } from "../utils/studySession";
-import { easyInterval, pickNextCard, computeAnswerPatch } from "../utils/studySession";
+import {
+  easyInterval,
+  pickNextCard,
+  computeAnswerPatch,
+  computeRemoveContextPatch,
+} from "../utils/studySession";
 
 type StudyMode = "learn" | "review";
 
@@ -125,6 +130,23 @@ export function StudyPage() {
     advanceCard();
   }
 
+  function handleRemoveContext() {
+    if (!current || !ctx) return;
+    cancelAudio.current();
+    setMenuOpen(false);
+    const { patch, removedAudioKey } = computeRemoveContextPatch(current, contextIndex);
+    if (removedAudioKey) void deleteAudio(removedAudioKey);
+    patchFlashcard(current.id, patch);
+    if ((patch.contexts ?? []).length === 0) {
+      advanceCard();
+      return;
+    }
+    const updatedCard = { ...current, ...patch };
+    setRemaining((rs) => rs.map((c) => (c.id === current.id ? updatedCard : c)));
+    setCurrent(updatedCard);
+    showCard(updatedCard);
+  }
+
   const ctx = current && current.contexts[contextIndex];
   const title = mode === "learn" ? `Learn new words` : `Review`;
 
@@ -208,13 +230,13 @@ export function StudyPage() {
                 <div className="flex gap-3">
                   <button
                     onClick={() => handleAnswer(false)}
-                    className="flex-1 border-2 border-gray-400 bg-white text-gray-700 py-3 rounded-xl font-semibold hover:bg-gray-100 transition cursor-pointer"
+                    className="flex-1 border-2 border-red-200 bg-red-50 text-gray-700 py-3 rounded-xl font-semibold hover:bg-red-100 transition cursor-pointer"
                   >
                     {`Wrong`}
                   </button>
                   <button
                     onClick={() => handleAnswer(true)}
-                    className="flex-1 border-2 border-gray-400 bg-white text-gray-700 py-3 rounded-xl font-semibold hover:bg-gray-100 transition cursor-pointer"
+                    className="flex-1 border-2 border-blue-200 bg-blue-50 text-gray-700 py-3 rounded-xl font-semibold hover:bg-blue-100 transition cursor-pointer"
                   >
                     {`Right`}
                   </button>
@@ -229,7 +251,7 @@ export function StudyPage() {
                       <FaEllipsisV />
                     </button>
                     {menuOpen && (
-                      <div className="absolute right-0 bottom-full mb-2 bg-white rounded-xl shadow-lg border border-gray-100 py-1 z-20 min-w-[130px]">
+                      <div className="absolute right-0 bottom-full mb-2 bg-white rounded-xl shadow-lg border border-gray-100 py-1 z-20 min-w-[180px]">
                         <button
                           onClick={handleEasy}
                           className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-800 cursor-pointer"
@@ -241,6 +263,12 @@ export function StudyPage() {
                           className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-700 cursor-pointer"
                         >
                           {`Suspend`}
+                        </button>
+                        <button
+                          onClick={handleRemoveContext}
+                          className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-700 cursor-pointer"
+                        >
+                          {`Remove this context`}
                         </button>
                       </div>
                     )}

@@ -1,7 +1,7 @@
 import { useLoading } from "../contexts/LoadingContext";
 
 export function LoadingOverlay() {
-  const { isLoading } = useLoading();
+  const { isLoading, messages } = useLoading();
   if (!isLoading) return null;
 
   return (
@@ -17,19 +17,30 @@ export function LoadingOverlay() {
           50% { transform: translateY(-40px); animation-timing-function: cubic-bezier(0, 0, 0.5, 1); }
         }
       `}</style>
-      <div className="flex gap-4">
-        <span
-          className="w-6 h-6 bg-green-500 rounded-full shadow-lg"
-          style={{ animation: `bigBounce 700ms infinite`, animationDelay: `0ms` }}
-        />
-        <span
-          className="w-6 h-6 bg-green-500 rounded-full shadow-lg"
-          style={{ animation: `bigBounce 700ms infinite`, animationDelay: `120ms` }}
-        />
-        <span
-          className="w-6 h-6 bg-green-500 rounded-full shadow-lg"
-          style={{ animation: `bigBounce 700ms infinite`, animationDelay: `240ms` }}
-        />
+      <div className="flex flex-col items-center gap-6">
+        <div className="flex gap-4">
+          <span
+            className="w-6 h-6 bg-green-500 rounded-full shadow-lg"
+            style={{ animation: `bigBounce 700ms infinite`, animationDelay: `0ms` }}
+          />
+          <span
+            className="w-6 h-6 bg-green-500 rounded-full shadow-lg"
+            style={{ animation: `bigBounce 700ms infinite`, animationDelay: `120ms` }}
+          />
+          <span
+            className="w-6 h-6 bg-green-500 rounded-full shadow-lg"
+            style={{ animation: `bigBounce 700ms infinite`, animationDelay: `240ms` }}
+          />
+        </div>
+        {messages.length > 0 && (
+          <div className="flex flex-col items-center gap-1 px-4 py-2 bg-white/80 rounded-lg shadow">
+            {messages.map((m, i) => (
+              <p key={i} className="text-sm text-gray-700">
+                {m}
+              </p>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

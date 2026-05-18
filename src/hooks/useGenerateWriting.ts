@@ -1,15 +1,8 @@
 import { useMutation } from "@tanstack/react-query";
-import difficultyLevels from "../data/difficulty-levels.json";
 import { callChat } from "../utils/api";
 import { getUserId } from "../utils/user";
 import { getTitlesByComplexity } from "../utils/history";
-
-interface LevelRef {
-  description: string;
-  examples: { passage: string }[];
-}
-
-const levels = difficultyLevels as Record<string, LevelRef>;
+import { referenceBlocks } from "../utils/levelReferences";
 
 export interface WritingQuestion {
   question: string;
@@ -26,15 +19,6 @@ export interface WritingExercise {
   difficultWords: { source: string; translation: string }[];
   insight?: string;
   questions: WritingQuestion[];
-}
-
-function refBlock(level: number, label: string): string {
-  const r = levels[String(level)];
-  if (!r) return "";
-  const exampleLines = r.examples
-    .map((e, i) => `  Example ${String.fromCharCode(65 + i)}: "${e.passage}"`)
-    .join("\n");
-  return `${label} (level ${level}):\n  Description: ${r.description}\n${exampleLines}`;
 }
 
 function passageLengthGuide(languageComplexity: number): string {
@@ -68,16 +52,10 @@ async function fetchWritingExercise(
   language: string,
   languageComplexity: number,
 ): Promise<WritingExercise> {
-  const lo = Math.max(1, languageComplexity - 1);
-  const hi = Math.min(100, languageComplexity + 1);
   const { min, max } = essayWordCounts(languageComplexity);
 
   const referenceBlock = `Difficulty references (these illustrate the difficulty gradient, not the topic):
-${refBlock(lo, "One level easier")}
-
-${refBlock(languageComplexity, "Target level")}
-
-${refBlock(hi, "One level harder")}
+${referenceBlocks(languageComplexity)}
 
 Match the difficulty of the target level. Choose your own topic independently.`;
 

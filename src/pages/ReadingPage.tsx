@@ -1,49 +1,88 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa";
 import { SetupView } from "../components/reading/SetupView";
 import { PassageView } from "../components/reading/PassageView";
 import type { Translations } from "../components/reading/ResultsView";
 import { ResultsView } from "../components/reading/ResultsView";
-import { HistoryList } from "../components/HistoryList";
+import { HistoryList, type ResumeState } from "../components/HistoryList";
+import type { ReadingBody } from "../utils/history";
 import { useGenerateReading } from "../hooks/useGenerateReading";
 import { translateBatch } from "../hooks/useTranslate";
 import type { RatingResult } from "../hooks/useAbility";
 import { loadAbility, computeRating, DEFAULT_LANGUAGE_COMPLEXITY } from "../hooks/useAbility";
 import { useLanguage } from "../contexts/LanguageContext";
 import { useLoading } from "../contexts/LoadingContext";
-import { saveAssessment } from "../utils/history";
+import { saveAssessment, updateAssessment } from "../utils/history";
 import { uploadAssessment } from "../utils/api";
 import { getUserId } from "../utils/user";
 import type { Exercise, Phase } from "../types";
 
 export function ReadingPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { language } = useLanguage();
+  const resume =
+    (location.state as ResumeState | null)?.record?.mode === `reading`
+      ? (location.state as ResumeState)
+      : null;
+  const resumeBody = resume ? (resume.record.body as ReadingBody | undefined) : undefined;
   const [languageComplexity, setLanguageComplexity] = useState(
-    () => loadAbility(language) ?? DEFAULT_LANGUAGE_COMPLEXITY.reading,
+    () => resume?.record.difficulty ?? loadAbility(language) ?? DEFAULT_LANGUAGE_COMPLEXITY.reading,
   );
   const [rated, setRated] = useState(true);
-  const [phase, setPhase] = useState<Phase>(`setup`);
-  const [exercise, setExercise] = useState<Exercise | null>(null);
-  const [selected, setSelected] = useState<(number | null)[]>([]);
+  const [phase, setPhase] = useState<Phase>(() => (resumeBody ? `reading` : `setup`));
+  const [exercise, setExercise] = useState<Exercise | null>(() => resumeBody?.exercise ?? null);
+  const [selected, setSelected] = useState<(number | null)[]>(() => resumeBody?.selected ?? []);
   const [ratingResult, setRatingResult] = useState<RatingResult | null>(null);
-  const [assessmentId, setAssessmentId] = useState<string | null>(null);
+  const [assessmentId, setAssessmentId] = useState<string | null>(() => resume?.record.id ?? null);
   const [translations, setTranslations] = useState<Translations | null>(null);
   const { mutate, error } = useGenerateReading();
   const { beginLoading } = useLoading();
+  const [activeResumeId, setActiveResumeId] = useState<string | null>(resume?.record.id ?? null);
+
+  const incomingResumeId = resume?.record.id ?? null;
+  if (incomingResumeId !== activeResumeId) {
+    setActiveResumeId(incomingResumeId);
+    if (resume && resumeBody) {
+      setExercise(resumeBody.exercise);
+      setSelected(resumeBody.selected);
+      setAssessmentId(resume.record.id);
+      setPhase(`reading`);
+      setLanguageComplexity(resume.record.difficulty);
+      setRatingResult(null);
+      setTranslations(null);
+    }
+  }
 
   function handleGenerate() {
-    const done = beginLoading();
+    const task = beginLoading(`Generating reading exercise…`);
     mutate(
       { language, languageComplexity },
       {
         onSuccess: (data: Exercise) => {
+          const initialSelected = Array.from(
+            { length: data.questions.length },
+            () => null as number | null,
+          );
+          const id = saveAssessment({
+            mode: `reading`,
+            language,
+            title: data.title,
+            difficulty: languageComplexity,
+            scoreEarned: 0,
+            scoreMax: data.questions.length,
+            ratingBefore: null,
+            ratingAfter: null,
+            completedAt: null,
+            body: { exercise: data, selected: initialSelected },
+          });
+          setAssessmentId(id);
           setExercise(data);
-          setSelected(Array.from({ length: data.questions.length }, () => null));
+          setSelected(initialSelected);
           setPhase(`reading`);
         },
-        onSettled: done,
+        onSettled: () => task.done(),
       },
     );
   }
@@ -57,7 +96,7 @@ export function ReadingPage() {
   }
 
   function handleSubmit() {
-    if (!exercise) return;
+    if (!exercise || !assessmentId) return;
     const correct = selected.filter((s, i) => s === exercise.questions[i].correct).length;
     const total = exercise.questions.length;
     let rr: RatingResult | null = null;
@@ -66,19 +105,14 @@ export function ReadingPage() {
     }
     setRatingResult(rr);
     const completedAt = Date.now();
-    const localId = saveAssessment({
-      mode: `reading`,
-      language,
-      title: exercise.title,
-      difficulty: languageComplexity,
+    updateAssessment(assessmentId, {
       scoreEarned: correct,
       scoreMax: total,
       ratingBefore: rr?.oldRating ?? null,
       ratingAfter: rr?.newRating ?? null,
       completedAt,
+      body: { exercise, selected },
     });
-    const id = exercise.id ?? localId;
-    setAssessmentId(id);
     if (exercise.id) {
       uploadAssessment({
         id: exercise.id,

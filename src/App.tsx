@@ -12,6 +12,7 @@ import { WritingPage } from "./pages/WritingPage";
 import { SettingsPage } from "./pages/SettingsPage";
 import { GoalsPage } from "./pages/GoalsPage";
 import { StatsPage } from "./pages/StatsPage";
+import { HistoryViewPage } from "./pages/HistoryViewPage";
 import { VocabularyPage } from "./pages/VocabularyPage";
 import { VocabularyStatsPage } from "./pages/VocabularyStatsPage";
 import { StudyPage } from "./pages/StudyPage";
@@ -38,6 +39,7 @@ export function App() {
               <Route path="/settings" element={<SettingsPage />} />
               <Route path="/goals" element={<GoalsPage />} />
               <Route path="/stats/:mode" element={<StatsPage />} />
+              <Route path="/history/:id" element={<HistoryViewPage />} />
               <Route path="/vocabulary" element={<VocabularyPage />} />
               <Route path="/vocabulary/stats" element={<VocabularyStatsPage />} />
               <Route path="/vocabulary/:mode" element={<StudyPage />} />

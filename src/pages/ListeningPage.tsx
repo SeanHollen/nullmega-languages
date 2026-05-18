@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa";
 import { SetupView } from "../components/reading/SetupView";
 import { ListeningPassageView } from "../components/listening/ListeningPassageView";
 import type { Translations } from "../components/reading/ResultsView";
 import { ResultsView } from "../components/reading/ResultsView";
-import { HistoryList } from "../components/HistoryList";
+import { HistoryList, type ResumeState } from "../components/HistoryList";
+import type { ListeningBody } from "../utils/history";
 import { useGenerateReading } from "../hooks/useGenerateReading";
 import { translateBatch } from "../hooks/useTranslate";
 import type { RatingResult } from "../hooks/useAbility";
@@ -14,7 +15,7 @@ import type { ExerciseAudio } from "../hooks/useTTS";
 import { generateExerciseAudio } from "../hooks/useTTS";
 import { useLanguage } from "../contexts/LanguageContext";
 import { useLoading } from "../contexts/LoadingContext";
-import { saveAssessment } from "../utils/history";
+import { saveAssessment, updateAssessment } from "../utils/history";
 import { uploadAssessment } from "../utils/api";
 import { getUserId } from "../utils/user";
 import type { Exercise } from "../types";
@@ -23,43 +24,111 @@ type Phase = "setup" | "listening" | "results";
 
 export function ListeningPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { language } = useLanguage();
+  const resume =
+    (location.state as ResumeState | null)?.record?.mode === `listening`
+      ? (location.state as ResumeState)
+      : null;
+  const resumeBody = resume ? (resume.record.body as ListeningBody | undefined) : undefined;
   const [languageComplexity, setLanguageComplexity] = useState(
-    () => loadAbility(language, `listening`) ?? DEFAULT_LANGUAGE_COMPLEXITY.listening,
+    () =>
+      resume?.record.difficulty ??
+      loadAbility(language, `listening`) ??
+      DEFAULT_LANGUAGE_COMPLEXITY.listening,
   );
   const [rated, setRated] = useState(true);
-  const [phase, setPhase] = useState<Phase>(`setup`);
-  const [exercise, setExercise] = useState<Exercise | null>(null);
-  const [audio, setAudio] = useState<ExerciseAudio | null>(null);
-  const [selected, setSelected] = useState<(number | null)[]>([]);
+  const [phase, setPhase] = useState<Phase>(() => (resumeBody ? `listening` : `setup`));
+  const [exercise, setExercise] = useState<Exercise | null>(() => resumeBody?.exercise ?? null);
+  const [audio, setAudio] = useState<ExerciseAudio | null>(() =>
+    resume?.listeningAudio
+      ? {
+          passageUrl: resume.listeningAudio.passageUrl ?? "",
+          questionUrls: resume.listeningAudio.questionUrls.map((u) => u ?? ""),
+        }
+      : null,
+  );
+  const [selected, setSelected] = useState<(number | null)[]>(() => resumeBody?.selected ?? []);
   const [ratingResult, setRatingResult] = useState<RatingResult | null>(null);
-  const [assessmentId, setAssessmentId] = useState<string | null>(null);
+  const [assessmentId, setAssessmentId] = useState<string | null>(() => resume?.record.id ?? null);
   const [translations, setTranslations] = useState<Translations | null>(null);
   const [audioError, setAudioError] = useState(``);
   const { mutate, error: genError } = useGenerateReading();
   const { beginLoading } = useLoading();
+  const [activeResumeId, setActiveResumeId] = useState<string | null>(resume?.record.id ?? null);
+
+  const incomingResumeId = resume?.record.id ?? null;
+  if (incomingResumeId !== activeResumeId) {
+    setActiveResumeId(incomingResumeId);
+    if (resume && resumeBody) {
+      setExercise(resumeBody.exercise);
+      setSelected(resumeBody.selected);
+      setAssessmentId(resume.record.id);
+      setPhase(`listening`);
+      setLanguageComplexity(resume.record.difficulty);
+      setRatingResult(null);
+      setTranslations(null);
+      setAudioError(``);
+      if (resume.listeningAudio) {
+        setAudio({
+          passageUrl: resume.listeningAudio.passageUrl ?? ``,
+          questionUrls: resume.listeningAudio.questionUrls.map((u) => u ?? ``),
+        });
+      }
+    }
+  }
 
   function handleGenerate() {
     setAudioError(``);
-    const done = beginLoading();
+    const task = beginLoading(`Generating listening passage…`);
     mutate(
       { language, languageComplexity, mode: `listening` },
       {
         onSuccess: (data: Exercise) => {
+          const initialSelected = Array.from(
+            { length: data.questions.length },
+            () => null as number | null,
+          );
+          const id = saveAssessment({
+            mode: `listening`,
+            language,
+            title: data.title,
+            difficulty: languageComplexity,
+            scoreEarned: 0,
+            scoreMax: data.questions.length,
+            ratingBefore: null,
+            ratingAfter: null,
+            completedAt: null,
+          });
+          const audioKeyPassage = `assessment-${id}-passage`;
+          const audioKeyQuestions = data.questions.map((_, i) => `assessment-${id}-q-${i}`);
+          setAssessmentId(id);
           setExercise(data);
-          setSelected(Array.from({ length: data.questions.length }, () => null));
+          setSelected(initialSelected);
+          task.update(`Generating audio…`);
           void (async () => {
             try {
-              const exerciseAudio = await generateExerciseAudio(data);
+              const exerciseAudio = await generateExerciseAudio(data, {
+                passage: audioKeyPassage,
+                questions: audioKeyQuestions,
+              });
               setAudio(exerciseAudio);
+              updateAssessment(id, {
+                body: {
+                  exercise: data,
+                  selected: initialSelected,
+                  audioKeyPassage,
+                  audioKeyQuestions,
+                },
+              });
               setPhase(`listening`);
             } catch {
               setAudioError(`Failed to generate audio. Please try again.`);
             }
-            done();
+            task.done();
           })();
         },
-        onError: () => done(),
+        onError: () => task.done(),
       },
     );
   }
@@ -73,7 +142,7 @@ export function ListeningPage() {
   }
 
   function handleSubmit() {
-    if (!exercise) return;
+    if (!exercise || !assessmentId) return;
     const correct = selected.filter((s, i) => s === exercise.questions[i].correct).length;
     const total = exercise.questions.length;
     let rr: RatingResult | null = null;
@@ -82,19 +151,19 @@ export function ListeningPage() {
     }
     setRatingResult(rr);
     const completedAt = Date.now();
-    const localId = saveAssessment({
-      mode: `listening`,
-      language,
-      title: exercise.title,
-      difficulty: languageComplexity,
+    updateAssessment(assessmentId, {
       scoreEarned: correct,
       scoreMax: total,
       ratingBefore: rr?.oldRating ?? null,
       ratingAfter: rr?.newRating ?? null,
       completedAt,
+      body: {
+        exercise,
+        selected,
+        audioKeyPassage: `assessment-${assessmentId}-passage`,
+        audioKeyQuestions: exercise.questions.map((_, i) => `assessment-${assessmentId}-q-${i}`),
+      },
     });
-    const id = exercise.id ?? localId;
-    setAssessmentId(id);
     if (exercise.id) {
       uploadAssessment({
         id: exercise.id,

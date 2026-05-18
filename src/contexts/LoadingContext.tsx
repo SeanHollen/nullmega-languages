@@ -1,32 +1,46 @@
 import type { ReactNode } from "react";
 import { createContext, useContext, useMemo, useState } from "react";
 
+export interface LoadingTask {
+  update: (message: string) => void;
+  done: () => void;
+}
+
 interface LoadingCtx {
   isLoading: boolean;
-  // Begins a loading task. Returns a "finish" callback to call when done.
-  // Multiple concurrent tasks stack; the overlay shows while any are active.
-  beginLoading: () => () => void;
+  messages: string[];
+  beginLoading: (message?: string) => LoadingTask;
 }
 
 const Ctx = createContext<LoadingCtx | null>(null);
 
+let nextTaskId = 0;
+
 export function LoadingProvider({ children }: { children: ReactNode }) {
-  const [count, setCount] = useState(0);
+  const [tasks, setTasks] = useState<{ id: number; message: string }[]>([]);
 
   const value = useMemo<LoadingCtx>(
     () => ({
-      isLoading: count > 0,
-      beginLoading: () => {
-        setCount((c) => c + 1);
+      isLoading: tasks.length > 0,
+      messages: tasks.map((t) => t.message).filter((m) => m.length > 0),
+      beginLoading: (message = "") => {
+        const id = nextTaskId++;
+        setTasks((prev) => [...prev, { id, message }]);
         let released = false;
-        return () => {
-          if (released) return;
-          released = true;
-          setCount((c) => Math.max(0, c - 1));
+        return {
+          update: (newMessage: string) => {
+            if (released) return;
+            setTasks((prev) => prev.map((t) => (t.id === id ? { ...t, message: newMessage } : t)));
+          },
+          done: () => {
+            if (released) return;
+            released = true;
+            setTasks((prev) => prev.filter((t) => t.id !== id));
+          },
         };
       },
     }),
-    [count],
+    [tasks],
   );
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;

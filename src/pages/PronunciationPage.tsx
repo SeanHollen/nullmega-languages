@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa";
 import { SetupView } from "../components/reading/SetupView";
 import { PronunciationExerciseView } from "../components/pronunciation/PronunciationExerciseView";
 import { PronunciationResultsView } from "../components/pronunciation/PronunciationResultsView";
-import { HistoryList } from "../components/HistoryList";
+import { HistoryList, type ResumeState } from "../components/HistoryList";
+import type { PronunciationBody } from "../utils/history";
 import type { PronunciationExercise } from "../hooks/useGeneratePronunciation";
 import { useGeneratePronunciation } from "../hooks/useGeneratePronunciation";
 import type { RatingResult } from "../hooks/useAbility";
@@ -12,7 +13,7 @@ import { loadAbility, computeRating, DEFAULT_LANGUAGE_COMPLEXITY } from "../hook
 import { generatePhrasesAudio } from "../hooks/useTTS";
 import { useLanguage } from "../contexts/LanguageContext";
 import { useLoading } from "../contexts/LoadingContext";
-import { saveAssessment } from "../utils/history";
+import { saveAssessment, updateAssessment } from "../utils/history";
 import { uploadAssessment } from "../utils/api";
 import { getUserId } from "../utils/user";
 
@@ -20,42 +21,102 @@ type Phase = "setup" | "exercise" | "results";
 
 export function PronunciationPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { language } = useLanguage();
+  const resume =
+    (location.state as ResumeState | null)?.record?.mode === `pronunciation`
+      ? (location.state as ResumeState)
+      : null;
+  const resumeBody = resume ? (resume.record.body as PronunciationBody | undefined) : undefined;
+  const resumeExercise: PronunciationExercise | null = resumeBody
+    ? { title: resumeBody.title, phrases: resumeBody.phrases }
+    : null;
   const [languageComplexity, setLanguageComplexity] = useState(
-    () => loadAbility(language, `pronunciation`) ?? DEFAULT_LANGUAGE_COMPLEXITY.pronunciation,
+    () =>
+      resume?.record.difficulty ??
+      loadAbility(language, `pronunciation`) ??
+      DEFAULT_LANGUAGE_COMPLEXITY.pronunciation,
   );
   const [rated, setRated] = useState(true);
-  const [phase, setPhase] = useState<Phase>(`setup`);
-  const [exercise, setExercise] = useState<PronunciationExercise | null>(null);
-  const [audioUrls, setAudioUrls] = useState<string[]>([]);
-  const [ratings, setRatings] = useState<("good" | "medium" | "bad" | null)[]>([]);
+  const [phase, setPhase] = useState<Phase>(() => (resumeBody ? `exercise` : `setup`));
+  const [exercise, setExercise] = useState<PronunciationExercise | null>(() => resumeExercise);
+  const [audioUrls, setAudioUrls] = useState<string[]>(
+    () => resume?.pronunciationAudioUrls?.map((u) => u ?? ``) ?? [],
+  );
+  const [ratings, setRatings] = useState<("good" | "medium" | "bad" | null)[]>(
+    () => resumeBody?.ratings ?? [],
+  );
   const [ratingResult, setRatingResult] = useState<RatingResult | null>(null);
-  const [assessmentId, setAssessmentId] = useState<string | null>(null);
+  const [assessmentId, setAssessmentId] = useState<string | null>(() => resume?.record.id ?? null);
+  const [activeResumeId, setActiveResumeId] = useState<string | null>(resume?.record.id ?? null);
+
+  const incomingResumeId = resume?.record.id ?? null;
+  if (incomingResumeId !== activeResumeId) {
+    setActiveResumeId(incomingResumeId);
+    if (resume && resumeBody && resumeExercise) {
+      setExercise(resumeExercise);
+      setRatings(resumeBody.ratings);
+      setAssessmentId(resume.record.id);
+      setPhase(`exercise`);
+      setLanguageComplexity(resume.record.difficulty);
+      setRatingResult(null);
+      setAudioUrls(resume.pronunciationAudioUrls?.map((u) => u ?? ``) ?? []);
+    }
+  }
   const [audioError, setAudioError] = useState(``);
   const { mutate, error: genError } = useGeneratePronunciation();
   const { beginLoading } = useLoading();
 
   function handleGenerate() {
     setAudioError(``);
-    const done = beginLoading();
+    const task = beginLoading(`Generating phrases…`);
     mutate(
       { language, languageComplexity },
       {
         onSuccess: (data: PronunciationExercise) => {
+          const initialRatings = Array.from(
+            { length: data.phrases.length },
+            () => null as "good" | "medium" | "bad" | null,
+          );
+          const id = saveAssessment({
+            mode: `pronunciation`,
+            language,
+            title: data.title,
+            difficulty: languageComplexity,
+            scoreEarned: 0,
+            scoreMax: data.phrases.length,
+            ratingBefore: null,
+            ratingAfter: null,
+            completedAt: null,
+          });
+          const audioKeys = data.phrases.map((_, i) => `assessment-${id}-phrase-${i}`);
+          setAssessmentId(id);
           setExercise(data);
-          setRatings(Array.from({ length: data.phrases.length }, () => null));
+          setRatings(initialRatings);
+          task.update(`Generating audio…`);
           void (async () => {
             try {
-              const urls = await generatePhrasesAudio(data.phrases.map((p) => p.phrase));
+              const urls = await generatePhrasesAudio(
+                data.phrases.map((p) => p.phrase),
+                audioKeys,
+              );
               setAudioUrls(urls);
+              updateAssessment(id, {
+                body: {
+                  title: data.title,
+                  phrases: data.phrases,
+                  audioKeys,
+                  ratings: initialRatings,
+                },
+              });
               setPhase(`exercise`);
             } catch {
               setAudioError(`Failed to generate audio. Please try again.`);
             }
-            done();
+            task.done();
           })();
         },
-        onError: () => done(),
+        onError: () => task.done(),
       },
     );
   }
@@ -69,7 +130,7 @@ export function PronunciationPage() {
   }
 
   function handleSubmit() {
-    if (!exercise) return;
+    if (!exercise || !assessmentId) return;
     const goodCount = ratings.filter((r) => r === "good").length;
     const mediumCount = ratings.filter((r) => r === "medium").length;
     const weighted = goodCount + 0.75 * mediumCount;
@@ -80,19 +141,19 @@ export function PronunciationPage() {
     }
     setRatingResult(rr);
     const completedAt = Date.now();
-    const localId = saveAssessment({
-      mode: `pronunciation`,
-      language,
-      title: exercise.title,
-      difficulty: languageComplexity,
+    updateAssessment(assessmentId, {
       scoreEarned: weighted,
       scoreMax: total,
       ratingBefore: rr?.oldRating ?? null,
       ratingAfter: rr?.newRating ?? null,
       completedAt,
+      body: {
+        title: exercise.title,
+        phrases: exercise.phrases,
+        audioKeys: exercise.phrases.map((_, i) => `assessment-${assessmentId}-phrase-${i}`),
+        ratings,
+      },
     });
-    const id = exercise.id ?? localId;
-    setAssessmentId(id);
     if (exercise.id) {
       uploadAssessment({
         id: exercise.id,

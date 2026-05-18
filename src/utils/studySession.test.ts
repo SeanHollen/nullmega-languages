@@ -1,6 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { IDBFactory } from "fake-indexeddb";
-import { prepareReviewSession, pickNextCard, computeAnswerPatch } from "./studySession";
+import {
+  prepareReviewSession,
+  pickNextCard,
+  computeAnswerPatch,
+  computeRemoveContextPatch,
+} from "./studySession";
 import type { VocabSettings } from "./vocabSettings";
 import { callTTS } from "./api";
 import type { Flashcard } from "./flashcards";
@@ -138,6 +143,56 @@ describe("computeAnswerPatch", () => {
     expect(patch.status).toBe("learning");
     expect(patch.relearningStartedAt).toBe(1000);
     expect(`contexts` in patch).toBe(false);
+  });
+});
+
+describe("computeRemoveContextPatch", () => {
+  function cardWith(contexts: { source: string; audioKey: string | null }[]): Flashcard {
+    return {
+      ...makeCard("c1", null),
+      contexts: contexts.map((c) => ({
+        source: c.source,
+        translation: "tr",
+        audioKey: c.audioKey,
+      })),
+      dateContextGenerated: 100,
+    };
+  }
+
+  it("returns the contexts array with the target index removed", () => {
+    const card = cardWith([
+      { source: "a", audioKey: null },
+      { source: "b", audioKey: null },
+      { source: "c", audioKey: null },
+    ]);
+    const { patch } = computeRemoveContextPatch(card, 1);
+    expect(patch.contexts).toEqual([
+      { source: "a", translation: "tr", audioKey: null },
+      { source: "c", translation: "tr", audioKey: null },
+    ]);
+    expect(`dateContextGenerated` in patch).toBe(false);
+  });
+
+  it("clears dateContextGenerated when the removed context was the last one", () => {
+    const card = cardWith([{ source: "only", audioKey: null }]);
+    const { patch } = computeRemoveContextPatch(card, 0);
+    expect(patch.contexts).toEqual([]);
+    expect(patch.dateContextGenerated).toBeNull();
+  });
+
+  it("surfaces the removed context's audioKey so the caller can clean up the blob", () => {
+    const card = cardWith([
+      { source: "a", audioKey: "audio-a" },
+      { source: "b", audioKey: "audio-b" },
+    ]);
+    const { removedAudioKey } = computeRemoveContextPatch(card, 0);
+    expect(removedAudioKey).toBe("audio-a");
+  });
+
+  it("returns a null audioKey when the removed context had no audio", () => {
+    const card = cardWith([{ source: "a", audioKey: null }]);
+    const { removedAudioKey } = computeRemoveContextPatch(card, 0);
+    expect(removedAudioKey).toBeNull();
   });
 });
 

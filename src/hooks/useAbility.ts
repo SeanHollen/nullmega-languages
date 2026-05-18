@@ -50,11 +50,16 @@ function loadConfidence(language: string, mode: Mode): ConfidenceState {
       // fall through to bootstrap
     }
   }
-  const history = getHistory(mode, language);
-  if (history.length === 0) return { value: 0, updatedAt: 0 };
+  const completed = getHistory(mode, language).filter(
+    (r): r is typeof r & { completedAt: number } => typeof r.completedAt === "number",
+  );
+  if (completed.length === 0) return { value: 0, updatedAt: 0 };
   const now = Date.now();
-  const value = history.reduce((sum, rec) => sum + Math.exp(-(now - rec.completedAt) / TAU_MS), 0);
-  const updatedAt = history.reduce((max, rec) => Math.max(max, rec.completedAt), 0);
+  const value = completed.reduce(
+    (sum, rec) => sum + Math.exp(-(now - rec.completedAt) / TAU_MS),
+    0,
+  );
+  const updatedAt = completed.reduce((max, rec) => Math.max(max, rec.completedAt), 0);
   return { value, updatedAt };
 }
 

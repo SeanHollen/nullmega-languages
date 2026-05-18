@@ -16,6 +16,7 @@ import { loadGoals } from "../utils/goals";
 import { loadFlashcards, computeStatus } from "../utils/flashcards";
 import { loadVocabSettings, getLearnedTodayCount } from "../utils/vocabSettings";
 import { loadGrammarCards, computeGrammarStatus } from "../utils/grammarCards";
+import { recordToday, loadStreaks, computeCurrentStreak } from "../utils/streaks";
 
 interface ModeConfig {
   label: string;
@@ -46,10 +47,66 @@ const MODES: ModeConfig[] = [
   { label: `Grammar`, Icon: FaGraduationCap, href: `/grammar`, mode: null, kind: `grammar` },
 ];
 
+interface ModeState {
+  hasObligation: boolean;
+  met: boolean;
+}
+
+function computeDayState(language: string): { hadObligations: boolean; complete: boolean } {
+  const goals = loadGoals();
+  const states: ModeState[] = [];
+
+  for (const m of MODES) {
+    if (m.kind === `exercise` && m.mode) {
+      const goal = goals[m.mode];
+      if (goal > 0) {
+        states.push({ hasObligation: true, met: getCompletedToday(m.mode) >= goal });
+      }
+    } else if (m.kind === `vocab`) {
+      const cards = loadFlashcards(language);
+      if (cards.length > 0) {
+        const settings = loadVocabSettings();
+        const due = cards.filter((c) => computeStatus(c) === `due`).length;
+        const learning = cards.filter((c) => {
+          const s = computeStatus(c);
+          return s === `learning` || s === `relearning`;
+        }).length;
+        const availableNew = Math.max(
+          0,
+          Math.min(
+            cards.filter((c) => computeStatus(c) === `new`).length,
+            settings.newWordsPerDay - getLearnedTodayCount(),
+          ),
+        );
+        const studyCount = due + learning + availableNew;
+        states.push({ hasObligation: true, met: studyCount === 0 });
+      }
+    } else if (m.kind === `grammar`) {
+      const cards = loadGrammarCards(language);
+      if (cards.length > 0) {
+        const studyCount = cards.filter((c) => {
+          const s = computeGrammarStatus(c);
+          return s === `learning` || s === `due`;
+        }).length;
+        states.push({ hasObligation: true, met: studyCount === 0 });
+      }
+    }
+  }
+
+  const hadObligations = states.length > 0;
+  const complete = hadObligations && states.every((s) => s.met);
+  return { hadObligations, complete };
+}
+
 export function HomePage() {
   const navigate = useNavigate();
   const { language } = useLanguage();
   const goals = loadGoals();
+
+  // Visiting the home page records today's progress. Idempotent — safe to call every render.
+  const { hadObligations, complete } = computeDayState(language);
+  recordToday(complete, hadObligations);
+  const currentStreak = computeCurrentStreak(loadStreaks());
 
   return (
     <div className="min-h-screen bg-green-100 flex flex-col items-center px-4 pt-12">
@@ -57,12 +114,20 @@ export function HomePage() {
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-gray-900 mb-2">{`The Language Lab`}</h1>
           <p className="text-gray-500">{`Any language, any level`}</p>
-          <button
-            onClick={() => navigate(`/goals`)}
-            className="text-sm text-green-600 hover:text-green-700 font-medium mt-3 cursor-pointer"
-          >
-            {`Set daily goals →`}
-          </button>
+          <div className="flex items-center justify-center gap-4 mt-3">
+            <button
+              onClick={() => navigate(`/goals`)}
+              className="text-sm text-green-600 hover:text-green-700 font-medium cursor-pointer"
+            >
+              {`Set daily goals →`}
+            </button>
+            <button
+              onClick={() => navigate(`/streaks`)}
+              className="text-sm text-green-600 hover:text-green-700 font-medium cursor-pointer"
+            >
+              {`View streaks (${currentStreak}) →`}
+            </button>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 min-[420px]:grid-cols-2 gap-4">

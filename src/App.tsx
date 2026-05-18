@@ -11,6 +11,7 @@ import { PronunciationPage } from "./pages/PronunciationPage";
 import { WritingPage } from "./pages/WritingPage";
 import { SettingsPage } from "./pages/SettingsPage";
 import { GoalsPage } from "./pages/GoalsPage";
+import { StreaksPage } from "./pages/StreaksPage";
 import { StatsPage } from "./pages/StatsPage";
 import { HistoryViewPage } from "./pages/HistoryViewPage";
 import { VocabularyPage } from "./pages/VocabularyPage";
@@ -38,6 +39,7 @@ export function App() {
               <Route path="/writing" element={<WritingPage />} />
               <Route path="/settings" element={<SettingsPage />} />
               <Route path="/goals" element={<GoalsPage />} />
+              <Route path="/streaks" element={<StreaksPage />} />
               <Route path="/stats/:mode" element={<StatsPage />} />
               <Route path="/history/:id" element={<HistoryViewPage />} />
               <Route path="/vocabulary" element={<VocabularyPage />} />

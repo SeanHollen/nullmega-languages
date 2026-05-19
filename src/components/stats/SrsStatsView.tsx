@@ -2,10 +2,17 @@ import { useState } from "react";
 import { DAY } from "../../utils/studySession";
 import type { SrsCard } from "../../utils/srsForecast";
 import { forecastDueDays } from "../../utils/srsForecast";
+import type { ReviewEntry } from "../../utils/flashcards";
+import { aggregateOutcomesByInterval, formatIntervalLabel } from "../../utils/outcomesByInterval";
 
 export interface SrsCardWithStatus extends SrsCard {
   status: string;
+  addedAt: number;
+  // Optional because only Flashcards record review outcomes today; GrammarCards don't.
+  reviewHistory?: ReviewEntry[];
 }
+
+type AddedMode = "perDay" | "cumulative";
 
 const HORIZON_DAYS = 30;
 
@@ -71,6 +78,12 @@ export function SrsStatsView({ language, cards, emptyMessage }: Props) {
   const [now] = useState(() => Date.now());
   const [hoveredForecast, setHoveredForecast] = useState<number | null>(null);
   const [hoveredStatus, setHoveredStatus] = useState<number | null>(null);
+  const [hoveredAdded, setHoveredAdded] = useState<number | null>(null);
+  const [addedMode, setAddedMode] = useState<AddedMode>(`perDay`);
+  const [hoveredOutcome, setHoveredOutcome] = useState<{
+    bucket: number;
+    side: "correct" | "incorrect";
+  } | null>(null);
 
   const today = dayStart(now);
   const horizonMs = today + HORIZON_DAYS * DAY;
@@ -121,6 +134,56 @@ export function SrsStatsView({ language, cards, emptyMessage }: Props) {
 
   const totalCards = cards.length;
   const totalDueInWindow = forecastDays.reduce((s, d) => s + d.count, 0);
+
+  // ── Cards added over time ─────────────────────────────────────────────────
+  // Build a daily series from the earliest addedAt to today. perDay = count per
+  // day; cumulative = running total (burnup).
+  const addedByDay = new Map<number, number>();
+  for (const card of cards) {
+    const d = dayStart(card.addedAt);
+    addedByDay.set(d, (addedByDay.get(d) ?? 0) + 1);
+  }
+  const addedDayKeys = [...addedByDay.keys()];
+  const earliestAdded = addedDayKeys.length > 0 ? Math.min(...addedDayKeys) : today;
+  const addedSeries: { t: number; count: number; cumulative: number }[] = [];
+  let runningCumulative = 0;
+  for (let d = earliestAdded; d <= today; d += DAY) {
+    const count = addedByDay.get(d) ?? 0;
+    runningCumulative += count;
+    addedSeries.push({ t: d, count, cumulative: runningCumulative });
+  }
+  const addedHighValue =
+    addedMode === `perDay`
+      ? Math.max(1, ...addedSeries.map((d) => d.count))
+      : Math.max(1, runningCumulative);
+  const addedHigh = Math.max(5, Math.ceil(addedHighValue * 1.1));
+  const addedTicks = [0, Math.round(addedHigh / 2), addedHigh];
+  const addedBarSlot = addedSeries.length > 0 ? innerW / addedSeries.length : innerW;
+  function addedX(i: number): number {
+    return PAD_L + i * addedBarSlot + addedBarSlot / 2;
+  }
+  function addedY(value: number): number {
+    return PAD_T + innerH - (value / addedHigh) * innerH;
+  }
+
+  // ── Outcomes by interval ──────────────────────────────────────────────────
+  const outcomesByInterval = aggregateOutcomesByInterval(cards);
+  const totalOutcomes = outcomesByInterval.reduce((s, b) => s + b.correct + b.incorrect, 0);
+  const maxOutcomeCount = Math.max(
+    1,
+    ...outcomesByInterval.flatMap((b) => [b.correct, b.incorrect]),
+  );
+  const outcomeHigh = Math.max(5, Math.ceil(maxOutcomeCount * 1.1));
+  const outcomeTicks = [0, Math.round(outcomeHigh / 2), outcomeHigh];
+  const outcomeGroupSlot =
+    outcomesByInterval.length > 0 ? innerW / outcomesByInterval.length : innerW;
+  const outcomeBarW = Math.min(40, outcomeGroupSlot * 0.35);
+  function outcomeGroupX(i: number): number {
+    return PAD_L + i * outcomeGroupSlot + outcomeGroupSlot / 2;
+  }
+  function outcomeY(count: number): number {
+    return PAD_T + innerH - (count / outcomeHigh) * innerH;
+  }
 
   return (
     <>
@@ -347,6 +410,333 @@ export function SrsStatsView({ language, cards, emptyMessage }: Props) {
           </svg>
         )}
       </div>
+
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-4 mt-6">
+        <div className="flex items-baseline justify-between gap-4 flex-wrap">
+          <p className="text-sm text-gray-500">{`Cards added over time`}</p>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setAddedMode(`perDay`)}
+              className={`text-xs px-3 py-1 rounded-md transition cursor-pointer ${
+                addedMode === `perDay`
+                  ? `bg-green-100 text-green-700 font-medium`
+                  : `text-gray-500 hover:bg-gray-100`
+              }`}
+            >
+              {`Per day`}
+            </button>
+            <button
+              onClick={() => setAddedMode(`cumulative`)}
+              className={`text-xs px-3 py-1 rounded-md transition cursor-pointer ${
+                addedMode === `cumulative`
+                  ? `bg-green-100 text-green-700 font-medium`
+                  : `text-gray-500 hover:bg-gray-100`
+              }`}
+            >
+              {`Cumulative`}
+            </button>
+          </div>
+        </div>
+
+        {totalCards === 0 ? (
+          <p className="text-sm text-gray-400 italic py-8 text-center">{emptyMessage}</p>
+        ) : (
+          <svg
+            viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
+            className="w-full"
+            role="img"
+            aria-label="Cards added over time"
+          >
+            {addedTicks.map((tick) => (
+              <g key={tick}>
+                <line
+                  x1={PAD_L}
+                  x2={WIDTH - PAD_R}
+                  y1={addedY(tick)}
+                  y2={addedY(tick)}
+                  stroke="#e5e7eb"
+                  strokeDasharray="3 3"
+                />
+                <text
+                  x={PAD_L - 6}
+                  y={addedY(tick) + 4}
+                  textAnchor="end"
+                  className="fill-gray-400"
+                  fontSize="11"
+                >
+                  {tick}
+                </text>
+              </g>
+            ))}
+
+            <line x1={PAD_L} x2={PAD_L} y1={PAD_T} y2={HEIGHT - PAD_B} stroke="#e5e7eb" />
+            <line
+              x1={PAD_L}
+              x2={WIDTH - PAD_R}
+              y1={HEIGHT - PAD_B}
+              y2={HEIGHT - PAD_B}
+              stroke="#e5e7eb"
+            />
+
+            {addedSeries.map((d, i) => {
+              const date = new Date(d.t);
+              const dayOfMonth = date.getDate();
+              const showMonth = i === 0 || dayOfMonth === 1;
+              const labelEveryNth = Math.max(1, Math.floor(addedSeries.length / 30));
+              if (i % labelEveryNth !== 0 && i !== addedSeries.length - 1) return null;
+              return (
+                <g key={`label-${d.t}`}>
+                  <text
+                    x={addedX(i)}
+                    y={HEIGHT - PAD_B + 12}
+                    textAnchor="middle"
+                    className="fill-gray-400"
+                    fontSize="9"
+                  >
+                    {dayOfMonth}
+                  </text>
+                  {showMonth && (
+                    <text
+                      x={addedX(i)}
+                      y={HEIGHT - PAD_B + 22}
+                      textAnchor="middle"
+                      className="fill-gray-500"
+                      fontSize="9"
+                    >
+                      {date.toLocaleDateString(undefined, { month: `short` })}
+                    </text>
+                  )}
+                </g>
+              );
+            })}
+
+            {addedMode === `perDay`
+              ? addedSeries.map((d, i) => {
+                  const innerBarW = Math.max(2, addedBarSlot * 0.7);
+                  const bx = addedX(i) - innerBarW / 2;
+                  const by = addedY(d.count);
+                  const bh = Math.max(0, addedY(0) - by);
+                  return (
+                    <g key={d.t}>
+                      {d.count > 0 && (
+                        <rect
+                          x={bx}
+                          y={by}
+                          width={innerBarW}
+                          height={bh}
+                          fill="#0ea5e9"
+                          opacity={hoveredAdded === i ? 0.8 : 1}
+                          rx="2"
+                        />
+                      )}
+                      <rect
+                        x={addedX(i) - addedBarSlot / 2}
+                        y={PAD_T}
+                        width={addedBarSlot}
+                        height={innerH}
+                        fill="transparent"
+                        style={{ cursor: `pointer` }}
+                        onMouseEnter={() => setHoveredAdded(i)}
+                        onMouseLeave={() => setHoveredAdded(null)}
+                      />
+                    </g>
+                  );
+                })
+              : (() => {
+                  // Step-area path for cumulative.
+                  const path: string[] = [];
+                  addedSeries.forEach((d, i) => {
+                    const x = addedX(i);
+                    const y = addedY(d.cumulative);
+                    path.push(`${i === 0 ? `M` : `L`}${x},${y}`);
+                  });
+                  const baseY = addedY(0);
+                  const lastX = addedX(addedSeries.length - 1);
+                  const firstX = addedX(0);
+                  const areaPath = `${path.join(` `)} L${lastX},${baseY} L${firstX},${baseY} Z`;
+                  return (
+                    <g>
+                      <path d={areaPath} fill="#0ea5e9" opacity={0.2} />
+                      <path d={path.join(` `)} stroke="#0ea5e9" strokeWidth="2" fill="none" />
+                      {addedSeries.map((d, i) => (
+                        <g key={d.t}>
+                          {hoveredAdded === i && (
+                            <circle cx={addedX(i)} cy={addedY(d.cumulative)} r="3" fill="#0ea5e9" />
+                          )}
+                          <rect
+                            x={addedX(i) - addedBarSlot / 2}
+                            y={PAD_T}
+                            width={addedBarSlot}
+                            height={innerH}
+                            fill="transparent"
+                            style={{ cursor: `pointer` }}
+                            onMouseEnter={() => setHoveredAdded(i)}
+                            onMouseLeave={() => setHoveredAdded(null)}
+                          />
+                        </g>
+                      ))}
+                    </g>
+                  );
+                })()}
+
+            {hoveredAdded !== null &&
+              (() => {
+                const d = addedSeries[hoveredAdded];
+                const value = addedMode === `perDay` ? d.count : d.cumulative;
+                const valueLine =
+                  addedMode === `perDay` ? `${d.count} added` : `${d.cumulative} total`;
+                return renderTooltip(addedX(hoveredAdded), addedY(value), [
+                  shortDate(d.t),
+                  valueLine,
+                ]);
+              })()}
+          </svg>
+        )}
+      </div>
+
+      {totalOutcomes > 0 && (
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-4 mt-6">
+          <div className="flex items-baseline justify-between gap-4 flex-wrap">
+            <p className="text-sm text-gray-500">{`Review outcomes by interval`}</p>
+            <div className="text-sm">
+              <span className="text-gray-500">{`Reviews logged: `}</span>
+              <span className="font-semibold text-gray-800">{totalOutcomes}</span>
+            </div>
+          </div>
+
+          <svg
+            viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
+            className="w-full"
+            role="img"
+            aria-label="Review outcomes by interval"
+          >
+            {outcomeTicks.map((tick) => (
+              <g key={tick}>
+                <line
+                  x1={PAD_L}
+                  x2={WIDTH - PAD_R}
+                  y1={outcomeY(tick)}
+                  y2={outcomeY(tick)}
+                  stroke="#e5e7eb"
+                  strokeDasharray="3 3"
+                />
+                <text
+                  x={PAD_L - 6}
+                  y={outcomeY(tick) + 4}
+                  textAnchor="end"
+                  className="fill-gray-400"
+                  fontSize="11"
+                >
+                  {tick}
+                </text>
+              </g>
+            ))}
+
+            <line x1={PAD_L} x2={PAD_L} y1={PAD_T} y2={HEIGHT - PAD_B} stroke="#e5e7eb" />
+            <line
+              x1={PAD_L}
+              x2={WIDTH - PAD_R}
+              y1={HEIGHT - PAD_B}
+              y2={HEIGHT - PAD_B}
+              stroke="#e5e7eb"
+            />
+
+            {outcomesByInterval.map((b, i) => {
+              const cx = outcomeGroupX(i);
+              const correctX = cx - outcomeBarW - 1;
+              const incorrectX = cx + 1;
+              const correctY = outcomeY(b.correct);
+              const incorrectY = outcomeY(b.incorrect);
+              const baseY = outcomeY(0);
+              const isHoveredCorrect =
+                hoveredOutcome?.bucket === i && hoveredOutcome.side === `correct`;
+              const isHoveredIncorrect =
+                hoveredOutcome?.bucket === i && hoveredOutcome.side === `incorrect`;
+              return (
+                <g key={b.intervalMs}>
+                  {b.correct > 0 && (
+                    <rect
+                      x={correctX}
+                      y={correctY}
+                      width={outcomeBarW}
+                      height={Math.max(0, baseY - correctY)}
+                      fill="#16a34a"
+                      opacity={isHoveredCorrect ? 0.8 : 1}
+                      rx="2"
+                    />
+                  )}
+                  {b.incorrect > 0 && (
+                    <rect
+                      x={incorrectX}
+                      y={incorrectY}
+                      width={outcomeBarW}
+                      height={Math.max(0, baseY - incorrectY)}
+                      fill="#ef4444"
+                      opacity={isHoveredIncorrect ? 0.8 : 1}
+                      rx="2"
+                    />
+                  )}
+                  <text
+                    x={cx}
+                    y={HEIGHT - PAD_B + 14}
+                    textAnchor="middle"
+                    className="fill-gray-500"
+                    fontSize="10"
+                  >
+                    {formatIntervalLabel(b.intervalMs)}
+                  </text>
+                  <rect
+                    x={cx - outcomeGroupSlot / 2}
+                    y={PAD_T}
+                    width={outcomeGroupSlot / 2}
+                    height={innerH}
+                    fill="transparent"
+                    style={{ cursor: `pointer` }}
+                    onMouseEnter={() => setHoveredOutcome({ bucket: i, side: `correct` })}
+                    onMouseLeave={() => setHoveredOutcome(null)}
+                  />
+                  <rect
+                    x={cx}
+                    y={PAD_T}
+                    width={outcomeGroupSlot / 2}
+                    height={innerH}
+                    fill="transparent"
+                    style={{ cursor: `pointer` }}
+                    onMouseEnter={() => setHoveredOutcome({ bucket: i, side: `incorrect` })}
+                    onMouseLeave={() => setHoveredOutcome(null)}
+                  />
+                </g>
+              );
+            })}
+
+            {hoveredOutcome !== null &&
+              (() => {
+                const b = outcomesByInterval[hoveredOutcome.bucket];
+                const count = hoveredOutcome.side === `correct` ? b.correct : b.incorrect;
+                const cx = outcomeGroupX(hoveredOutcome.bucket);
+                const tx =
+                  hoveredOutcome.side === `correct`
+                    ? cx - outcomeBarW / 2 - 1
+                    : cx + outcomeBarW / 2 + 1;
+                return renderTooltip(tx, outcomeY(count), [
+                  `${formatIntervalLabel(b.intervalMs)} interval`,
+                  `${count} ${hoveredOutcome.side}`,
+                ]);
+              })()}
+          </svg>
+
+          <div className="flex items-center gap-4 text-xs text-gray-500">
+            <span className="flex items-center gap-1.5">
+              <span className="w-3 h-3 rounded-sm bg-green-600" />
+              {`Correct`}
+            </span>
+            <span className="flex items-center gap-1.5">
+              <span className="w-3 h-3 rounded-sm bg-red-500" />
+              {`Incorrect`}
+            </span>
+          </div>
+        </div>
+      )}
     </>
   );
 }

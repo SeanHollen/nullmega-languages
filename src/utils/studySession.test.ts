@@ -33,6 +33,7 @@ function makeCard(id: string, relearningStartedAt: number | null): Flashcard {
     dateContextGenerated: null,
     learningCorrectCount: 0,
     relearningStartedAt,
+    reviewHistory: [],
   };
 }
 
@@ -142,6 +143,44 @@ describe("computeAnswerPatch", () => {
     expect(patch.status).toBe("learning");
     expect(patch.relearningStartedAt).toBe(1000);
     expect(`contexts` in patch).toBe(false);
+  });
+
+  it("appends a 'correct' entry to reviewHistory when a review is answered right", () => {
+    const card = cardWithContexts({ status: "scheduled", currentInterval: 3 * DAY });
+    const { patch } = computeAnswerPatch(card, "review", true, 1000);
+    expect(patch.reviewHistory).toEqual([
+      { outcome: "correct", timestamp: 1000, currentInterval: 3 * DAY },
+    ]);
+  });
+
+  it("appends an 'incorrect' entry to reviewHistory when a review is answered wrong", () => {
+    const card = cardWithContexts({ status: "scheduled", currentInterval: 7 * DAY });
+    const { patch } = computeAnswerPatch(card, "review", false, 1000);
+    expect(patch.reviewHistory).toEqual([
+      { outcome: "incorrect", timestamp: 1000, currentInterval: 7 * DAY },
+    ]);
+  });
+
+  it("preserves prior reviewHistory entries when appending a new one", () => {
+    const prior = { outcome: "correct" as const, timestamp: 500, currentInterval: DAY };
+    const card = cardWithContexts({
+      status: "scheduled",
+      currentInterval: 3 * DAY,
+      reviewHistory: [prior],
+    });
+    const { patch } = computeAnswerPatch(card, "review", true, 1000);
+    expect(patch.reviewHistory).toEqual([
+      prior,
+      { outcome: "correct", timestamp: 1000, currentInterval: 3 * DAY },
+    ]);
+  });
+
+  it("does NOT touch reviewHistory when a learn-mode answer is given (relearning practice)", () => {
+    const card = cardWithContexts({ status: "learning", learningCorrectCount: 0 });
+    const right = computeAnswerPatch(card, "learn", true, 1000);
+    const wrong = computeAnswerPatch(card, "learn", false, 1000);
+    expect(`reviewHistory` in right.patch).toBe(false);
+    expect(`reviewHistory` in wrong.patch).toBe(false);
   });
 });
 

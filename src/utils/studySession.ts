@@ -86,6 +86,16 @@ export function computeAnswerPatch(
       patch: { lastReviewed: now, learningCorrectCount: 0 },
     };
   }
+  // Cards persisted before this feature shipped may not have reviewHistory; default to []
+  // so we don't blow up spreading undefined.
+  const reviewHistory = [
+    ...(card.reviewHistory ?? []),
+    {
+      outcome: (right ? "correct" : "incorrect") as "correct" | "incorrect",
+      timestamp: now,
+      currentInterval: card.currentInterval,
+    },
+  ];
   if (right) {
     return {
       graduate: true,
@@ -95,6 +105,7 @@ export function computeAnswerPatch(
         currentInterval: nextInterval(card.currentInterval),
         contexts: [],
         dateContextGenerated: null,
+        reviewHistory,
       },
     };
   }
@@ -106,6 +117,7 @@ export function computeAnswerPatch(
       currentInterval: INITIAL_INTERVAL,
       learningCorrectCount: 0,
       relearningStartedAt: now,
+      reviewHistory,
     },
   };
 }

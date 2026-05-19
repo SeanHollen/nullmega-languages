@@ -9,6 +9,15 @@ export interface FlashcardContext {
   audioKey: string | null;
 }
 
+export interface ReviewEntry {
+  outcome: "correct" | "incorrect";
+  timestamp: number;
+  // The interval the card had at the moment it was reviewed (i.e., the SRS slot
+  // that was just tested). Stored alongside outcome so future analyses can compute
+  // retention curves per interval.
+  currentInterval: number;
+}
+
 export interface Flashcard {
   id: string;
   source: string;
@@ -32,6 +41,10 @@ export interface Flashcard {
   // Index of the next context to show. Advances (mod contexts.length) after each
   // presentation so the user cycles through contexts in order. Treated as 0 when absent.
   contextCursor?: number;
+  // History of review answers (status was `scheduled` / `due` when shown). Relearning
+  // practice answers are NOT recorded here — only the original review that determines
+  // whether the SRS interval advances or resets.
+  reviewHistory: ReviewEntry[];
 }
 
 export async function loadFlashcards(language: string): Promise<Flashcard[]> {
@@ -68,6 +81,7 @@ export async function addFlashcard(
     dateContextGenerated: null,
     learningCorrectCount: 0,
     relearningStartedAt: null,
+    reviewHistory: [],
   };
   await db().flashcards.put(card);
   return card;

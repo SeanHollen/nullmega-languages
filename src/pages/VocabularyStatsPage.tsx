@@ -16,6 +16,8 @@ export function VocabularyStatsPage() {
           status: computeStatus(c),
           lastReviewed: c.lastReviewed,
           currentInterval: c.currentInterval,
+          addedAt: c.addedAt,
+          reviewHistory: c.reviewHistory,
         })),
       [language],
     ) ?? [];

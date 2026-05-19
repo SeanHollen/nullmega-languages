@@ -16,6 +16,7 @@ export function GrammarStatsPage() {
           status: computeGrammarStatus(c),
           lastReviewed: c.lastReviewed,
           currentInterval: c.currentInterval,
+          addedAt: c.addedAt,
         })),
       [language],
     ) ?? [];

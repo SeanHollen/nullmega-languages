@@ -30,7 +30,7 @@ function makeCard(id: string, relearningStartedAt: number | null): Flashcard {
     status: "learning",
     contexts: [],
     dateContextGenerated: null,
-    learningCorrectCount: 0,
+    learningCorrectCount: null,
     relearningStartedAt,
     reviewHistory: [],
   };
@@ -123,6 +123,19 @@ describe("computeAnswerPatch", () => {
     expect(graduate).toBe(false);
     expect(`contexts` in patch).toBe(false);
     expect(`dateContextGenerated` in patch).toBe(false);
+  });
+
+  it("flips learningCorrectCount from null to 1 on a learn-mode right answer (first time shown)", () => {
+    const card = cardWithContexts({ status: "learning", learningCorrectCount: null });
+    const { patch, graduate } = computeAnswerPatch(card, "learn", true, 1000);
+    expect(graduate).toBe(false);
+    expect(patch.learningCorrectCount).toBe(1);
+  });
+
+  it("flips learningCorrectCount from null to 0 on a learn-mode wrong answer (first time shown)", () => {
+    const card = cardWithContexts({ status: "learning", learningCorrectCount: null });
+    const { patch } = computeAnswerPatch(card, "learn", false, 1000);
+    expect(patch.learningCorrectCount).toBe(0);
   });
 
   it("clears contexts when a review-mode card is answered right", () => {

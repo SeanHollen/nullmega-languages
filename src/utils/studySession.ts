@@ -61,7 +61,7 @@ export function computeAnswerPatch(
 ): { patch: Partial<Flashcard>; graduate: boolean } {
   if (mode === "learn") {
     if (right) {
-      const newCount = card.learningCorrectCount + 1;
+      const newCount = (card.learningCorrectCount ?? 0) + 1;
       if (newCount >= LEARN_STEPS_REQUIRED) {
         return {
           graduate: true,

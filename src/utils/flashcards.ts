@@ -31,9 +31,10 @@ export interface Flashcard {
   contexts: FlashcardContext[];
   dateContextGenerated: number | null;
   // Number of consecutive correct answers given while in `learning` status. Used to require
-  // multiple correct passes before graduating to `scheduled`. Resets on wrong answer and on
-  // entering relearning.
-  learningCorrectCount: number;
+  // multiple correct passes before graduating to `scheduled`. Resets to 0 on wrong answer and
+  // on entering relearning. `null` means the card has never been shown to the user — flips
+  // to a number (0 or 1) on the first learn-mode answer.
+  learningCorrectCount: number | null;
   // Timestamp of the most recent relearning event (when a `due` card was answered wrong and
   // dropped back to `learning`). null if the card has never been relearned. Persisted for
   // future stats; not currently used to drive behavior.
@@ -79,7 +80,7 @@ export async function addFlashcard(
     status: `new`,
     contexts: [],
     dateContextGenerated: null,
-    learningCorrectCount: 0,
+    learningCorrectCount: null,
     relearningStartedAt: null,
     reviewHistory: [],
   };

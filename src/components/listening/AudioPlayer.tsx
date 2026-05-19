@@ -8,10 +8,19 @@ interface Props {
   small?: boolean;
 }
 
+function formatTime(seconds: number): string {
+  if (!Number.isFinite(seconds)) return `0:00`;
+  const m = Math.floor(seconds / 60);
+  const s = Math.floor(seconds % 60);
+  return `${m}:${s.toString().padStart(2, `0`)}`;
+}
+
 export function AudioPlayer({ src, label, autoplay = false, small = false }: Props) {
   const [trackedSrc, setTrackedSrc] = useState(src);
   const [playing, setPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   // Reset playing/progress during render when src changes (not in an effect)
@@ -19,16 +28,23 @@ export function AudioPlayer({ src, label, autoplay = false, small = false }: Pro
     setTrackedSrc(src);
     setPlaying(false);
     setProgress(0);
+    setCurrentTime(0);
+    setDuration(0);
   }
 
   useEffect(() => {
     const audio = new Audio(src);
+    audio.addEventListener(`loadedmetadata`, () => {
+      setDuration(audio.duration);
+    });
     audio.addEventListener(`timeupdate`, () => {
+      setCurrentTime(audio.currentTime);
       if (audio.duration) setProgress(audio.currentTime / audio.duration);
     });
     audio.addEventListener(`ended`, () => {
       setPlaying(false);
       setProgress(0);
+      setCurrentTime(0);
     });
     audio.addEventListener(`pause`, () => {
       setPlaying(false);
@@ -66,6 +82,7 @@ export function AudioPlayer({ src, label, autoplay = false, small = false }: Pro
     if (!audio) return;
     audio.currentTime = 0;
     setProgress(0);
+    setCurrentTime(0);
   }
 
   return (
@@ -77,11 +94,22 @@ export function AudioPlayer({ src, label, autoplay = false, small = false }: Pro
     >
       <button
         onClick={toggle}
-        className={`flex items-center gap-3 hover:brightness-90 transition cursor-pointer ${small ? `px-3 py-1.5` : `px-4 py-2`}`}
+        className={`flex items-center gap-3 hover:brightness-90 transition cursor-pointer ${small ? `px-3 py-1.5` : `px-4 py-1`}`}
         aria-label={playing ? `Pause` : `Play`}
       >
         {playing ? <FaPause className="shrink-0" /> : <FaPlay className="shrink-0" />}
-        {label && <span>{label}</span>}
+        {small
+          ? label && <span>{label}</span>
+          : label && (
+              <span className="flex flex-col items-start leading-tight">
+                <span className="text-sm">{label}</span>
+                {duration > 0 && (
+                  <span className="tabular-nums text-[10px] text-green-600/80">
+                    {`${formatTime(currentTime)} / ${formatTime(duration)}`}
+                  </span>
+                )}
+              </span>
+            )}
       </button>
       <div className="w-px self-stretch bg-green-200" />
       <button

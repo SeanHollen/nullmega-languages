@@ -151,15 +151,19 @@ export function StudyPage() {
   const ctx = current && current.contexts[contextIndex];
   const title = mode === "learn" ? `Learn new words` : `Review`;
 
-  const counts = { learning: 0, relearning: 0, reviewing: 0 };
+  const counts = { upcoming: 0, learning: 0, relearning: 0, reviewing: 0 };
   for (const c of remaining) {
     const s = computeStatus(c);
     if (s === "relearning") counts.relearning++;
     else if (s === "due") counts.reviewing++;
-    else if (s === "learning" || s === "new") counts.learning++;
+    else if (s === "learning" || s === "new") {
+      if (c.learningCorrectCount === null) counts.upcoming++;
+      else counts.learning++;
+    }
   }
   const countParts: string[] = [];
   if (counts.reviewing > 0) countParts.push(`${counts.reviewing} reviewing`);
+  if (counts.upcoming > 0) countParts.push(`${counts.upcoming} upcoming`);
   if (counts.learning > 0) countParts.push(`${counts.learning} learning`);
   if (counts.relearning > 0) countParts.push(`${counts.relearning} relearning`);
 

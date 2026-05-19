@@ -1,5 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import Dexie from "dexie";
+import { describe, expect, it, vi } from "vitest";
 import {
   addFlashcard,
   computeStatus,
@@ -39,10 +38,6 @@ const settings: VocabSettings = {
   autoplayAudio: false,
   showText: true,
 };
-
-beforeEach(async () => {
-  await Dexie.delete(`language-lab`);
-});
 
 describe("addFlashcard", () => {
   it("creates a card with status 'new'", async () => {

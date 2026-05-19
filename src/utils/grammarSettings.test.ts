@@ -1,5 +1,4 @@
-import { beforeEach, describe, expect, it } from "vitest";
-import Dexie from "dexie";
+import { describe, expect, it } from "vitest";
 import {
   loadGrammarSettings,
   saveGrammarSettings,
@@ -7,10 +6,6 @@ import {
   recordGeneratedToday,
   shiftGrammarSessionDate,
 } from "./grammarSettings";
-
-beforeEach(async () => {
-  await Dexie.delete(`language-lab`);
-});
 
 describe("loadGrammarSettings", () => {
   it("returns DEFAULTS when nothing is saved", async () => {

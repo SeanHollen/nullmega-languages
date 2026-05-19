@@ -1,15 +1,10 @@
-import { beforeEach, describe, expect, it } from "vitest";
-import Dexie from "dexie";
+import { describe, expect, it } from "vitest";
 import {
   getStoredLanguage,
   setStoredLanguage,
   getCustomLanguages,
   addCustomLanguage,
 } from "./language";
-
-beforeEach(async () => {
-  await Dexie.delete(`language-lab`);
-});
 
 describe("selected language", () => {
   it("returns the default when nothing has been set", async () => {

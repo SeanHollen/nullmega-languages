@@ -1,11 +1,6 @@
-import { beforeEach, describe, expect, it } from "vitest";
-import Dexie from "dexie";
+import { describe, expect, it } from "vitest";
 import { loadGoals, saveGoals } from "./goals";
 import { db } from "./db";
-
-beforeEach(async () => {
-  await Dexie.delete(`language-lab`);
-});
 
 describe("loadGoals", () => {
   it("returns DEFAULTS when no goals have been saved for the language", async () => {

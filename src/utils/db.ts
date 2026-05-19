@@ -35,12 +35,7 @@ class LanguageLabDB extends Dexie {
   assessments!: Table<AssessmentRecord, string>;
 
   constructor() {
-    // Pass current globals explicitly so test setups that swap globalThis.indexedDB take
-    // effect on each new instance. In prod these are the same browser globals every time.
-    super(`language-lab`, {
-      indexedDB: globalThis.indexedDB,
-      IDBKeyRange: globalThis.IDBKeyRange,
-    });
+    super(`language-lab`);
     this.version(1).stores({ audio: `` });
     this.version(2).stores({ audio: ``, streaks: `&date` });
     this.version(3).stores({ audio: ``, streaks: `&date`, goals: `&language` });
@@ -98,12 +93,14 @@ class LanguageLabDB extends Dexie {
   }
 }
 
-// Construct on each call. Dexie probes globalThis.indexedDB at construction time, and
-// tests swap fake-indexeddb between tests — caching a singleton across them pins it to a
-// stale IDBFactory. Dexie maintains its own connection cache internally, so re-constructing
-// is cheap.
+// One Dexie instance for the page's lifetime. A new instance per call would leak
+// live-query subscriptions and IDB handles — the broadcast fanout grows unbounded and
+// the page eventually chokes. Tests reset data with table.clear() (see test-setup), not
+// Dexie.delete, so we never need to rebuild.
+const instance = new LanguageLabDB();
+
 export function db(): LanguageLabDB {
-  return new LanguageLabDB();
+  return instance;
 }
 
 // --- Audio ---

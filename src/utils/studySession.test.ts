@@ -1,5 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import Dexie from "dexie";
+import { describe, expect, it, vi } from "vitest";
 import {
   prepareReviewSession,
   pickNextCard,
@@ -72,10 +71,6 @@ async function makeCardDue(id: string): Promise<void> {
     currentInterval: INITIAL_INTERVAL,
   });
 }
-
-beforeEach(async () => {
-  await Dexie.delete(`language-lab`);
-});
 
 describe("pickNextCard", () => {
   it("returns null for an empty list", () => {

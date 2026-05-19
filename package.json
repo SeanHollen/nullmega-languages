@@ -9,9 +9,9 @@
     "preview": "vite preview",
     "prettier": "prettier --write .",
     "prebuild": "prettier --write .",
-    "lint": "eslint src/",
-    "lint:fix": "eslint src/ --fix",
-    "check": "oxlint --react-plugin src/ && oxfmt --write src/ && tsc --noEmit && eslint src/ && vitest run",
+    "lint": "eslint src/ --max-warnings 0",
+    "lint:fix": "eslint src/ --fix --max-warnings 0",
+    "check": "oxlint --react-plugin src/ && oxfmt --write src/ && tsc --noEmit && eslint src/ --max-warnings 0 && vitest run",
     "test": "vitest run"
   },
   "devDependencies": {

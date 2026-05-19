@@ -1,5 +1,5 @@
-import { beforeEach, describe, expect, it } from "vitest";
-import Dexie from "dexie";
+import { describe, expect, it } from "vitest";
+import { resetDb } from "../test-setup";
 import {
   addGrammarCards,
   loadGrammarCards,
@@ -9,10 +9,6 @@ import {
   exportGrammarCards,
   importGrammarCards,
 } from "./grammarCards";
-
-beforeEach(async () => {
-  await Dexie.delete(`language-lab`);
-});
 
 function rawCard(title: string) {
   return {
@@ -76,7 +72,7 @@ describe("exportGrammarCards / importGrammarCards", () => {
   it("round-trips a card via JSON", async () => {
     await addGrammarCards(`Spanish`, [rawCard(`exportable`)], 50);
     const json = await exportGrammarCards(`Spanish`);
-    await Dexie.delete(`language-lab`);
+    await resetDb();
     const result = await importGrammarCards(`Spanish`, json);
     expect(result.added).toBe(1);
     const [card] = await loadGrammarCards(`Spanish`);

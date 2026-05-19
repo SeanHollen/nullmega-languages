@@ -1,5 +1,4 @@
-import { beforeEach, describe, expect, it } from "vitest";
-import Dexie from "dexie";
+import { describe, expect, it } from "vitest";
 import {
   saveAssessment,
   getAssessment,
@@ -9,10 +8,6 @@ import {
   getTitlesByComplexity,
   pointsForRecord,
 } from "./history";
-
-beforeEach(async () => {
-  await Dexie.delete(`language-lab`);
-});
 
 function baseRec() {
   return {

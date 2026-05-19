@@ -1,11 +1,6 @@
-import { beforeEach, describe, expect, it } from "vitest";
-import Dexie from "dexie";
+import { describe, expect, it } from "vitest";
 import { recordToday, loadStreaks, computeCurrentStreak, todayStr, dateStr } from "./streaks";
 import { db } from "./db";
-
-beforeEach(async () => {
-  await Dexie.delete(`language-lab`);
-});
 
 describe("recordToday", () => {
   it("creates a new entry on first call", async () => {

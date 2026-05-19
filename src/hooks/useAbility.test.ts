@@ -1,13 +1,9 @@
-import { beforeEach, describe, expect, it } from "vitest";
-import Dexie from "dexie";
+import { describe, expect, it } from "vitest";
 import { computeRating, loadAbility, saveAbility, rebuildRatingResult } from "./useAbility";
 import { db } from "../utils/db";
+import { resetDb } from "../test-setup";
 
 const DAY = 24 * 60 * 60 * 1000;
-
-beforeEach(async () => {
-  await Dexie.delete(`language-lab`);
-});
 
 describe("loadAbility / saveAbility", () => {
   it("returns null when nothing is saved", async () => {
@@ -39,11 +35,11 @@ describe("computeRating — placement", () => {
     expect(win.oldRating).toBeNull();
     expect(win.newRating).toBe(32.5);
 
-    await Dexie.delete(`language-lab`);
+    await resetDb();
     const draw = await computeRating(`French`, 7, 10, 30, `reading`);
     expect(draw.newRating).toBe(30);
 
-    await Dexie.delete(`language-lab`);
+    await resetDb();
     const loss = await computeRating(`French`, 3, 10, 30, `reading`);
     expect(loss.newRating).toBe(27.5);
   });
@@ -52,7 +48,7 @@ describe("computeRating — placement", () => {
     const low = await computeRating(`French`, 0, 10, 1, `reading`);
     expect(low.newRating).toBeGreaterThanOrEqual(1);
 
-    await Dexie.delete(`language-lab`);
+    await resetDb();
     const high = await computeRating(`French`, 10, 10, 100, `reading`);
     expect(high.newRating).toBeLessThanOrEqual(100);
   });

@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   FaBook,
@@ -16,8 +17,8 @@ import { loadGoals, type Goals } from "../utils/goals";
 import { loadFlashcards, computeStatus, type Flashcard } from "../utils/flashcards";
 import { loadVocabSettings, getLearnedTodayCount } from "../utils/vocabSettings";
 import { loadGrammarCards, computeGrammarStatus, type GrammarCard } from "../utils/grammarCards";
-import { recordToday, loadStreaks, computeCurrentStreak } from "../utils/streaks";
 import { useLiveQuery } from "dexie-react-hooks";
+import { loadStreaks, recordToday, computeCurrentStreak } from "../utils/streaks";
 
 interface ModeConfig {
   label: string;
@@ -124,22 +125,25 @@ export function HomePage() {
     return Object.fromEntries(entries) as Record<Mode, number | null>;
   }, [language]) ?? { reading: null, listening: null, writing: null, pronunciation: null };
 
-  // Visiting the home page records today's progress. Fire-and-forget — Dexie put is
-  // idempotent by primary key so repeated renders just overwrite today's record. Only
-  // run once async state has loaded so we don't snapshot a stale "no obligations" state.
-  if (goals && vocabSettings) {
-    const { hadObligations, complete } = computeDayState(
-      goals,
-      vocabSettings.newWordsPerDay,
-      learnedToday,
-      vocabCards,
-      grammarCards,
-      completedTodayByMode,
-    );
-    void recordToday(complete, hadObligations);
-  }
   const streakRecords = useLiveQuery(() => loadStreaks(), []);
   const currentStreak = streakRecords ? computeCurrentStreak(streakRecords) : 0;
+  const dayState =
+    goals && vocabSettings
+      ? computeDayState(
+          goals,
+          vocabSettings.newWordsPerDay,
+          learnedToday,
+          vocabCards,
+          grammarCards,
+          completedTodayByMode,
+        )
+      : null;
+  const complete = dayState?.complete ?? null;
+  const hadObligations = dayState?.hadObligations ?? null;
+  useEffect(() => {
+    if (complete === null || hadObligations === null) return;
+    void recordToday(complete, hadObligations);
+  }, [complete, hadObligations]);
 
   return (
     <div className="min-h-screen bg-green-100 flex flex-col items-center px-4 pt-12">

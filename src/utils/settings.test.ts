@@ -1,9 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import Dexie from "dexie";
 import { loadSettings, saveSettings } from "./settings";
 
-beforeEach(async () => {
-  await Dexie.delete(`language-lab`);
+beforeEach(() => {
   vi.stubEnv(`VITE_OPENAI_API_KEY`, ``);
 });
 

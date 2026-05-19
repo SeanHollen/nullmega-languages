@@ -1,0 +1,344 @@
+// Centralised LLM prompt strings. Every prompt sent to a chat model in the app is
+// built here, so the wording can be reviewed in one place.
+
+import { referenceBlocks } from "./levelReferences";
+
+// ---------- Shared helpers ----------
+
+function pastTitlesBlock(label: string, titles: string[]): string {
+  if (titles.length === 0) return ``;
+  return `\n\n${label} (do not repeat any of these or cover closely related ground — choose something fresh):
+${titles.map((t) => `- ${t}`).join(`\n`)}`;
+}
+
+const NARRATIVE_BLOCK = `
+
+NARRATIVE QUALITY:
+Where the form supports it, give the passage genuine interest. Aim for at least one of:
+- A clear narrative arc (setup → complication → resolution or twist)
+- Disagreement, conflict, or contrasting perspectives between people or ideas
+- An unexpected detail, observation, or insight that earns its place
+- A protagonist with a recognisable motivation, not a generic actor
+- Concrete specifics (names, places, gestures) over abstract description
+Avoid bland "person does activity in pleasant location" filler — passages should be the kind of thing a reader would actually want to keep reading.`;
+
+// ---------- Reading / Listening exercise ----------
+
+function readingPassageLengthGuide(languageComplexity: number): string {
+  if (languageComplexity <= 15)
+    return `100-150 words. At this level, achieve length through simple conversations, repetitive sentence structures, lists of objects or actions, or labelled descriptions — not by using complex vocabulary or grammar`;
+  if (languageComplexity <= 30)
+    return `120-170 words. Use dialogue, simple narratives with repeated patterns, or descriptive lists to fill the length while keeping language elementary`;
+  if (languageComplexity <= 50) return `140-200 words`;
+  return `160-220 words`;
+}
+
+export function buildReadingExercisePrompt(args: {
+  language: string;
+  languageComplexity: number;
+  pastTitles: string[];
+}): string {
+  const { language, languageComplexity, pastTitles } = args;
+  const referenceBlock = `Difficulty references (based on English examples — these illustrate the difficulty gradient, not the topic):
+${referenceBlocks(languageComplexity, { includeQuestion: true })}
+
+Match the difficulty of the target level. The topic and content of your passage should be chosen independently — do not anchor on the topics in the examples above.`;
+  const avoidanceBlock = pastTitlesBlock(`PAST TOPICS at similar complexity`, pastTitles);
+
+  return `Generate a reading comprehension exercise in ${language} at difficulty ${languageComplexity}/100.
+
+${referenceBlock}${avoidanceBlock}${NARRATIVE_BLOCK}
+
+Return ONLY valid JSON with this exact shape:
+{
+  "title": "3-6 word title in ${language} describing the topic of the passage",
+  "passage": "${readingPassageLengthGuide(languageComplexity)} passage entirely in ${language}",
+  "translation": "full English translation of the passage",
+  "difficultWords": [{ "source": "word in ${language}", "translation": "English equivalent" }],
+  "insight": "1-2 sentences in English noting something genuinely interesting about the passage — an unusual grammatical construction, a subtle idiomatic choice, a register shift, or a structural feature worth a learner's attention. Scale depth to the difficulty level.",
+  "questions": [
+    {
+      "question": "question in ${language}",
+      "options": ["A) ...", "B) ...", "C) ...", "D) ..."],
+      "correct": 0
+    },
+    "... 3-6 questions total ..."
+  ]
+}
+
+- Generate 3 to 6 questions, scaled to passage length — shorter passages get 3, longer ones up to 6. All text in ${language}.
+- "correct" is the 0-based index of the correct answer
+
+DIFFICULT WORDS — what to include and what to exclude:
+- Include: words an English speaker is unlikely to recognise or correctly guess — non-cognates, false friends, idiomatic expressions, words with unexpected meanings in context
+- Exclude: cognates and near-cognates — words whose meaning is obvious or easily inferred from their resemblance to English (e.g. "biodiversité", "naturellement", "décision", "organisation"). If an English speaker could look at the word and correctly guess its meaning, do not mark it as difficult.
+- Scale the list to the difficulty level: at low levels, even a few genuinely opaque words count; at high levels, include subtler vocabulary like register-specific or idiomatic terms
+
+QUESTION QUALITY:
+Before writing each question, apply this test: "Could someone answer this correctly by searching for the question's key noun or verb in the passage and picking the option whose words appear nearby?" If yes, rewrite it. Specifically:
+- Use paraphrase and synonyms in questions and answer choices rather than lifting phrases verbatim from the passage
+- Require inference, logical conclusion, understanding of word meaning in context, or recognition of tone/intent — not just recall
+- Wrong options must be plausible: either true statements from the passage that don't actually answer the question, or near-correct conclusions that fail on a subtle point
+- A question or two can be more direct at lower difficulty levels, but even then the answer should require understanding, not matching
+
+ANSWER OPTION LENGTH:
+All four answer options for each question must be similar in length and grammatical complexity. Do not let the correct answer stand out by being noticeably longer, more detailed, or more qualified than the others. A reader should not be able to guess the answer from its length or structure alone.`;
+}
+
+// ---------- Writing exercise ----------
+
+function writingPassageLengthGuide(languageComplexity: number): string {
+  if (languageComplexity <= 15) return `100-150 words`;
+  if (languageComplexity <= 30) return `120-170 words`;
+  if (languageComplexity <= 50) return `140-200 words`;
+  return `160-220 words`;
+}
+
+function passageWordsFor(languageComplexity: number): number {
+  if (languageComplexity <= 15) return 125;
+  if (languageComplexity <= 30) return 145;
+  if (languageComplexity <= 50) return 170;
+  if (languageComplexity <= 75) return 185;
+  return 200;
+}
+
+function roundTo5(n: number): number {
+  return Math.round(n / 5) * 5;
+}
+
+export function essayWordCounts(languageComplexity: number): { min: number; max: number } {
+  const target = Math.max(
+    15,
+    Math.round((languageComplexity / 100) * passageWordsFor(languageComplexity)),
+  );
+  return { min: roundTo5(Math.round(target * 0.8)), max: roundTo5(Math.round(target * 1.3)) };
+}
+
+export function buildWritingExercisePrompt(args: {
+  language: string;
+  languageComplexity: number;
+  pastTitles: string[];
+}): string {
+  const { language, languageComplexity, pastTitles } = args;
+  const { min, max } = essayWordCounts(languageComplexity);
+  const referenceBlock = `Difficulty references (these illustrate the difficulty gradient, not the topic):
+${referenceBlocks(languageComplexity)}
+
+Match the difficulty of the target level. Choose your own topic independently.`;
+  const avoidanceBlock = pastTitlesBlock(`PAST TOPICS at similar complexity`, pastTitles);
+
+  return `Generate a writing exercise in ${language} at difficulty ${languageComplexity}/100.
+
+${referenceBlock}${avoidanceBlock}${NARRATIVE_BLOCK}
+
+Return ONLY valid JSON with this exact shape:
+{
+  "title": "3-6 word title in ${language} describing the topic of the passage",
+  "passage": "${writingPassageLengthGuide(languageComplexity)} passage entirely in ${language}",
+  "translation": "full English translation of the passage",
+  "difficultWords": [{ "source": "word in ${language}", "translation": "English equivalent" }],
+  "insight": "1-2 sentences in English noting something interesting about the language used in the passage",
+  "questions": [
+    { "type": "short", "question": "short-answer question in ${language} — answer should fit in one brief phrase or sentence" },
+    { "type": "short", "question": "another short-answer question in ${language} — answer should fit in one brief phrase or sentence" },
+    { "type": "essay", "question": "essay prompt in ${language} asking for a ${min}–${max} word response related to the passage theme" }
+  ]
+}
+
+SHORT-ANSWER QUESTIONS: test specific comprehension; require understanding, not just copying words.
+ESSAY QUESTION: at low levels use simple prompts (describe your own experience with the topic); at high levels use analytical or argumentative prompts.
+DIFFICULT WORDS: exclude cognates an English speaker could recognise. Include genuine non-cognates, false friends, idiomatic expressions.`;
+}
+
+// ---------- Writing grader ----------
+
+export interface GraderQuestion {
+  type: "short" | "essay";
+  question: string;
+  answer: string;
+  minWords?: number;
+  maxWords?: number;
+}
+
+export function buildWritingGraderPrompt(args: {
+  language: string;
+  languageComplexity: number;
+  passage: string;
+  questions: GraderQuestion[];
+}): string {
+  const { language, languageComplexity, passage, questions } = args;
+  const questionBlock = questions
+    .map((q, i) => {
+      const typeLabel =
+        q.type === `essay` ? `essay (${q.minWords}–${q.maxWords} words required)` : `short answer`;
+      return `Question ${i + 1} (${typeLabel}): ${q.question}\nStudent's answer: "${q.answer}"`;
+    })
+    .join(`\n\n`);
+
+  return `You are grading a ${language} writing exercise at difficulty ${languageComplexity}/100.
+
+Passage the student read:
+"${passage}"
+
+${questionBlock}
+
+Grade each answer from 1–5:
+5 = Excellent — correct, natural ${language}, good vocabulary
+4 = Good — minor errors that don't impede understanding
+3 = Adequate — some errors but meaning is clear
+2 = Poor — significant errors that impede understanding
+1 = Very poor — mostly incorrect, incomprehensible, or blank
+
+Return ONLY valid JSON:
+{
+  "grades": [
+    { "score": 1-5, "notes": "..." },
+    { "score": 1-5, "notes": "..." },
+    { "score": 1-5, "notes": "..." }
+  ]
+}
+
+For "notes": list only concrete corrections in the form "wrong → correct" (e.g. "hiver → l'hiver", "j'aime jouer → j'aime jouer au foot"). Separate multiple corrections with ", ". If the answer is perfect, write "✓". Do not write prose descriptions — only corrections. For essay answers, if the word count was not met also prepend e.g. "Word count: 18/25 minimum. " before the corrections.`;
+}
+
+// ---------- Pronunciation exercise ----------
+
+function pronunciationPhraseCount(languageComplexity: number): number {
+  if (languageComplexity <= 25) return 3;
+  if (languageComplexity <= 50) return 4;
+  if (languageComplexity <= 75) return 5;
+  return 6;
+}
+
+function pronunciationPhraseLengthGuide(languageComplexity: number): string {
+  if (languageComplexity <= 20)
+    return `3-6 words each. Use very common vocabulary and basic everyday phrases`;
+  if (languageComplexity <= 40)
+    return `5-10 words each. Use common vocabulary with some variety in tense and structure`;
+  if (languageComplexity <= 60)
+    return `8-15 words each. Include varied grammar, some idioms, and moderately challenging vocabulary`;
+  if (languageComplexity <= 80)
+    return `12-20 words each. Use complex sentence structures, idiomatic language, and nuanced vocabulary`;
+  return `15-25 words each. Include sophisticated idioms, complex grammar, and advanced vocabulary`;
+}
+
+export function buildPronunciationExercisePrompt(args: {
+  language: string;
+  languageComplexity: number;
+  pastTitles: string[];
+}): string {
+  const { language, languageComplexity, pastTitles } = args;
+  const count = pronunciationPhraseCount(languageComplexity);
+  const avoidanceBlock = pastTitlesBlock(`PAST THEMES at similar complexity`, pastTitles);
+
+  return `Generate a pronunciation practice exercise in ${language} at difficulty ${languageComplexity}/100.
+
+THEME: All ${count} phrases must belong to a single coherent topic or theme summarised by the title (e.g. "ordering at a café", "moving day", "weather complaints", "phone call with a friend"). Do not produce a grab-bag of unrelated sentences.
+
+Return ONLY valid JSON with this exact shape:
+{
+  "title": "3-6 word title in ${language} describing the theme tying the phrases together",
+  "phrases": [
+    { "phrase": "...", "translation": "..." }
+  ]
+}
+
+- Generate exactly ${count} phrases, all within the chosen theme
+- Phrases should be ${pronunciationPhraseLengthGuide(languageComplexity)}
+- Within the theme, vary the type: statements, questions, exclamations
+- Phrases should be practical and natural-sounding in ${language}
+- At low difficulty: prioritise common sounds and basic patterns; at high difficulty: include challenging phoneme combinations, intonation shifts, and less common vocabulary
+- "translation" is the complete English translation of each phrase${avoidanceBlock}`;
+}
+
+// ---------- Flashcard contexts ----------
+
+export function buildContextsPrompt(args: {
+  language: string;
+  word: string;
+  translation: string;
+  count: number;
+}): string {
+  const { language, word, translation, count } = args;
+  return `Generate ${count} short example contexts for the ${language} word/phrase "${word}" (English meaning: "${translation}").
+
+Each context is a short sentence or fragment in ${language} (5-15 words) that uses a form of "${word}".
+
+Requirements:
+- The ${language} context must use "${word}" (you may vary tense, gender, plurality, conjugation; for multi-word phrases keep the phrase together).
+- In the ${language} context, wrap the exact form of "${word}" that appears with double asterisks: **like this**. Wrap only the word/phrase itself, not surrounding punctuation.
+- In the English translation, wrap the English equivalent of "${word}" (whatever inflected form fits naturally) with double asterisks too.
+- "${word}" should be the most complex/difficult element of the context. Surround it with simpler, common vocabulary. These are "n+1 cards".
+- The context should make sense and stay true to the word's meaning, but should NOT give away the translation directly (no glosses, no synonyms in parentheses).
+- Each context should use the word differently — vary the tense, register, situation, or sentence structure. Aim for genuine variety.
+
+Return ONLY valid JSON of this exact shape:
+{
+  "contexts": [
+    { "source": "<${language} context containing **${word}** (or an inflected form)>", "translation": "<English translation containing **the English equivalent**>" }
+  ]
+}`;
+}
+
+// ---------- Grammar quiz cards ----------
+
+const GRAMMAR_LEVEL_DESCRIPTIONS: Record<number, string> = {
+  1: `absolute beginner — present tense only, simplest vocabulary, basic affirmative sentences`,
+  2: `beginner — present tense variations, basic negation, simple questions`,
+  3: `beginner-intermediate — past tense basics, common irregular verbs, simple connectives`,
+  4: `elementary — past and future basics, negation, simple questions, basic pronouns`,
+  5: `lower-intermediate — multiple tenses, articles, prepositions, moderate sentence length`,
+  6: `intermediate — subjunctive basics, conditional, relative clauses, complex sentences`,
+  7: `upper-intermediate — nuanced tense usage, passive constructions, idiomatic phrases`,
+  8: `advanced — nuanced tenses, idiomatic structures, formal/informal register distinctions`,
+  9: `proficient — rare constructions, advanced register, complex subordination, stylistics`,
+  10: `expert — literary forms, archaic usage, advanced stylistics, subtle grammatical nuance`,
+};
+
+export const GRAMMAR_CARDS_SYSTEM_MESSAGE = `You generate grammar quiz cards for language learners. Card titles must be descriptive and specific — name the exact construction or rule being tested (e.g. "Passé Composé with avoir: irregular past participles" rather than "Past Tense Practice"). Titles should be concise but informative, typically 4–10 words.`;
+
+export function buildGrammarCardsPrompt(args: {
+  language: string;
+  level: number;
+  count: number;
+  pastTitles: string[];
+}): string {
+  const { language, level, count, pastTitles } = args;
+  const safeLevel = Math.max(10, Math.min(100, level));
+  const bucket = Math.max(1, Math.min(10, Math.round(safeLevel / 10)));
+  const levelDesc = GRAMMAR_LEVEL_DESCRIPTIONS[bucket];
+
+  const avoidNote =
+    pastTitles.length > 0
+      ? `\n\nAvoid redundancy with these previously generated quiz titles:\n${pastTitles.join(`, `)}`
+      : ``;
+
+  return `Generate ${count} grammar quiz card${count === 1 ? `` : `s`} for a ${language} learner at difficulty level ${safeLevel}/100 (${levelDesc}).
+
+Each card tests one specific grammar concept. Include a mix of these categories:
+- tense-conjugation: verb tenses, conjugation rules and patterns
+- word-order: sentence structure, clause ordering, constituent placement
+- parts-of-speech: nouns, adjectives, pronouns, prepositions, articles
+- misc: register and formality, honorifics and addressee deference (e.g. tu/vous, du/Sie, Japanese keigo, Korean speech levels), politeness strategies (hedging, softening, indirectness), idioms and set phrases, wordplay and humor (puns, irony, register-mismatch jokes), discourse markers and fillers, sociolinguistic conventions, regional/dialectal variation, connotation, punctuation, orthography, common learner errors, and any other ${language}-specific feature not covered by the categories above
+
+Scale topic choice to the level. Up to level ~50, stay grounded in core grammar (the first three categories). From level ~60 upward, increasingly weight the misc category, and connotation becomes essential at advanced levels. Only generate honorifics/keigo-style cards for languages that actually have such systems.
+
+Card structure:
+- title: 2-10 words naming the concept (e.g. "Passé Composé vs Imparfait", "Adjective Agreement with Gender")
+- prompt: 5-40 words describing what the quiz tests
+- category: one of "tense-conjugation", "word-order", "parts-of-speech", "misc"
+- questions: 1-8 questions, each either:
+  - multiple-choice: {"type":"multiple-choice","prompt":"...","choices":["a","b","c","d"],"answer":"exact text of correct choice"}
+  - write-in: {"type":"write-in","prompt":"Fill in: Je ___ (aller) au marché hier.","answer":"suis allé"}
+
+Rules:
+- Every question must have exactly one unambiguous correct answer
+- Use real ${language} examples in questions
+- Write-in answers should be 1-4 words and unambiguous
+- Multiple-choice distractors should be plausible but clearly wrong
+- For tense-conjugation cards, strongly prefer write-in questions — use multiple-choice only when the answer would be genuinely ambiguous as a free-form fill-in
+- Do NOT mix question types for the sake of variety; choose the type that best fits each question${avoidNote}
+
+Return ONLY valid JSON:
+{"cards":[{"title":"...","prompt":"...","category":"...","questions":[...]}]}`;
+}

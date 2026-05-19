@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import type { Exercise } from "../types";
+import type { Exercise, ExerciseLlmResponse } from "../types";
 import { callChat } from "../utils/api";
 import { getUserId } from "../utils/user";
 import { getTitlesByComplexity } from "../utils/history";
@@ -85,9 +85,10 @@ All four answer options for each question must be similar in length and grammati
     model: "o4-mini",
     messages: [{ role: "user", content: prompt }],
     response_format: { type: "json_object" },
-    metadata: { mode, language, difficulty: languageComplexity, userId: getUserId() },
+    metadata: { mode, language, difficulty: languageComplexity, userId: await getUserId() },
   });
-  return JSON.parse(data.choices[0].message.content) as Exercise;
+  const parsed = JSON.parse(data.choices[0].message.content) as ExerciseLlmResponse;
+  return { ...parsed, languageComplexity };
 }
 
 export function useGenerateReading() {

@@ -18,6 +18,7 @@ import { useLoading } from "../contexts/LoadingContext";
 import { saveAssessment, updateAssessment } from "../utils/history";
 import { uploadAssessment } from "../utils/api";
 import { getUserId } from "../utils/user";
+import { resolveSliderComplexity } from "../utils/sliderComplexity";
 
 type Phase = "setup" | "writing" | "results";
 
@@ -31,9 +32,12 @@ export function WritingPage() {
       : null;
   const resumeBody = resume ? (resume.record.body as WritingBody | undefined) : undefined;
   const savedRating = useLiveQuery(() => loadAbility(language, `writing`), [language]) ?? null;
-  const [languageComplexity, setLanguageComplexity] = useState(
-    () => resume?.record.difficulty ?? DEFAULT_LANGUAGE_COMPLEXITY.writing,
-  );
+  const [complexityOverride, setComplexityOverride] = useState<number | null>(null);
+  const sliderComplexity = resolveSliderComplexity({
+    override: complexityOverride,
+    savedRating,
+    defaultComplexity: DEFAULT_LANGUAGE_COMPLEXITY.writing,
+  });
   const [rated, setRated] = useState(true);
   const [phase, setPhase] = useState<Phase>(() => (resumeBody ? `writing` : `setup`));
   const [exercise, setExercise] = useState<WritingExercise | null>(
@@ -56,7 +60,7 @@ export function WritingPage() {
       setAnswers(resumeBody.answers);
       setAssessmentId(resume.record.id);
       setPhase(`writing`);
-      setLanguageComplexity(resume.record.difficulty);
+      setComplexityOverride(null);
       setGrades([]);
       setRatingResult(null);
     }
@@ -65,7 +69,7 @@ export function WritingPage() {
   function handleGenerate() {
     const task = beginLoading(`Generating passage…`);
     generateWriting.mutate(
-      { language, languageComplexity },
+      { language, languageComplexity: sliderComplexity },
       {
         onSuccess: (data: WritingExercise) => {
           void (async () => {
@@ -74,7 +78,7 @@ export function WritingPage() {
               mode: `writing`,
               language,
               title: data.title,
-              difficulty: languageComplexity,
+              difficulty: data.languageComplexity,
               scoreEarned: 0,
               scoreMax: data.questions.length * 5,
               ratingBefore: null,
@@ -115,7 +119,7 @@ export function WritingPage() {
     if (!exercise || !assessmentId) return;
     const task = beginLoading(`Grading your answers…`);
     gradeWriting.mutate(
-      { exercise, answers, language, languageComplexity },
+      { exercise, answers, language, languageComplexity: exercise.languageComplexity },
       {
         onSettled: () => task.done(),
         onSuccess: (result) => {
@@ -129,7 +133,7 @@ export function WritingPage() {
                 language,
                 totalScore,
                 maxScore,
-                languageComplexity,
+                exercise.languageComplexity,
                 `writing`,
               );
             }
@@ -165,7 +169,7 @@ export function WritingPage() {
     setGrades([]);
     setRatingResult(null);
     setAssessmentId(null);
-    setLanguageComplexity(savedRating ?? DEFAULT_LANGUAGE_COMPLEXITY.writing);
+    setComplexityOverride(null);
     setPhase(`setup`);
   }
 
@@ -188,12 +192,12 @@ export function WritingPage() {
           <>
             <SetupView
               language={language}
-              languageComplexity={languageComplexity}
+              languageComplexity={sliderComplexity}
               rated={rated}
               savedRating={savedRating}
               error={error}
               generateLabel={`Generate Writing Exercise`}
-              onLanguageComplexityChange={setLanguageComplexity}
+              onLanguageComplexityChange={setComplexityOverride}
               onRatedChange={setRated}
               onGenerate={handleGenerate}
             />
@@ -205,7 +209,7 @@ export function WritingPage() {
           <WritingPassageView
             exercise={exercise}
             language={language}
-            languageComplexity={languageComplexity}
+            languageComplexity={exercise.languageComplexity}
             answers={answers}
             onAnswerChange={handleAnswerChange}
             onAppendToAnswer={handleAppendToAnswer}

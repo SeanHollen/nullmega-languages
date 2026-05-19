@@ -19,6 +19,7 @@ import { useLoading } from "../contexts/LoadingContext";
 import { saveAssessment, updateAssessment } from "../utils/history";
 import { uploadAssessment } from "../utils/api";
 import { getUserId } from "../utils/user";
+import { resolveSliderComplexity } from "../utils/sliderComplexity";
 import type { Exercise } from "../types";
 
 type Phase = "setup" | "listening" | "results";
@@ -33,9 +34,12 @@ export function ListeningPage() {
       : null;
   const resumeBody = resume ? (resume.record.body as ListeningBody | undefined) : undefined;
   const savedRating = useLiveQuery(() => loadAbility(language, `listening`), [language]) ?? null;
-  const [languageComplexity, setLanguageComplexity] = useState(
-    () => resume?.record.difficulty ?? DEFAULT_LANGUAGE_COMPLEXITY.listening,
-  );
+  const [complexityOverride, setComplexityOverride] = useState<number | null>(null);
+  const sliderComplexity = resolveSliderComplexity({
+    override: complexityOverride,
+    savedRating,
+    defaultComplexity: DEFAULT_LANGUAGE_COMPLEXITY.listening,
+  });
   const [rated, setRated] = useState(true);
   const [phase, setPhase] = useState<Phase>(() => (resumeBody ? `listening` : `setup`));
   const [exercise, setExercise] = useState<Exercise | null>(() => resumeBody?.exercise ?? null);
@@ -64,7 +68,7 @@ export function ListeningPage() {
       setSelected(resumeBody.selected);
       setAssessmentId(resume.record.id);
       setPhase(`listening`);
-      setLanguageComplexity(resume.record.difficulty);
+      setComplexityOverride(null);
       setRatingResult(null);
       setTranslations(null);
       setAudioError(``);
@@ -81,7 +85,7 @@ export function ListeningPage() {
     setAudioError(``);
     const task = beginLoading(`Generating passage…`);
     mutate(
-      { language, languageComplexity, mode: `listening` },
+      { language, languageComplexity: sliderComplexity, mode: `listening` },
       {
         onSuccess: (data: Exercise) => {
           void (async () => {
@@ -93,7 +97,7 @@ export function ListeningPage() {
               mode: `listening`,
               language,
               title: data.title,
-              difficulty: languageComplexity,
+              difficulty: data.languageComplexity,
               scoreEarned: 0,
               scoreMax: data.questions.length,
               ratingBefore: null,
@@ -146,7 +150,7 @@ export function ListeningPage() {
     const total = exercise.questions.length;
     let rr: RatingResult | null = null;
     if (rated) {
-      rr = await computeRating(language, correct, total, languageComplexity, `listening`);
+      rr = await computeRating(language, correct, total, exercise.languageComplexity, `listening`);
     }
     setRatingResult(rr);
     const completedAt = Date.now();
@@ -198,7 +202,7 @@ export function ListeningPage() {
     setSelected([]);
     setRatingResult(null);
     setAssessmentId(null);
-    setLanguageComplexity(savedRating ?? DEFAULT_LANGUAGE_COMPLEXITY.listening);
+    setComplexityOverride(null);
     setPhase(`setup`);
   }
 
@@ -221,12 +225,12 @@ export function ListeningPage() {
           <>
             <SetupView
               language={language}
-              languageComplexity={languageComplexity}
+              languageComplexity={sliderComplexity}
               rated={rated}
               savedRating={savedRating}
               error={error}
               generateLabel={`Generate Listening Exercise`}
-              onLanguageComplexityChange={setLanguageComplexity}
+              onLanguageComplexityChange={setComplexityOverride}
               onRatedChange={setRated}
               onGenerate={handleGenerate}
             />
@@ -238,7 +242,7 @@ export function ListeningPage() {
           <ListeningPassageView
             exercise={exercise}
             language={language}
-            languageComplexity={languageComplexity}
+            languageComplexity={exercise.languageComplexity}
             audio={audio}
             selected={selected}
             onSelect={handleSelect}

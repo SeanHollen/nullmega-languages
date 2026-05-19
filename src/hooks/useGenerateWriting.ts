@@ -11,14 +11,18 @@ export interface WritingQuestion {
   maxWords?: number;
 }
 
-export interface WritingExercise {
-  id?: string;
+export interface WritingExerciseLlmResponse {
   title: string;
   passage: string;
   translation: string;
   difficultWords: { source: string; translation: string }[];
   insight?: string;
   questions: WritingQuestion[];
+}
+
+export interface WritingExercise extends WritingExerciseLlmResponse {
+  id?: string;
+  languageComplexity: number;
 }
 
 function passageLengthGuide(languageComplexity: number): string {
@@ -103,12 +107,18 @@ DIFFICULT WORDS: exclude cognates an English speaker could recognise. Include ge
     model: "o4-mini",
     messages: [{ role: "user", content: prompt }],
     response_format: { type: "json_object" },
-    metadata: { mode: "writing", language, difficulty: languageComplexity, userId: getUserId() },
+    metadata: {
+      mode: "writing",
+      language,
+      difficulty: languageComplexity,
+      userId: await getUserId(),
+    },
   });
-  const parsed = JSON.parse(data.choices[0].message.content) as WritingExercise;
+  const parsed = JSON.parse(data.choices[0].message.content) as WritingExerciseLlmResponse;
 
   return {
     ...parsed,
+    languageComplexity,
     questions: parsed.questions.map((q) =>
       q.type === "essay" ? { ...q, minWords: min, maxWords: max } : q,
     ),

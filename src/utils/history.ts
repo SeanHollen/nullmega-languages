@@ -35,8 +35,7 @@ export interface PronunciationBody {
 
 export type AssessmentBody = ReadingBody | ListeningBody | WritingBody | PronunciationBody;
 
-export interface AssessmentRecord {
-  id: string;
+export interface AssessmentFields {
   mode: Mode;
   language: string;
   title: string;
@@ -45,22 +44,28 @@ export interface AssessmentRecord {
   scoreMax: number;
   ratingBefore: number | null;
   ratingAfter: number | null;
-  createdAt: number;
   // null while the assessment is still in progress (saved at generation, not yet submitted)
   completedAt: number | null;
-  helpful: boolean | null;
   // Full exercise body + user inputs. Discriminated by `mode`. Optional for legacy records
   // that pre-date this field.
   body?: AssessmentBody;
+}
+
+export interface AssessmentInput extends AssessmentFields {
+  createdAt?: number;
+}
+
+export interface AssessmentRecord extends AssessmentFields {
+  id: string;
+  createdAt: number;
+  helpful: boolean | null;
 }
 
 function genId(): string {
   return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
 }
 
-export async function saveAssessment(
-  rec: Omit<AssessmentRecord, "id" | "helpful" | "createdAt"> & { createdAt?: number },
-): Promise<string> {
+export async function saveAssessment(rec: AssessmentInput): Promise<string> {
   const id = genId();
   const record: AssessmentRecord = {
     ...rec,

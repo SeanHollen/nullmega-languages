@@ -8,10 +8,14 @@ export interface PronunciationPhrase {
   translation: string;
 }
 
-export interface PronunciationExercise {
-  id?: string;
+export interface PronunciationExerciseLlmResponse {
   title: string;
   phrases: PronunciationPhrase[];
+}
+
+export interface PronunciationExercise extends PronunciationExerciseLlmResponse {
+  id?: string;
+  languageComplexity: number;
 }
 
 function phraseCount(languageComplexity: number): number {
@@ -81,7 +85,8 @@ Return ONLY valid JSON with this exact shape:
       userId: await getUserId(),
     },
   });
-  return JSON.parse(data.choices[0].message.content) as PronunciationExercise;
+  const parsed = JSON.parse(data.choices[0].message.content) as PronunciationExerciseLlmResponse;
+  return { ...parsed, languageComplexity };
 }
 
 export function useGeneratePronunciation() {

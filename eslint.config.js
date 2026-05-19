@@ -18,6 +18,7 @@ export default defineConfig(
         { selector: "AwaitExpression > ImportExpression", message: "Use a static import instead of await import()." },
         { selector: "CallExpression > MemberExpression.callee[property.name='then']", message: "Use async/await instead of .then(). For fire-and-forget, wrap in `void (async () => { ... })()`." },
         { selector: "TryStatement[finalizer]", message: "Avoid try/finally. Put cleanup after the try/catch block — it runs in both paths anyway." },
+        { selector: "TSTypeReference > Identifier[name='Omit']", message: "Don't use Omit<>. Define an explicit base type that other types extend." },
       ],
       "unicorn/no-nested-ternary": "error",
     },

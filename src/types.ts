@@ -4,14 +4,18 @@ export interface Question {
   correct: number;
 }
 
-export interface Exercise {
-  id?: string;
+export interface ExerciseLlmResponse {
   title: string;
   passage: string;
   translation: string;
   difficultWords: { source: string; translation: string }[];
   insight: string;
   questions: Question[];
+}
+
+export interface Exercise extends ExerciseLlmResponse {
+  id?: string;
+  languageComplexity: number;
 }
 
 export type Phase = "setup" | "reading" | "results";

@@ -86,8 +86,8 @@ export function ResultsView({
               <span className="font-semibold text-gray-800">{ratingResult.newRating}</span>
               <span className={ratingResult.change >= 0 ? `text-green-600` : `text-red-500`}>
                 {ratingResult.change >= 0
-                  ? `(+${ratingResult.change})`
-                  : `(${ratingResult.change})`}
+                  ? `(+${ratingResult.change.toFixed(1)})`
+                  : `(${ratingResult.change.toFixed(1)})`}
               </span>
             </div>
           )

@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa";
 import { useLiveQuery } from "dexie-react-hooks";
 import { loadStreaks, computeCurrentStreak, dateStr, type StreakRecord } from "../utils/streaks";
+import { loadListeningSeconds, formatListeningDuration } from "../utils/listeningStats";
 
 const WEEKS = 26;
 const DAY_LABELS = [`Sun`, `Mon`, `Tue`, `Wed`, `Thu`, `Fri`, `Sat`];
@@ -49,6 +50,7 @@ export function StreaksPage() {
   const records = useLiveQuery(() => loadStreaks(), []) ?? [];
   const byDate = new Map(records.map((r) => [r.date, r]));
   const currentStreak = computeCurrentStreak(records);
+  const listeningSeconds = useLiveQuery(() => loadListeningSeconds(), []) ?? 0;
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -105,7 +107,7 @@ export function StreaksPage() {
         </div>
 
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-6">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-3 gap-4">
             <div>
               <p className="text-xs text-gray-400 uppercase tracking-wide">{`Current streak`}</p>
               <p className="text-3xl font-bold text-green-600">{currentStreak}</p>
@@ -117,6 +119,13 @@ export function StreaksPage() {
               <p className="text-xs text-gray-400 mt-0.5">
                 {total > 0 ? `of ${total} tracked` : `no days tracked yet`}
               </p>
+            </div>
+            <div>
+              <p className="text-xs text-gray-400 uppercase tracking-wide">{`Time listening`}</p>
+              <p className="text-3xl font-bold text-gray-800">
+                {formatListeningDuration(listeningSeconds)}
+              </p>
+              <p className="text-xs text-gray-400 mt-0.5">{`total`}</p>
             </div>
           </div>
 

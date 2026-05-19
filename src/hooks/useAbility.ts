@@ -108,7 +108,9 @@ export function rebuildRatingResult(record: {
   if (record.ratingAfter === null) return null;
   const outcome = record.scoreMax > 0 ? getOutcome(record.scoreEarned, record.scoreMax) : `draw`;
   const isPlacement = record.ratingBefore === null;
-  const change = isPlacement ? 0 : record.ratingAfter - record.ratingBefore!;
+  const change = isPlacement
+    ? 0
+    : Math.round((record.ratingAfter - record.ratingBefore!) * 10) / 10;
   return {
     outcome,
     oldRating: record.ratingBefore,

@@ -25,6 +25,7 @@ export function PronunciationExerciseView({
 }: Props) {
   const allRated = ratings.every((r) => r !== null);
   const [showPhrasesByDefault, setShowPhrasesByDefault] = useState(true);
+  const [showTranslationsByDefault, setShowTranslationsByDefault] = useState(false);
 
   return (
     <div className="space-y-6">
@@ -45,6 +46,15 @@ export function PronunciationExerciseView({
           />
           <span className="text-sm text-gray-600">{`Show phrases by default`}</span>
         </label>
+        <label className="flex items-center gap-2 mt-1 cursor-pointer select-none">
+          <input
+            type="checkbox"
+            checked={showTranslationsByDefault}
+            onChange={(e) => setShowTranslationsByDefault(e.target.checked)}
+            className="accent-green-600 cursor-pointer"
+          />
+          <span className="text-sm text-gray-600">{`Show translations by default`}</span>
+        </label>
       </div>
 
       {phrases.map((p, i) => (
@@ -53,9 +63,11 @@ export function PronunciationExerciseView({
           index={i}
           phrase={p.phrase}
           translation={p.translation}
+          language={language}
           audioUrl={audioUrls[i]}
           rating={ratings[i]}
           defaultTextRevealed={showPhrasesByDefault}
+          defaultTranslationRevealed={showTranslationsByDefault}
           onRate={(r) => onRate(i, r)}
         />
       ))}

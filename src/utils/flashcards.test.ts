@@ -37,6 +37,8 @@ const settings: VocabSettings = {
   generateAudio: true,
   autoplayAudio: false,
   showText: true,
+  showUpcomingBeforeLearning: true,
+  showDueBeforeRelearning: true,
 };
 
 describe("addFlashcard", () => {

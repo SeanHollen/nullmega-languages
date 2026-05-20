@@ -38,14 +38,41 @@ export function pickRandom<T>(items: T[]): T {
   return items[Math.floor(Math.random() * items.length)];
 }
 
-// Picks the next card from `cards`, preferring cards that are NOT currently relearning
-// (relearningStartedAt === null). Relearning cards are only shown once no non-relearning
-// cards remain in the session.
-export function pickNextCard(cards: Flashcard[]): Flashcard | null {
+export type TierFn = (card: Flashcard) => number;
+
+// Picks the next card from `cards`. If `tierFn` is provided, only cards in the lowest
+// (highest-priority) non-empty tier are eligible. If omitted, picks uniformly at random
+// from the entire list — used when the user has disabled tier-based ordering.
+export function pickNextCard(cards: Flashcard[], tierFn?: TierFn): Flashcard | null {
   if (cards.length === 0) return null;
-  const nonRelearning = cards.filter((c) => c.relearningStartedAt === null);
-  const pool = nonRelearning.length > 0 ? nonRelearning : cards;
+  if (!tierFn) return pickRandom(cards);
+  let minTier = Number.POSITIVE_INFINITY;
+  for (const c of cards) {
+    const t = tierFn(c);
+    if (t < minTier) minTier = t;
+  }
+  const pool = cards.filter((c) => tierFn(c) === minTier);
   return pickRandom(pool);
+}
+
+// Builds the tier function for a study session based on the user's ordering preferences.
+// Lower numbers = higher priority. Returns undefined when the user has opted out of
+// tiering for this mode (pickNextCard then chooses uniformly at random).
+export function buildTierFn(
+  mode: "learn" | "review",
+  showUpcomingBeforeLearning: boolean,
+  showDueBeforeRelearning: boolean,
+): TierFn | undefined {
+  if (mode === "learn") {
+    if (!showUpcomingBeforeLearning) return undefined;
+    return (c) => {
+      if (c.relearningStartedAt !== null) return 2;
+      if (c.learningCorrectCount === null) return 0;
+      return 1;
+    };
+  }
+  if (!showDueBeforeRelearning) return undefined;
+  return (c) => (c.relearningStartedAt !== null ? 1 : 0);
 }
 
 export const LEARN_STEPS_REQUIRED = 2;
@@ -208,7 +235,13 @@ export async function prepareLearnSession(
 
   const finalCards = needAudio.length > 0 ? await reloadCards(language, cards) : cards;
 
-  const current = pickRandom(finalCards);
+  const tierFn = buildTierFn(
+    `learn`,
+    settings.showUpcomingBeforeLearning,
+    settings.showDueBeforeRelearning,
+  );
+  const current = pickNextCard(finalCards, tierFn);
+  if (!current) return null;
   const contextIndex = current.contexts.length > 0 ? await pickNextContext(current) : 0;
   const audioUrl = await initialAudioUrl(current, contextIndex, settings.generateAudio);
 
@@ -235,7 +268,13 @@ export async function prepareReviewSession(
 
   const finalCards = needAudio.length > 0 ? await reloadCards(language, cards) : cards;
 
-  const current = pickRandom(finalCards);
+  const tierFn = buildTierFn(
+    `review`,
+    settings.showUpcomingBeforeLearning,
+    settings.showDueBeforeRelearning,
+  );
+  const current = pickNextCard(finalCards, tierFn);
+  if (!current) return null;
   const contextIndex = current.contexts.length > 0 ? await pickNextContext(current) : 0;
   const audioUrl = await initialAudioUrl(current, contextIndex, settings.generateAudio);
 

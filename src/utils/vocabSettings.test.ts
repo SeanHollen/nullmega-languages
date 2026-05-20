@@ -17,6 +17,8 @@ describe("loadVocabSettings", () => {
       generateAudio: true,
       autoplayAudio: true,
       showText: true,
+      showUpcomingBeforeLearning: true,
+      showDueBeforeRelearning: true,
     });
   });
 
@@ -28,6 +30,8 @@ describe("loadVocabSettings", () => {
       generateAudio: false,
       autoplayAudio: false,
       showText: false,
+      showUpcomingBeforeLearning: false,
+      showDueBeforeRelearning: false,
     });
     const s = await loadVocabSettings();
     expect(s).toEqual({
@@ -37,6 +41,8 @@ describe("loadVocabSettings", () => {
       generateAudio: false,
       autoplayAudio: false,
       showText: false,
+      showUpcomingBeforeLearning: false,
+      showDueBeforeRelearning: false,
     });
   });
 
@@ -48,6 +54,8 @@ describe("loadVocabSettings", () => {
       generateAudio: true,
       autoplayAudio: true,
       showText: true,
+      showUpcomingBeforeLearning: true,
+      showDueBeforeRelearning: true,
     });
     const s = await loadVocabSettings();
     expect(s.newWordsPerDay).toBe(50);

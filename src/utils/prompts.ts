@@ -70,6 +70,7 @@ Return ONLY valid JSON with this exact shape:
 - "correct" is the 0-based index of the correct answer
 
 DIFFICULT WORDS — what to include and what to exclude:
+- Include: words that are important for understanding the rest of the passage. If the reader doesn't really need to know the word, don't include it.
 - Include: words an English speaker is unlikely to recognise or correctly guess — non-cognates, false friends, idiomatic expressions, words with unexpected meanings in context
 - Exclude: cognates and near-cognates — words whose meaning is obvious or easily inferred from their resemblance to English (e.g. "biodiversité", "naturellement", "décision", "organisation"). If an English speaker could look at the word and correctly guess its meaning, do not mark it as difficult.
 - Scale the list to the difficulty level: at low levels, even a few genuinely opaque words count; at high levels, include subtler vocabulary like register-specific or idiomatic terms
@@ -80,6 +81,7 @@ Before writing each question, apply this test: "Could someone answer this correc
 - Require inference, logical conclusion, understanding of word meaning in context, or recognition of tone/intent — not just recall
 - Wrong options must be plausible: either true statements from the passage that don't actually answer the question, or near-correct conclusions that fail on a subtle point
 - A question or two can be more direct at lower difficulty levels, but even then the answer should require understanding, not matching
+- Questions should be about the meaning and understanding of the passage, not grammar questions.
 
 ANSWER OPTION LENGTH:
 All four answer options for each question must be similar in length and grammatical complexity. Do not let the correct answer stand out by being noticeably longer, more detailed, or more qualified than the others. A reader should not be able to guess the answer from its length or structure alone.`;

@@ -12,6 +12,7 @@ import type { StudySessionData } from "../utils/studySession";
 import {
   easyInterval,
   pickNextCard,
+  buildTierFn,
   computeAnswerPatch,
   computeRemoveContextPatch,
 } from "../utils/studySession";
@@ -36,6 +37,12 @@ export function StudyPage() {
   const [audioUrl, setAudioUrl] = useState<string | null>(() => sessionData?.audioUrl ?? null);
 
   const cancelAudio = useRef<() => void>(() => {});
+
+  const tierFn = buildTierFn(
+    mode,
+    settings?.showUpcomingBeforeLearning ?? true,
+    settings?.showDueBeforeRelearning ?? true,
+  );
 
   function showCard(card: Flashcard) {
     cancelAudio.current();
@@ -84,7 +91,7 @@ export function StudyPage() {
     } else {
       const updatedRemaining = remaining.map((c) => (c.id === current.id ? { ...c, ...patch } : c));
       setRemaining(updatedRemaining);
-      const nextCard = pickNextCard(updatedRemaining);
+      const nextCard = pickNextCard(updatedRemaining, tierFn);
       setCurrent(nextCard);
       if (nextCard) showCard(nextCard);
     }
@@ -93,7 +100,7 @@ export function StudyPage() {
   function advanceCard() {
     const next = remaining.filter((c) => c.id !== current!.id);
     setRemaining(next);
-    const nextCard = pickNextCard(next);
+    const nextCard = pickNextCard(next, tierFn);
     setCurrent(nextCard);
     if (nextCard) showCard(nextCard);
   }
@@ -191,8 +198,8 @@ export function StudyPage() {
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 text-center">
             <p className="text-gray-500">
               {mode === "learn"
-                ? `No new flashcards to learn. Save more words from any exercise.`
-                : `No cards due for review. Come back later.`}
+                ? `All done! Come back later, or add more cards if you ran out.`
+                : `All done! Come back later.`}
             </p>
           </div>
         )}

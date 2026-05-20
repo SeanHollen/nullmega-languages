@@ -97,6 +97,28 @@ export function VocabSettingsPanel({ settings, onUpdate }: Props) {
             </div>
           </div>
         )}
+        {open && (
+          <div className="px-6 pb-4 flex flex-col items-center gap-3 text-sm">
+            <label className="flex items-center gap-2 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={settings.showUpcomingBeforeLearning}
+                onChange={(e) => onUpdate({ showUpcomingBeforeLearning: e.target.checked })}
+                className="accent-green-600 cursor-pointer"
+              />
+              <span className="text-gray-600">{`show upcoming before learning`}</span>
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={settings.showDueBeforeRelearning}
+                onChange={(e) => onUpdate({ showDueBeforeRelearning: e.target.checked })}
+                className="accent-green-600 cursor-pointer"
+              />
+              <span className="text-gray-600">{`show due before relearning`}</span>
+            </label>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -9,6 +9,8 @@ export interface VocabSettings {
   generateAudio: boolean;
   autoplayAudio: boolean;
   showText: boolean;
+  showUpcomingBeforeLearning: boolean;
+  showDueBeforeRelearning: boolean;
 }
 
 const SETTINGS_KEY = `vocab_settings`;
@@ -21,6 +23,8 @@ const DEFAULTS: VocabSettings = {
   generateAudio: true,
   autoplayAudio: true,
   showText: true,
+  showUpcomingBeforeLearning: true,
+  showDueBeforeRelearning: true,
 };
 
 export const NEW_WORDS_PER_DAY_MIN = 1;
@@ -58,6 +62,14 @@ function normalize(raw: Partial<VocabSettings> | null | undefined): VocabSetting
     autoplayAudio:
       typeof raw.autoplayAudio === `boolean` ? raw.autoplayAudio : DEFAULTS.autoplayAudio,
     showText: typeof raw.showText === `boolean` ? raw.showText : DEFAULTS.showText,
+    showUpcomingBeforeLearning:
+      typeof raw.showUpcomingBeforeLearning === `boolean`
+        ? raw.showUpcomingBeforeLearning
+        : DEFAULTS.showUpcomingBeforeLearning,
+    showDueBeforeRelearning:
+      typeof raw.showDueBeforeRelearning === `boolean`
+        ? raw.showDueBeforeRelearning
+        : DEFAULTS.showDueBeforeRelearning,
   };
 }
 

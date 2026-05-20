@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import {
   prepareReviewSession,
   pickNextCard,
+  buildTierFn,
   computeAnswerPatch,
   computeRemoveContextPatch,
 } from "./studySession";
@@ -62,6 +63,8 @@ const settings: VocabSettings = {
   generateAudio: true,
   autoplayAudio: false,
   showText: true,
+  showUpcomingBeforeLearning: true,
+  showDueBeforeRelearning: true,
 };
 
 async function makeCardDue(id: string): Promise<void> {
@@ -73,11 +76,13 @@ async function makeCardDue(id: string): Promise<void> {
 }
 
 describe("pickNextCard", () => {
+  const reviewTier = buildTierFn(`review`, true, true);
+
   it("returns null for an empty list", () => {
-    expect(pickNextCard([])).toBeNull();
+    expect(pickNextCard([], reviewTier)).toBeNull();
   });
 
-  it("always returns a non-relearning card when both kinds are present", () => {
+  it("with a tier function, always returns the highest-priority card available", () => {
     const cards = [
       makeCard("a", Date.now()),
       makeCard("b", null),
@@ -85,16 +90,54 @@ describe("pickNextCard", () => {
       makeCard("d", Date.now()),
     ];
     for (let i = 0; i < 50; i++) {
-      const picked = pickNextCard(cards);
+      const picked = pickNextCard(cards, reviewTier);
       expect(picked?.id).toBe("b");
     }
   });
 
-  it("falls back to a relearning card when nothing else is left", () => {
+  it("falls back to a lower-priority tier when the top tier is empty", () => {
     const cards = [makeCard("a", 100), makeCard("b", 200)];
-    const picked = pickNextCard(cards);
+    const picked = pickNextCard(cards, reviewTier);
     expect(picked).not.toBeNull();
     expect(picked!.relearningStartedAt).not.toBeNull();
+  });
+
+  it("with no tier function, picks uniformly at random across all cards", () => {
+    const cards = [makeCard("relearning", Date.now()), makeCard("learning", null)];
+    const counts: Record<string, number> = { relearning: 0, learning: 0 };
+    for (let i = 0; i < 200; i++) {
+      const picked = pickNextCard(cards, undefined);
+      counts[picked!.id]++;
+    }
+    // Both cards should be picked sometimes — neither stays at 0.
+    expect(counts.relearning).toBeGreaterThan(0);
+    expect(counts.learning).toBeGreaterThan(0);
+  });
+});
+
+describe("buildTierFn", () => {
+  it("returns undefined for learn mode when showUpcomingBeforeLearning is off", () => {
+    expect(buildTierFn(`learn`, false, true)).toBeUndefined();
+  });
+
+  it("returns undefined for review mode when showDueBeforeRelearning is off", () => {
+    expect(buildTierFn(`review`, true, false)).toBeUndefined();
+  });
+
+  it("ranks upcoming < learning < relearning in learn mode when the flag is on", () => {
+    const tier = buildTierFn(`learn`, true, true)!;
+    const upcomingCard = makeCard("u", null); // learningCorrectCount === null
+    const learningCard = { ...makeCard("l", null), learningCorrectCount: 1 };
+    const relearningCard = makeCard("r", Date.now());
+    expect(tier(upcomingCard)).toBe(0);
+    expect(tier(learningCard)).toBe(1);
+    expect(tier(relearningCard)).toBe(2);
+  });
+
+  it("ranks non-relearning < relearning in review mode when the flag is on", () => {
+    const tier = buildTierFn(`review`, true, true)!;
+    expect(tier(makeCard("a", null))).toBe(0);
+    expect(tier(makeCard("b", Date.now()))).toBe(1);
   });
 });
 

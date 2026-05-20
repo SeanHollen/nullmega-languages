@@ -21,14 +21,18 @@ export interface WritingExerciseLlmResponse {
   summary: string;
 }
 
+export type WritingMode = "short-answer" | "dictogloss";
+
 export interface WritingExercise extends WritingExerciseLlmResponse {
   id?: string;
   languageComplexity: number;
+  mode: WritingMode;
 }
 
 async function fetchWritingExercise(
   language: string,
   languageComplexity: number,
+  mode: WritingMode,
 ): Promise<WritingExercise> {
   const { min, max } = essayWordCounts(languageComplexity);
   const pastSummaries = await getPastSummariesByComplexity(
@@ -37,7 +41,7 @@ async function fetchWritingExercise(
     languageComplexity,
     100,
   );
-  const prompt = buildWritingExercisePrompt({ language, languageComplexity, pastSummaries });
+  const prompt = buildWritingExercisePrompt({ language, languageComplexity, mode, pastSummaries });
 
   const data = await callChat({
     model: "o4-mini",
@@ -55,6 +59,7 @@ async function fetchWritingExercise(
   return {
     ...parsed,
     languageComplexity,
+    mode,
     questions: parsed.questions.map((q) =>
       q.type === "essay" ? { ...q, minWords: min, maxWords: max } : q,
     ),
@@ -66,9 +71,11 @@ export function useGenerateWriting() {
     mutationFn: ({
       language,
       languageComplexity,
+      mode,
     }: {
       language: string;
       languageComplexity: number;
-    }) => fetchWritingExercise(language, languageComplexity),
+      mode: WritingMode;
+    }) => fetchWritingExercise(language, languageComplexity, mode),
   });
 }

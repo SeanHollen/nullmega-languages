@@ -130,6 +130,16 @@ function writingPassageLengthGuide(languageComplexity: number): string {
   return `160-220 words`;
 }
 
+// Dictogloss passages are read aloud — we target ~N seconds of audio at level N.
+// Roughly 2.5 spoken words per second, so target words ≈ 2.5 × complexity.
+// e.g. level 20 → ~50 words (~20 s); level 50 → ~125 words (~50 s); level 100 → ~250 words.
+function dictoglossPassageLengthGuide(languageComplexity: number): string {
+  const target = Math.max(10, Math.round(languageComplexity * 2.5));
+  const min = Math.max(5, roundTo5(Math.round(target * 0.85)));
+  const max = roundTo5(Math.round(target * 1.15));
+  return `${min}-${max} words (passage will be read aloud — aim for roughly ${languageComplexity} seconds of speech)`;
+}
+
 function passageWordsFor(languageComplexity: number): number {
   if (languageComplexity <= 15) return 125;
   if (languageComplexity <= 30) return 145;
@@ -153,10 +163,15 @@ export function essayWordCounts(languageComplexity: number): { min: number; max:
 export function buildWritingExercisePrompt(args: {
   language: string;
   languageComplexity: number;
+  mode: "short-answer" | "dictogloss";
   pastSummaries: string[];
 }): string {
-  const { language, languageComplexity, pastSummaries } = args;
+  const { language, languageComplexity, mode, pastSummaries } = args;
   const { min, max } = essayWordCounts(languageComplexity);
+  const passageGuide =
+    mode === `dictogloss`
+      ? dictoglossPassageLengthGuide(languageComplexity)
+      : writingPassageLengthGuide(languageComplexity);
   const referenceBlock = `Difficulty references (these illustrate the difficulty gradient, not the topic):
 ${referenceBlocks(languageComplexity)}
 
@@ -173,7 +188,7 @@ ${referenceBlock}${avoidanceBlock}${NARRATIVE_BLOCK}
 Return ONLY valid JSON with this exact shape (write the fields in this order — summary is LAST so you fill it in after the passage is fully drafted):
 {
   "title": "3-6 word title in ${language} describing the topic of the passage",
-  "passage": "${writingPassageLengthGuide(languageComplexity)} passage entirely in ${language}",
+  "passage": "${passageGuide} passage entirely in ${language}",
   "translation": "full English translation of the passage",
   "difficultWords": [{ "source": "word in ${language}", "translation": "English equivalent" }],
   "insight": "1-2 sentences in English noting something interesting about the language used in the passage",

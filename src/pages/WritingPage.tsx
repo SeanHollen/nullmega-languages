@@ -5,12 +5,15 @@ import { FaArrowLeft } from "react-icons/fa";
 import { SetupView } from "../components/reading/SetupView";
 import { WritingPassageView } from "../components/writing/WritingPassageView";
 import { WritingResultsView } from "../components/writing/WritingResultsView";
+import { DictoglossListeningView } from "../components/writing/DictoglossListeningView";
+import { DictoglossWritingView } from "../components/writing/DictoglossWritingView";
 import { HistoryList, type ResumeState } from "../components/HistoryList";
 import type { WritingBody } from "../utils/history";
-import type { WritingExercise } from "../hooks/useGenerateWriting";
+import type { WritingExercise, WritingMode, WritingQuestion } from "../hooks/useGenerateWriting";
 import { useGenerateWriting } from "../hooks/useGenerateWriting";
 import type { WritingGrade } from "../hooks/useGradeWriting";
 import { useGradeWriting } from "../hooks/useGradeWriting";
+import { generatePhrasesAudio } from "../hooks/useTTS";
 import type { RatingResult } from "../hooks/useAbility";
 import { loadAbility, computeRating, DEFAULT_LANGUAGE_COMPLEXITY } from "../hooks/useAbility";
 import { useLanguage } from "../contexts/LanguageContext";
@@ -20,7 +23,28 @@ import { uploadAssessment } from "../utils/api";
 import { getUserId } from "../utils/user";
 import { resolveSliderComplexity } from "../utils/sliderComplexity";
 
-type Phase = "setup" | "writing" | "results";
+type Phase = "setup" | "listening" | "writing" | "results";
+
+const DICTOGLOSS_PROMPT = `Summarize the passage in as much detail as you can recall.`;
+
+function dictoglossQuestion(): WritingQuestion {
+  return { type: `essay`, question: DICTOGLOSS_PROMPT };
+}
+
+function initialAnswers(exercise: WritingExercise): string[] {
+  if (exercise.mode === `dictogloss`) return [``];
+  return Array.from({ length: exercise.questions.length }, () => ``);
+}
+
+function gradingQuestions(exercise: WritingExercise): WritingQuestion[] {
+  if (exercise.mode === `dictogloss`) return [dictoglossQuestion()];
+  return exercise.questions;
+}
+
+function gradingMaxScore(exercise: WritingExercise): number {
+  if (exercise.mode === `dictogloss`) return 5;
+  return exercise.questions.length * 5;
+}
 
 export function WritingPage() {
   const navigate = useNavigate();
@@ -39,11 +63,16 @@ export function WritingPage() {
     defaultComplexity: DEFAULT_LANGUAGE_COMPLEXITY.writing,
   });
   const [rated, setRated] = useState(true);
-  const [phase, setPhase] = useState<Phase>(() => (resumeBody ? `writing` : `setup`));
+  const [mode, setMode] = useState<WritingMode>(() => resumeBody?.exercise?.mode ?? `short-answer`);
+  const [phase, setPhase] = useState<Phase>(() => {
+    if (!resumeBody) return `setup`;
+    return resumeBody.exercise.mode === `dictogloss` ? `listening` : `writing`;
+  });
   const [exercise, setExercise] = useState<WritingExercise | null>(
     () => resumeBody?.exercise ?? null,
   );
-  const [answers, setAnswers] = useState<string[]>(() => resumeBody?.answers ?? []);
+  const [answers, setAnswers] = useState<string[]>(() => (resumeBody ? resumeBody.answers : []));
+  const [audioUrl, setAudioUrl] = useState<string | null>(() => resume?.writingPassageUrl ?? null);
   const [grades, setGrades] = useState<WritingGrade[]>([]);
   const [ratingResult, setRatingResult] = useState<RatingResult | null>(null);
   const [assessmentId, setAssessmentId] = useState<string | null>(() => resume?.record.id ?? null);
@@ -59,40 +88,65 @@ export function WritingPage() {
       setExercise(resumeBody.exercise);
       setAnswers(resumeBody.answers);
       setAssessmentId(resume.record.id);
-      setPhase(`writing`);
+      setMode(resumeBody.exercise.mode);
+      setPhase(resumeBody.exercise.mode === `dictogloss` ? `listening` : `writing`);
       setComplexityOverride(null);
       setGrades([]);
       setRatingResult(null);
+      setAudioUrl(resume.writingPassageUrl ?? null);
     }
   }
 
   function handleGenerate() {
     const task = beginLoading(`Generating passage…`);
     generateWriting.mutate(
-      { language, languageComplexity: sliderComplexity },
+      { language, languageComplexity: sliderComplexity, mode },
       {
         onSuccess: (data: WritingExercise) => {
           void (async () => {
-            const initialAnswers = Array.from({ length: data.questions.length }, () => "");
+            const answersSeed = initialAnswers(data);
+            const maxScore = gradingMaxScore(data);
             const id = await saveAssessment({
               mode: `writing`,
               language,
               title: data.title,
               difficulty: data.languageComplexity,
               scoreEarned: 0,
-              scoreMax: data.questions.length * 5,
+              scoreMax: maxScore,
               ratingBefore: null,
               ratingAfter: null,
               completedAt: null,
-              body: { exercise: data, answers: initialAnswers, grades: [] },
+              body: { exercise: data, answers: answersSeed, grades: [] },
             });
             setAssessmentId(id);
             setExercise(data);
-            setAnswers(initialAnswers);
-            setPhase(`writing`);
+            setAnswers(answersSeed);
+
+            if (data.mode === `dictogloss`) {
+              task.update(`Generating audio…`);
+              try {
+                const audioKeyPassage = `assessment-${id}-passage`;
+                const [url] = await generatePhrasesAudio([data.passage], [audioKeyPassage]);
+                setAudioUrl(url);
+                await updateAssessment(id, {
+                  body: {
+                    exercise: data,
+                    answers: answersSeed,
+                    grades: [],
+                    audioKeyPassage,
+                  },
+                });
+                setPhase(`listening`);
+              } catch {
+                // Audio failed — fall through to setup; user can retry.
+              }
+            } else {
+              setPhase(`writing`);
+            }
+            task.done();
           })();
         },
-        onSettled: () => task.done(),
+        onError: () => task.done(),
       },
     );
   }
@@ -118,15 +172,22 @@ export function WritingPage() {
   function handleSubmit() {
     if (!exercise || !assessmentId) return;
     const task = beginLoading(`Grading your answers…`);
+    const questionsForGrading = gradingQuestions(exercise);
+    const exerciseForGrading: WritingExercise = { ...exercise, questions: questionsForGrading };
     gradeWriting.mutate(
-      { exercise, answers, language, languageComplexity: exercise.languageComplexity },
+      {
+        exercise: exerciseForGrading,
+        answers,
+        language,
+        languageComplexity: exercise.languageComplexity,
+      },
       {
         onSettled: () => task.done(),
         onSuccess: (result) => {
           void (async () => {
             setGrades(result.grades);
             const totalScore = result.grades.reduce((sum, g) => sum + g.score, 0);
-            const maxScore = result.grades.length * 5;
+            const maxScore = gradingMaxScore(exercise);
             let rr: RatingResult | null = null;
             if (rated) {
               rr = await computeRating(
@@ -145,7 +206,13 @@ export function WritingPage() {
               ratingBefore: rr?.oldRating ?? null,
               ratingAfter: rr?.newRating ?? null,
               completedAt,
-              body: { exercise, answers, grades: result.grades },
+              body: {
+                exercise,
+                answers,
+                grades: result.grades,
+                audioKeyPassage:
+                  exercise.mode === `dictogloss` ? `assessment-${assessmentId}-passage` : undefined,
+              },
             });
             if (exercise.id) {
               uploadAssessment({
@@ -170,6 +237,7 @@ export function WritingPage() {
     setRatingResult(null);
     setAssessmentId(null);
     setComplexityOverride(null);
+    setAudioUrl(null);
     setPhase(`setup`);
   }
 
@@ -197,6 +265,8 @@ export function WritingPage() {
               savedRating={savedRating}
               error={error}
               generateLabel={`Generate Writing Exercise`}
+              writingMode={mode}
+              onWritingModeChange={setMode}
               onLanguageComplexityChange={setComplexityOverride}
               onRatedChange={setRated}
               onGenerate={handleGenerate}
@@ -205,7 +275,28 @@ export function WritingPage() {
           </>
         )}
 
-        {phase === `writing` && exercise && (
+        {phase === `listening` && exercise && audioUrl && (
+          <DictoglossListeningView
+            exercise={exercise}
+            language={language}
+            languageComplexity={exercise.languageComplexity}
+            audioUrl={audioUrl}
+            onContinue={() => setPhase(`writing`)}
+          />
+        )}
+
+        {phase === `writing` && exercise && exercise.mode === `dictogloss` && (
+          <DictoglossWritingView
+            exercise={exercise}
+            language={language}
+            languageComplexity={exercise.languageComplexity}
+            summary={answers[0] ?? ``}
+            onSummaryChange={(s) => handleAnswerChange(0, s)}
+            onSubmit={handleSubmit}
+          />
+        )}
+
+        {phase === `writing` && exercise && exercise.mode === `short-answer` && (
           <WritingPassageView
             exercise={exercise}
             language={language}

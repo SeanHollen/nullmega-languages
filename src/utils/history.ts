@@ -22,6 +22,7 @@ export interface WritingBody {
   exercise: WritingExercise;
   answers: string[];
   grades: WritingGrade[];
+  audioKeyPassage?: string;
 }
 
 export type PhraseRating = "good" | "medium" | "bad" | null;

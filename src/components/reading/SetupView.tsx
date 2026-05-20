@@ -1,5 +1,6 @@
 import { FaExclamationTriangle } from "react-icons/fa";
 import type { ReadingLength } from "../../utils/prompts";
+import type { WritingMode } from "../../hooks/useGenerateWriting";
 
 interface Props {
   language: string;
@@ -10,12 +11,18 @@ interface Props {
   generateLabel?: string;
   length?: ReadingLength;
   onLengthChange?: (l: ReadingLength) => void;
+  writingMode?: WritingMode;
+  onWritingModeChange?: (m: WritingMode) => void;
   onLanguageComplexityChange: (d: number) => void;
   onRatedChange: (r: boolean) => void;
   onGenerate: () => void;
 }
 
 const LENGTH_OPTIONS: ReadingLength[] = [`short`, `medium`, `long`];
+const WRITING_MODE_OPTIONS: { mode: WritingMode; label: string }[] = [
+  { mode: `short-answer`, label: `Short answer` },
+  { mode: `dictogloss`, label: `Dictogloss` },
+];
 
 export function SetupView({
   language,
@@ -26,6 +33,8 @@ export function SetupView({
   generateLabel = `Generate Passage`,
   length,
   onLengthChange,
+  writingMode,
+  onWritingModeChange,
   onLanguageComplexityChange,
   onRatedChange,
   onGenerate,
@@ -84,6 +93,23 @@ export function SetupView({
                 }`}
               >
                 {opt}
+              </button>
+            ))}
+          </div>
+        )}
+        {writingMode !== undefined && onWritingModeChange && (
+          <div className="inline-flex rounded-xl border border-gray-200 overflow-hidden">
+            {WRITING_MODE_OPTIONS.map(({ mode, label }) => (
+              <button
+                key={mode}
+                onClick={() => onWritingModeChange(mode)}
+                className={`px-3 py-1 text-sm transition cursor-pointer ${
+                  writingMode === mode
+                    ? `bg-green-600 text-white`
+                    : `bg-white text-gray-600 hover:bg-gray-50`
+                }`}
+              >
+                {label}
               </button>
             ))}
           </div>

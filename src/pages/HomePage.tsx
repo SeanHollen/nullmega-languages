@@ -17,6 +17,7 @@ import { loadGoals, type Goals } from "../utils/goals";
 import { loadFlashcards, computeStatus, type Flashcard } from "../utils/flashcards";
 import { loadVocabSettings, getLearnedTodayCount } from "../utils/vocabSettings";
 import { loadGrammarCards, computeGrammarStatus, type GrammarCard } from "../utils/grammarCards";
+import { loadGrammarSettings, getGeneratedTodayCount } from "../utils/grammarSettings";
 import { useLiveQuery } from "dexie-react-hooks";
 import { loadStreaks, recordToday, computeCurrentStreak } from "../utils/streaks";
 
@@ -54,11 +55,40 @@ interface ModeState {
   met: boolean;
 }
 
+function vocabStudyCount(
+  vocabCards: Flashcard[],
+  vocabNewLimit: number,
+  vocabLearnedToday: number,
+): number {
+  const due = vocabCards.filter((c) => computeStatus(c) === `due`).length;
+  const learning = vocabCards.filter((c) => {
+    const s = computeStatus(c);
+    return s === `learning` || s === `relearning`;
+  }).length;
+  const remainingNewGoal = Math.max(0, vocabNewLimit - vocabLearnedToday);
+  return due + learning + remainingNewGoal;
+}
+
+function grammarStudyCount(
+  grammarCards: GrammarCard[],
+  grammarNewLimit: number,
+  grammarGeneratedToday: number,
+): number {
+  const studyCount = grammarCards.filter((c) => {
+    const s = computeGrammarStatus(c);
+    return s === `learning` || s === `due`;
+  }).length;
+  const remainingNewGoal = Math.max(0, grammarNewLimit - grammarGeneratedToday);
+  return studyCount + remainingNewGoal;
+}
+
 function computeDayState(
   goals: Goals,
   vocabNewLimit: number,
-  learnedToday: number,
+  vocabLearnedToday: number,
   vocabCards: Flashcard[],
+  grammarNewLimit: number,
+  grammarGeneratedToday: number,
   grammarCards: GrammarCard[],
   completedTodayByMode: Record<Mode, number>,
 ): { hadObligations: boolean; complete: boolean } {
@@ -71,28 +101,13 @@ function computeDayState(
         states.push({ hasObligation: true, met: completedTodayByMode[m.mode] >= goal });
       }
     } else if (m.kind === `vocab`) {
-      if (vocabCards.length > 0) {
-        const due = vocabCards.filter((c) => computeStatus(c) === `due`).length;
-        const learning = vocabCards.filter((c) => {
-          const s = computeStatus(c);
-          return s === `learning` || s === `relearning`;
-        }).length;
-        const availableNew = Math.max(
-          0,
-          Math.min(
-            vocabCards.filter((c) => computeStatus(c) === `new`).length,
-            vocabNewLimit - learnedToday,
-          ),
-        );
-        const studyCount = due + learning + availableNew;
+      if (vocabCards.length > 0 || vocabNewLimit > 0) {
+        const studyCount = vocabStudyCount(vocabCards, vocabNewLimit, vocabLearnedToday);
         states.push({ hasObligation: true, met: studyCount === 0 });
       }
     } else if (m.kind === `grammar`) {
-      if (grammarCards.length > 0) {
-        const studyCount = grammarCards.filter((c) => {
-          const s = computeGrammarStatus(c);
-          return s === `learning` || s === `due`;
-        }).length;
+      if (grammarCards.length > 0 || grammarNewLimit > 0) {
+        const studyCount = grammarStudyCount(grammarCards, grammarNewLimit, grammarGeneratedToday);
         states.push({ hasObligation: true, met: studyCount === 0 });
       }
     }
@@ -110,6 +125,8 @@ export function HomePage() {
   const vocabSettings = useLiveQuery(() => loadVocabSettings(), []);
   const learnedToday = useLiveQuery(() => getLearnedTodayCount(), []) ?? 0;
   const vocabCards = useLiveQuery(() => loadFlashcards(language), [language]) ?? [];
+  const grammarSettings = useLiveQuery(() => loadGrammarSettings(), []);
+  const grammarGeneratedToday = useLiveQuery(() => getGeneratedTodayCount(), []) ?? 0;
   const grammarCards = useLiveQuery(() => loadGrammarCards(language), [language]) ?? [];
   const allModes = Object.keys(DEFAULT_LANGUAGE_COMPLEXITY) as Mode[];
   const completedTodayByMode = useLiveQuery(async () => {
@@ -128,12 +145,14 @@ export function HomePage() {
   const streakRecords = useLiveQuery(() => loadStreaks(), []);
   const currentStreak = streakRecords ? computeCurrentStreak(streakRecords) : 0;
   const dayState =
-    goals && vocabSettings
+    goals && vocabSettings && grammarSettings
       ? computeDayState(
           goals,
           vocabSettings.newWordsPerDay,
           learnedToday,
           vocabCards,
+          grammarSettings.newCardsPerDay,
+          grammarGeneratedToday,
           grammarCards,
           completedTodayByMode,
         )
@@ -181,33 +200,24 @@ export function HomePage() {
             const showBadge = mode && (goal > 0 || completedToday > 0);
 
             const cardCount = kind === `vocab` ? vocabCards.length : null;
+            const vocabNewLimit = vocabSettings?.newWordsPerDay ?? 0;
             const studyCount =
               kind === `vocab` && vocabSettings
-                ? (() => {
-                    const due = vocabCards.filter((c) => computeStatus(c) === `due`).length;
-                    const learning = vocabCards.filter((c) => {
-                      const s = computeStatus(c);
-                      return s === `learning` || s === `relearning`;
-                    }).length;
-                    const availableNew = Math.max(
-                      0,
-                      Math.min(
-                        vocabCards.filter((c) => computeStatus(c) === `new`).length,
-                        vocabSettings.newWordsPerDay - learnedToday,
-                      ),
-                    );
-                    return due + learning + availableNew;
-                  })()
+                ? vocabStudyCount(vocabCards, vocabNewLimit, learnedToday)
                 : null;
+            const showStudyBadge =
+              studyCount !== null && cardCount !== null && (cardCount > 0 || vocabNewLimit > 0);
 
             const grammarCount = kind === `grammar` ? grammarCards.length : null;
-            const grammarStudyCount =
-              kind === `grammar`
-                ? grammarCards.filter((c) => {
-                    const s = computeGrammarStatus(c);
-                    return s === `learning` || s === `due`;
-                  }).length
+            const grammarNewLimit = grammarSettings?.newCardsPerDay ?? 0;
+            const grammarStudyCountValue =
+              kind === `grammar` && grammarSettings
+                ? grammarStudyCount(grammarCards, grammarNewLimit, grammarGeneratedToday)
                 : null;
+            const showGrammarStudyBadge =
+              grammarStudyCountValue !== null &&
+              grammarCount !== null &&
+              (grammarCount > 0 || grammarNewLimit > 0);
             return (
               <button
                 key={label}
@@ -232,7 +242,7 @@ export function HomePage() {
                     {cardCount === 1 ? `1 card saved` : `${cardCount} cards saved`}
                   </span>
                 )}
-                {studyCount !== null && cardCount !== null && cardCount > 0 && (
+                {showStudyBadge && (
                   <span
                     className={`text-xs font-semibold px-2 py-0.5 rounded-full mt-1 ${
                       studyCount > 0
@@ -248,15 +258,17 @@ export function HomePage() {
                     {grammarCount === 1 ? `1 card` : `${grammarCount} cards`}
                   </span>
                 )}
-                {grammarStudyCount !== null && grammarCount !== null && grammarCount > 0 && (
+                {showGrammarStudyBadge && (
                   <span
                     className={`text-xs font-semibold px-2 py-0.5 rounded-full mt-1 ${
-                      grammarStudyCount > 0
+                      grammarStudyCountValue > 0
                         ? `text-yellow-700 bg-yellow-100`
                         : `text-green-700 bg-green-100`
                     }`}
                   >
-                    {grammarStudyCount > 0 ? `${grammarStudyCount} cards left` : `All caught up!`}
+                    {grammarStudyCountValue > 0
+                      ? `${grammarStudyCountValue} cards left`
+                      : `All caught up!`}
                   </span>
                 )}
                 {showBadge && (

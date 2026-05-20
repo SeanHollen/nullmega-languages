@@ -7,6 +7,7 @@ import {
   type AssessmentRecord,
   type ListeningBody,
   type PronunciationBody,
+  type WritingBody,
 } from "../utils/history";
 import { deltaColor } from "../utils/colors";
 import { loadAudio } from "../utils/db";
@@ -49,6 +50,7 @@ export interface ResumeState {
   record: AssessmentRecord;
   listeningAudio?: { passageUrl: string | null; questionUrls: (string | null)[] };
   pronunciationAudioUrls?: (string | null)[];
+  writingPassageUrl?: string | null;
 }
 
 export function HistoryList({ mode, language, limit = 10 }: Props) {
@@ -76,6 +78,11 @@ export function HistoryList({ mode, language, limit = 10 }: Props) {
     } else if (r.mode === `pronunciation`) {
       const body = r.body as PronunciationBody;
       state.pronunciationAudioUrls = await Promise.all(body.audioKeys.map(blobUrl));
+    } else if (r.mode === `writing`) {
+      const body = r.body as WritingBody;
+      if (body.audioKeyPassage) {
+        state.writingPassageUrl = await blobUrl(body.audioKeyPassage);
+      }
     }
     void navigate(`/${r.mode}`, { state });
     task.done();

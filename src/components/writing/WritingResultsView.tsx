@@ -116,35 +116,54 @@ export function WritingResultsView({
         )}
       </div>
 
-      <div className="space-y-4">
-        {exercise.questions.map((q, i) => {
-          const grade = grades[i];
-          return (
-            <div
-              key={i}
-              className="bg-white rounded-2xl border border-green-100 shadow-sm p-6 space-y-3"
-            >
-              <div className="flex items-start justify-between gap-4">
-                <p className="font-medium text-gray-800">
-                  {`${i + 1}. `}
-                  <ClickableText text={q.question} language={language} />
-                </p>
-                {grade && (
-                  <span className={`text-lg font-bold shrink-0 ${scoreColor(grade.score)}`}>
-                    {`${grade.score}/5`}
-                  </span>
-                )}
+      {exercise.mode === `dictogloss` ? (
+        <div className="bg-white rounded-2xl border border-green-100 shadow-sm p-6 space-y-3">
+          <div className="flex items-start justify-between gap-4">
+            <p className="font-medium text-gray-800">{`Your summary`}</p>
+            {grades[0] && (
+              <span className={`text-lg font-bold shrink-0 ${scoreColor(grades[0].score)}`}>
+                {`${grades[0].score}/5`}
+              </span>
+            )}
+          </div>
+          <div className="bg-gray-50 rounded-xl px-4 py-3">
+            <p className="text-sm text-gray-700 whitespace-pre-wrap">
+              <ClickableText text={answers[0] ?? ``} language={language} />
+            </p>
+          </div>
+          {grades[0]?.notes && <p className="text-sm text-gray-500 italic">{grades[0].notes}</p>}
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {exercise.questions.map((q, i) => {
+            const grade = grades[i];
+            return (
+              <div
+                key={i}
+                className="bg-white rounded-2xl border border-green-100 shadow-sm p-6 space-y-3"
+              >
+                <div className="flex items-start justify-between gap-4">
+                  <p className="font-medium text-gray-800">
+                    {`${i + 1}. `}
+                    <ClickableText text={q.question} language={language} />
+                  </p>
+                  {grade && (
+                    <span className={`text-lg font-bold shrink-0 ${scoreColor(grade.score)}`}>
+                      {`${grade.score}/5`}
+                    </span>
+                  )}
+                </div>
+                <div className="bg-gray-50 rounded-xl px-4 py-3">
+                  <p className="text-sm text-gray-700">
+                    <ClickableText text={answers[i] ?? ``} language={language} />
+                  </p>
+                </div>
+                {grade?.notes && <p className="text-sm text-gray-500 italic">{grade.notes}</p>}
               </div>
-              <div className="bg-gray-50 rounded-xl px-4 py-3">
-                <p className="text-sm text-gray-700">
-                  <ClickableText text={answers[i] ?? ``} language={language} />
-                </p>
-              </div>
-              {grade?.notes && <p className="text-sm text-gray-500 italic">{grade.notes}</p>}
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      )}
 
       {assessmentId && <AssessmentFeedback assessmentId={assessmentId} />}
 

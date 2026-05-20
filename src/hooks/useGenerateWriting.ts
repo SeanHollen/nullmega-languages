@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { callChat } from "../utils/api";
 import { getUserId } from "../utils/user";
-import { getTitlesByComplexity } from "../utils/history";
+import { getPastSummariesByComplexity } from "../utils/history";
 import { buildWritingExercisePrompt, essayWordCounts } from "../utils/prompts";
 
 export interface WritingQuestion {
@@ -18,6 +18,7 @@ export interface WritingExerciseLlmResponse {
   difficultWords: { source: string; translation: string }[];
   insight?: string;
   questions: WritingQuestion[];
+  summary: string;
 }
 
 export interface WritingExercise extends WritingExerciseLlmResponse {
@@ -30,8 +31,13 @@ async function fetchWritingExercise(
   languageComplexity: number,
 ): Promise<WritingExercise> {
   const { min, max } = essayWordCounts(languageComplexity);
-  const pastTitles = await getTitlesByComplexity("writing", language, languageComplexity, 500);
-  const prompt = buildWritingExercisePrompt({ language, languageComplexity, pastTitles });
+  const pastSummaries = await getPastSummariesByComplexity(
+    "writing",
+    language,
+    languageComplexity,
+    100,
+  );
+  const prompt = buildWritingExercisePrompt({ language, languageComplexity, pastSummaries });
 
   const data = await callChat({
     model: "o4-mini",

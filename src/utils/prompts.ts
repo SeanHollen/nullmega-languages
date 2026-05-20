@@ -66,20 +66,23 @@ export function buildReadingExercisePrompt(args: {
   language: string;
   languageComplexity: number;
   length: ReadingLength;
-  pastTitles: string[];
+  pastSummaries: string[];
 }): string {
-  const { language, languageComplexity, length, pastTitles } = args;
+  const { language, languageComplexity, length, pastSummaries } = args;
   const referenceBlock = `Difficulty references (based on English examples — these illustrate the difficulty gradient, not the topic):
 ${referenceBlocks(languageComplexity, { includeQuestion: true })}
 
 Match the difficulty of the target level. The topic and content of your passage should be chosen independently — do not anchor on the topics in the examples above.`;
-  const avoidanceBlock = pastTitlesBlock(`PAST TOPICS at similar complexity`, pastTitles);
+  const avoidanceBlock = pastTitlesBlock(
+    `PAST PASSAGE SUMMARIES at similar complexity`,
+    pastSummaries,
+  );
 
   return `Generate a reading comprehension exercise in ${language} at difficulty ${languageComplexity}/100.
 
 ${referenceBlock}${avoidanceBlock}${NARRATIVE_BLOCK}
 
-Return ONLY valid JSON with this exact shape:
+Return ONLY valid JSON with this exact shape (write the fields in this order — summary is LAST so you fill it in after the passage is fully drafted):
 {
   "title": "3-6 word title in ${language} describing the topic of the passage",
   "passage": "${readingPassageLengthGuide(languageComplexity, length)} passage entirely in ${language}",
@@ -93,7 +96,8 @@ Return ONLY valid JSON with this exact shape:
       "correct": 0
     },
     "... 3-6 questions total ..."
-  ]
+  ],
+  "summary": "one grammatically correct English sentence written after the passage is finished. State, plainly and literally, the key concrete objects, places, people, and themes that appear, plus enough plot nuance to make this passage distinguishable from others on the same topic. No flourish, no metaphor, no poetic framing — describe what is, not how it feels. Example: 'A grandmother teaches her granddaughter to bake bread in a village kitchen, and the granddaughter ruins the first loaf by adding salt instead of sugar before getting it right on the second try.'"
 }
 
 - Generate 3 to 6 questions, scaled to passage length — shorter passages get 3, longer ones up to 6. All text in ${language}.
@@ -149,21 +153,24 @@ export function essayWordCounts(languageComplexity: number): { min: number; max:
 export function buildWritingExercisePrompt(args: {
   language: string;
   languageComplexity: number;
-  pastTitles: string[];
+  pastSummaries: string[];
 }): string {
-  const { language, languageComplexity, pastTitles } = args;
+  const { language, languageComplexity, pastSummaries } = args;
   const { min, max } = essayWordCounts(languageComplexity);
   const referenceBlock = `Difficulty references (these illustrate the difficulty gradient, not the topic):
 ${referenceBlocks(languageComplexity)}
 
 Match the difficulty of the target level. Choose your own topic independently.`;
-  const avoidanceBlock = pastTitlesBlock(`PAST TOPICS at similar complexity`, pastTitles);
+  const avoidanceBlock = pastTitlesBlock(
+    `PAST PASSAGE SUMMARIES at similar complexity`,
+    pastSummaries,
+  );
 
   return `Generate a writing exercise in ${language} at difficulty ${languageComplexity}/100.
 
 ${referenceBlock}${avoidanceBlock}${NARRATIVE_BLOCK}
 
-Return ONLY valid JSON with this exact shape:
+Return ONLY valid JSON with this exact shape (write the fields in this order — summary is LAST so you fill it in after the passage is fully drafted):
 {
   "title": "3-6 word title in ${language} describing the topic of the passage",
   "passage": "${writingPassageLengthGuide(languageComplexity)} passage entirely in ${language}",
@@ -174,7 +181,8 @@ Return ONLY valid JSON with this exact shape:
     { "type": "short", "question": "short-answer question in ${language} — answer should fit in one brief phrase or sentence" },
     { "type": "short", "question": "another short-answer question in ${language} — answer should fit in one brief phrase or sentence" },
     { "type": "essay", "question": "essay prompt in ${language} asking for a ${min}–${max} word response related to the passage theme" }
-  ]
+  ],
+  "summary": "one grammatically correct English sentence written after the passage is finished. State, plainly and literally, the key concrete objects, places, people, and themes that appear, plus enough plot nuance to make this passage distinguishable from others on the same topic. No flourish, no metaphor, no poetic framing — describe what is, not how it feels."
 }
 
 SHORT-ANSWER QUESTIONS: test specific comprehension; require understanding, not just copying words.

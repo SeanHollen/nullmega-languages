@@ -123,7 +123,19 @@ export async function getHistory(mode: Mode, language: string): Promise<Assessme
   return records.sort((a, b) => (b.completedAt ?? b.createdAt) - (a.completedAt ?? a.createdAt));
 }
 
-export async function getTitlesByComplexity(
+function passageSummary(record: AssessmentRecord): string | null {
+  const body = record.body;
+  if (body && `exercise` in body && typeof body.exercise.summary === `string`) {
+    const s = body.exercise.summary.trim();
+    if (s.length > 0) return s;
+  }
+  if (typeof record.title === `string` && record.title.length > 0 && record.title !== `Untitled`) {
+    return record.title;
+  }
+  return null;
+}
+
+export async function getPastSummariesByComplexity(
   mode: Mode,
   language: string,
   languageComplexity: number,
@@ -133,10 +145,14 @@ export async function getTitlesByComplexity(
     .assessments.where(`[mode+language]`)
     .equals([mode, language])
     .toArray();
-  const eligible = records.filter(
-    (r) => typeof r.title === `string` && r.title.length > 0 && r.title !== `Untitled`,
+  const eligible: { record: AssessmentRecord; summary: string }[] = [];
+  for (const r of records) {
+    const s = passageSummary(r);
+    if (s) eligible.push({ record: r, summary: s });
+  }
+  return pickClosest(eligible, (e) => e.record.difficulty, languageComplexity, limit).map(
+    (e) => e.summary,
   );
-  return pickClosest(eligible, (r) => r.difficulty, languageComplexity, limit).map((r) => r.title);
 }
 
 export function pointsForRecord(record: AssessmentRecord): number {

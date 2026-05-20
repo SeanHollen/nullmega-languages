@@ -11,6 +11,7 @@ export interface ExerciseLlmResponse {
   difficultWords: { source: string; translation: string }[];
   insight: string;
   questions: Question[];
+  summary: string;
 }
 
 export type ReadingLength = "short" | "medium" | "long";

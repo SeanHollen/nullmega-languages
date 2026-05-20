@@ -2,7 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import type { Exercise, ExerciseLlmResponse } from "../types";
 import { callChat } from "../utils/api";
 import { getUserId } from "../utils/user";
-import { getTitlesByComplexity } from "../utils/history";
+import { getPastSummariesByComplexity } from "../utils/history";
 import { buildReadingExercisePrompt, type ReadingLength } from "../utils/prompts";
 
 async function fetchExercise(
@@ -11,8 +11,13 @@ async function fetchExercise(
   length: ReadingLength,
   mode: "reading" | "listening",
 ): Promise<Exercise> {
-  const pastTitles = await getTitlesByComplexity(mode, language, languageComplexity, 500);
-  const prompt = buildReadingExercisePrompt({ language, languageComplexity, length, pastTitles });
+  const pastSummaries = await getPastSummariesByComplexity(mode, language, languageComplexity, 100);
+  const prompt = buildReadingExercisePrompt({
+    language,
+    languageComplexity,
+    length,
+    pastSummaries,
+  });
 
   const data = await callChat({
     model: "o4-mini",

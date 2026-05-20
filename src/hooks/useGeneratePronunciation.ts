@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { callChat } from "../utils/api";
 import { getUserId } from "../utils/user";
-import { getTitlesByComplexity } from "../utils/history";
+import { getPastSummariesByComplexity } from "../utils/history";
 import { buildPronunciationExercisePrompt } from "../utils/prompts";
 
 export interface PronunciationPhrase {
@@ -23,7 +23,7 @@ async function fetchPronunciationExercise(
   language: string,
   languageComplexity: number,
 ): Promise<PronunciationExercise> {
-  const pastTitles = await getTitlesByComplexity(
+  const pastTitles = await getPastSummariesByComplexity(
     "pronunciation",
     language,
     languageComplexity,

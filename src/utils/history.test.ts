@@ -5,7 +5,7 @@ import {
   updateAssessment,
   getHistory,
   getCompletedToday,
-  getTitlesByComplexity,
+  getPastSummariesByComplexity,
   pointsForRecord,
 } from "./history";
 
@@ -73,12 +73,12 @@ describe("getCompletedToday", () => {
   });
 });
 
-describe("getTitlesByComplexity", () => {
+describe("getPastSummariesByComplexity", () => {
   it("returns titles closest to the given complexity, dropping 'Untitled' entries", async () => {
     await saveAssessment({ ...baseRec(), difficulty: 30, title: `near30` });
     await saveAssessment({ ...baseRec(), difficulty: 50, title: `Untitled` });
     await saveAssessment({ ...baseRec(), difficulty: 60, title: `near60` });
-    const titles = await getTitlesByComplexity(`reading`, `Spanish`, 55, 10);
+    const titles = await getPastSummariesByComplexity(`reading`, `Spanish`, 55, 10);
     expect(titles).toContain(`near60`);
     expect(titles).toContain(`near30`);
     expect(titles).not.toContain(`Untitled`);

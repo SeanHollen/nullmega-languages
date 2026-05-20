@@ -61,6 +61,8 @@ function formatInterval(ms: number): string {
   return `${days}d`;
 }
 
+const PAGE_SIZE = 1000;
+
 type SortCol =
   | "title"
   | "category"
@@ -110,6 +112,8 @@ export function GrammarCardTable({ cards, language }: Props) {
   const [search, setSearch] = useState(``);
   const [actionMessage, setActionMessage] = useState<string | null>(null);
   const [sort, setSort] = useState<{ col: SortCol; dir: SortDir } | null>(null);
+  const [page, setPage] = useState(0);
+  const [trackedPageKey, setTrackedPageKey] = useState(``);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   function handleSort(col: SortCol) {
@@ -178,6 +182,18 @@ export function GrammarCardTable({ cards, language }: Props) {
 
   const sorted = sort ? sortCards(filtered, sort.col, sort.dir) : filtered;
 
+  const pageKey = `${q}|${sort?.col ?? ``}|${sort?.dir ?? ``}`;
+  if (pageKey !== trackedPageKey) {
+    setTrackedPageKey(pageKey);
+    setPage(0);
+  }
+  const total = sorted.length;
+  const pageCount = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const clampedPage = Math.min(page, pageCount - 1);
+  const pageStart = clampedPage * PAGE_SIZE;
+  const pageEnd = Math.min(pageStart + PAGE_SIZE, total);
+  const paginated = sorted.slice(pageStart, pageEnd);
+
   return (
     <>
       <div className="flex flex-wrap items-center gap-2 mb-4">
@@ -229,6 +245,32 @@ export function GrammarCardTable({ cards, language }: Props) {
               className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
             />
           </div>
+          <div className="flex items-center justify-between gap-3 px-4 py-2 border-b border-gray-100 text-xs text-gray-500">
+            <span>
+              {total === 0
+                ? `No matches`
+                : `Showing ${pageStart + 1}–${pageEnd} of ${total}${q ? ` (filtered from ${cards.length})` : ``}`}
+            </span>
+            {pageCount > 1 && (
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setPage((p) => Math.max(0, p - 1))}
+                  disabled={clampedPage === 0}
+                  className="px-2 py-1 rounded border border-gray-200 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 cursor-pointer"
+                >
+                  {`Prev`}
+                </button>
+                <span>{`Page ${clampedPage + 1} of ${pageCount}`}</span>
+                <button
+                  onClick={() => setPage((p) => Math.min(pageCount - 1, p + 1))}
+                  disabled={clampedPage >= pageCount - 1}
+                  className="px-2 py-1 rounded border border-gray-200 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 cursor-pointer"
+                >
+                  {`Next`}
+                </button>
+              </div>
+            )}
+          </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="border-b border-gray-100 bg-gray-50 text-xs font-semibold text-gray-500">
@@ -244,14 +286,14 @@ export function GrammarCardTable({ cards, language }: Props) {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
-                {sorted.length === 0 ? (
+                {paginated.length === 0 ? (
                   <tr>
                     <td colSpan={8} className="px-4 py-6 text-center text-gray-400 text-sm">
                       {`No matches for "${search}"`}
                     </td>
                   </tr>
                 ) : (
-                  sorted.map((c) => {
+                  paginated.map((c) => {
                     const status = computeGrammarStatus(c);
                     return (
                       <tr key={c.id}>

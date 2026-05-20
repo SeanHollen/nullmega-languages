@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useLiveQuery } from "dexie-react-hooks";
 import { FaArrowLeft } from "react-icons/fa";
 import { useLanguage } from "../contexts/LanguageContext";
-import { ResultsView } from "../components/reading/ResultsView";
+import { ResultsView } from "../components/reading-listening/ResultsView";
 import { WritingResultsView } from "../components/writing/WritingResultsView";
 import { PronunciationResultsView } from "../components/pronunciation/PronunciationResultsView";
 import {

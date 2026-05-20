@@ -18,6 +18,7 @@ import { saveAssessment, updateAssessment } from "../utils/history";
 import { uploadAssessment } from "../utils/api";
 import { getUserId } from "../utils/user";
 import { resolveSliderComplexity } from "../utils/sliderComplexity";
+import type { ReadingLength } from "../utils/prompts";
 import type { Exercise, Phase } from "../types";
 
 export function ReadingPage() {
@@ -37,6 +38,9 @@ export function ReadingPage() {
     defaultComplexity: DEFAULT_LANGUAGE_COMPLEXITY.reading,
   });
   const [rated, setRated] = useState(true);
+  const [length, setLength] = useState<ReadingLength>(
+    () => resumeBody?.exercise?.length ?? `medium`,
+  );
   const [phase, setPhase] = useState<Phase>(() => (resumeBody ? `reading` : `setup`));
   const [exercise, setExercise] = useState<Exercise | null>(() => resumeBody?.exercise ?? null);
   const [selected, setSelected] = useState<(number | null)[]>(() => resumeBody?.selected ?? []);
@@ -56,6 +60,7 @@ export function ReadingPage() {
       setAssessmentId(resume.record.id);
       setPhase(`reading`);
       setComplexityOverride(null);
+      setLength(resumeBody.exercise.length ?? `medium`);
       setRatingResult(null);
       setTranslations(null);
     }
@@ -64,7 +69,7 @@ export function ReadingPage() {
   function handleGenerate() {
     const task = beginLoading(`Generating passage…`);
     mutate(
-      { language, languageComplexity: sliderComplexity },
+      { language, languageComplexity: sliderComplexity, length },
       {
         onSuccess: (data: Exercise) => {
           void (async () => {
@@ -181,6 +186,8 @@ export function ReadingPage() {
               savedRating={savedRating}
               error={error?.message ?? ``}
               generateLabel={`Generate Reading Exercise`}
+              length={length}
+              onLengthChange={setLength}
               onLanguageComplexityChange={setComplexityOverride}
               onRatedChange={setRated}
               onGenerate={handleGenerate}

@@ -1,4 +1,5 @@
 import { FaExclamationTriangle } from "react-icons/fa";
+import type { ReadingLength } from "../../utils/prompts";
 
 interface Props {
   language: string;
@@ -7,10 +8,14 @@ interface Props {
   savedRating: number | null;
   error: string;
   generateLabel?: string;
+  length?: ReadingLength;
+  onLengthChange?: (l: ReadingLength) => void;
   onLanguageComplexityChange: (d: number) => void;
   onRatedChange: (r: boolean) => void;
   onGenerate: () => void;
 }
+
+const LENGTH_OPTIONS: ReadingLength[] = [`short`, `medium`, `long`];
 
 export function SetupView({
   language,
@@ -19,6 +24,8 @@ export function SetupView({
   savedRating,
   error,
   generateLabel = `Generate Passage`,
+  length,
+  onLengthChange,
   onLanguageComplexityChange,
   onRatedChange,
   onGenerate,
@@ -54,15 +61,34 @@ export function SetupView({
         </p>
       </div>
 
-      <label className="flex items-center gap-3 cursor-pointer select-none">
-        <input
-          type="checkbox"
-          checked={!rated}
-          onChange={(e) => onRatedChange(!e.target.checked)}
-          className="w-4 h-4 accent-green-600 cursor-pointer"
-        />
-        <span className="text-sm text-gray-600">{`Unrated exercise`}</span>
-      </label>
+      <div className="flex items-center gap-4 flex-wrap">
+        <label className="flex items-center gap-3 cursor-pointer select-none">
+          <input
+            type="checkbox"
+            checked={!rated}
+            onChange={(e) => onRatedChange(!e.target.checked)}
+            className="w-4 h-4 accent-green-600 cursor-pointer"
+          />
+          <span className="text-sm text-gray-600">{`Unrated exercise`}</span>
+        </label>
+        {length !== undefined && onLengthChange && (
+          <div className="inline-flex rounded-xl border border-gray-200 overflow-hidden">
+            {LENGTH_OPTIONS.map((opt) => (
+              <button
+                key={opt}
+                onClick={() => onLengthChange(opt)}
+                className={`px-3 py-1 text-sm capitalize transition cursor-pointer ${
+                  length === opt
+                    ? `bg-green-600 text-white`
+                    : `bg-white text-gray-600 hover:bg-gray-50`
+                }`}
+              >
+                {opt}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
 
       {error && (
         <div className="flex items-start gap-3 bg-red-50 border border-red-200 rounded-xl px-4 py-3">

@@ -2,6 +2,9 @@
 // built here, so the wording can be reviewed in one place.
 
 import { referenceBlocks } from "./levelReferences";
+import type { ReadingLength } from "../types";
+
+export type { ReadingLength };
 
 // ---------- Shared helpers ----------
 
@@ -24,21 +27,48 @@ Avoid bland "person does activity in pleasant location" filler — passages shou
 
 // ---------- Reading / Listening exercise ----------
 
-function readingPassageLengthGuide(languageComplexity: number): string {
+const READING_LENGTH_MULTIPLIER: Record<ReadingLength, number> = {
+  short: 1 / 3,
+  medium: 1,
+  long: 3,
+};
+
+function readingPassageBaseRange(languageComplexity: number): {
+  min: number;
+  max: number;
+  extra: string;
+} {
   if (languageComplexity <= 15)
-    return `100-150 words. At this level, achieve length through simple conversations, repetitive sentence structures, lists of objects or actions, or labelled descriptions — not by using complex vocabulary or grammar`;
+    return {
+      min: 100,
+      max: 150,
+      extra: `At this level, achieve length through simple conversations, repetitive sentence structures, lists of objects or actions, or labelled descriptions — not by using complex vocabulary or grammar`,
+    };
   if (languageComplexity <= 30)
-    return `120-170 words. Use dialogue, simple narratives with repeated patterns, or descriptive lists to fill the length while keeping language elementary`;
-  if (languageComplexity <= 50) return `140-200 words`;
-  return `160-220 words`;
+    return {
+      min: 120,
+      max: 170,
+      extra: `Use dialogue, simple narratives with repeated patterns, or descriptive lists to fill the length while keeping language elementary`,
+    };
+  if (languageComplexity <= 50) return { min: 140, max: 200, extra: `` };
+  return { min: 160, max: 220, extra: `` };
+}
+
+function readingPassageLengthGuide(languageComplexity: number, length: ReadingLength): string {
+  const { min, max, extra } = readingPassageBaseRange(languageComplexity);
+  const m = READING_LENGTH_MULTIPLIER[length];
+  const scaledMin = Math.round((min * m) / 10) * 10;
+  const scaledMax = Math.round((max * m) / 10) * 10;
+  return extra ? `${scaledMin}-${scaledMax} words. ${extra}` : `${scaledMin}-${scaledMax} words`;
 }
 
 export function buildReadingExercisePrompt(args: {
   language: string;
   languageComplexity: number;
+  length: ReadingLength;
   pastTitles: string[];
 }): string {
-  const { language, languageComplexity, pastTitles } = args;
+  const { language, languageComplexity, length, pastTitles } = args;
   const referenceBlock = `Difficulty references (based on English examples — these illustrate the difficulty gradient, not the topic):
 ${referenceBlocks(languageComplexity, { includeQuestion: true })}
 
@@ -52,7 +82,7 @@ ${referenceBlock}${avoidanceBlock}${NARRATIVE_BLOCK}
 Return ONLY valid JSON with this exact shape:
 {
   "title": "3-6 word title in ${language} describing the topic of the passage",
-  "passage": "${readingPassageLengthGuide(languageComplexity)} passage entirely in ${language}",
+  "passage": "${readingPassageLengthGuide(languageComplexity, length)} passage entirely in ${language}",
   "translation": "full English translation of the passage",
   "difficultWords": [{ "source": "word in ${language}", "translation": "English equivalent" }],
   "insight": "1-2 sentences in English noting something genuinely interesting about the passage — an unusual grammatical construction, a subtle idiomatic choice, a register shift, or a structural feature worth a learner's attention. Scale depth to the difficulty level.",

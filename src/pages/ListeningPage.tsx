@@ -20,6 +20,7 @@ import { saveAssessment, updateAssessment } from "../utils/history";
 import { uploadAssessment } from "../utils/api";
 import { getUserId } from "../utils/user";
 import { resolveSliderComplexity } from "../utils/sliderComplexity";
+import type { ReadingLength } from "../utils/prompts";
 import type { Exercise } from "../types";
 
 type Phase = "setup" | "listening" | "results";
@@ -41,6 +42,9 @@ export function ListeningPage() {
     defaultComplexity: DEFAULT_LANGUAGE_COMPLEXITY.listening,
   });
   const [rated, setRated] = useState(true);
+  const [length, setLength] = useState<ReadingLength>(
+    () => resumeBody?.exercise?.length ?? `medium`,
+  );
   const [phase, setPhase] = useState<Phase>(() => (resumeBody ? `listening` : `setup`));
   const [exercise, setExercise] = useState<Exercise | null>(() => resumeBody?.exercise ?? null);
   const [audio, setAudio] = useState<ExerciseAudio | null>(() =>
@@ -69,6 +73,7 @@ export function ListeningPage() {
       setAssessmentId(resume.record.id);
       setPhase(`listening`);
       setComplexityOverride(null);
+      setLength(resumeBody.exercise.length ?? `medium`);
       setRatingResult(null);
       setTranslations(null);
       setAudioError(``);
@@ -85,7 +90,7 @@ export function ListeningPage() {
     setAudioError(``);
     const task = beginLoading(`Generating passage…`);
     mutate(
-      { language, languageComplexity: sliderComplexity, mode: `listening` },
+      { language, languageComplexity: sliderComplexity, length, mode: `listening` },
       {
         onSuccess: (data: Exercise) => {
           void (async () => {
@@ -230,6 +235,8 @@ export function ListeningPage() {
               savedRating={savedRating}
               error={error}
               generateLabel={`Generate Listening Exercise`}
+              length={length}
+              onLengthChange={setLength}
               onLanguageComplexityChange={setComplexityOverride}
               onRatedChange={setRated}
               onGenerate={handleGenerate}

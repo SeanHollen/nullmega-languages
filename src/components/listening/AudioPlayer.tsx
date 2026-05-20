@@ -122,7 +122,7 @@ export function AudioPlayer({ src, label, autoplay = false, small = false }: Pro
           : label && (
               <span className="flex flex-col items-start leading-tight">
                 <span className="text-sm">{label}</span>
-                {duration > 0 && (
+                {duration > MIN_TRACKABLE_DURATION_SECONDS && (
                   <span className="tabular-nums text-[10px] text-green-600/80">
                     {`${formatTime(currentTime)} / ${formatTime(duration)}`}
                   </span>

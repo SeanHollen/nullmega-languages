@@ -13,9 +13,12 @@ export interface ExerciseLlmResponse {
   questions: Question[];
 }
 
+export type ReadingLength = "short" | "medium" | "long";
+
 export interface Exercise extends ExerciseLlmResponse {
   id?: string;
   languageComplexity: number;
+  length: ReadingLength;
 }
 
 export type Phase = "setup" | "reading" | "results";

@@ -1,6 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useLiveQuery } from "dexie-react-hooks";
 import type { Mode } from "../hooks/useAbility";
+import type { WritingMode } from "../hooks/useGenerateWriting";
 import {
   getHistory,
   pointsForRecord,
@@ -17,6 +18,18 @@ interface Props {
   mode: Mode;
   language: string;
   limit?: number;
+  writingMode?: WritingMode | null;
+}
+
+const WRITING_MODE_LABEL: Record<WritingMode, string> = {
+  "short-answer": `Short answer`,
+  dictogloss: `Dictogloss`,
+};
+
+function writingModeOf(r: AssessmentRecord): WritingMode | null {
+  if (r.mode !== `writing`) return null;
+  const body = r.body as WritingBody | undefined;
+  return body?.exercise?.mode ?? null;
 }
 
 function relativeTime(ts: number): string {
@@ -53,12 +66,13 @@ export interface ResumeState {
   writingPassageUrl?: string | null;
 }
 
-export function HistoryList({ mode, language, limit = 10 }: Props) {
+export function HistoryList({ mode, language, limit = 10, writingMode }: Props) {
   const records =
-    useLiveQuery(
-      async () => (await getHistory(mode, language)).slice(0, limit),
-      [mode, language, limit],
-    ) ?? [];
+    useLiveQuery(async () => {
+      const all = await getHistory(mode, language);
+      const filtered = writingMode ? all.filter((r) => writingModeOf(r) === writingMode) : all;
+      return filtered.slice(0, limit);
+    }, [mode, language, limit, writingMode]) ?? [];
   const navigate = useNavigate();
   const { beginLoading } = useLoading();
   if (records.length === 0) return null;
@@ -109,10 +123,18 @@ export function HistoryList({ mode, language, limit = 10 }: Props) {
           const ratingClass = deltaColor(delta);
           const points = inProgress ? 0 : pointsForRecord(r);
 
+          const writingCategory = writingModeOf(r);
           const inner = (
             <>
               <div className="min-w-0 flex-1">
-                <p className="text-sm text-gray-700 truncate">{r.title || `Untitled`}</p>
+                <div className="flex items-center gap-2">
+                  <p className="text-sm text-gray-700 truncate">{r.title || `Untitled`}</p>
+                  {writingCategory && (
+                    <span className="text-[10px] uppercase tracking-wide text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded shrink-0">
+                      {WRITING_MODE_LABEL[writingCategory]}
+                    </span>
+                  )}
+                </div>
                 <p className="text-xs text-gray-400">
                   {inProgress ? `In progress` : relativeTime(r.completedAt!)}
                 </p>

@@ -196,6 +196,31 @@ describe("computeAnswerPatch", () => {
     expect(`contexts` in patch).toBe(false);
   });
 
+  it("graduates a relearning card on a single right answer in review mode, but keeps interval at INITIAL_INTERVAL (does NOT re-advance via nextInterval, which would silently undo the wrong's reset)", () => {
+    const card = cardWithContexts({
+      status: "learning",
+      currentInterval: INITIAL_INTERVAL,
+      relearningStartedAt: 500,
+      learningCorrectCount: 0,
+    });
+    const { patch, graduate } = computeAnswerPatch(card, "review", true, 1000);
+    expect(graduate).toBe(true);
+    expect(patch.status).toBe("scheduled");
+    expect(patch.currentInterval).toBe(INITIAL_INTERVAL);
+    expect(patch.relearningStartedAt).toBeNull();
+  });
+
+  it("advances via nextInterval when right answer is for a card NOT in relearning", () => {
+    const card = cardWithContexts({
+      status: "scheduled",
+      currentInterval: 3 * DAY,
+      relearningStartedAt: null,
+    });
+    const { patch } = computeAnswerPatch(card, "review", true, 1000);
+    expect(patch.currentInterval).toBe(7 * DAY);
+    expect(patch.relearningStartedAt).toBeNull();
+  });
+
   it("appends a 'correct' entry to reviewHistory when a review is answered right", () => {
     const card = cardWithContexts({ status: "scheduled", currentInterval: 3 * DAY });
     const { patch } = computeAnswerPatch(card, "review", true, 1000);

@@ -11,7 +11,7 @@ interface Props {
   generateLabel?: string;
   length?: ReadingLength;
   onLengthChange?: (l: ReadingLength) => void;
-  writingMode?: WritingMode;
+  writingMode?: WritingMode | null;
   onWritingModeChange?: (m: WritingMode) => void;
   onLanguageComplexityChange: (d: number) => void;
   onRatedChange: (r: boolean) => void;
@@ -19,9 +19,17 @@ interface Props {
 }
 
 const LENGTH_OPTIONS: ReadingLength[] = [`short`, `medium`, `long`];
-const WRITING_MODE_OPTIONS: { mode: WritingMode; label: string }[] = [
-  { mode: `short-answer`, label: `Short answer` },
-  { mode: `dictogloss`, label: `Dictogloss` },
+const WRITING_MODE_OPTIONS: { mode: WritingMode; label: string; description: string }[] = [
+  {
+    mode: `short-answer`,
+    label: `Short answer`,
+    description: `Read a passage, then answer 2 short comprehension questions plus 1 short essay.`,
+  },
+  {
+    mode: `dictogloss`,
+    label: `Dictogloss`,
+    description: `Listen to a passage, then summarize it from memory in your own words. Combines retrieval practice with noticing-the-gap — strong for grammatical accuracy.`,
+  },
 ];
 
 export function SetupView({
@@ -97,7 +105,10 @@ export function SetupView({
             ))}
           </div>
         )}
-        {writingMode !== undefined && onWritingModeChange && (
+      </div>
+
+      {onWritingModeChange && (
+        <div>
           <div className="inline-flex rounded-xl border border-gray-200 overflow-hidden">
             {WRITING_MODE_OPTIONS.map(({ mode, label }) => (
               <button
@@ -113,8 +124,13 @@ export function SetupView({
               </button>
             ))}
           </div>
-        )}
-      </div>
+          {writingMode && (
+            <p className="text-xs text-gray-500 mt-2">
+              {WRITING_MODE_OPTIONS.find((o) => o.mode === writingMode)?.description}
+            </p>
+          )}
+        </div>
+      )}
 
       {error && (
         <div className="flex items-start gap-3 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
@@ -128,7 +144,8 @@ export function SetupView({
 
       <button
         onClick={onGenerate}
-        className="w-full bg-green-600 text-white py-3 rounded-xl font-semibold hover:bg-green-700 transition cursor-pointer"
+        disabled={onWritingModeChange !== undefined && !writingMode}
+        className="w-full bg-green-600 text-white py-3 rounded-xl font-semibold hover:bg-green-700 disabled:opacity-40 disabled:cursor-not-allowed transition cursor-pointer"
       >
         {rated ? generateLabel : `${generateLabel} (Unrated)`}
       </button>

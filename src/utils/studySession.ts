@@ -124,12 +124,17 @@ export function computeAnswerPatch(
     },
   ];
   if (right) {
+    // A card that was demoted earlier (relearningStartedAt !== null) graduates back to
+    // scheduled at INITIAL_INTERVAL — don't re-advance via nextInterval(), or the
+    // wrong answer's interval reset gets silently undone.
+    const wasRelearning = card.relearningStartedAt !== null;
     return {
       graduate: true,
       patch: {
         status: "scheduled",
         lastReviewed: now,
-        currentInterval: nextInterval(card.currentInterval),
+        currentInterval: wasRelearning ? INITIAL_INTERVAL : nextInterval(card.currentInterval),
+        relearningStartedAt: null,
         contexts: [],
         dateContextGenerated: null,
         reviewHistory,

@@ -63,7 +63,7 @@ export function WritingPage() {
     defaultComplexity: DEFAULT_LANGUAGE_COMPLEXITY.writing,
   });
   const [rated, setRated] = useState(true);
-  const [mode, setMode] = useState<WritingMode>(() => resumeBody?.exercise?.mode ?? `short-answer`);
+  const [mode, setMode] = useState<WritingMode | null>(() => resumeBody?.exercise?.mode ?? null);
   const [phase, setPhase] = useState<Phase>(() => {
     if (!resumeBody) return `setup`;
     return resumeBody.exercise.mode === `dictogloss` ? `listening` : `writing`;
@@ -98,6 +98,7 @@ export function WritingPage() {
   }
 
   function handleGenerate() {
+    if (!mode) return;
     const task = beginLoading(`Generating passage…`);
     generateWriting.mutate(
       { language, languageComplexity: sliderComplexity, mode },
@@ -238,6 +239,7 @@ export function WritingPage() {
     setAssessmentId(null);
     setComplexityOverride(null);
     setAudioUrl(null);
+    setMode(null);
     setPhase(`setup`);
   }
 
@@ -271,7 +273,7 @@ export function WritingPage() {
               onRatedChange={setRated}
               onGenerate={handleGenerate}
             />
-            <HistoryList mode={`writing`} language={language} />
+            <HistoryList mode={`writing`} language={language} writingMode={mode} />
           </>
         )}
 

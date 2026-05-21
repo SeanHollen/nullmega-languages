@@ -244,12 +244,10 @@ Grade each answer from 1–5:
 2 = Poor — significant errors that impede understanding
 1 = Very poor — mostly incorrect, incomprehensible, or blank
 
-Return ONLY valid JSON:
+Return ONLY valid JSON with EXACTLY ${questions.length} grade${questions.length === 1 ? `` : `s`} (one per question, in the same order):
 {
   "grades": [
-    { "score": 1-5, "notes": "..." },
-    { "score": 1-5, "notes": "..." },
-    { "score": 1-5, "notes": "..." }
+${questions.map(() => `    { "score": 1-5, "notes": "..." }`).join(`,\n`)}
   ]
 }
 

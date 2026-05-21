@@ -54,23 +54,26 @@ export function GrammarStudyPage() {
     const now = Date.now();
     const cardStatus = computeGrammarStatus(current);
 
+    let patch: Partial<GrammarCard> | null = null;
     if (right) {
       const interval =
         cardStatus === `due` ? nextInterval(current.currentInterval) : INITIAL_INTERVAL;
-      void patchGrammarCard(current.id, {
-        status: `scheduled`,
-        lastReviewed: now,
-        currentInterval: interval,
-      });
+      patch = { status: `scheduled`, lastReviewed: now, currentInterval: interval };
     } else if (cardStatus === `due`) {
-      void patchGrammarCard(current.id, {
-        status: `learning`,
-        lastReviewed: now,
-        currentInterval: INITIAL_INTERVAL,
-      });
+      patch = { status: `learning`, lastReviewed: now, currentInterval: INITIAL_INTERVAL };
+    }
+    if (patch) {
+      void patchGrammarCard(current.id, patch);
     }
 
-    const nextRemaining = right ? remaining.filter((c) => c.id !== current.id) : remaining;
+    // Reflect the patch in our in-memory session state so subsequent answers on the same
+    // card don't operate on stale values (e.g. wrong → right on the same card was treating
+    // the second answer as if no wrong had ever happened).
+    const updatedCurrent: GrammarCard = patch ? { ...current, ...patch } : current;
+    const remainingAfterPatch = remaining.map((c) => (c.id === current.id ? updatedCurrent : c));
+    const nextRemaining = right
+      ? remainingAfterPatch.filter((c) => c.id !== current.id)
+      : remainingAfterPatch;
     const nextCard = nextRemaining.length > 0 ? pickRandom(nextRemaining) : null;
 
     setRemaining(nextRemaining);

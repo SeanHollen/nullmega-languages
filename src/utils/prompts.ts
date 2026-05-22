@@ -19,11 +19,15 @@ const NARRATIVE_BLOCK = `
 NARRATIVE QUALITY:
 Where the form supports it, give the passage genuine interest. Aim for at least one of:
 - A clear narrative arc (setup → complication → resolution or twist)
-- Disagreement, conflict, or contrasting perspectives between people or ideas
+- Disagreement, conflict, or contrasting perspectives between people
 - An unexpected detail, observation, or insight that earns its place
 - A protagonist with a recognisable motivation, not a generic actor
 - Concrete specifics (names, places, gestures) over abstract description
-Avoid bland "person does activity in pleasant location" filler — passages should be the kind of thing a reader would actually want to keep reading.`;
+Avoid 
+- Avoid bland filler — passages should be the kind of thing a reader would actually want to keep reading.
+- Avoid cliches, like "When I was a child, I did X, now that I'm an adult, I do Y." If a theme has appeared in a prior story, you should probably not do the same thing.
+- Avoid re-using the same themes as described in difficuty levels. The point of the examples is to explain the difficulty, NOT to give you a type of story you should copy.
+`;
 
 // ---------- Reading / Listening exercise ----------
 
@@ -73,10 +77,7 @@ export function buildReadingExercisePrompt(args: {
 ${referenceBlocks(languageComplexity, { includeQuestion: true })}
 
 Match the difficulty of the target level. The topic and content of your passage should be chosen independently — do not anchor on the topics in the examples above.`;
-  const avoidanceBlock = pastTitlesBlock(
-    `PAST PASSAGE SUMMARIES at similar complexity`,
-    pastSummaries,
-  );
+  const avoidanceBlock = pastTitlesBlock(`PAST PASSAGE SUMMARIES`, pastSummaries);
 
   return `Generate a reading comprehension exercise in ${language} at difficulty ${languageComplexity}/100.
 
@@ -176,10 +177,7 @@ export function buildWritingExercisePrompt(args: {
 ${referenceBlocks(languageComplexity)}
 
 Match the difficulty of the target level. Choose your own topic independently.`;
-  const avoidanceBlock = pastTitlesBlock(
-    `PAST PASSAGE SUMMARIES at similar complexity`,
-    pastSummaries,
-  );
+  const avoidanceBlock = pastTitlesBlock(`PAST PASSAGE SUMMARIES`, pastSummaries);
 
   return `Generate a writing exercise in ${language} at difficulty ${languageComplexity}/100.
 

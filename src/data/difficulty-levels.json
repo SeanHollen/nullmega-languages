@@ -1,6 +1,6 @@
 {
   "1": {
-    "description": "Pre-A1. Day 1 of study. Single isolated words only — basic nouns and simple greetings. No grammar, no sentences. Equivalent to pointing at objects and naming them. Vocabulary is 10–20 core words.",
+    "description": "Pre-A1. Day 1. Isolated single words only — basic concrete nouns and simple greetings. No grammar, no sentences. Vocabulary 10–20 core words.",
     "examples": [
       {
         "passage": "Hello. Yes. No. Hello. Water. Cat. Dog. Bread. Milk. Egg. Fish. Rice. Tea. Apple. Book. Pen. Hand. Foot. Eye. Ear. Mouth. Hat. Bag. Box. Key. Door. Bed. Cup. Plate. Spoon. Knife. Salt. Sugar. Boy. Girl. Man. Woman. Mom. Dad. Yes. No. Hello. Water. Cat. Dog. Bread. Milk. Tea. Hand. Foot. Eye. Ear. Hat. Bag. Key. Door. Bed. Cup. Boy. Girl. Mom. Dad. Apple. Book. Pen. Box. Plate. Spoon. Knife. Salt. Egg. Fish. Rice. Yes. No. Hello. Water. Cat. Dog. Bread. Milk. Tea. Sugar. Man. Woman. Eye. Ear. Mouth. Hat. Bag. Box. Key. Door. Bed. Cup. Plate. Spoon. Hand. Foot. Yes. Hello.",
@@ -21,7 +21,7 @@
     ]
   },
   "2": {
-    "description": "Pre-A1. Day 1–2. Single words and very simple two-word phrases. Basic greetings and farewells. No verbs except 'is' used implicitly. The learner recognizes common objects and social words.",
+    "description": "Pre-A1. Day 1–2. Single words and very simple two-word phrases. Vocabulary near 20–25 words. No verbs except an implicit 'is.'",
     "examples": [
       {
         "passage": "Hi. Bye. Thank you. Cat. Dog. Apple. Water. Good. Hi. Bye. Thank you. Good morning. Good night. Cat. Dog. Bird. Fish. Apple. Bread. Water. Milk. Tea. Good. Bad. Big. Small. Hot. Cold. New. Old. Yes. No. Please. Hi. Bye. Thank you. Good morning. Good night. Cat. Dog. Bird. Apple. Bread. Water. Milk. Good. Bad. Big. Small. Hot. Cold. New. Old. Boy. Girl. Mom. Dad. House. Car. Bus. School. Bag. Book. Hi. Bye. Thank you. Cat. Dog. Apple. Water. Good. Big. Small. Hot. Cold. Yes. No. Boy. Girl. House. Car. Bus. School. Bag. Book. Hi. Bye. Thank you. Cat. Dog. Apple. Water. Good. Bad. Hot. Cold. Yes. No. Boy. Girl. House. Car. Hi. Bye. Good.",
@@ -42,7 +42,7 @@
     ]
   },
   "3": {
-    "description": "Pre-A1. Day 2–3. Two- to three-word phrases. Simple subject-verb constructions at the most basic level. Colors, numbers 1–5, and common nouns introduced. No past or future tense.",
+    "description": "Pre-A1. Day 2–3. Two- to three-word phrases. Vocabulary near 30 words. Subject-verb constructions at the most basic level.",
     "examples": [
       {
         "passage": "One cat. Two dogs. Red apple. Big dog. Small cat. One book. Two pens. Red bag. Big house. Small box. One boy. Two girls. Red hat. Big cup. Small key. One bird. Two fish. Red flower. Big tree. Small leaf. One mom. Two kids. Red door. Big bed. Small chair. One man. Two women. Red car. Big bus. Small bike. One cat. Two dogs. Red apple. Big dog. Small cat. One book. Two pens. Red bag. Big house. Small box. One boy. Two girls. Red hat. Big cup. Small key. One bird. Two fish. Red flower. Big tree. Small leaf. One mom. Two kids. Red door. Big bed. Small chair. One man. Two women. Red car. Big bus. Small bike. One cat. Two dogs.",
@@ -63,7 +63,7 @@
     ]
   },
   "4": {
-    "description": "Pre-A1. Day 3–5. Very short sentences with 'is' and 'are.' Subject + verb + noun, with simple adjectives. Numbers up to 10, basic colors, and body parts. Present tense only.",
+    "description": "Pre-A1. Day 3–5. Very short sentences with 'is' and 'are.' Subject + verb + noun with a single adjective. Vocabulary near 40 words. Present tense only.",
     "examples": [
       {
         "passage": "This is a cat. That is a dog. I am here. You are nice. This is a book. That is a pen. This is a hat. That is a bag. I am tall. You are short. I am happy. You are kind. This is my hand. That is my foot. This is my eye. That is my ear. The cat is small. The dog is big. The book is red. The pen is blue. The hat is new. The bag is old. I am ten. You are nine. This is one. That is two. I am here. You are there. The cat is here. The dog is there. I am a boy. You are a girl. This is good. That is bad. I am ready. You are too.",
@@ -89,7 +89,7 @@
     ]
   },
   "5": {
-    "description": "Pre-A1. First week. Simple declarative sentences using 'I have,' 'I like,' and 'I see.' Vocabulary of roughly 50 common concrete nouns and basic verbs. No negation, no questions yet. The learner can name things in their environment.",
+    "description": "Pre-A1. First week. Simple declarative sentences using 'I have,' 'I like,' 'I see.' Vocabulary roughly 50 common words. No negation, no questions.",
     "examples": [
       {
         "passage": "I see a cat. I have a dog. I like apples. She has a book. He is happy. I see a bird. I have a hat. I like bread. I see the sun. I see the sky. She has a pen. She has a bag. He has a ball. He has a cup. I like milk. I like tea. I like rice. He is kind. She is nice. I am happy. The cat is small. The dog is big. The bird is red. The book is new. The bag is old. I see my mom. I see my dad. I have a sister. I have a brother. I like my home. I like my school. She is my friend. He is my friend. I am here. They are here.",
@@ -115,33 +115,28 @@
     ]
   },
   "6": {
-    "description": "Pre-A1. First week. Simple declarative sentences using 'I have,' 'I like,' and 'I see.' Vocabulary of roughly 50 common concrete nouns and basic verbs. No negation, no questions yet. The learner can name things in their environment.",
+    "description": "Pre-A1. Week 1–2. Simple negation ('I do not have,' 'It is not big'). Adds 'this/that.' Vocabulary near 60 words. Still declarative; no questions.",
     "examples": [
       {
-        "passage": "I see a cat. I have a dog. I like apples. She has a book. He is happy. I see a bird. I have a hat. I like bread. I see the sun. I see the sky. She has a pen. She has a bag. He has a ball. He has a cup. I like milk. I like tea. I like rice. He is kind. She is nice. I am happy. The cat is small. The dog is big. The bird is red. The book is new. The bag is old. I see my mom. I see my dad. I have a sister. I have a brother. I like my home. I like my school. She is my friend. He is my friend. I am here. They are here.",
+        "passage": "I have a hat. I do not have a coat. My sister has a book. She does not have a pen. We like apples. We do not like onions. The cat is small. The cat is not big. The sky is blue. The sky is not green. I see a bird. I do not see a fish. The bird is red. It is not yellow. My mom is at home. My dad is not at home. He is at work. I am happy today. I am not sad. The dog is friendly. It is not loud. This is my chair. That is not my chair. This pen is black. That pen is blue. I have one brother. I do not have a sister. I like the sea. I do not like the cold.",
         "question": {
-          "question": "Which statement best describes what the speaker owns?",
-          "options": [
-            "A) A cat and a book",
-            "B) A dog only",
-            "C) Apples and a book",
-            "D) A cat and a dog"
-          ],
-          "answer": 1
+          "question": "What does the speaker NOT have?",
+          "options": ["A) A book", "B) A hat", "C) A coat", "D) An apple"],
+          "answer": 2
         }
       },
       {
-        "passage": "I see a tree. I have a ball. I like the sea. The bird is small. The fish is big. I see a flower. I see a leaf. I see a rock. I have a box. I have a key. I like the sun. I like the rain. The cat is small. The dog is small. The cow is small. The bee is small. The frog is small. The horse is small. The fish is big. The sky is blue. The sea is blue. The grass is green. The flower is red. I see the moon. I see a star. I have a friend. I like my friend. He is kind. She is nice. The boy is happy. The girl is happy. I am here. They are here too.",
+        "passage": "This is my room. The window is open. The door is not open. My bed is big. The bed is not small. I have a blue chair. The chair is not new. I have a red lamp. The lamp is on. The light is not off. I see a plant on the table. The plant is green. The leaves are not yellow. My bag is on the floor. The floor is clean. The wall is white. The wall is not blue. I have a clock. The clock is round. It is not square. I am in my room. I am not in the kitchen. This book is mine. That book is not mine. I like this room. I do not like the cold room next door.",
         "question": {
-          "question": "Which animal in the passage is described as big?",
-          "options": ["A) The cat", "B) The bird", "C) The fish", "D) The dog"],
-          "answer": 2
+          "question": "What color is the lamp in the speaker's room?",
+          "options": ["A) Blue", "B) Red", "C) Green", "D) White"],
+          "answer": 1
         }
       }
     ]
   },
   "7": {
-    "description": "A1 entry. First week. Simple yes/no questions and short answers. Introduces 'do you like' and 'what is this.' Vocabulary expands to 75 words. Sentences are 4–6 words. Present tense with common verbs: eat, drink, walk, sit.",
+    "description": "A1 entry. First week. Yes/no questions and short answers. Vocabulary near 75 words. Sentences 4–6 words. Present tense with common high-frequency verbs.",
     "examples": [
       {
         "passage": "Do you have a dog? Yes, I have a dog. I eat an apple. She drinks water. Do you eat bread? Yes, I eat bread. Do you drink tea? Yes, I drink tea. Do you walk to school? Yes, I walk every day. What is this? This is a book. What is that? That is a pen. Do you sit on the chair? Yes, I sit here. The dog eats food. The cat drinks milk. The boy walks to the park. The girl walks to the shop. The man eats fish. The woman eats rice. Do you like apples? Yes, I like apples. Do you like fish? No. Do you have a cat? Yes, I have a cat. Do you have a bag? Yes, I have a bag. I sit. I eat. I drink. I walk.",
@@ -167,7 +162,7 @@
     ]
   },
   "8": {
-    "description": "A1 entry. Days 7–10. Short dialogues with basic questions and answers. Introduces possessives (my, your, his, her) and simple plurals. Vocabulary of about 100 words. Family members and household objects appear.",
+    "description": "A1 entry. Days 7–10. Short question-answer exchanges. Possessives (my, your, his, her) and simple plurals. Vocabulary near 100 words.",
     "examples": [
       {
         "passage": "This is my cat. Her name is Luna. My dog is big. Your book is small. I have two sisters. My sisters are kind. Their names are Ana and Mia. This is my mom. Her name is Sara. This is my dad. His name is Tom. My house is small. Your house is big. My room is blue. Your room is red. My bed is new. Your bed is old. I have two cats. I have one dog. My cats are small. My dog is big. My friend has a bird. Her bird is yellow. His friend has a fish. His fish is orange. We have many books. We have many pens. My bag is here. Your bag is there. This is my school. That is your school.",
@@ -193,7 +188,7 @@
     ]
   },
   "9": {
-    "description": "A1 entry. Second week. Present continuous introduced ('I am eating'). Simple descriptions of ongoing actions. Vocabulary around 125 words. Sentences remain very short but actions are now depicted in progress.",
+    "description": "A1 entry. Second week. Present continuous introduced. Vocabulary near 125 words. Sentences remain very short but now depict ongoing actions.",
     "examples": [
       {
         "passage": "I am eating lunch. She is reading a book. He is walking to school. The dog is sleeping. The cat is sitting on the bed. My mom is cooking food. My dad is washing the car. My sister is drawing a picture. My brother is playing with a ball. The baby is drinking milk. I am drinking water. She is eating an apple. He is opening the door. The bird is flying. The fish is swimming. The horse is running. The cow is eating grass. The teacher is talking. The boy is listening. The girl is writing. We are sitting in class. They are playing a game. I am wearing a hat. She is wearing a coat. He is holding a pen. The dog is sleeping under the chair.",
@@ -219,7 +214,7 @@
     ]
   },
   "10": {
-    "description": "A1 entry. Weeks 2–3. Simple negation ('I don't like') and basic 'where' questions. Prepositions of place: in, on, under, next to. Vocabulary of roughly 150 words. Spatial relationships between simple objects.",
+    "description": "A1 entry. Weeks 2–3. Negation with 'don't' and basic 'where' questions. Prepositions of place. Vocabulary near 150 words.",
     "examples": [
       {
         "passage": "The cat is on the table. I don't like milk. Where is the book? The book is under the chair. Where is the pen? The pen is on the desk. Where is the bag? The bag is next to the door. Where is the dog? The dog is in the garden. Where is the ball? The ball is under the bed. I don't like fish. I don't like rice. I don't like rain. The cup is on the table too. The plate is next to the cup. The spoon is in the cup. The keys are under the book. The hat is on the chair. The shoes are next to the bed. The cat sits next to the dog. The dog sleeps under the tree. The bird sits on the wall. The fish swims in the pond. I don't like the cold.",
@@ -245,7 +240,7 @@
     ]
   },
   "11": {
-    "description": "A1 entry. Third week. Introduces 'there is / there are' and simple 'how many' questions. Counting objects in simple scenes. Numbers to 20. Vocabulary near 175 words. Sentences are still one clause each.",
+    "description": "A1 entry. Third week. 'There is / there are' and 'how many' questions. Numbers up to 20. Vocabulary near 175 words. One clause per sentence.",
     "examples": [
       {
         "passage": "There is a cat in the room. There are three apples on the table. How many dogs do you have? I have two dogs. There is one book on the shelf. There are two pens in the bag. There is one chair in the kitchen. There are four cups on the shelf. There are two windows in the room. There is one door. How many people are here? There are two people. There is one boy and one girl. There is bread on the table. There is milk in the cup. There are eggs in the bowl. How many eggs? There are two eggs. There is one orange in the bag. How many bags do you have? I have one bag. How many books do you have? I have ten books. There is one cat. There are two dogs. There are three apples. There are four cups.",
@@ -271,7 +266,7 @@
     ]
   },
   "12": {
-    "description": "A1. Weeks 3–4. Days of the week and basic time expressions (today, tomorrow, yesterday). Simple routines described in present tense. Vocabulary of about 200 words. Short paragraphs of two or three closely related sentences.",
+    "description": "A1. Weeks 3–4. Basic time expressions (today, tomorrow, yesterday). Vocabulary near 200 words. Two or three closely related sentences.",
     "examples": [
       {
         "passage": "Today is Monday. I go to school every day. I eat breakfast in the morning. I sleep at night. On Monday I have math. On Tuesday I have music. On Wednesday I have art. On Thursday I have sport. On Friday I have English. On Saturday I do not go to school. On Sunday I do not go to school. I like Saturday and Sunday. I get up in the morning. I wash my face in the morning. I eat breakfast in the morning. I walk to school in the morning. I come home in the afternoon. I do my homework in the afternoon. I eat dinner in the evening. I read a book in the evening. I sleep at night. Tomorrow I will go to school again. Yesterday I went to school too. Every day is the same.",
@@ -297,7 +292,7 @@
     ]
   },
   "13": {
-    "description": "A1. Week 4. Telling time and discussing daily schedules. Numbers to 100. Basic ordinals (first, second, third). Vocabulary near 225 words. Simple question words: when, what time.",
+    "description": "A1. Week 4. Telling time. Numbers up to 100. Basic ordinals (first, second, third). Question words 'when' and 'what time.' Vocabulary near 225 words.",
     "examples": [
       {
         "passage": "I wake up at seven o'clock. I eat lunch at twelve. School starts at eight. What time is dinner? Dinner is at six o'clock. I go to bed at ten. I wake up at seven every day. I eat breakfast at half past seven. I leave home at quarter to eight. School starts at eight. The first class is math. The second class is reading. The third class is music. We have a break at ten. We eat lunch at twelve. School ends at three. I walk home at three. I do my homework at four. I play with my friends at five. I eat dinner at six. I read a book at seven. I watch TV at eight. I have a bath at nine. I go to bed at ten. What time do you go to bed?",
@@ -318,7 +313,7 @@
     ]
   },
   "14": {
-    "description": "A1. End of first month. Simple past tense introduced with regular verbs ('walked,' 'talked'). Describing what happened yesterday. Vocabulary approaching 275 words. Two or three simple sentences about a past event.",
+    "description": "A1. End of first month. Simple past tense introduced with regular verbs ('walked,' 'talked'). Vocabulary near 275 words. Two or three simple past-tense sentences.",
     "examples": [
       {
         "passage": "Yesterday I walked to school. I talked to my friend. We played in the park. It was fun. In the morning, I walked with my sister. We talked about our day. At school, I worked very hard. I learned new words. I helped my friend with her work. At lunch, we shared our food. After school, we walked to the park. We played for one hour. We jumped on the grass. We laughed a lot. Then I walked home. My mom cooked dinner. I helped her in the kitchen. We talked about my day. I told her about the park. After dinner, I called my friend. We talked on the phone. I finished my homework. I watched a film with my dad. We laughed at the funny parts. I brushed my teeth. I went to bed at ten.",
@@ -349,38 +344,38 @@
     ]
   },
   "15": {
-    "description": "A1. End of first month. Simple past tense introduced with regular verbs ('walked,' 'talked'). Describing what happened yesterday. Vocabulary approaching 275 words. Two or three simple sentences about a past event.",
+    "description": "A1. End of first month. Simple past regular verbs paired with time markers ('yesterday morning,' 'last night'). Vocabulary near 300 words. Two or three connected past-tense sentences.",
     "examples": [
       {
-        "passage": "Yesterday I walked to school. I talked to my friend. We played in the park. It was fun. In the morning, I walked with my sister. We talked about our day. At school, I worked very hard. I learned new words. I helped my friend with her work. At lunch, we shared our food. After school, we walked to the park. We played for one hour. We jumped on the grass. We laughed a lot. Then I walked home. My mom cooked dinner. I helped her in the kitchen. We talked about my day. I told her about the park. After dinner, I called my friend. We talked on the phone. I finished my homework. I watched a film with my dad. We laughed at the funny parts. I brushed my teeth. I went to bed at ten.",
+        "passage": "Yesterday morning I walked to the supermarket near my house. I bought some bread and some milk. The shop was full of people. I talked to my neighbor for a few minutes. She lived next to us for many years. Last night I cooked rice and chicken for my family. My sister helped me in the kitchen. We watched a movie after dinner. The movie ended late. This morning I waited for the bus. The bus arrived late, but I was patient. At school I studied math and history. I worked with my friends on a project. Last weekend we visited my grandmother in the village. She lived in a small house with a green garden. We picked apples from her tree. She talked about her childhood. Her stories were long but interesting.",
         "question": {
-          "question": "What can we infer about the speaker's day yesterday?",
+          "question": "What did the speaker do last weekend?",
           "options": [
-            "A) They stayed inside all day",
-            "B) They spent time with at least one other person",
-            "C) They went to school by bus",
-            "D) They played a sport by themselves"
+            "A) Walked to the supermarket",
+            "B) Cooked dinner for the family",
+            "C) Visited their grandmother in the village",
+            "D) Studied math and history at school"
           ],
-          "answer": 1
+          "answer": 2
         }
       },
       {
-        "passage": "Yesterday it rained all morning. The garden looked very green. The flowers opened slowly. I watched them from the window. The rain washed the leaves. The trees looked clean and bright. The grass shined in the soft light. Birds did not sing in the morning. They waited in the trees. A small cat walked under a bush. The cat stayed dry there. In the afternoon, the rain stopped. The sun came out slowly. The clouds moved away. Birds started to sing. The cat walked into the garden. It looked at the wet flowers. I opened the window. I smelled the fresh air. The garden smelled very nice. I walked outside. I picked one wet flower. I put it in a small cup of water. I placed the cup on my desk.",
+        "passage": "Last weekend my brother and I cleaned the house. On Saturday morning we washed all the windows. The house looked much brighter after that. Then we washed the floors in every room. It took us about three hours. We listened to music while we worked. The work was easier with music. In the afternoon my brother and I helped our mother in the garden. We planted new flowers near the fence. We finished just before it started to rain. On Sunday I rested at home. I read a book about ships. The book belonged to my father. I talked to my brother about it later. He liked ships too, but he preferred trains. Last summer he visited a train museum in another city. He still talked about it many months later.",
         "question": {
-          "question": "Based on the passage, what most likely caused the garden to look very green?",
+          "question": "What did the speaker and their brother do on Saturday afternoon?",
           "options": [
-            "A) The flowers opening slowly",
-            "B) The window being clean",
-            "C) The rain in the morning",
-            "D) The speaker watching it"
+            "A) Washed the windows of the house",
+            "B) Helped their mother plant flowers in the garden",
+            "C) Listened to music inside the house",
+            "D) Read books about ships and trains"
           ],
-          "answer": 2
+          "answer": 1
         }
       }
     ]
   },
   "16": {
-    "description": "A1. Month 1, weeks 3–4. Irregular past tense verbs (went, saw, had, ate). Short narratives about familiar events. Vocabulary near 325 words. Simple conjunctions 'and' and 'but' connect two clauses.",
+    "description": "A1. Month 1, weeks 3–4. Irregular past tense verbs (went, saw, had, ate). 'And' and 'but' connect two clauses. Vocabulary near 325 words.",
     "examples": [
       {
         "passage": "We went to the park yesterday. I saw a big dog and I was happy. We ate ice cream, but it was cold. My sister came with us, and my brother came too. We took our small dog with us. We walked for a long time, and we saw many people. We saw a woman with two children, and we saw a man with three dogs. I had a ball, and we played with it. My brother kicked it far, but I caught it. We sat on the grass and ate our lunch. We had bread and cheese, and we had apples. After lunch, we bought ice cream from a shop. The ice cream was good, but it was very cold. My sister did not eat hers. I ate mine fast, and my brother ate his too. We went home tired but happy.",
@@ -411,7 +406,7 @@
     ]
   },
   "17": {
-    "description": "A1. End of first month. Simple connected sentences about daily life, with 'and,' 'but,' and 'because.' Past and present tenses used. Vocabulary of about 375 words. Picture-book level — simple, concrete, and personal. Equivalent to children's earliest readers.",
+    "description": "A1. End of first month. 'And,' 'but,' and 'because' link clauses. Past and present tenses mixed. Vocabulary near 375 words. Sentences are short, concrete, and personal.",
     "examples": [
       {
         "passage": "I went to the store with my mom. We bought apples and bread. I like apples because they are sweet. My mom likes bread. We were happy. The store was near our house, and we walked there together. The man at the store was very kind, and he said hello to my mom. We took a small basket. We walked around the store and looked at the food. My mom put bread in the basket because we eat bread every day. I put apples in the basket because I like sweet things. We also bought milk because my brother drinks milk in the morning. We bought eggs because my dad cooks eggs on Sundays. We did not buy meat because we already had some at home. The bag was heavy, but my mom carried it. I carried the apples in my hand. We walked home slowly and talked about dinner.",
@@ -442,7 +437,7 @@
     ]
   },
   "18": {
-    "description": "A1. Month 2. Introducing simple future with 'will' and 'going to.' Making plans and predictions. Vocabulary near 425 words. Short, concrete paragraphs about familiar future events.",
+    "description": "A1. Month 2. Simple future with 'will' and 'going to.' Vocabulary near 425 words. Short, concrete paragraphs.",
     "examples": [
       {
         "passage": "Tomorrow I will go to school. After school, I am going to play with my friends. We will eat dinner at six. It will be a good day. In the morning, I will wake up at seven. I will eat breakfast with my family. My mom will make eggs and bread. I will leave home at quarter to eight. I will walk to school with my sister. We will arrive at eight. I will have math class first, and then I will have art. After lunch, I will read a book in the library. School will end at three. I am going to meet my friends at the park. We are going to play football. After we play, I am going to go home. I am going to do my homework. We will eat dinner at six. After dinner, I am going to watch a film with my dad. Then I will go to bed.",
@@ -468,7 +463,7 @@
     ]
   },
   "19": {
-    "description": "A1. Month 2. Describing people's appearance and personality with basic adjectives (tall, short, kind, funny). Simple comparatives (bigger, faster). Vocabulary around 475 words. Very short personal descriptions.",
+    "description": "A1. Month 2. Basic descriptive adjectives. Simple comparatives (bigger, faster). Vocabulary near 475 words. Very short descriptive passages.",
     "examples": [
       {
         "passage": "My friend is tall and funny. She has long hair. Her dog is bigger than my dog. I am shorter than my friend, but I am faster. My friend is also kind and very smart. She is the smartest person in our class. She is taller than me, and she is taller than her brother too. Her brother is short and quiet. Her sister is the youngest in the family. The sister is small and shy. My friend has long brown hair, and she has dark eyes. I have short black hair and brown eyes. I am thin and small, but I run very fast. I am faster than my friend. I am also faster than her brother. My friend is funnier than me. She tells funny stories, and she makes everyone laugh. Her dog is big and friendly. My dog is smaller, but my dog is older. We are good friends.",
@@ -494,7 +489,7 @@
     ]
   },
   "20": {
-    "description": "A1. Month 2. Simple directions and location vocabulary (turn left, go straight, next to the library). Asking and giving basic directions. Vocabulary near 525 words. Commands and imperatives appear.",
+    "description": "A1. Month 2. Imperatives and commands appear. Vocabulary near 525 words. Short functional sentences.",
     "examples": [
       {
         "passage": "Go straight and turn left. The school is next to the park. Where is the library? It is on Main Street, after the store. To get to the school from my house, walk straight for two minutes. Turn left at the end of my street. Walk past the bus stop. The school is next to the park, and the park has many trees. To get to the shop, leave the school and turn right. Walk past three houses. The shop is on the corner. To get to the library, do not turn at the shop. Go straight on Main Street. Walk past the small café. Walk past the bank. The library is on Main Street, just after the store. It is a big white building. To get home from the library, walk back the same way. Turn right at the school. Then walk straight, and you are home.",
@@ -520,7 +515,7 @@
     ]
   },
   "21": {
-    "description": "A1. Month 2–3. Shopping and money vocabulary. Simple transactional dialogues. Prices, quantities, and requests. Vocabulary around 575 words. Very short functional exchanges.",
+    "description": "A1. Month 2–3. Numbers, quantities, and prices used in short functional exchanges. Vocabulary near 575 words.",
     "examples": [
       {
         "passage": "How much does this cost? It costs five dollars. I would like two apples, please. Here is the money. Thank you very much. I went to the small shop on the corner. The man at the shop said hello to me. I said hello and looked at the food. I asked, How much do these apples cost? The man said, They cost five dollars each. I said, I would like two apples, please. The man put two apples in a bag. I asked, How much is the bread? The man said, The bread is three dollars. I said, I would like one bread, please. He put the bread in the bag. I asked, How much is the milk? The man said, The milk is two dollars. I said, I would like one bottle, please. The total cost was fifteen dollars. I gave him a twenty-dollar bill. He gave me five dollars back. I said, Thank you very much.",
@@ -541,7 +536,7 @@
     ]
   },
   "22": {
-    "description": "A1. Month 3. Weather and seasons vocabulary. Describing current and seasonal weather. Modal 'can' introduced for ability. Vocabulary near 625 words. Short descriptive passages about the natural world.",
+    "description": "A1. Month 3. Modal 'can' for ability introduced. Vocabulary near 625 words. Short descriptive passages with one or two simple clauses.",
     "examples": [
       {
         "passage": "Today it is sunny and warm. In winter, it is cold and it snows. I can swim in summer. Can you ski? I like spring because the flowers are beautiful. There are four seasons in my country. In spring, the weather is cool and rainy. The trees are green again, and the flowers come out. I like spring because the flowers are beautiful. In summer, the weather is hot and sunny. The days are long, and the nights are short. I can swim in the lake in summer. I can ride my bike too. In autumn, the weather is cool and windy. The leaves turn red and yellow. They fall from the trees. We can pick apples in autumn. In winter, the weather is very cold, and it snows a lot. The days are short and the nights are long. We can ski in the mountains. Can you ski? I cannot ski well, but I can swim well.",
@@ -572,7 +567,7 @@
     ]
   },
   "23": {
-    "description": "A1. Month 3. Food and meals — describing what people eat and when. Simple 'would like' for polite requests. Cooking verbs (cook, boil, fry). Vocabulary around 675 words. A simple scene at a table or in a kitchen.",
+    "description": "A1. Month 3. Modal 'would like' for polite requests. Vocabulary around 675 words. Short scenes with one or two characters and simple dialogue.",
     "examples": [
       {
         "passage": "For breakfast I eat eggs and bread. My mother cooks dinner every night. Would you like some soup? Yes, please. I like soup a lot. In our family, we eat three meals a day. For breakfast, I eat eggs and bread, and I drink tea. My father eats only fruit. My sister eats cereal with milk. My mother does not eat much in the morning. For lunch, we usually eat at school or at work. I take a sandwich and an apple in my bag. After school, I sometimes have a small snack at home. My mother cooks dinner every night. She is a very good cook. She often boils vegetables and fries fish. Sometimes she makes soup with rice. Tonight she is making chicken soup. My mother asks me, Would you like some soup? Yes, please. I like soup a lot, especially when it is cold outside. We sit at the table together and talk about our day.",
@@ -603,38 +598,38 @@
     ]
   },
   "24": {
-    "description": "A1. Month 3. Food and meals — describing what people eat and when. Simple 'would like' for polite requests. Cooking verbs (cook, boil, fry). Vocabulary around 675 words. A simple scene at a table or in a kitchen.",
+    "description": "A1. Month 3. Time-of-day expressions ('at seven o'clock,' 'in the afternoon,' 'after work'). Vocabulary around 700 words. Short connected paragraphs.",
     "examples": [
       {
-        "passage": "For breakfast I eat eggs and bread. My mother cooks dinner every night. Would you like some soup? Yes, please. I like soup a lot. In our family, we eat three meals a day. For breakfast, I eat eggs and bread, and I drink tea. My father eats only fruit. My sister eats cereal with milk. My mother does not eat much in the morning. For lunch, we usually eat at school or at work. I take a sandwich and an apple in my bag. After school, I sometimes have a small snack at home. My mother cooks dinner every night. She is a very good cook. She often boils vegetables and fries fish. Sometimes she makes soup with rice. Tonight she is making chicken soup. My mother asks me, Would you like some soup? Yes, please. I like soup a lot, especially when it is cold outside. We sit at the table together and talk about our day.",
+        "passage": "Every weekday I get up at seven o'clock. I drink a cup of coffee and eat some toast for breakfast. At eight o'clock I leave the house and walk to the bus stop. The bus comes at quarter past eight. I get to work at nine. I usually eat lunch at one o'clock. My favorite lunch is a sandwich with cheese and a salad. In the afternoon I drink another coffee. I finish work at five. After work I sometimes go to the gym for an hour. I get home around seven. I cook dinner for me and my brother. We usually eat rice and vegetables, or sometimes pasta. In the evening I read a book or watch television. I go to bed at eleven. On the weekend I get up much later.",
         "question": {
-          "question": "Who is responsible for preparing the evening meal in this household?",
+          "question": "What does the speaker usually do right after work?",
           "options": [
-            "A) The speaker alone",
-            "B) The speaker's mother",
-            "C) Both the speaker and the mother",
-            "D) The person being offered soup"
+            "A) Cooks dinner for the family at home",
+            "B) Goes to the gym for about an hour",
+            "C) Reads a book or watches television",
+            "D) Eats a sandwich and a salad for lunch"
           ],
           "answer": 1
         }
       },
       {
-        "passage": "Long ago, people did not have stoves. They cooked their food over a fire outside. They boiled water in a heavy pot. Today we have many easy ways to cook, but some people still like to cook over a fire. In old times, every family had a small fire pit near their house. They put wood in the pit and lit it every morning. They hung a large pot over the fire. They boiled water in this heavy pot for soup, for tea, and for washing. They fried meat on a flat hot stone next to the fire. They baked bread in a clay box. Cooking took many hours every day. Today most people use modern stoves. We can boil water in just a few minutes. We can cook a meal very fast. But some people still like to cook over a fire on weekends. They say food cooked over a fire has a special taste that no stove can give.",
+        "passage": "Maria works in a small bakery in the center of town. She starts very early — at four o'clock in the morning. She mixes the flour, the water, and the yeast in a large bowl. Then she lets the bread rise for an hour. While she waits, she boils water for tea and eats a small breakfast. At six the bakery opens. The first customers come for fresh bread and coffee. Maria serves them with a smile. She likes her customers and knows most of them by name. At noon she stops to eat lunch. She usually has soup or a small piece of pizza from the oven. The bakery closes at three. Maria goes home tired but happy. She often takes a short walk before dinner. She lives near a small park, and the walk helps her relax.",
         "question": {
-          "question": "What does the passage suggest about cooking over a fire today?",
+          "question": "What does Maria do during the hour while the bread rises?",
           "options": [
-            "A) It is no longer possible to cook over a fire",
-            "B) Everyone uses a stove now and not a fire",
-            "C) Some people still choose to cook over a fire by preference",
-            "D) People cannot boil water in a pot anymore"
+            "A) Serves the first customers of the morning",
+            "B) Makes herself tea and a small breakfast",
+            "C) Goes for a walk in the park near her house",
+            "D) Eats soup or a small piece of pizza from the oven"
           ],
-          "answer": 2
+          "answer": 1
         }
       }
     ]
   },
   "25": {
-    "description": "A1. Month 3. Hobbies and free-time activities. Frequency adverbs (always, sometimes, never, often). Simple sentences about personal preferences and habits. Vocabulary near 725 words.",
+    "description": "A1. Month 3. Frequency adverbs (always, sometimes, never, often). Simple sentences about preferences and habits. Vocabulary near 725 words.",
     "examples": [
       {
         "passage": "I sometimes play football with my friends. My sister always reads books on weekends. I never watch TV in the morning. What do you like to do? Everyone in my family has different free-time activities. I sometimes play football with my friends after school. We meet in the park. I am not a great player, but I have fun. On weekends, I often go for a walk with my dog. My sister always reads books on weekends. She loves stories about animals and far places. She finishes a new book almost every week. My brother often plays games on his computer in the evening. Sometimes he plays with his friends online. My mother often cooks new things on Sundays. She likes to try new foods. My father usually works in the garden. He grows tomatoes and onions. I never watch TV in the morning, but I sometimes watch a film at night. What do you like to do in your free time?",
@@ -665,7 +660,7 @@
     ]
   },
   "26": {
-    "description": "A1. Month 3–4. Describing a home — rooms, furniture, and layout. There is/are with more detail. Simple relative clauses beginning with 'that' or 'which.' Vocabulary around 775 words.",
+    "description": "A1. Month 3–4. Simple relative clauses with 'that' or 'which.' 'There is/are' with more detail. Vocabulary around 775 words.",
     "examples": [
       {
         "passage": "My house has three rooms. There is a big kitchen and a small garden. The room that I like most is the living room. It has a comfortable sofa. My house is small but very cozy. It has three rooms in total, plus a kitchen and a bathroom. There is a big kitchen with a wooden table that we eat at every day. The kitchen has a window that looks out on the small garden. There is a small garden behind the house, which has only one tree and some flowers. The first bedroom is mine. It has a small bed, a desk that I study at, and a shelf full of books. The second bedroom belongs to my parents. It is bigger than mine and has its own little bathroom. The room that I like most is the living room. It has a comfortable sofa, a soft rug on the floor, and a small table that we put our cups on when we have tea together every evening.",
@@ -696,7 +691,7 @@
     ]
   },
   "27": {
-    "description": "A1. Month 4. Talking about health and body — how you feel, simple ailments. Present and past tense mixed in short narrative. Modal 'should' introduced. Vocabulary near 825 words.",
+    "description": "A1. Month 4. Modal 'should' introduced. Present and past tense mixed in short narrative. Vocabulary near 825 words.",
     "examples": [
       {
         "passage": "Last week I had a bad cold and I was sick for several days. I had a sore throat and I could not eat much. My eyes hurt and my head was hot. Yesterday I had a headache and I felt very tired all day. I went to the doctor in the morning. The doctor checked my throat and listened to my chest. She said that I should sleep more. She also said that I should drink more water and eat fresh fruit. She told me that I should not work for two more days. I came home and rested. I went to bed early and slept for ten hours. Today I feel a little better. My head does not hurt as much, and I can eat normal food again. But I am still tired. I should rest one more day before I go back to school.",
@@ -727,7 +722,7 @@
     ]
   },
   "28": {
-    "description": "A1. End of month 4. Short personal narrative about a familiar event combining present, past, and simple future. Vocabulary of about 875 words. Equivalent to a simple picture-book story or the easiest level of graded readers. Sentences have one or two clauses; content is entirely concrete and personal.",
+    "description": "A1. End of month 4. Short personal narrative combining present, past, and simple future. Vocabulary around 875 words. Sentences have one or two clauses; content remains concrete.",
     "examples": [
       {
         "passage": "My grandmother lives in a small village about two hours from my city. I do not see her often because I am busy with school. Last weekend, I had no homework, so I took the bus to her house. Her house is small but very clean. There are old photos of our family on the walls. She was waiting for me at the door with a big smile. We cooked soup together in her warm kitchen. She showed me how to make her special vegetable soup. While we cooked, we talked about our family. She told me old stories about my mother when she was a child. I felt very happy. After lunch, I helped her in the garden. The bus came at five and I had to leave. Next time, I will bring her flowers and stay for the whole day.",
@@ -758,7 +753,7 @@
     ]
   },
   "29": {
-    "description": "A2. Month 4–5. Graded reader level 1. Short paragraphs about familiar everyday topics. Simple past narrative with time connectors (first, then, after that). Vocabulary around 1,000 words. Compound sentences with 'and,' 'but,' 'so,' 'because.'",
+    "description": "A2. Month 4–5. Compound sentences with 'and,' 'but,' 'so,' 'because.' Time connectors (first, then, after that). Vocabulary around 1,000 words.",
     "examples": [
       {
         "passage": "First, I woke up early at six and had a quick breakfast of bread and tea. I did not eat much because I was not very hungry yet. Then I got dressed and packed my bag. After that, I walked to the bus stop, which is about ten minutes from my house. The morning air was cool and fresh, and I saw a few neighbors on the way. The bus came on time, and I sat by the window. Then I went to work. The office was quiet because some people were already on holiday. I answered emails for two hours, and after that I had a meeting with my team. We finished our main project together. It was a normal day, but I was very happy because it was Friday and I had no plans for the weekend except to relax at home with a good book.",
@@ -789,7 +784,7 @@
     ]
   },
   "30": {
-    "description": "A2. Month 5. Comparing and contrasting using comparatives and superlatives. Describing differences between places, people, and things. Vocabulary near 1,100 words. Two or three sentences with comparative structures.",
+    "description": "A2. Month 5. Comparatives and superlatives. Vocabulary near 1,100 words. Two or three sentences using comparative structures.",
     "examples": [
       {
         "passage": "I moved from the village to the city last year, and life is very different now. The city is noisier than the village, but it has more things to do. There are theaters, museums, and cafés on almost every street. The streets are wider, and the buildings are much taller than in my old village. People walk faster, and they seem busier. My new flat is smaller than my old house, but it is closer to my work. The trains here are faster than the buses I used to take. My new job is more interesting than my old one, and the salary is higher too. I work with a bigger team, and we have more difficult projects. The food is more expensive than at home, but it is also more varied. Last week I tried a new café near the office. This is the best coffee I have ever had.",
@@ -820,7 +815,7 @@
     ]
   },
   "31": {
-    "description": "A2. Month 5. Talking about past experiences with 'have you ever.' Present perfect introduced for experience. Vocabulary around 1,200 words. Short personal anecdotes.",
+    "description": "A2. Month 5. Present perfect introduced ('have you ever') for experience. Vocabulary around 1,200 words. Short personal anecdotes.",
     "examples": [
       {
         "passage": "Have you ever visited another country? I have been to Spain twice, and both trips changed the way I think about travel. The first time, I went with my parents when I was young. The second time, I went alone last summer to study the language for two months. Spain was very different from home in many ways that I did not expect. The food was delicious and very fresh, with lots of vegetables, fish, and bread. The weather was warm even at night, which was new to me. People ate dinner very late, often after nine in the evening. Many shops closed in the afternoon for a long break. People talked loudly in the streets, and the cafés were always busy. I have also been to France once and to Italy three times, but Spain is the place I want to go back to most.",
@@ -851,7 +846,7 @@
     ]
   },
   "32": {
-    "description": "A2. Month 5–6. Describing routines and habitual actions in the past using 'used to.' Contrasting past and present habits. Vocabulary near 1,300 words. A short descriptive paragraph about change over time.",
+    "description": "A2. Month 5–6. 'Used to' for habitual past action. Vocabulary near 1,300 words.",
     "examples": [
       {
         "passage": "When I was young, my life was very different from how it is now. I used to play outside every day after school. My friends and I would run in the park, climb the trees, and play football until it got dark. Now I work in an office from nine to five, and I sit at a desk for most of the day. I used to eat a lot of sweets, especially chocolate and cake. My grandmother used to bake every weekend. Now I try to eat healthy food, with more vegetables and fruit. I used to sleep ten hours every night. Now I am happy if I get seven. I used to read comic books for hours. Now I usually read the news on my phone. Some of these changes feel sad, but others feel right for the person I have become.",
@@ -882,38 +877,38 @@
     ]
   },
   "33": {
-    "description": "A2. Month 5–6. Describing routines and habitual actions in the past using 'used to.' Contrasting past and present habits. Vocabulary near 1,300 words. A short descriptive paragraph about change over time.",
+    "description": "A2. Month 6. 'Used to' paired with the present tense, with reasons and consequences ('I used to … because …'). Vocabulary near 1,350 words.",
     "examples": [
       {
-        "passage": "When I was young, my life was very different from how it is now. I used to play outside every day after school. My friends and I would run in the park, climb the trees, and play football until it got dark. Now I work in an office from nine to five, and I sit at a desk for most of the day. I used to eat a lot of sweets, especially chocolate and cake. My grandmother used to bake every weekend. Now I try to eat healthy food, with more vegetables and fruit. I used to sleep ten hours every night. Now I am happy if I get seven. I used to read comic books for hours. Now I usually read the news on my phone. Some of these changes feel sad, but others feel right for the person I have become.",
+        "passage": "When I was a student, I used to live in a small room above a noisy café. I used to wake up to the smell of coffee every morning because the air came up through the floor. I did not have much money then, so I used to walk everywhere instead of taking the bus. I used to eat at the same cheap restaurant almost every night because I knew the owner, and he gave me a small discount. Now I live in a quiet apartment on the other side of the city. I drive to work because the bus does not come to my neighborhood. I cook at home most evenings, which is healthier and cheaper than eating out. The smell of coffee still reminds me of those years, though, and sometimes I miss them more than I expected to.",
         "question": {
-          "question": "What overall change does the passage suggest has occurred in the speaker's life?",
+          "question": "Why does the speaker still feel some fondness for those years?",
           "options": [
-            "A) They now enjoy eating sweets even more than they did when they were younger",
-            "B) Their lifestyle has become more physically active and centered on the outdoors",
-            "C) Their habits have shifted toward a more settled and health-conscious adult life",
-            "D) They have come to prefer working outdoors to working in an office environment"
+            "A) Because the café served excellent coffee at low prices",
+            "B) Because the smell of coffee brings back the memory",
+            "C) Because the cheap restaurant gave them a permanent discount",
+            "D) Because they had more money and freedom than today"
           ],
-          "answer": 2
+          "answer": 1
         }
       },
       {
-        "passage": "A hundred years ago, cities looked very different from the way they look today. Cities used to be much smaller, with only a few main streets and not many houses. People used to walk everywhere because there were no cars, and most things they needed were close to home. Schools, churches, shops, and homes were all in the same small area. Markets used to be the center of every town. People would meet there to buy food, sell their goods, and share news with their neighbors. Now most people drive, and shopping happens in big stores far from where they live. The streets are quieter because few people walk for shopping. Many small markets have closed, and the new big stores are usually outside the city. People often do not know their neighbors as well as they used to.",
+        "passage": "My grandfather used to be a fisherman in a small coastal village. He used to go out before sunrise every morning because the fish came close to the shore at that hour. He used to mend his nets in the afternoon, sitting on the same wooden bench by the harbor. Now the village has changed. Many fishermen have stopped working because there are fewer fish in the sea. My grandfather sold his boat last year. He still walks down to the harbor every afternoon, but he sits on the bench empty-handed. He says he does not miss the early mornings, but he misses the work itself. He used to feel useful, and now he is not sure what to do with his days. The bench has not changed, but everything around it has.",
         "question": {
-          "question": "What broad change in city life does the passage describe?",
+          "question": "What does the grandfather mainly regret about no longer fishing?",
           "options": [
-            "A) Cities have grown smaller, and walking has become much more common again",
-            "B) Daily life has moved away from a compact, walkable center toward a spread-out one",
-            "C) Big stores have replaced cars as the main way that people travel within cities",
-            "D) Markets remain the center of city life, though people now drive to reach them"
+            "A) Not being able to wake up before sunrise anymore",
+            "B) Losing the income from selling his daily catch",
+            "C) The loss of feeling useful through his work",
+            "D) Having to sell the boat that he loved so much"
           ],
-          "answer": 1
+          "answer": 2
         }
       }
     ]
   },
   "34": {
-    "description": "A2. Month 6. Writing simple letters and messages — informal register, greetings, and closings. Giving news and asking about someone's life. Vocabulary around 1,400 words. Friendly, conversational tone.",
+    "description": "A2. Month 6. Informal register — greetings, closings, conversational tone. Vocabulary around 1,400 words.",
     "examples": [
       {
         "passage": "Dear Maria, how are you? I hope your family is well and that the weather where you live is finally getting warmer. Things here are going well, although I have been very busy. Last week I started a new job at a small company in the center of town. It is hard work, and the days are longer than I am used to. I have to read many new documents every day, and the system is hard to learn. But I like my colleagues a lot. They are kind and patient with me, and they always answer my questions. We have lunch together every day, which makes the long hours easier. My new flat is also good. It is small but bright, and it has a tree right outside the window. Please write back soon and tell me about your studies. Best wishes, Anna.",
@@ -944,7 +939,7 @@
     ]
   },
   "35": {
-    "description": "A2. Month 6–7. Describing a journey or trip — past tense narrative with places, transport, and impressions. Vocabulary near 1,500 words. A short connected paragraph with a clear beginning, middle, and end.",
+    "description": "A2. Month 6–7. Short connected paragraph with a clear beginning, middle, and end. Past-tense narration with adverbial detail. Vocabulary near 1,500 words.",
     "examples": [
       {
         "passage": "Last weekend, my friends and I decided to escape the city for a short trip. We traveled to the coast by train, leaving early on Saturday morning to make the most of the day. The journey took two hours, but the time passed quickly because we played cards and looked out at the changing landscape. The mountains slowly gave way to flat green fields, and then we saw the sea for the first time. When we arrived, the sea was beautiful and calm, with hardly any waves. The sky was a soft blue, and a light wind kept the air cool. We walked along the beach for an hour and collected small shells. In the afternoon, we ate fresh fish at a small restaurant near the beach. The food was simple but delicious. We took the last train home, tired but very happy.",
@@ -975,7 +970,7 @@
     ]
   },
   "36": {
-    "description": "A2. Month 7. Giving opinions and making simple arguments. 'I think that,' 'In my opinion,' 'I agree / disagree.' Vocabulary around 1,600 words. Short opinion paragraph on a familiar topic.",
+    "description": "A2. Month 7. Opinion markers: 'I think that,' 'In my opinion,' 'I agree/disagree.' Vocabulary around 1,600 words. A short paragraph stating and supporting a position.",
     "examples": [
       {
         "passage": "I think that learning a language is one of the most important things a person can do today. The world is more connected than ever, and meeting people from different places has become a normal part of life. In my opinion, learning a language helps you understand other people. When you speak someone's language, even just a little, they open up to you in a different way. You also begin to see how they think, because language and thinking are closely connected. I agree that it is hard work. You have to study every day, and you will make many mistakes before you start to feel comfortable. There will be days when you want to give up, especially when grammar feels confusing. But it is also very interesting, and the work brings real rewards. I think every person should try to learn at least one new language in their life.",
@@ -1006,7 +1001,7 @@
     ]
   },
   "37": {
-    "description": "A2. Month 7–8. Conditionals type 1 (real and possible). 'If it rains, I will stay home.' Planning around possibilities. Vocabulary near 1,700 words. Short practical paragraphs.",
+    "description": "A2. Month 7–8. Conditionals type 1 ('If it rains, I will stay home'). Vocabulary near 1,700 words. Short practical paragraphs.",
     "examples": [
       {
         "passage": "We have been planning this weekend for a long time, but the weather is making it difficult. If the weather is good tomorrow, we will go to the park near the river. We will take sandwiches, fruit, and a blanket, and we will spend the whole afternoon outside. The children want to play football on the open grass, and my sister wants to read her new book under a tree. If the sun is hot, we will buy ice cream from the small van by the entrance. If it rains, we will change all our plans. We will stay inside and watch a film together at home. I will make popcorn and hot chocolate for everyone. If the rain stops in the afternoon, we may go for a short walk in the neighborhood. But honestly, I hope it will be sunny tomorrow. The children have been waiting all week for this trip.",
@@ -1037,7 +1032,7 @@
     ]
   },
   "38": {
-    "description": "A2. Month 8. Describing a process or how to do something. Sequence markers and imperative instructions. Vocabulary around 1,800 words. A simple how-to or process description.",
+    "description": "A2. Month 8. Sequence markers and imperatives in an instructional register. Vocabulary around 1,800 words.",
     "examples": [
       {
         "passage": "Cooking pasta is one of the simplest meals, but each step still matters. First, fill a large pot with water and add a little salt. Place the pot on the stove and turn the heat to high. Boil the water completely before you do anything else. Then add the pasta and stir gently with a wooden spoon to stop it sticking. Cook it for ten minutes, but check it from time to time, because some types of pasta cook more quickly. Test one piece by tasting it. It should be soft but still firm in the middle. After that, drain the water in a clean strainer over the sink. Put the pasta back in the pot, and add the sauce. Mix everything together until each piece is covered in sauce. Serve hot, with a little cheese on top if you like.",
@@ -1068,7 +1063,7 @@
     ]
   },
   "39": {
-    "description": "A2. End of month 9. A connected short paragraph on a familiar topic with past, present, and future tenses, comparatives, simple conditionals, and basic conjunctions. Vocabulary of about 2,000 words. Equivalent to graded reader level 2 or a simple magazine article for learners. Sentences are short to medium length, and the content is concrete with emerging personal opinions.",
+    "description": "A2. End of month 9. Connected paragraph spanning past, present, and future, with comparatives, simple conditionals, and basic conjunctions. Vocabulary around 2,000 words. Short to medium sentences.",
     "examples": [
       {
         "passage": "Last summer I spent two weeks at the coast in a place I had wanted to visit for years. The town was smaller than I expected, with only one main street and a handful of cafés along the harbor, but it was very beautiful. The houses were all painted white with blue doors, and the air smelled of salt and pine trees. I stayed in a small guesthouse run by an older couple who treated me like a member of their family. Every day I swam in the sea before breakfast, and the water was clear enough to see the rocks at the bottom. In the afternoons, I walked along the cliffs or read in the shade of the old fig tree in the garden. Every evening I ate local food at a different restaurant. If I have time next year, I will go back. I think it is one of the best places I have ever visited.",
@@ -1099,7 +1094,7 @@
     ]
   },
   "40": {
-    "description": "B1 entry. Month 9–10. Graded reader level 3 / simple young adult text. Paragraphs with multiple clauses, subordination, and some embedded phrases. Vocabulary near 2,200 words. Moderate descriptive detail; emerging narrative complexity.",
+    "description": "B1 entry. Month 9–10. Paragraphs with multiple clauses, subordination, and embedded phrases. Vocabulary near 2,200 words.",
     "examples": [
       {
         "passage": "The town where I grew up was a quiet place surrounded by fields, far from any larger city. There was a single main street, a small school, an old church, and a market that opened only on Saturdays. Not much happened there, which is why most young people left as soon as they could, usually for jobs or universities in the capital. They wrote home for a year or two, then visited only at holidays, and eventually some did not come back at all. I was different — I always found something to love about its slowness. I liked the way each season felt long enough to be properly known, and the way you could leave a book on a windowsill in the café and find it still there a week later. To my friends in the city, this seemed like an absence of life. To me, it has always seemed like a fuller version of it.",
@@ -1130,7 +1125,7 @@
     ]
   },
   "41": {
-    "description": "B1 entry. Month 10. Discussing advantages and disadvantages. Balanced paragraphs with concessive clauses ('although,' 'even though,' 'however'). Vocabulary near 2,400 words.",
+    "description": "B1 entry. Month 10. Concessive clauses ('although,' 'even though,' 'however') used to hold two perspectives in balance. Vocabulary near 2,400 words.",
     "examples": [
       {
         "passage": "Although living in a large city offers many opportunities, including better jobs and easier access to education, it can also be stressful and expensive. Rents in big cities are often two or three times higher than in smaller towns, and the cost of basic food and transport is rising every year. The pace of daily life can be exhausting, and many people complain that they have no time for friends or family. However, for young people looking for work, especially those who have just finished their studies, the advantages often outweigh the difficulties. Cities offer the kinds of jobs and professional networks that are simply not available in smaller places. Even so, many people eventually prefer a quieter life. By the time they have a family, the noise, the cost, and the pressure of the city begin to feel less like an exciting challenge and more like a daily burden they would rather not carry.",
@@ -1161,30 +1156,30 @@
     ]
   },
   "42": {
-    "description": "B1 entry. Month 10. Discussing advantages and disadvantages. Balanced paragraphs with concessive clauses ('although,' 'even though,' 'however'). Vocabulary near 2,400 words.",
+    "description": "B1. Month 10. Causal connectives ('because of,' 'as a result,' 'consequently'). One factor traced to another over multiple steps. Vocabulary near 2,500 words.",
     "examples": [
       {
-        "passage": "Although living in a large city offers many opportunities, including better jobs and easier access to education, it can also be stressful and expensive. Rents in big cities are often two or three times higher than in smaller towns, and the cost of basic food and transport is rising every year. The pace of daily life can be exhausting, and many people complain that they have no time for friends or family. However, for young people looking for work, especially those who have just finished their studies, the advantages often outweigh the difficulties. Cities offer the kinds of jobs and professional networks that are simply not available in smaller places. Even so, many people eventually prefer a quieter life. By the time they have a family, the noise, the cost, and the pressure of the city begin to feel less like an exciting challenge and more like a daily burden they would rather not carry.",
+        "passage": "Many small towns across the country have seen their populations decline sharply over the past two decades, and the causes are interconnected and tend to reinforce one another. As large supermarkets opened on the outskirts, local family-owned shops lost customers and were eventually forced to close. Because of this, the main streets emptied out, and the towns became less attractive places to live. Young people in particular left to look for work in larger cities. As a result, schools closed too, since there were fewer children to fill them. The closure of schools then accelerated the departure of remaining families, and the cycle continued. Some towns have tried to reverse the trend by offering tax breaks to new businesses, but the underlying causes are difficult to address. Consequently, recovery, when it happens at all, tends to be slow and uneven.",
         "question": {
-          "question": "What does the phrase 'Even so, many people eventually prefer a quieter life' imply about the appeal of cities?",
+          "question": "Which best describes the cycle the passage identifies?",
           "options": [
-            "A) Cities are always the best place to live long-term",
-            "B) The benefits of city life are permanent for most people",
-            "C) The advantages of cities may matter less to people over time",
-            "D) A quiet life is only for people who cannot find work"
+            "A) Supermarkets caused population growth, which strained the local schools",
+            "B) Shop closures triggered emigration, which then closed schools, accelerating further emigration",
+            "C) Tax breaks for new businesses prevented young people from leaving the small towns",
+            "D) School closures alone explain the decline of family-owned shops on the main street"
           ],
-          "answer": 2
+          "answer": 1
         }
       },
       {
-        "passage": "Although solar panels can produce clean energy for many decades, they are not without their own environmental cost. They require rare materials, including certain metals that are difficult to mine responsibly. Many of these materials come from a small number of countries, and the working conditions in some of the mines are poor. However, the alternative — continuing to burn fossil fuels — causes far greater long-term harm to the environment, including rising temperatures and serious damage to the air quality in our cities. Compared to that, the problems associated with solar panels are real but manageable. Even so, the search for cleaner ways to produce solar panels remains an urgent task. Engineers and scientists are now working on new designs that use cheaper materials, and on better methods for recycling old panels at the end of their lives.",
+        "passage": "Coral reefs are dying at an alarming rate, and the causes are well understood even if the solutions are not. Rising ocean temperatures, driven primarily by greenhouse gas emissions, cause coral to expel the algae that live within their tissue. Because the algae provide most of the coral's nutrients, the coral begins to starve. As a result, large sections of reef turn ghostly white in a phenomenon known as bleaching. Bleaching is not necessarily fatal in itself, but recovery requires the temperature to fall again — and as warming continues, the intervals between bleaching events grow shorter. Consequently, reefs no longer have time to recover between stresses. Compounding this, ocean acidification, also driven by carbon emissions, weakens the very structure of coral skeletons. Even if temperatures stabilized tomorrow, many reefs would continue to degrade for decades because of damage already done.",
         "question": {
-          "question": "What is the writer's central position on solar panels?",
+          "question": "Why does the passage say bleaching has become more dangerous over time?",
           "options": [
-            "A) Solar panels should be abandoned because of their reliance on rare materials",
-            "B) Solar panels are clearly the best option and need no further improvement at all",
-            "C) Solar panels are preferable to fossil fuels but their own problems still need addressing",
-            "D) Mining concerns matter more than the long-term effects of using fossil fuels"
+            "A) Acidification has made the coral more sensitive to algae loss",
+            "B) The bleached coral has become more vulnerable to natural predators",
+            "C) The intervals between bleaching events have grown too short for recovery",
+            "D) The algae that nourish the coral have begun migrating to cooler waters"
           ],
           "answer": 2
         }
@@ -1192,7 +1187,7 @@
     ]
   },
   "43": {
-    "description": "B1 entry. Month 10–11. Narrative past tense with more complex sequencing and embedded description. Past perfect introduced ('had left,' 'had forgotten'). Vocabulary around 2,600 words.",
+    "description": "B1 entry. Month 10–11. Past perfect introduced ('had left,' 'had forgotten'). More complex sequencing in past-tense passages. Vocabulary around 2,600 words.",
     "examples": [
       {
         "passage": "We had spent the whole afternoon in the old part of the city, walking through narrow streets and eating in small restaurants we had read about online. The sun had set before we noticed how late it had become, and we hurried back through the evening crowds toward the station, our bags heavier than we remembered them. By the time we arrived at the station, the last train had already left. The platform was empty, and the lights in the small ticket office were off. We had forgotten to check the timetable that morning, and the fact that the trains stopped earlier on Sundays had not even crossed our minds. There was nothing to do but find a hotel and try again in the morning. We walked back into the city, found a small place near a square we had passed earlier, and went to sleep.",
@@ -1223,7 +1218,7 @@
     ]
   },
   "44": {
-    "description": "B1 entry. Month 11. Describing emotions and abstract states with some nuance. Vocabulary for inner life: relieved, frustrated, anxious, content. Vocabulary around 2,800 words. A short introspective paragraph.",
+    "description": "B1 entry. Month 11. Vocabulary for inner life (relieved, frustrated, anxious, content). More nuanced adjectives. Vocabulary around 2,800 words.",
     "examples": [
       {
         "passage": "She felt anxious about the interview even though she had prepared carefully. For two weeks she had read about the company, practiced answers in front of the mirror, and chosen her clothes with more care than usual. By the morning of the interview, however, none of that preparation seemed to settle her. Part of her was excited at the thought of a new role and a new set of colleagues, but she was also afraid of making a mistake — of saying the wrong thing, of going blank in front of a difficult question. She sat in the waiting room and tried to slow her breathing. She reminded herself that she had done this before, more than once, and that even her worst interviews had not been as bad afterward as they had felt in the moment. The thought did not remove her anxiety, but it gave her something firm to stand on while she waited.",
@@ -1254,7 +1249,7 @@
     ]
   },
   "45": {
-    "description": "B1 entry. Month 11–12. Simple reporting and indirect speech ('He said that,' 'She told me'). Summarizing what others said or wrote. Vocabulary near 3,000 words. A short journalistic or informational paragraph.",
+    "description": "B1 entry. Month 11–12. Indirect speech ('He said that,' 'She told me'). Reporting and summarizing. Vocabulary near 3,000 words.",
     "examples": [
       {
         "passage": "A new study on city air pollution was presented to the local council yesterday, and its findings were widely reported in the morning papers. The report said that air quality in the city had improved over the last decade, with measurable drops in two of the most harmful pollutants. Experts told the committee that new regulations on traffic, factories, and home heating had made a significant difference, although the changes had been gradual and the effects were not always easy to feel from one year to the next. They added that public transport investment and a wider network of cycle lanes had also played a role. However, they warned that more work was still needed. Some areas near the main highway continued to record dangerous levels of pollution on the busiest days, and the level of certain newer pollutants was rising. The committee promised to consider further measures.",
@@ -1285,7 +1280,7 @@
     ]
   },
   "46": {
-    "description": "B1. Month 12. Simple argumentative writing — a clear position supported by two or three reasons. Discourse markers: 'firstly,' 'secondly,' 'in addition,' 'to conclude.' Vocabulary near 3,200 words.",
+    "description": "B1. Month 12. Discourse markers: 'firstly,' 'secondly,' 'in addition,' 'to conclude.' A clear position supported by two or three reasons. Vocabulary near 3,200 words.",
     "examples": [
       {
         "passage": "There are several reasons why people choose to live in cities. Firstly, cities offer better job opportunities. Secondly, there are more cultural and social activities available. In addition, transport links are usually much better than in rural areas.",
@@ -1316,7 +1311,7 @@
     ]
   },
   "47": {
-    "description": "B1. Month 12–13. Describing social issues with basic analysis. Cause and effect language ('as a result,' 'this leads to'). Vocabulary around 3,400 words. A short expository paragraph on a familiar topic.",
+    "description": "B1. Month 12–13. Expository paragraph with cause-and-effect language ('as a result,' 'this leads to'). Vocabulary around 3,400 words.",
     "examples": [
       {
         "passage": "Many young people leave small towns to study in big cities. As a result, rural communities often struggle to keep their population young and active. This leads to a lack of workers in local industries, which can make the problem worse over time.",
@@ -1347,7 +1342,7 @@
     ]
   },
   "48": {
-    "description": "B1. Month 13. Reading and producing simple news-style text. Active and passive voice used naturally. Vocabulary near 3,600 words. A short news paragraph with basic journalistic structure.",
+    "description": "B1. Month 13. Active and passive voice used naturally. Vocabulary near 3,600 words.",
     "examples": [
       {
         "passage": "A new community center was opened in the town last week. The building was designed by a local architect and funded by the city government. Residents were invited to attend the opening ceremony, which was attended by several hundred people.",
@@ -1378,7 +1373,7 @@
     ]
   },
   "49": {
-    "description": "B1. Month 13–14. Hypothetical situations with type 2 conditional ('If I were,' 'I would'). Discussing wishes and imagined scenarios. Vocabulary around 3,800 words.",
+    "description": "B1. Month 13–14. Conditional type 2 ('If I were,' 'I would'). Hypothetical and counterfactual reasoning. Vocabulary around 3,800 words.",
     "examples": [
       {
         "passage": "If I had more free time, I would travel more and learn to paint. I would probably live somewhere by the sea. But right now I have other priorities, and I think I am happy with that.",
@@ -1409,7 +1404,7 @@
     ]
   },
   "50": {
-    "description": "B1. Month 14–15. A sustained paragraph on a familiar topic with clear structure, varied sentence length, and some subordinate clauses. Vocabulary of about 4,000 words. Equivalent to a young adult novel or a straightforward news article. Some idiomatic language, clear logical flow, and moderate descriptive detail.",
+    "description": "B1. Month 14–15. Sustained paragraph with clear structure, varied sentence length, and some subordinate clauses. Vocabulary around 4,000 words. Some idiomatic language. Comparable in difficulty to a young-adult novel or a straightforward news article.",
     "examples": [
       {
         "passage": "Living abroad for the first time is both exciting and unsettling. You discover things about yourself that you never expected — your habits, your fears, and your need for familiarity. At first everything feels different, from the food to the way people greet each other. But slowly, if you give it time, the feeling shifts. You begin to feel at home in a place that once seemed impossible to understand.",
@@ -1440,38 +1435,38 @@
     ]
   },
   "51": {
-    "description": "B1. Month 14–15. A sustained paragraph on a familiar topic with clear structure, varied sentence length, and some subordinate clauses. Vocabulary of about 4,000 words. Equivalent to a young adult novel or a straightforward news article. Some idiomatic language, clear logical flow, and moderate descriptive detail.",
+    "description": "B1. Month 15. A short reasoned argument: clear claim, one or two supporting reasons, brief acknowledgment of a counter-point. Vocabulary around 4,100 words. Connectors signal logical relations between sentences.",
     "examples": [
       {
-        "passage": "Living abroad for the first time is both exciting and unsettling. You discover things about yourself that you never expected — your habits, your fears, and your need for familiarity. At first everything feels different, from the food to the way people greet each other. But slowly, if you give it time, the feeling shifts. You begin to feel at home in a place that once seemed impossible to understand.",
+        "passage": "Public libraries are often described as outdated, but in fact they are quietly becoming more important, not less. With most of life now lived through screens, the library is one of the few places where a person can spend several hours without being asked to buy anything. That alone is worth defending. Libraries also serve as informal community centers — places where new residents can meet neighbors, where children's reading clubs gather, and where people without internet access at home can apply for jobs. Critics point out that book lending itself accounts for less of a library's activity than it used to, and they are right. But this misses the point: the library has adapted, taking on functions the market refuses to provide. Whether that adaptation continues depends largely on whether municipal budgets continue to support it.",
         "question": {
-          "question": "According to the passage, what is the key condition for eventually feeling at home abroad?",
+          "question": "What does the writer concede to the critics?",
           "options": [
-            "A) Learning the local language as quickly as possible",
-            "B) Changing your habits to match the local culture",
-            "C) Allowing enough time to pass without rushing it",
-            "D) Finding familiar food and recognizable greetings"
+            "A) That libraries have become less important than they once were",
+            "B) That book lending now accounts for less of a library's activity",
+            "C) That commercial bookstores serve communities better than libraries do",
+            "D) That municipal budgets should be redirected to other priorities"
           ],
-          "answer": 2
+          "answer": 1
         }
       },
       {
-        "passage": "The discovery of penicillin in 1928 was famously accidental. A scientist returned from holiday to find that a mold had grown in one of his dishes and had killed the bacteria around it. Many others might have thrown the dish away. What made the difference was not luck alone but the kind of attention that was prepared to notice what luck had set in front of it.",
+        "passage": "It is fashionable to say that working from home is the future, but the case is more complicated than its enthusiasts suggest. Remote work clearly suits some kinds of work and some kinds of people — independent tasks, experienced employees who already know their colleagues, parents juggling young children. The savings in commuting time alone are significant. Against that, however, are losses that are harder to measure. New hires, especially those just out of school, learn an enormous amount simply by being near experienced coworkers — overhearing how problems are handled, observing how decisions get made. None of that translates easily to a video call. Companies that fully embrace remote work may not feel the cost for years, until a generation of employees has been trained without the unstructured learning that an office provides.",
         "question": {
-          "question": "What does the writer ultimately credit for the discovery of penicillin?",
+          "question": "What is the writer's main concern about remote work?",
           "options": [
-            "A) Pure luck, since the scientist had no real role in the events that took place",
-            "B) The scientist's foreign travel, which had given him enough time to think clearly",
-            "C) A trained mind that was ready to recognize what an accident had revealed",
-            "D) The mold itself, which had killed the bacteria without any scientific help"
+            "A) That commuting costs are not being properly reimbursed by employers",
+            "B) That the loss of incidental, on-the-job learning will only show its effects later",
+            "C) That parents working from home are at a disadvantage compared to other workers",
+            "D) That video calls cannot replace the personal connections built in offices"
           ],
-          "answer": 2
+          "answer": 1
         }
       }
     ]
   },
   "52": {
-    "description": "B1. Month 15. Nuanced personal narrative with reflection. Complex sentences with multiple subordinate clauses. Vocabulary near 4,300 words. Emerging personal voice and observation.",
+    "description": "B1. Month 15. Complex sentences with multiple subordinate clauses. Emerging personal voice. Vocabulary near 4,300 words.",
     "examples": [
       {
         "passage": "Growing up near the water, I never thought of the sea as something special — it was simply there, the way a wall or a road is there. It was only years later, living inland, that I began to understand what I had taken for granted.",
@@ -1502,7 +1497,7 @@
     ]
   },
   "53": {
-    "description": "B1. Month 16. Explaining a concept or process to a general audience. Clear exposition with examples. Technical vocabulary is minimal but accurately used. Vocabulary around 4,600 words.",
+    "description": "B1. Month 16. Clear exposition with examples. Some technical vocabulary used precisely. Vocabulary around 4,600 words.",
     "examples": [
       {
         "passage": "Memory does not work like a recording. Each time we remember something, we reconstruct it slightly differently, influenced by what we have experienced since. This is why two people who witnessed the same event can describe it in completely different ways.",
@@ -1533,7 +1528,7 @@
     ]
   },
   "54": {
-    "description": "B1. Month 16–17. Discussing cultural topics — traditions, customs, and values — with some comparison between cultures. Vocabulary near 4,900 words. A balanced, descriptive paragraph.",
+    "description": "B1. Month 16–17. Comparative paragraph holding two or more cases in parallel. Vocabulary near 4,900 words.",
     "examples": [
       {
         "passage": "In many cultures, sharing a meal is much more than just eating. It is a tradition that brings family members closer together and marks important events. The food itself is often less important than the meaning of eating together.",
@@ -1564,7 +1559,7 @@
     ]
   },
   "55": {
-    "description": "B1–B2 boundary. Month 17. A passage with moderate complexity and fluency, some idiomatic language, and varied sentence structures. Vocabulary around 5,200 words. The writing feels natural and connected rather than constructed.",
+    "description": "B1–B2 boundary. Month 17. Moderate complexity and fluency. Some idiomatic language and varied sentence structures. Vocabulary around 5,200 words. The writing feels natural and connected rather than constructed.",
     "examples": [
       {
         "passage": "She had lived in the same apartment for twelve years, and by now it felt less like a home than a habit. Every morning she followed the same route to work, passed the same faces, bought coffee from the same cart. She told herself this was stability. On difficult days, she was not so sure.",
@@ -1595,7 +1590,7 @@
     ]
   },
   "56": {
-    "description": "B1. About 18 months of study. Standard news article or short popular nonfiction. Vocabulary of roughly 5,500 words active. Varied sentence structures, clear argumentation, and emerging idioms. The prose is fluent, direct, and efficient — not yet literary, but fully functional for adult reading.",
+    "description": "B1. About 18 months. Vocabulary roughly 5,500 words active. Varied sentence structures, clear argumentation, emerging idioms. Comparable in difficulty to a standard newspaper article or short popular nonfiction.",
     "examples": [
       {
         "passage": "Researchers have long debated whether cities make people happier or more isolated. New data suggests the answer depends heavily on factors like income, age, and access to green space. Those who live near parks and community spaces report significantly higher levels of wellbeing, regardless of how densely populated their neighborhood is.",
@@ -1626,7 +1621,7 @@
     ]
   },
   "57": {
-    "description": "B1–B2. Month 18–20. Slightly richer vocabulary and more sustained argument. A longer paragraph with a clear thesis, evidence, and a concluding observation. Vocabulary near 5,800 words.",
+    "description": "B1–B2. Month 18–20. Sustained argument with a thesis, evidence, and concluding observation. Vocabulary near 5,800 words.",
     "examples": [
       {
         "passage": "The appeal of nostalgia is easy to understand but hard to justify. We tend to remember the past not as it was but as we wished it to be, editing out the discomforts and magnifying the warmth. Politicians who promise to restore a golden age are selling a version of history that never quite existed.",
@@ -1657,7 +1652,7 @@
     ]
   },
   "58": {
-    "description": "B1–B2. Month 20. Popular science or nature writing. Accessible explanation of complex ideas with concrete illustrations. Vocabulary around 6,100 words. Clear prose with some figurative language.",
+    "description": "B1–B2. Month 20. Accessible exposition of complex ideas with concrete illustrations. Some figurative language. Vocabulary around 6,100 words.",
     "examples": [
       {
         "passage": "The deep ocean is one of the least understood places on Earth. Below a thousand meters, sunlight disappears entirely and the water is near freezing. Yet life thrives there, in forms so unusual they seem to belong to another world — fish with their own built-in lights, creatures that can survive pressures that would crush a submarine.",
@@ -1688,7 +1683,7 @@
     ]
   },
   "59": {
-    "description": "B2 approach. Month 21. Personal essay style with observation, reflection, and a small argumentative thread. Vocabulary near 6,400 words. Sentence variety increases; the prose has rhythm.",
+    "description": "B2 approach. Month 21. Sentence variety increases; the prose has rhythm. Observation, reflection, and a small argumentative thread. Vocabulary near 6,400 words.",
     "examples": [
       {
         "passage": "There is something particular about the quiet of a library — not the absence of sound exactly, but the active suppression of it, as if everyone present has agreed to a shared form of consideration. It is one of the few public spaces where silence is still taken seriously.",
@@ -1719,30 +1714,30 @@
     ]
   },
   "60": {
-    "description": "B2 approach. Month 21. Personal essay style with observation, reflection, and a small argumentative thread. Vocabulary near 6,400 words. Sentence variety increases; the prose has rhythm.",
+    "description": "B2 entry. Month 22. Reflective prose that moves toward an implicit thesis through accumulated observation. Vocabulary near 6,500 words.",
     "examples": [
       {
-        "passage": "There is something particular about the quiet of a library — not the absence of sound exactly, but the active suppression of it, as if everyone present has agreed to a shared form of consideration. It is one of the few public spaces where silence is still taken seriously.",
+        "passage": "There is a particular kind of attention required to walk in a city you do not yet know. You notice things — the angle at which a shop sign leans, the way the light falls on a doorway, an accent you cannot quite place — because nothing yet is filtered out by familiarity. The same street, walked daily for a year, becomes nearly invisible. The city does not change; you do. This is not a loss exactly, but it is something. The price of being at home in a place is forgetting how strange it once seemed.",
         "question": {
-          "question": "How does the author distinguish library quiet from ordinary silence?",
+          "question": "What does the writer suggest happens as a place becomes familiar?",
           "options": [
-            "A) Libraries are completely soundproofed, unlike other public buildings",
-            "B) The quiet in a library is passively present rather than actively kept up",
-            "C) It is a collectively upheld behavior, not simply the absence of noise",
-            "D) Libraries stay quiet because very few people visit them regularly"
+            "A) Cities present their best qualities only to long-term residents",
+            "B) Familiarity is what makes a place feel like home over time",
+            "C) Habit makes a familiar environment effectively invisible",
+            "D) Travelers see cities more accurately than people who live in them"
           ],
           "answer": 2
         }
       },
       {
-        "passage": "Long-distance running is often described as a sport, but it has always seemed to me more like a form of negotiation. The runner is not really competing with the others on the course; they are bargaining with their own body, asking it for one more kilometer in exchange for the brief illusion of being in control. The body usually agrees. Until, one day, it does not.",
+        "passage": "Cooking from a recipe is a strangely social act, even when performed alone. The recipe is the trace of someone else's experiment, refined through repetition and eventually written down. To follow it is to step briefly into their kitchen, their assumptions about what a pan should sound like at a given heat, what 'a pinch' means in their hands. Even improvisation, when it happens, happens against the background of inherited technique. We praise originality in cooks, but most of what looks like originality is a long conversation with the dead, conducted in stock and salt.",
         "question": {
-          "question": "What does the writer's framing of running as 'negotiation' rather than 'sport' chiefly emphasize?",
+          "question": "What does the writer mean by calling cooking from a recipe 'strangely social'?",
           "options": [
-            "A) Running races are won through clever bargaining with one's competitors on the course",
-            "B) The real contest is internal, and the body's eventual refusal is part of its terms",
-            "C) Long-distance runners do not compete against each other in any meaningful sense",
-            "D) Control of one's body is fully attainable through proper training and preparation"
+            "A) Recipes are typically shared at gatherings of friends and family",
+            "B) The cook is following instructions shaped by another person's prior experience",
+            "C) Cooking together is more rewarding than cooking alone in the kitchen",
+            "D) Modern recipes encourage cooks to share photos of their results online"
           ],
           "answer": 1
         }
@@ -1750,7 +1745,7 @@
     ]
   },
   "61": {
-    "description": "B2 approach. Month 22. Sustained analytical paragraph on a social or cultural topic. Abstract nouns and more formal register emerge. Vocabulary around 6,700 words. The prose is confident and varied.",
+    "description": "B2 approach. Month 22. Abstract nouns and more formal register emerge. Confident, varied prose. Vocabulary around 6,700 words.",
     "examples": [
       {
         "passage": "The relationship between language and thought is more intimate than we usually acknowledge. The words available to us in any given moment shape not only how we communicate but what we are able to conceive. Cultures that lack a word for a specific emotion do not simply lack a term — they may lack the concept itself.",
@@ -1781,7 +1776,7 @@
     ]
   },
   "62": {
-    "description": "B2. About 2 years of study. Quality newspaper writing or accessible popular nonfiction (think The Atlantic, The Economist, or a well-written history book). Vocabulary of roughly 7,000–8,000 words. Sustained argumentation, figurative language, subordinate clauses, and moderate stylistic complexity. The reader handles abstraction, inference, and nuanced register with comfort.",
+    "description": "B2. About 2 years. Vocabulary roughly 7,000–8,000 words. Sustained argumentation, figurative language, subordinate clauses, and moderate stylistic complexity. Comparable in difficulty to a quality newspaper feature or accessible popular nonfiction.",
     "examples": [
       {
         "passage": "Democracy depends not only on institutions but on habits of mind that no constitution can mandate. Citizens must be willing to extend some basic trust to people whose views they find repugnant, to accept election results they find bitterly disappointing, and to believe that disagreement can be legitimate without being treasonous. When those habits erode, laws alone are rarely sufficient to restore them.",
@@ -1812,7 +1807,7 @@
     ]
   },
   "63": {
-    "description": "B2. 2 years. The prose becomes more assured and varied. Longer sentences balanced against short ones for effect. A clear authorial voice begins to emerge. Vocabulary near 8,500 words.",
+    "description": "B2. 2 years. Longer sentences balanced against short ones for effect. A clear authorial voice begins to emerge. Vocabulary near 8,500 words.",
     "examples": [
       {
         "passage": "There is a particular kind of loneliness that comes not from being alone but from being surrounded by people with whom you have nothing in common. It is the loneliness of a party you cannot leave, of a conversation that never quite touches anything real. Some people spend years trying to explain it; others simply learn to carry it.",
@@ -1843,7 +1838,7 @@
     ]
   },
   "64": {
-    "description": "B2. 2–2.5 years. Accessible literary nonfiction or well-written memoir. Sensory detail, metaphor, and reflection integrated into the prose. Vocabulary around 9,000 words.",
+    "description": "B2. 2–2.5 years. Sensory detail, metaphor, and reflection integrated into the prose. Vocabulary around 9,000 words.",
     "examples": [
       {
         "passage": "My grandfather's house smelled of sawdust and tobacco long after he had stopped working wood and given up smoking. Memory, I think, is largely a matter of smell — not images or voices but the physical trace of time, caught in objects and rooms long after the moment has passed.",
@@ -1874,7 +1869,7 @@
     ]
   },
   "65": {
-    "description": "B2. 2.5 years. Longer analytical argument with counterarguments acknowledged. Concessive and conditional structures used skillfully. Vocabulary near 9,500 words. The prose handles complex ideas without becoming opaque.",
+    "description": "B2. 2.5 years. Longer analytical argument with counterarguments acknowledged. Concessive and conditional structures used skillfully. Vocabulary near 9,500 words.",
     "examples": [
       {
         "passage": "It is tempting to argue that technology has shortened our attention spans. The evidence, however, is more ambiguous than the claim suggests. People concentrate deeply on video games, long films, and serialized fiction for hours at a time. What has changed is not the capacity for attention but the environment that competes for it.",
@@ -1905,7 +1900,7 @@
     ]
   },
   "66": {
-    "description": "B2. 2.5–3 years. A passage of literary quality, drawing on observation, specific detail, and controlled emotion. Vocabulary around 10,000 words. The prose is polished without being academic.",
+    "description": "B2. 2.5–3 years. Polished prose with controlled emotion, specific detail, and observation. Vocabulary around 10,000 words.",
     "examples": [
       {
         "passage": "She learned the language in fragments — a word here, a phrase there — the way you might reassemble a broken plate, knowing that the cracks will always show. But she also learned that a plate with cracks can still hold water, still be beautiful in its way, and still be used every day without apology.",
@@ -1936,7 +1931,7 @@
     ]
   },
   "67": {
-    "description": "B2. 3 years. Confident literary or journalistic prose. Rich vocabulary, metaphor, and syntactic variety used purposefully. Equivalent to a quality novel aimed at general adult readers or a long-form magazine piece in a publication like The New Yorker. Vocabulary of roughly 10,000–12,000 words actively used.",
+    "description": "B2. 3 years. Rich vocabulary, metaphor, and syntactic variety used purposefully. Vocabulary roughly 10,000–12,000 words. Comparable in difficulty to a quality literary novel for general adult readers or a long-form magazine essay.",
     "examples": [
       {
         "passage": "The city changes so fast that nostalgia is almost a reflex here — people mourn neighborhoods that disappeared a decade ago, and mourn the mourning itself as a kind of sentimentality. There is a version of every city that exists only in the memory of those who knew it at a particular moment, and that version is, in its way, as real as any other.",
@@ -1967,7 +1962,7 @@
     ]
   },
   "68": {
-    "description": "B2–C1 boundary. 3–3.5 years. The prose handles abstraction and ambiguity with ease. Subtext begins to operate beneath the surface of the writing. Vocabulary near 12,000 words.",
+    "description": "B2–C1 boundary. 3–3.5 years. The prose handles abstraction and ambiguity with ease. Subtext operates beneath the surface. Vocabulary near 12,000 words.",
     "examples": [
       {
         "passage": "What we call common sense is usually nothing more than the unexamined assumptions of our particular time and place dressed up in the language of inevitability. Every era believes its prejudices to be observations. It takes unusual courage — or unusual distance — to see the difference.",
@@ -1998,30 +1993,30 @@
     ]
   },
   "69": {
-    "description": "B2–C1 boundary. 3–3.5 years. The prose handles abstraction and ambiguity with ease. Subtext begins to operate beneath the surface of the writing. Vocabulary near 12,000 words.",
+    "description": "B2–C1. 3.5 years. Modal hedging ('it seems,' 'in some sense,' 'one might say') marks uncertainty without abandoning argument. Vocabulary around 12,200 words.",
     "examples": [
       {
-        "passage": "What we call common sense is usually nothing more than the unexamined assumptions of our particular time and place dressed up in the language of inevitability. Every era believes its prejudices to be observations. It takes unusual courage — or unusual distance — to see the difference.",
+        "passage": "It is tempting to read history as a series of moral lessons, but the lessons are rarely as legible as we would like. The same events, viewed at different distances, suggest different conclusions, and even contemporaries disagreed sharply about what they were witnessing. To insist on a single moral reading is, in some sense, to flatten the texture of the past — to mistake the cleanness of a story for the truth of an event. The temptation is understandable; complexity is uncomfortable, and a tidy lesson lets us close the book and move on. But the historians worth reading rarely let us.",
         "question": {
-          "question": "Why does the author present 'courage' and 'distance' as alternative routes to the same insight?",
+          "question": "What does the writer warn against?",
           "options": [
-            "A) Courage means ignoring common sense, while distance means moving to a new place",
-            "B) One must either actively resist the assumptions of one's era or be removed from them to see their contingency",
-            "C) Courage is what it takes to accept common sense, while distance lends perspective on it",
-            "D) Both words describe the same emotional state that follows an intellectual discovery"
+            "A) Drawing any moral conclusions whatsoever from historical events",
+            "B) Reducing the complexity of past events to a single tidy lesson",
+            "C) Allowing contemporary observers to dictate how history is read today",
+            "D) The growing tendency among historians to disagree with one another"
           ],
           "answer": 1
         }
       },
       {
-        "passage": "Mountains are, in some sense, our most honest landscapes. They do not pretend to be useful. They cannot be cultivated, persuaded, or hurried. What they offer is a glimpse of duration in a form that humbles ordinary timescales: ranges that were rising while our species was still arboreal, summits that will be ground down to nothing while our descendants, if any, are doing things we could not now imagine. The proper response, I have always thought, is not awe so much as a kind of quiet relief.",
+        "passage": "Most diaries are not, in any honest sense, written for the self. The diarist is keenly aware, however much they protest otherwise, that words on paper persist in a way that thought does not — that someone, eventually, may read them. This awareness shapes the writing in ways the diarist may not fully recognise: a tendency to compose rather than confess, to leave out what would embarrass, to elevate ordinary days into something worth recording. The result is not a faithful record but a portrait already in negotiation with a future audience, even when that audience is imagined as no one in particular.",
         "question": {
-          "question": "What unusual emotional response to mountains does the writer endorse, and why?",
+          "question": "What does the writer claim about diary-writing?",
           "options": [
-            "A) Awe, because mountains stand as a vivid demonstration of nature's overwhelming and decorative power",
-            "B) Relief, because the geological scale of mountains liberates the observer from the inflation of human concerns",
-            "C) Disappointment, because mountains turn out to be useful and persuadable in ways the writer dislikes",
-            "D) Indifference, because mountains have no relevant relationship to the lives of ordinary modern people"
+            "A) Most diarists secretly intend their work to be published after their death",
+            "B) The presence of an imagined future reader subtly shapes what gets written",
+            "C) Honest diary-writing requires the writer to abandon all literary instincts",
+            "D) Most diaries lose their value once the diarist is no longer alive"
           ],
           "answer": 1
         }
@@ -2029,7 +2024,7 @@
     ]
   },
   "70": {
-    "description": "B2–C1. 3.5 years. A passage with layered meaning and sophisticated sentence construction. Complex nominal phrases, embedded relative clauses. Vocabulary around 12,500 words.",
+    "description": "B2–C1. 3.5 years. Layered meaning and sophisticated sentence construction. Complex nominal phrases, embedded relative clauses. Vocabulary around 12,500 words.",
     "examples": [
       {
         "passage": "The novel, at its best, is a machine for generating empathy — a device that places the reader inside a consciousness not their own and asks them to inhabit it long enough to feel its logic. This is not escapism. It is, in fact, one of the more serious things a person can do with their time.",
@@ -2060,7 +2055,7 @@
     ]
   },
   "71": {
-    "description": "C1 approach. 4 years. Dense analytical or critical prose. Argument unfolds across multiple sentences with qualifications, concessions, and precise distinctions. Vocabulary near 13,000 words.",
+    "description": "C1 approach. 4 years. Argument unfolds across multiple sentences with qualifications, concessions, and precise distinctions. Vocabulary near 13,000 words.",
     "examples": [
       {
         "passage": "To speak of a culture's values as if they were a coherent system is to import a kind of order that rarely exists in practice. Values conflict, overlap, and contradict one another in ways that anthropologists have documented repeatedly. What holds a society together is not agreement but a shared tolerance for disagreement within certain limits — limits that are themselves contested.",
@@ -2091,7 +2086,7 @@
     ]
   },
   "72": {
-    "description": "C1 approach. 4–4.5 years. Literary fiction with psychological depth. Complex interior monologue or free indirect discourse. Vocabulary around 13,500 words. The prose rewards close attention.",
+    "description": "C1 approach. 4–4.5 years. Complex interior monologue or free indirect discourse. The prose rewards close attention. Vocabulary around 13,500 words.",
     "examples": [
       {
         "passage": "He had the curious sensation, not unfamiliar to him, of watching himself from a slight distance — as though some calmer version of himself had stepped back to observe the proceedings with the mild interest of a stranger. He knew the feeling would pass. He also knew, from experience, that knowing this did not make it pass any faster.",
@@ -2122,7 +2117,7 @@
     ]
   },
   "73": {
-    "description": "C1. About 5 years of study. Literary fiction, academic writing, or quality long-form journalism. Vocabulary of roughly 14,000–16,000 words. Complex syntax, nuanced register, embedded irony, and sustained argument across a multi-sentence unit. The prose requires inferential reading — not everything is stated. Equivalent to Orwell's essays, quality literary fiction, or a serious academic introduction.",
+    "description": "C1. About 5 years. Vocabulary roughly 14,000–16,000 words. Complex syntax, nuanced register, embedded irony, sustained argument across multi-sentence units. Inferential reading required; not everything stated. Comparable in difficulty to literary fiction or long-form essays of the calibre of Orwell.",
     "examples": [
       {
         "passage": "What strikes the reader of eighteenth-century moral philosophy is not how alien its concerns are but how persistent. The questions Hume and Smith were asking about sympathy, self-interest, and the nature of justice have not been answered — they have simply been translated into different vocabularies and distributed across different academic departments. The urgency, if anything, has increased.",
@@ -2153,7 +2148,7 @@
     ]
   },
   "74": {
-    "description": "C1. 5–5.5 years. Sophisticated literary prose with irony, moral complexity, and precise observation. The sentences are long and carefully weighted. Vocabulary near 16,000 words.",
+    "description": "C1. 5–5.5 years. Long, carefully weighted sentences. Irony, moral complexity, and precise observation. Vocabulary near 16,000 words.",
     "examples": [
       {
         "passage": "She was a woman who had spent so much of her life being competent that she had lost track of whether she was also happy. Competence had its own satisfactions, she supposed — the small, clean pleasure of a task completed, a problem solved, a situation managed — but she had begun to suspect that she had mistaken those satisfactions for something larger.",
@@ -2184,7 +2179,7 @@
     ]
   },
   "75": {
-    "description": "C1. 5.5 years. Academic humanities or social science writing. Technical vocabulary used precisely. Argument builds on previous paragraphs in a chain of reasoning. Vocabulary around 16,500 words.",
+    "description": "C1. 5.5 years. Technical vocabulary used precisely. Argument builds on previous paragraphs in a chain of reasoning. Vocabulary around 16,500 words.",
     "examples": [
       {
         "passage": "The distinction between performative and constative utterances, which Austin introduced with characteristic tentativeness, was meant to mark a clean boundary between saying and doing. Subsequent philosophers of language have argued, with considerable force, that virtually any speech act can be understood as performing something, and that the notion of a purely descriptive utterance may be a theoretical fiction.",
@@ -2215,7 +2210,7 @@
     ]
   },
   "76": {
-    "description": "C1. 6 years. Dense literary criticism or intellectual journalism. The prose assumes a well-read audience and does not pause to explain allusions. Vocabulary near 17,000 words.",
+    "description": "C1. 6 years. Allusions operate without signposting; a well-read audience is assumed. Vocabulary near 17,000 words.",
     "examples": [
       {
         "passage": "Chekhov's great achievement was to make nothing happen in a way that felt like everything. His plots refuse the conventional satisfactions of resolution, preferring instead the off-key chord, the unfinished gesture, the silence where speech might have been. Readers who want events are perpetually disappointed; readers who want truth rarely are.",
@@ -2246,7 +2241,7 @@
     ]
   },
   "77": {
-    "description": "C1–C2 boundary. 6–7 years. A passage of considerable intellectual and stylistic density. Abstract ideas handled with precision and some elegance. Vocabulary around 17,500 words.",
+    "description": "C1–C2 boundary. 6–7 years. Considerable intellectual and stylistic density. Abstract ideas handled with precision and elegance. Vocabulary around 17,500 words.",
     "examples": [
       {
         "passage": "The fear of death is not a simple thing. It is compounded of several distinct anxieties — the fear of pain, of loss, of non-existence, of irrelevance — and these are not always distinguishable from one another in the moment of experiencing them. Philosophy has tried, repeatedly and without complete success, to disentangle them, perhaps because they resist disentangling.",
@@ -2277,30 +2272,30 @@
     ]
   },
   "78": {
-    "description": "C1–C2 boundary. 6–7 years. A passage of considerable intellectual and stylistic density. Abstract ideas handled with precision and some elegance. Vocabulary around 17,500 words.",
+    "description": "C1–C2. 7 years. Qualification is essential to meaning. Sentences carry multiple subordinate clauses; each clause earns its place. Vocabulary around 17,800 words.",
     "examples": [
       {
-        "passage": "The fear of death is not a simple thing. It is compounded of several distinct anxieties — the fear of pain, of loss, of non-existence, of irrelevance — and these are not always distinguishable from one another in the moment of experiencing them. Philosophy has tried, repeatedly and without complete success, to disentangle them, perhaps because they resist disentangling.",
+        "passage": "The distinction between persuasion and manipulation is harder to draw than most would-be ethicists allow. Persuasion, at its noblest, supplies reasons and trusts the listener to weigh them; manipulation bypasses that weighing process, working on appetites or fears below the threshold of conscious deliberation. But the line, in practice, is porous. A well-told story is more persuasive than the bare argument it dramatises, yet it functions partly through identification — through the kind of half-conscious sympathy that, in another context, we would call a manipulative appeal. To grant rhetoric its legitimate work is therefore to accept, uneasily, that the techniques we condemn in our opponents are the techniques we cannot quite abandon ourselves.",
         "question": {
-          "question": "What does the author suggest about philosophy's project of analyzing the fear of death?",
+          "question": "What is the writer's central observation?",
           "options": [
-            "A) Philosophy has fully succeeded in separating each distinct anxiety involved in it",
-            "B) The fear of death is too simple a topic to benefit from philosophical examination",
-            "C) These anxieties may resist neat separation because of how they are lived from the inside",
-            "D) Philosophy ought to give up on this question entirely since it remains unanswerable"
+            "A) Persuasion is always preferable to manipulation in serious public discourse",
+            "B) The boundary between them is blurry because effective persuasion borrows manipulative techniques",
+            "C) Modern audiences can no longer reliably distinguish between the two methods",
+            "D) Storytelling has replaced rational argument in nearly all forms of discourse"
           ],
-          "answer": 2
+          "answer": 1
         }
       },
       {
-        "passage": "There is a peculiar pleasure in watching an old building come down. It is not, exactly, schadenfreude — the building has done no one any harm — but a more ambiguous emotion, in which one's interest in continuity is briefly overruled by a delight in the rare spectacle of irreversibility. We who spend our lives undoing minor errors, restoring drafts, and amending sentences are made strangely cheerful by an act that cannot be taken back, and the cheer outlasts our knowledge that we will, by tomorrow, have forgotten the building entirely.",
+        "passage": "What is most striking about the rise of social media as a venue for political argument is not the coarsening of debate — that has been remarked upon to exhaustion — but the disappearance of the slow, intermediate form of reasoning that used to mediate between an initial reaction and a public utterance. Letters to the editor, even when intemperate, were written, set aside, and revised before posting. The friction was deliberate, even if no one called it that. Strip away that friction and you are left with a stream of first reactions, which is not the same thing as a public conversation, however much it superficially resembles one.",
         "question": {
-          "question": "What does the writer suggest is the deeper source of the pleasure of watching a demolition?",
+          "question": "What does the writer identify as the most significant change in political discourse?",
           "options": [
-            "A) A genuine hostility toward the building, which had quietly offended the watcher in some indirect way",
-            "B) The rarity, for people whose lives are governed by revisable acts, of witnessing something genuinely irreversible",
-            "C) A nostalgic mourning for the building, made poignant by the certainty of its imminent and final disappearance",
-            "D) The visual interest of the spectacle, which provides ordinary entertainment without much further significance"
+            "A) The growing coarseness and rudeness of public debate online",
+            "B) The removal of friction that once separated impulse from public statement",
+            "C) The replacement of newspapers with social media platforms",
+            "D) The increasing speed at which political news spreads across networks"
           ],
           "answer": 1
         }
@@ -2308,7 +2303,7 @@
     ]
   },
   "79": {
-    "description": "C1–C2. 7 years. Confident, sophisticated prose that handles complexity with apparent ease. Long sentences with balanced constructions, embedded qualifications, and precise word choices. Vocabulary near 18,000 words.",
+    "description": "C1–C2. 7 years. Long sentences with balanced constructions, embedded qualifications, and precise word choices. Vocabulary near 18,000 words.",
     "examples": [
       {
         "passage": "To read Montaigne is to encounter a mind in motion — not the polished certainties of a moralist, but the provisional, self-correcting movements of someone genuinely thinking on the page. This is what makes his essays feel so contemporary: not their content, which is often antiquated, but their method, which is the method of someone who refuses to pretend he has finished thinking.",
@@ -2339,7 +2334,7 @@
     ]
   },
   "80": {
-    "description": "C1–C2. 7–8 years. Literary fiction at a high level — complex characters, moral ambiguity, and precise psychological observation. The syntax is demanding; meaning sometimes arrives obliquely. Vocabulary around 18,500 words.",
+    "description": "C1–C2. 7–8 years. Demanding syntax; meaning sometimes arrives obliquely. Vocabulary around 18,500 words.",
     "examples": [
       {
         "passage": "All her life she had confused being needed with being loved, and by the time she recognized the distinction it had already organized her most important relationships beyond easy revision. She did not blame anyone. That, too, she had learned late: that blame was just another way of remaining attached to something you could no longer change.",
@@ -2370,7 +2365,7 @@
     ]
   },
   "81": {
-    "description": "C2 approach. 8 years. Dense political or philosophical argument with a strong authorial voice. Complex periodic sentences. The prose makes demands on the reader's patience and attention. Vocabulary near 19,000 words.",
+    "description": "C2 approach. 8 years. Complex periodic sentences with a strong authorial voice. The prose makes demands on patience and attention. Vocabulary near 19,000 words.",
     "examples": [
       {
         "passage": "The argument that freedom of expression must be near-absolute rests on an epistemic claim that is often left unstated: that we cannot know in advance which ideas will prove valuable, and that the suppression of error has historically involved the suppression of truth with a frequency that should give us pause. This is a serious argument. It does not, however, settle the question of what to do about forms of speech whose primary function is not the communication of ideas but the intimidation of persons.",
@@ -2401,7 +2396,7 @@
     ]
   },
   "82": {
-    "description": "C2. 8–9 years. Sustained literary or critical essay with a high density of ideas per sentence. The prose assumes considerable cultural literacy. Allusions operate without signposting. Vocabulary around 19,500 words.",
+    "description": "C2. 8–9 years. High density of ideas per sentence. Allusions operate without signposting; considerable cultural literacy assumed. Vocabulary around 19,500 words.",
     "examples": [
       {
         "passage": "The great nineteenth-century realist novel was, among other things, a training ground in the reading of social surfaces — in the interpretation of the significant detail, the telling gesture, the word that reveals more than its speaker intended. This is a skill that translates directly to life, which is perhaps why Middlemarch and Anna Karenina still feel, to their readers, less like historical documents than like mirrors.",
@@ -2432,7 +2427,7 @@
     ]
   },
   "83": {
-    "description": "C2. 9 years. A passage of real literary complexity — long sentences with multiple embedded clauses, precise and sometimes unusual vocabulary, and a subtly ironic narrator. The prose rewards re-reading. Vocabulary near 20,000 words.",
+    "description": "C2. 9 years. Long sentences with multiple embedded clauses, precise and sometimes unusual vocabulary, a subtly ironic narrator. The prose rewards re-reading. Vocabulary near 20,000 words.",
     "examples": [
       {
         "passage": "It was his habit, formed over decades of professional disappointment, to expect the worst from institutions while harboring an inexplicable tenderness for the individuals within them — a contradiction he had never resolved and had eventually decided to stop trying to resolve, on the grounds that most of the interesting things about a person are contradictions they have decided to stop resolving.",
@@ -2463,7 +2458,7 @@
     ]
   },
   "84": {
-    "description": "C2. 10+ years / near-native. Dense, complex, stylistically assured literary prose. Vocabulary of roughly 20,000–25,000 words. The writing demands high cultural literacy, tolerance for ambiguity, and the ability to hold multiple meanings in suspension. Equivalent to Hemingway, Fitzgerald, Orwell at his most demanding, or a serious academic monograph in the humanities. Syntax is complex and purposeful; the meaning of sentences is sometimes revealed only in retrospect.",
+    "description": "C2. 10+ years / near-native. Vocabulary roughly 20,000–25,000 words. Complex and purposeful syntax; meaning sometimes revealed only in retrospect. High cultural literacy and tolerance for ambiguity required. Comparable in difficulty to Hemingway, Fitzgerald, or a serious academic monograph.",
     "examples": [
       {
         "passage": "The afternoon light fell through the office window in long flat bars, and he sat watching it move across the floor with the patience of a man who has learned, through a long discipline of failure, that the day will not be improved by hurrying it. He had been waiting for the call for three weeks. It did not come. After a while he went home, and the light moved on without him.",
@@ -2494,7 +2489,7 @@
     ]
   },
   "85": {
-    "description": "C2. 10–12 years near-native. Academic humanities writing at the monograph level. Dense footnotes-worthy argument with precise technical vocabulary from philosophy, literary theory, or history. Complex sentence architecture. Vocabulary near 22,000 words.",
+    "description": "C2. 10–12 years near-native. Dense, footnote-worthy argumentation with precise technical vocabulary. Complex sentence architecture. Vocabulary near 22,000 words.",
     "examples": [
       {
         "passage": "The persistence of the author-function in contemporary literary discourse, despite decades of theoretical challenges to authorial intentionality, suggests that the concept performs ideological work that the field has been reluctant to relinquish. Attribution remains central to evaluation, canonization, and legal ownership — functions that cannot easily survive the radical decentering of the subject that post-structuralism proposed.",
@@ -2525,7 +2520,7 @@
     ]
   },
   "86": {
-    "description": "C2. 11 years. Legal or contractual prose — highly formal, precise, and embedded with qualifications. Designed to be unambiguous at the expense of elegance. Vocabulary around 22,500 words.",
+    "description": "C2. 11 years. Highly formal, precise prose with embedded qualifications. Designed to be unambiguous at the expense of elegance. Vocabulary around 22,500 words.",
     "examples": [
       {
         "passage": "Notwithstanding any provision to the contrary contained herein, the indemnifying party shall defend, indemnify, and hold harmless the indemnified party from and against any and all claims, damages, losses, costs, and expenses, including reasonable attorneys' fees, arising out of or related to any breach of the representations and warranties set forth in Section 4.2 of this Agreement.",
@@ -2556,30 +2551,30 @@
     ]
   },
   "87": {
-    "description": "C2. 11 years. Legal or contractual prose — highly formal, precise, and embedded with qualifications. Designed to be unambiguous at the expense of elegance. Vocabulary around 22,500 words.",
+    "description": "C2. 11 years. Formal prose structured around references and procedural conditions. The reader must track conditional chains and exceptions across sentence boundaries. Vocabulary near 22,800 words.",
     "examples": [
       {
-        "passage": "Notwithstanding any provision to the contrary contained herein, the indemnifying party shall defend, indemnify, and hold harmless the indemnified party from and against any and all claims, damages, losses, costs, and expenses, including reasonable attorneys' fees, arising out of or related to any breach of the representations and warranties set forth in Section 4.2 of this Agreement.",
+        "passage": "Pursuant to Section 7(b) of the Administrative Procedure Act and the regulations promulgated thereunder at 29 C.F.R. § 1620.4, any covered entity seeking to invoke the exemption set forth in subparagraph (ii) above shall, not later than thirty (30) days prior to the proposed effective date of the exempted activity, file with the Director a notice of intent containing, at minimum, (A) a description of the activity sufficient to permit substantive review, (B) the proposed effective and termination dates, and (C) a certification, executed under penalty of perjury, that the activity satisfies each of the conditions enumerated in paragraph (3) of this Section, provided, however, that the Director may, in his or her sole discretion and upon a showing of good cause, accept a notice filed fewer than thirty (30) days in advance.",
         "question": {
-          "question": "What is the legal effect of the phrase 'notwithstanding any provision to the contrary contained herein'?",
+          "question": "Under what condition may the Director accept a late filing?",
           "options": [
-            "A) It confines the indemnification solely to claims arising under Section 4.2 of the Agreement",
-            "B) It signals that this indemnification clause overrides any conflicting term found elsewhere in the same document",
-            "C) It removes attorneys' fees from the overall scope of the indemnification obligation entirely",
-            "D) It permits either contracting party to waive the indemnification requirement by reaching mutual agreement"
+            "A) Only if the covered entity has never previously sought the exemption",
+            "B) When the activity has already terminated before the proposed effective date",
+            "C) At the Director's discretion upon a showing of good cause by the filer",
+            "D) If the certification of compliance is signed by independent outside counsel"
           ],
-          "answer": 1
+          "answer": 2
         }
       },
       {
-        "passage": "The Borrower hereby irrevocably and unconditionally waives, to the fullest extent permitted by applicable law, any and all rights of set-off, counterclaim, recoupment, or similar defense which the Borrower may have against the Lender in respect of payments due under this Note, provided, however, that nothing in this Section shall be construed as a waiver by the Borrower of any direct cause of action which the Borrower may otherwise possess against the Lender for fraud or willful misconduct.",
+        "passage": "The Committee, having considered the State party's third periodic report and the supplementary information furnished in response to the list of issues transmitted in advance, expresses its appreciation for the candour with which certain shortcomings have been acknowledged, while reiterating its concern, previously expressed in its concluding observations of 2018 and not yet adequately addressed, regarding the absence of an independent mechanism for the prompt and impartial investigation of allegations of ill-treatment by law enforcement officials, and urges the State party, as a matter of priority, to establish such a mechanism, endow it with the resources and statutory authority necessary to discharge its mandate effectively, and report to the Committee on the steps taken not later than the date of submission of its next periodic report.",
         "question": {
-          "question": "What is the legal effect of the proviso clause beginning 'provided, however'?",
+          "question": "What is the Committee's principal demand of the State party?",
           "options": [
-            "A) It nullifies the entire waiver clause, restoring the Borrower's full right to assert set-off and counterclaim defenses against payments due",
-            "B) It carves out an exception preserving the Borrower's separate right to bring a direct claim for fraud or willful misconduct, without reviving the waived defenses",
-            "C) It expands the waiver by adding fraud and willful misconduct to the categories of defense that the Borrower has agreed to give up under the Note",
-            "D) It limits the waiver to apply only when the Lender has acted in good faith, requiring the Lender to prove the absence of misconduct in any dispute"
+            "A) Submission of an additional supplementary report within the year",
+            "B) Establishment of an independent body to investigate allegations of ill-treatment",
+            "C) Full implementation of the concluding observations issued back in 2018",
+            "D) Disciplinary action against any law enforcement officials previously named"
           ],
           "answer": 1
         }
@@ -2587,7 +2582,7 @@
     ]
   },
   "88": {
-    "description": "C2. 11–12 years. Advanced scientific or technical writing for a specialist audience. Methodological precision, passive constructions, and discipline-specific jargon used without apology. Vocabulary near 23,000 words.",
+    "description": "C2. 11–12 years. Methodological precision, passive constructions, and discipline-specific terminology used without apology. Vocabulary near 23,000 words.",
     "examples": [
       {
         "passage": "The observed attenuation of the BOLD signal in the anterior cingulate cortex during periods of sustained cognitive conflict may reflect either a genuine reduction in neural activity or a habituation effect in the hemodynamic response that does not correspond to reduced metabolic demand — a distinction with significant implications for the interpretation of longitudinal fMRI studies.",
@@ -2618,7 +2613,7 @@
     ]
   },
   "89": {
-    "description": "C2. 12 years. Literary fiction of the highest technical sophistication — long periodic sentences, embedded irony, unreliable narration, and vocabulary drawn from multiple registers. Vocabulary around 23,500 words.",
+    "description": "C2. 12 years. Long periodic sentences, embedded irony, unreliable narration, vocabulary drawn from multiple registers. Vocabulary around 23,500 words.",
     "examples": [
       {
         "passage": "She had, by now, assembled for herself a private mythology of the city — a map not of streets but of meanings, in which each corner held the residue of some past version of herself she could neither fully claim nor entirely disavow; and it was through this map, rather than the official one, that she moved, which made her, in the eyes of newcomers, both knowledgeable and slightly lost.",
@@ -2649,7 +2644,7 @@
     ]
   },
   "90": {
-    "description": "Beyond C2. 15+ years / educated native speaker. The prose operates at the level of a serious literary novelist or public intellectual. Vocabulary of over 25,000 words. Sentences are long, weighted, and precisely controlled. Allusions expect literary and historical literacy. Equivalent to the better essays of Orwell or Baldwin, the prose of Fitzgerald or Wharton at full stretch.",
+    "description": "Beyond C2. 15+ years / educated native speaker. Vocabulary over 25,000 words. Sentences are long, weighted, and precisely controlled. Allusions expect literary and historical literacy. Comparable in difficulty to the better essays of Orwell or Baldwin.",
     "examples": [
       {
         "passage": "It is a peculiarity of great cities that they permit, even encourage, the fantasy of self-invention — the sense that the past is genuinely revisable, that a person may arrive one thing and become another without the old self pursuing the new one through every room of every apartment it subsequently inhabits. This fantasy, which is also sometimes a fact, is what draws the ambitious and the desperate in roughly equal measure, and the city, indifferent to the distinction, accommodates both.",
@@ -2680,7 +2675,7 @@
     ]
   },
   "91": {
-    "description": "Beyond C2. 15 years. Complex political philosophy or critical theory. Sustained argumentation across many sentences, building a cumulative case. Vocabulary near 26,000 words. The prose is dense with qualifications and distinctions.",
+    "description": "Beyond C2. 15 years. Sustained argumentation across many sentences, building a cumulative case. Vocabulary near 26,000 words. Prose dense with qualifications and distinctions.",
     "examples": [
       {
         "passage": "Liberal political theory has persistently underestimated the extent to which the exercise of formal freedoms depends on social conditions that liberalism is structurally reluctant to mandate. The right to speak is not identical to the capacity to be heard; the right to vote is not identical to the capacity to participate meaningfully in political life. Bridging that gap requires forms of collective provision that market societies generate fitfully, if at all.",
@@ -2711,7 +2706,7 @@
     ]
   },
   "92": {
-    "description": "Beyond C2. 16 years. Late Jamesian or Proustian prose — the sentence as an instrument of precise psychological investigation, branching and self-correcting as it moves. Vocabulary around 26,500 words.",
+    "description": "Beyond C2. 16 years. Sentence as an instrument of precise psychological investigation, branching and self-correcting as it moves. Vocabulary around 26,500 words.",
     "examples": [
       {
         "passage": "She found herself, as she often did in moments of social exposure, adopting an attitude of mildly ironic detachment that was not, she knew, entirely dishonest — she was genuinely amused, genuinely a little bored — but was also, to an uncomfortable degree, a performance of those qualities rather than a simple expression of them, which raised the question of whether the distinction had, over time, entirely collapsed.",
@@ -2742,7 +2737,7 @@
     ]
   },
   "93": {
-    "description": "Beyond C2. 17 years. Dense philosophical prose — Nietzsche, Hegel, or their contemporary descendants. The argument moves through aphorism, paradox, and reversal. Vocabulary near 27,000 words.",
+    "description": "Beyond C2. 17 years. Dense argument moving through aphorism, paradox, and reversal. Vocabulary near 27,000 words.",
     "examples": [
       {
         "passage": "The will to truth is itself a moral phenomenon — a faith, as Nietzsche observed, held with a devotion that rarely examines its own foundations. To ask why we value truth rather than useful falsehood is to perform, at the moment of asking, the very commitment to truth that the question puts in doubt. This is not a paradox to be dissolved but a condition to be understood.",
@@ -2773,7 +2768,7 @@
     ]
   },
   "94": {
-    "description": "Beyond C2. 17–18 years. Dense literary criticism or theory written for specialists. Every sentence assumes fluency in the relevant discourse and does considerable conceptual work. Vocabulary around 27,500 words.",
+    "description": "Beyond C2. 17–18 years. Every sentence assumes fluency in a specialist discourse and does considerable conceptual work. Vocabulary around 27,500 words.",
     "examples": [
       {
         "passage": "The aporia that deconstruction identifies in the metaphysics of presence is not a local deficiency correctable by further argument but a constitutive feature of the Western philosophical project — the trace of an exclusion without which the edifice of meaning cannot be erected but upon which it cannot, for that reason, honestly rely. To read Derrida is to witness a sustained demonstration of this impossibility, not as defeat but as a new kind of rigor.",
@@ -2804,7 +2799,7 @@
     ]
   },
   "95": {
-    "description": "Beyond C2. 20 years / fully educated native speaker or specialist. The level of Dostoevsky in translation, Thomas Hardy, or George Eliot — dense moral intelligence, complex syntax, and a large cast of psychologically realized characters. Vocabulary of roughly 28,000–30,000 words. Long periodic sentences carry significant weight; the reader must hold the full architecture of a sentence in mind to resolve its meaning.",
+    "description": "Beyond C2. 20 years / fully educated native speaker. Vocabulary roughly 28,000–30,000 words. Long periodic sentences carry significant weight; the reader must hold the full architecture of a sentence in mind to resolve its meaning. Comparable in difficulty to Dostoevsky in translation, Thomas Hardy, or George Eliot.",
     "examples": [
       {
         "passage": "It had not occurred to him, until this moment, that the quality he had most admired in her was precisely the quality that made her unavailable to him — not her beauty, which was real but not extraordinary, nor her intelligence, which he had initially overestimated, but her fundamental self-sufficiency, the way she seemed to require nothing from anyone, including him, which he had misread, for a long time, as an invitation rather than what it actually was: a statement of fact.",
@@ -2835,30 +2830,30 @@
     ]
   },
   "96": {
-    "description": "Beyond C2. 20 years / fully educated native speaker or specialist. The level of Dostoevsky in translation, Thomas Hardy, or George Eliot — dense moral intelligence, complex syntax, and a large cast of psychologically realized characters. Vocabulary of roughly 28,000–30,000 words. Long periodic sentences carry significant weight; the reader must hold the full architecture of a sentence in mind to resolve its meaning.",
+    "description": "Beyond C2. 20+ years. Syntax that mirrors the gradient of thought, with parenthetical refinement and figurative language that earns its weight. Vocabulary roughly 29,000 words.",
     "examples": [
       {
-        "passage": "It had not occurred to him, until this moment, that the quality he had most admired in her was precisely the quality that made her unavailable to him — not her beauty, which was real but not extraordinary, nor her intelligence, which he had initially overestimated, but her fundamental self-sufficiency, the way she seemed to require nothing from anyone, including him, which he had misread, for a long time, as an invitation rather than what it actually was: a statement of fact.",
+        "passage": "She had supposed, when she first agreed to the arrangement, that she could maintain a posture of half-engaged amusement — the sort of detachment that lets one walk through a room without quite committing to any of the conversations in it — but she had not reckoned with the particular gravity of his attention, which, far from importuning her or seeking the usual returns, simply held her steady at the centre of itself, and which, by virtue of that very steadiness, made the slightness of her own contributions seem, even to her, like an evasion she could no longer comfortably mistake for a choice.",
         "question": {
-          "question": "What is the nature of his fundamental misreading of her self-sufficiency?",
+          "question": "What discovery does the passage describe?",
           "options": [
-            "A) He took her for indifferent to him when she was secretly in love with him all along",
-            "B) He read her self-containment as desire — a gap she wanted filled — when it was simply her settled condition needing nothing",
-            "C) He overestimated her intelligence and so misjudged the depth and nature of her emotional needs",
-            "D) He saw in her the qualities he recognized in himself and was therefore unconsciously projecting onto her"
+            "A) That her companion's apparent reserve in fact concealed an importunate demand",
+            "B) That her affected detachment had become untenable in the face of his steady attention",
+            "C) That his refusal to converse with her had left her socially isolated in the room",
+            "D) That the room itself had grown too crowded for any meaningful exchange to occur"
           ],
           "answer": 1
         }
       },
       {
-        "passage": "Mrs. Halverston had passed, in her later years, into that condition of moral observation in which the people around her appeared to her not as separate individuals to be judged on their own terms but as variations on themes she had already encountered too often, and her conversation had taken on, in consequence, the slightly weary inflection of someone reading aloud a text she had once found absorbing and now consulted, when she consulted it at all, for the sake of the few footnotes she had not yet annotated, with the result that her younger interlocutors, who came expecting to be examined, often left feeling that they had not, in any sense that mattered, been seen at all.",
+        "passage": "The reviewer's task is, at its best, an act of inhabited disagreement: to enter the author's premises as a willing guest, to follow the architecture of the argument from room to room, registering the elegance of the joinery and the cleverness of the sight-lines, and then — having walked through the whole of it — to say, with whatever gentleness or severity the case requires, what has been gained and what, in the writer's own terms, is missing; for the most damaging review is not the hostile one, which is easily resisted, but the one that has plainly understood the book before objecting to it.",
         "question": {
-          "question": "What is the deeper consequence the passage attributes to Mrs. Halverston's habit of typological perception?",
+          "question": "What does the writer claim makes a review most damaging?",
           "options": [
-            "A) Her judgments of younger people had become more incisive and accurate over the years, with the result that her interlocutors came to fear her examinations and to avoid her social company entirely whenever they could",
-            "B) Her readiness to assimilate each new person to a pattern she already knew meant that her younger interlocutors received her attention without receiving the recognition they had come hoping to find from her in conversation",
-            "C) She had become incapable of judging anyone fairly because of the cumulative weight of her past disappointments, and her younger interlocutors correctly perceived that her assessments of them could not be trusted in any way",
-            "D) Her conversational manner had grown so reserved that her younger interlocutors mistook it for hostility, when in fact she was attending to them with greater care than she had ever extended to others before"
+            "A) That it is delivered with severity rather than gentleness of tone",
+            "B) That its objections come from a position of genuine understanding",
+            "C) That it follows the author's argument in great structural detail",
+            "D) That it is published at a time when the author cannot publicly respond"
           ],
           "answer": 1
         }
@@ -2866,7 +2861,7 @@
     ]
   },
   "97": {
-    "description": "Expert level. 20+ years. Academic philosophy or legal scholarship at the frontier of its discipline. Arguments require familiarity with the existing literature and the ability to track closely reasoned distinctions over many sentences. Vocabulary near 30,000 words.",
+    "description": "Expert level. 20+ years. Closely reasoned distinctions tracked over many sentences. Familiarity with an existing specialist literature presumed. Vocabulary near 30,000 words.",
     "examples": [
       {
         "passage": "The objection that rule-consequentialism collapses, under pressure, into act-consequentialism has been pressed with varying degrees of sophistication since Lyons's 1965 monograph. The most defensible versions of the rule view, however, can resist this objection by insisting on an internalized-norms reading of 'what agents following the rules would do,' rather than the ideal-compliance reading that generates the collapse — a distinction whose plausibility depends on a prior account of moral psychology that the consequentialist framework is not obviously equipped to provide.",
@@ -2897,7 +2892,7 @@
     ]
   },
   "98": {
-    "description": "Expert level. 20+ years. Late Henry James — the novel of consciousness taken to its furthest elaboration, where the sentence itself becomes a drama of qualification, retraction, and recovered perception. Vocabulary around 30,500 words.",
+    "description": "Expert level. 20+ years. The sentence itself becomes a drama of qualification, retraction, and recovered perception. Vocabulary around 30,500 words.",
     "examples": [
       {
         "passage": "What she had come to understand — not suddenly, as she had once imagined understanding would come, but gradually, in the way that a room becomes familiar not through any single act of attention but through the accumulated impressions of a thousand unremarkable mornings — was that the thing she had been waiting for had, in fact, already arrived, and had been present, all along, in the very texture of the waiting itself.",
@@ -2928,7 +2923,7 @@
     ]
   },
   "99": {
-    "description": "Expert level. 20+ years. Medical or scientific writing at the journal article level — dense methodology, statistical language, and discipline-specific conventions. Vocabulary near 31,000 words.",
+    "description": "Expert level. 20+ years. Dense methodological prose, statistical language, and discipline-specific conventions. Vocabulary near 31,000 words.",
     "examples": [
       {
         "passage": "Multivariate regression analysis controlling for age, sex, comorbidity index, and baseline HbA1c revealed a statistically significant inverse association between adherence to the Mediterranean dietary pattern and incident type 2 diabetes mellitus (OR 0.74, 95% CI 0.61–0.89, p<0.001), a finding robust to sensitivity analyses excluding participants with pre-existing insulin resistance as defined by HOMA-IR thresholds above the 75th percentile.",
@@ -2959,7 +2954,7 @@
     ]
   },
   "100": {
-    "description": "Expert literary. 20+ years. Dense, philosophically inflected literary fiction — Musil, Broch, or their contemporaries in translation. The novel of ideas where argument and narrative are inseparable. Vocabulary around 31,500 words.",
+    "description": "Expert literary. 20+ years. Argument and narrative inseparable; ideas drive the syntax. Vocabulary around 31,500 words.",
     "examples": [
       {
         "passage": "He belonged to that generation for whom irony had become so thorough a habit of mind that sincerity, when it ambushed them, felt not like a relief but like a defeat — as though the feelings were a lapse rather than a return, a failure of the vigilance that had become, over time, their only reliable form of self-respect.",

@@ -13,6 +13,7 @@ interface Props {
   onLengthChange?: (l: ReadingLength) => void;
   writingMode?: WritingMode | null;
   onWritingModeChange?: (m: WritingMode) => void;
+  writingModeBlockedReason?: string | null;
   onLanguageComplexityChange: (d: number) => void;
   onRatedChange: (r: boolean) => void;
   onGenerate: () => void;
@@ -30,6 +31,11 @@ const WRITING_MODE_OPTIONS: { mode: WritingMode; label: string; description: str
     label: `Dictogloss`,
     description: `Listen to a passage, then summarize it from memory in your own words. Combines retrieval practice with noticing-the-gap — strong for grammatical accuracy.`,
   },
+  {
+    mode: `vocab-paragraph`,
+    label: `Vocab paragraph`,
+    description: `Write a paragraph that uses the 5–8 vocab cards from your deck that are about to become due. Reinforces words you're about to forget in productive context.`,
+  },
 ];
 
 export function SetupView({
@@ -43,6 +49,7 @@ export function SetupView({
   onLengthChange,
   writingMode,
   onWritingModeChange,
+  writingModeBlockedReason,
   onLanguageComplexityChange,
   onRatedChange,
   onGenerate,
@@ -89,7 +96,7 @@ export function SetupView({
           <span className="text-sm text-gray-600">{`Unrated exercise`}</span>
         </label>
         {length !== undefined && onLengthChange && (
-          <div className="inline-flex rounded-xl border border-gray-200 overflow-hidden">
+          <div className="inline-flex rounded-xl border border-gray-200 overflow-hidden divide-x divide-gray-200">
             {LENGTH_OPTIONS.map((opt) => (
               <button
                 key={opt}
@@ -109,7 +116,7 @@ export function SetupView({
 
       {onWritingModeChange && (
         <div>
-          <div className="inline-flex rounded-xl border border-gray-200 overflow-hidden">
+          <div className="inline-flex rounded-xl border border-gray-200 overflow-hidden divide-x divide-gray-200">
             {WRITING_MODE_OPTIONS.map(({ mode, label }) => (
               <button
                 key={mode}
@@ -129,6 +136,9 @@ export function SetupView({
               {WRITING_MODE_OPTIONS.find((o) => o.mode === writingMode)?.description}
             </p>
           )}
+          {writingMode && writingModeBlockedReason && (
+            <p className="text-xs text-amber-600 mt-2">{writingModeBlockedReason}</p>
+          )}
         </div>
       )}
 
@@ -144,7 +154,9 @@ export function SetupView({
 
       <button
         onClick={onGenerate}
-        disabled={onWritingModeChange !== undefined && !writingMode}
+        disabled={
+          (onWritingModeChange !== undefined && !writingMode) || Boolean(writingModeBlockedReason)
+        }
         className="w-full bg-green-600 text-white py-3 rounded-xl font-semibold hover:bg-green-700 disabled:opacity-40 disabled:cursor-not-allowed transition cursor-pointer"
       >
         {rated ? generateLabel : `${generateLabel} (Unrated)`}

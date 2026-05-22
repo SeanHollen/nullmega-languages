@@ -180,6 +180,13 @@ export function ResultsView({
 
       {assessmentId && <AssessmentFeedback assessmentId={assessmentId} />}
 
+      {exercise.summary && (
+        <p className="text-sm text-gray-500 leading-relaxed italic">
+          <span className="text-xs text-gray-400 uppercase tracking-wide not-italic">{`Summary — `}</span>
+          {exercise.summary}
+        </p>
+      )}
+
       <div className="flex gap-3">
         <button
           onClick={onGoAgain}

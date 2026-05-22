@@ -254,6 +254,47 @@ ${questions.map(() => `    { "score": 1-5, "notes": "..." }`).join(`,\n`)}
 For "notes": list only concrete corrections in the form "wrong → correct" (e.g. "hiver → l'hiver", "j'aime jouer → j'aime jouer au foot"). Separate multiple corrections with ", ". If the answer is perfect, write "✓". Do not write prose descriptions — only corrections. For essay answers, if the word count was not met also prepend e.g. "Word count: 18/25 minimum. " before the corrections.`;
 }
 
+// ---------- Vocab paragraph grader ----------
+
+export function buildVocabParagraphGraderPrompt(args: {
+  language: string;
+  languageComplexity: number;
+  requiredWords: { source: string; translation: string }[];
+  paragraph: string;
+}): string {
+  const { language, languageComplexity, requiredWords, paragraph } = args;
+  const wordList = requiredWords.map((w) => `- ${w.source} (English: ${w.translation})`).join(`\n`);
+
+  return `You are grading a ${language} paragraph written by a student at difficulty ${languageComplexity}/100.
+
+The student was asked to write one paragraph that incorporates ALL of the following vocabulary words. Inflected forms are acceptable (e.g. plural, conjugated, gendered) — what matters is that the word's root meaning is used.
+
+Required vocabulary:
+${wordList}
+
+Student's paragraph:
+"${paragraph}"
+
+Score from 1–5 reflecting BOTH:
+1. Coverage — did the student use all required words correctly and in context?
+2. Writing quality — grammar, naturalness, vocabulary variety, coherence in ${language}.
+
+5 = Excellent — used every word naturally and correctly; well-written ${language}
+4 = Good — minor issues; one or two words awkward but used; otherwise solid
+3 = Adequate — most words used but with notable errors, OR all words used but writing is rough
+2 = Poor — missed words or significant errors that impede meaning
+1 = Very poor — most words unused or paragraph is incoherent
+
+Return ONLY valid JSON with EXACTLY one grade:
+{
+  "grades": [
+    { "score": 1-5, "notes": "..." }
+  ]
+}
+
+For "notes": list which required words were missing (if any), then concrete corrections in the form "wrong → correct" (e.g. "hiver → l'hiver"). Separate with ", ". If perfect, write "✓". Don't write prose; only word-misses and corrections.`;
+}
+
 // ---------- Pronunciation exercise ----------
 
 function pronunciationPhraseCount(languageComplexity: number): number {
@@ -348,7 +389,7 @@ const GRAMMAR_LEVEL_DESCRIPTIONS: Record<number, string> = {
   10: `expert — literary forms, archaic usage, advanced stylistics, subtle grammatical nuance`,
 };
 
-export const GRAMMAR_CARDS_SYSTEM_MESSAGE = `You generate grammar quiz cards for language learners. Card titles must be descriptive and specific — name the exact construction or rule being tested (e.g. "Passé Composé with avoir: irregular past participles" rather than "Past Tense Practice"). Titles should be concise but informative, typically 4–10 words.`;
+export const GRAMMAR_CARDS_SYSTEM_MESSAGE = `You generate grammar quiz cards for language learners. Card titles must be as narrow and specific as the category allows — ideally pinned to a particular lexical item (verb, preposition, particle, idiom, etc.) rather than a whole grammatical class. Examples of GOOD titles: "Present-tense conjugation of 'aller'", "Subjunctive after 'pour que'", "Avoir vs être as auxiliary in passé composé". Examples of BAD titles (too broad — do not use these): "Present Conjugation of -er Verbs", "Past Tense Practice", "Adjective Agreement". Only fall back to a broader title when the concept genuinely cannot be tied to a specific word (e.g. a sentence-structure rule). Titles should be concise but informative, typically 4–10 words.`;
 
 export function buildGrammarCardsPrompt(args: {
   language: string;
@@ -377,7 +418,7 @@ Each card tests one specific grammar concept. Include a mix of these categories:
 Scale topic choice to the level. Up to level ~50, stay grounded in core grammar (the first three categories). From level ~60 upward, increasingly weight the misc category, and connotation becomes essential at advanced levels. Only generate honorifics/keigo-style cards for languages that actually have such systems.
 
 Card structure:
-- title: 2-10 words naming the concept (e.g. "Passé Composé vs Imparfait", "Adjective Agreement with Gender")
+- title: 2-10 words naming the concept. Pin to a specific word when possible (e.g. "Present-tense conjugation of 'aller'", "Gender agreement of 'beau'/'belle'", "Subjunctive after 'pour que'"). Avoid broad titles like "-er verbs", "irregular verbs", "past tense" — pick a specific verb/word/construction and test that.
 - prompt: 5-40 words describing what the quiz tests
 - category: one of "tense-conjugation", "word-order", "parts-of-speech", "misc"
 - questions: 1-8 questions, each either:

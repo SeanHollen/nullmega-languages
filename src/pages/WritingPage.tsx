@@ -7,13 +7,17 @@ import { WritingPassageView } from "../components/writing/WritingPassageView";
 import { WritingResultsView } from "../components/writing/WritingResultsView";
 import { DictoglossListeningView } from "../components/writing/DictoglossListeningView";
 import { DictoglossWritingView } from "../components/writing/DictoglossWritingView";
+import { VocabParagraphWritingView } from "../components/writing/VocabParagraphWritingView";
 import { HistoryList, type ResumeState } from "../components/HistoryList";
 import type { WritingBody } from "../utils/history";
 import type { WritingExercise, WritingMode, WritingQuestion } from "../hooks/useGenerateWriting";
-import { useGenerateWriting } from "../hooks/useGenerateWriting";
+import { useGenerateWriting, buildVocabParagraphExercise } from "../hooks/useGenerateWriting";
 import type { WritingGrade } from "../hooks/useGradeWriting";
 import { useGradeWriting } from "../hooks/useGradeWriting";
+import { useGradeVocabParagraph } from "../hooks/useGradeVocabParagraph";
 import { generatePhrasesAudio } from "../hooks/useTTS";
+import { loadFlashcards } from "../utils/flashcards";
+import { pickUpcomingVocabWords } from "../utils/pickUpcomingVocabWords";
 import type { RatingResult } from "../hooks/useAbility";
 import { loadAbility, computeRating, DEFAULT_LANGUAGE_COMPLEXITY } from "../hooks/useAbility";
 import { useLanguage } from "../contexts/LanguageContext";
@@ -32,7 +36,7 @@ function dictoglossQuestion(): WritingQuestion {
 }
 
 function initialAnswers(exercise: WritingExercise): string[] {
-  if (exercise.mode === `dictogloss`) return [``];
+  if (exercise.mode === `dictogloss` || exercise.mode === `vocab-paragraph`) return [``];
   return Array.from({ length: exercise.questions.length }, () => ``);
 }
 
@@ -42,7 +46,7 @@ function gradingQuestions(exercise: WritingExercise): WritingQuestion[] {
 }
 
 function gradingMaxScore(exercise: WritingExercise): number {
-  if (exercise.mode === `dictogloss`) return 5;
+  if (exercise.mode === `dictogloss` || exercise.mode === `vocab-paragraph`) return 5;
   return exercise.questions.length * 5;
 }
 
@@ -68,6 +72,8 @@ export function WritingPage() {
     if (!resumeBody) return `setup`;
     return resumeBody.exercise.mode === `dictogloss` ? `listening` : `writing`;
   });
+  // Phase init mirrors the resume logic above — kept in sync in the resume track-and-reset
+  // block below.
   const [exercise, setExercise] = useState<WritingExercise | null>(
     () => resumeBody?.exercise ?? null,
   );
@@ -78,6 +84,12 @@ export function WritingPage() {
   const [assessmentId, setAssessmentId] = useState<string | null>(() => resume?.record.id ?? null);
   const generateWriting = useGenerateWriting();
   const gradeWriting = useGradeWriting();
+  const gradeVocabParagraph = useGradeVocabParagraph();
+  const upcomingVocabCount =
+    useLiveQuery(async () => {
+      const all = await loadFlashcards(language);
+      return all.filter((c) => c.status === `scheduled`).length;
+    }, [language]) ?? 0;
   const { beginLoading } = useLoading();
   const [activeResumeId, setActiveResumeId] = useState<string | null>(resume?.record.id ?? null);
 
@@ -99,9 +111,14 @@ export function WritingPage() {
 
   function handleGenerate() {
     if (!mode) return;
+    if (mode === `vocab-paragraph`) {
+      void handleGenerateVocabParagraph();
+      return;
+    }
+    const llmMode = mode;
     const task = beginLoading(`Generating passage…`);
     generateWriting.mutate(
-      { language, languageComplexity: sliderComplexity, mode },
+      { language, languageComplexity: sliderComplexity, mode: llmMode },
       {
         onSuccess: (data: WritingExercise) => {
           void (async () => {
@@ -152,6 +169,38 @@ export function WritingPage() {
     );
   }
 
+  async function handleGenerateVocabParagraph() {
+    const task = beginLoading(`Picking vocab…`);
+    const cards = await loadFlashcards(language);
+    const picked = pickUpcomingVocabWords(cards);
+    if (picked.length === 0) {
+      task.done();
+      return;
+    }
+    const data = buildVocabParagraphExercise({
+      languageComplexity: sliderComplexity,
+      requiredWords: picked.map((c) => ({ source: c.source, translation: c.translation })),
+    });
+    const answersSeed = initialAnswers(data);
+    const id = await saveAssessment({
+      mode: `writing`,
+      language,
+      title: `Vocab paragraph`,
+      difficulty: data.languageComplexity,
+      scoreEarned: 0,
+      scoreMax: gradingMaxScore(data),
+      ratingBefore: null,
+      ratingAfter: null,
+      completedAt: null,
+      body: { exercise: data, answers: answersSeed, grades: [] },
+    });
+    setAssessmentId(id);
+    setExercise(data);
+    setAnswers(answersSeed);
+    setPhase(`writing`);
+    task.done();
+  }
+
   function handleAnswerChange(index: number, value: string) {
     setAnswers((prev) => {
       const next = [...prev];
@@ -173,6 +222,67 @@ export function WritingPage() {
   function handleSubmit() {
     if (!exercise || !assessmentId) return;
     const task = beginLoading(`Grading your answers…`);
+
+    const onGraded = async (result: { grades: WritingGrade[] }) => {
+      setGrades(result.grades);
+      const totalScore = result.grades.reduce((sum, g) => sum + g.score, 0);
+      const maxScore = gradingMaxScore(exercise);
+      let rr: RatingResult | null = null;
+      if (rated) {
+        rr = await computeRating(
+          language,
+          totalScore,
+          maxScore,
+          exercise.languageComplexity,
+          `writing`,
+        );
+      }
+      setRatingResult(rr);
+      const completedAt = Date.now();
+      await updateAssessment(assessmentId, {
+        scoreEarned: totalScore,
+        scoreMax: maxScore,
+        ratingBefore: rr?.oldRating ?? null,
+        ratingAfter: rr?.newRating ?? null,
+        completedAt,
+        body: {
+          exercise,
+          answers,
+          grades: result.grades,
+          audioKeyPassage:
+            exercise.mode === `dictogloss` ? `assessment-${assessmentId}-passage` : undefined,
+        },
+      });
+      if (exercise.id) {
+        uploadAssessment({
+          id: exercise.id,
+          userId: await getUserId(),
+          scoreEarned: totalScore,
+          scoreMax: maxScore,
+          completedAt,
+        });
+      }
+      setPhase(`results`);
+    };
+
+    if (exercise.mode === `vocab-paragraph`) {
+      gradeVocabParagraph.mutate(
+        {
+          language,
+          languageComplexity: exercise.languageComplexity,
+          requiredWords: exercise.requiredWords ?? [],
+          paragraph: answers[0] ?? ``,
+        },
+        {
+          onSettled: () => task.done(),
+          onSuccess: (result) => {
+            void onGraded(result);
+          },
+        },
+      );
+      return;
+    }
+
     const questionsForGrading = gradingQuestions(exercise);
     const exerciseForGrading: WritingExercise = { ...exercise, questions: questionsForGrading };
     gradeWriting.mutate(
@@ -185,47 +295,7 @@ export function WritingPage() {
       {
         onSettled: () => task.done(),
         onSuccess: (result) => {
-          void (async () => {
-            setGrades(result.grades);
-            const totalScore = result.grades.reduce((sum, g) => sum + g.score, 0);
-            const maxScore = gradingMaxScore(exercise);
-            let rr: RatingResult | null = null;
-            if (rated) {
-              rr = await computeRating(
-                language,
-                totalScore,
-                maxScore,
-                exercise.languageComplexity,
-                `writing`,
-              );
-            }
-            setRatingResult(rr);
-            const completedAt = Date.now();
-            await updateAssessment(assessmentId, {
-              scoreEarned: totalScore,
-              scoreMax: maxScore,
-              ratingBefore: rr?.oldRating ?? null,
-              ratingAfter: rr?.newRating ?? null,
-              completedAt,
-              body: {
-                exercise,
-                answers,
-                grades: result.grades,
-                audioKeyPassage:
-                  exercise.mode === `dictogloss` ? `assessment-${assessmentId}-passage` : undefined,
-              },
-            });
-            if (exercise.id) {
-              uploadAssessment({
-                id: exercise.id,
-                userId: await getUserId(),
-                scoreEarned: totalScore,
-                scoreMax: maxScore,
-                completedAt,
-              });
-            }
-            setPhase(`results`);
-          })();
+          void onGraded(result);
         },
       },
     );
@@ -269,6 +339,11 @@ export function WritingPage() {
               generateLabel={`Generate Writing Exercise`}
               writingMode={mode}
               onWritingModeChange={setMode}
+              writingModeBlockedReason={
+                mode === `vocab-paragraph` && upcomingVocabCount === 0
+                  ? `You have no upcoming vocab cards. Add words to your vocabulary first.`
+                  : null
+              }
               onLanguageComplexityChange={setComplexityOverride}
               onRatedChange={setRated}
               onGenerate={handleGenerate}
@@ -306,6 +381,17 @@ export function WritingPage() {
             answers={answers}
             onAnswerChange={handleAnswerChange}
             onAppendToAnswer={handleAppendToAnswer}
+            onSubmit={handleSubmit}
+          />
+        )}
+
+        {phase === `writing` && exercise && exercise.mode === `vocab-paragraph` && (
+          <VocabParagraphWritingView
+            exercise={exercise}
+            language={language}
+            languageComplexity={exercise.languageComplexity}
+            paragraph={answers[0] ?? ``}
+            onParagraphChange={(s) => handleAnswerChange(0, s)}
             onSubmit={handleSubmit}
           />
         )}

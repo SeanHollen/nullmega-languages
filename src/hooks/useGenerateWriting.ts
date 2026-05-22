@@ -21,18 +21,21 @@ export interface WritingExerciseLlmResponse {
   summary: string;
 }
 
-export type WritingMode = "short-answer" | "dictogloss";
+export type WritingMode = "short-answer" | "dictogloss" | "vocab-paragraph";
 
 export interface WritingExercise extends WritingExerciseLlmResponse {
   id?: string;
   languageComplexity: number;
   mode: WritingMode;
+  // Only populated for `vocab-paragraph`: the user's own vocab words the paragraph must
+  // incorporate. The grader checks the student's paragraph against this list.
+  requiredWords?: { source: string; translation: string }[];
 }
 
 async function fetchWritingExercise(
   language: string,
   languageComplexity: number,
-  mode: WritingMode,
+  mode: "short-answer" | "dictogloss",
 ): Promise<WritingExercise> {
   const { min, max } = essayWordCounts(languageComplexity);
   const pastSummaries = await getPastSummariesByComplexity(
@@ -75,7 +78,26 @@ export function useGenerateWriting() {
     }: {
       language: string;
       languageComplexity: number;
-      mode: WritingMode;
+      mode: "short-answer" | "dictogloss";
     }) => fetchWritingExercise(language, languageComplexity, mode),
   });
+}
+
+// Constructs a vocab-paragraph WritingExercise locally — no LLM call, since the
+// "exercise" is just the user's own upcoming vocab words.
+export function buildVocabParagraphExercise(args: {
+  languageComplexity: number;
+  requiredWords: { source: string; translation: string }[];
+}): WritingExercise {
+  return {
+    title: ``,
+    passage: ``,
+    translation: ``,
+    difficultWords: [],
+    questions: [],
+    summary: ``,
+    languageComplexity: args.languageComplexity,
+    mode: `vocab-paragraph`,
+    requiredWords: args.requiredWords,
+  };
 }

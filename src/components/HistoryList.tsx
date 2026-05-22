@@ -24,6 +24,7 @@ interface Props {
 const WRITING_MODE_LABEL: Record<WritingMode, string> = {
   "short-answer": `Short answer`,
   dictogloss: `Dictogloss`,
+  "vocab-paragraph": `Vocab paragraph`,
 };
 
 function writingModeOf(r: AssessmentRecord): WritingMode | null {

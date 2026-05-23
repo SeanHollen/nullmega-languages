@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useLiveQuery } from "dexie-react-hooks";
-import { FaArrowLeft } from "react-icons/fa";
+import { BackHeader } from "../components/BackHeader";
 import { SetupView } from "../components/reading/SetupView";
 import { WritingPassageView } from "../components/writing/WritingPassageView";
 import { WritingResultsView } from "../components/writing/WritingResultsView";
@@ -318,15 +318,7 @@ export function WritingPage() {
   return (
     <div className="min-h-screen bg-green-100 py-10 px-4">
       <div className="max-w-2xl mx-auto">
-        <div className="flex items-center gap-4 mb-8">
-          <button
-            onClick={() => navigate(`/`)}
-            className="text-gray-400 hover:text-gray-600 transition cursor-pointer"
-          >
-            <FaArrowLeft />
-          </button>
-          <h1 className="text-2xl font-bold text-gray-800">{`Writing Practice`}</h1>
-        </div>
+        <BackHeader title="Writing Practice" to="/" />
 
         {phase === `setup` && (
           <>

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa";
+import { StudyEmptyState } from "../components/StudyEmptyState";
 import type { GrammarCard } from "../utils/grammarCards";
 import { computeGrammarStatus, patchGrammarCard } from "../utils/grammarCards";
 import type { GrammarSessionData } from "../utils/grammarSession";
@@ -101,15 +102,7 @@ export function GrammarStudyPage() {
           )}
         </div>
 
-        {current === null && (
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 text-center">
-            <p className="text-gray-500">
-              {mode === `learn`
-                ? `No cards to learn right now.`
-                : `No cards due for review. Come back later.`}
-            </p>
-          </div>
-        )}
+        {current === null && <StudyEmptyState mode={mode} />}
         {current !== null && phase === `answering` && (
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 space-y-6">
             <div className="space-y-1">

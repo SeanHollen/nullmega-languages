@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useLiveQuery } from "dexie-react-hooks";
-import { FaArrowLeft } from "react-icons/fa";
+import { BackHeader } from "../components/BackHeader";
 import { SetupView } from "../components/reading/SetupView";
 import { ListeningPassageView } from "../components/listening/ListeningPassageView";
 import type { Translations } from "../components/reading-listening/ResultsView";
@@ -216,15 +216,7 @@ export function ListeningPage() {
   return (
     <div className="min-h-screen bg-green-100 py-10 px-4">
       <div className="max-w-2xl mx-auto">
-        <div className="flex items-center gap-4 mb-8">
-          <button
-            onClick={() => navigate(`/`)}
-            className="text-gray-400 hover:text-gray-600 transition cursor-pointer"
-          >
-            <FaArrowLeft />
-          </button>
-          <h1 className="text-2xl font-bold text-gray-800">{`Listening Comprehension`}</h1>
-        </div>
+        <BackHeader title="Listening Comprehension" to="/" />
 
         {phase === `setup` && (
           <>

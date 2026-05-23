@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { useLiveQuery } from "dexie-react-hooks";
 import { FaArrowLeft, FaEllipsisV } from "react-icons/fa";
+import { StudyEmptyState } from "../components/StudyEmptyState";
 import type { Flashcard } from "../utils/flashcards";
 import { patchFlashcard, computeStatus, pickNextContext } from "../utils/flashcards";
 import { loadVocabSettings } from "../utils/vocabSettings";
@@ -194,15 +195,7 @@ export function StudyPage() {
           )}
         </div>
 
-        {current === null && (
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 text-center">
-            <p className="text-gray-500">
-              {mode === "learn"
-                ? `All done! Come back later, or add more cards if you ran out.`
-                : `All done! Come back later.`}
-            </p>
-          </div>
-        )}
+        {current === null && <StudyEmptyState mode={mode} learnSuggestsAddingCards />}
         {current !== null && ctx && (
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-10 space-y-6 text-center">
             {(settings.showText || textRevealed || revealed) && (

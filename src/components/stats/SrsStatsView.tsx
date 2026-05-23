@@ -3,7 +3,14 @@ import { DAY } from "../../utils/studySession";
 import type { SrsCard } from "../../utils/srsForecast";
 import { forecastDueDays } from "../../utils/srsForecast";
 import type { ReviewEntry } from "../../utils/flashcards";
-import { aggregateOutcomesByInterval, formatIntervalLabel } from "../../utils/outcomesByInterval";
+import {
+  aggregateOutcomesByDay,
+  aggregateOutcomesByHour,
+  aggregateOutcomesByInterval,
+  formatIntervalLabel,
+} from "../../utils/outcomesByInterval";
+
+type OutcomeMode = "interval" | "day" | "hour";
 
 export interface SrsCardWithStatus extends SrsCard {
   status: string;
@@ -80,6 +87,7 @@ export function SrsStatsView({ language, cards, emptyMessage }: Props) {
   const [hoveredStatus, setHoveredStatus] = useState<number | null>(null);
   const [hoveredAdded, setHoveredAdded] = useState<number | null>(null);
   const [addedMode, setAddedMode] = useState<AddedMode>(`perDay`);
+  const [outcomeMode, setOutcomeMode] = useState<OutcomeMode>(`interval`);
   const [hoveredOutcome, setHoveredOutcome] = useState<{
     bucket: number;
     side: "correct" | "incorrect";
@@ -166,18 +174,59 @@ export function SrsStatsView({ language, cards, emptyMessage }: Props) {
     return PAD_T + innerH - (value / addedHigh) * innerH;
   }
 
-  // ── Outcomes by interval ──────────────────────────────────────────────────
-  const outcomesByInterval = aggregateOutcomesByInterval(cards);
-  const totalOutcomes = outcomesByInterval.reduce((s, b) => s + b.correct + b.incorrect, 0);
-  const maxOutcomeCount = Math.max(
-    1,
-    ...outcomesByInterval.flatMap((b) => [b.correct, b.incorrect]),
-  );
+  // ── Review outcomes (toggleable: by interval / by day / by hour) ─────────
+  interface OutcomeBucket {
+    label: string;
+    tooltipLabel: string;
+    correct: number;
+    incorrect: number;
+  }
+  let outcomeBuckets: OutcomeBucket[];
+  if (outcomeMode === `interval`) {
+    outcomeBuckets = aggregateOutcomesByInterval(cards).map((b) => {
+      const lbl = formatIntervalLabel(b.intervalMs);
+      return {
+        label: lbl,
+        tooltipLabel: `${lbl} interval`,
+        correct: b.correct,
+        incorrect: b.incorrect,
+      };
+    });
+  } else if (outcomeMode === `day`) {
+    outcomeBuckets = aggregateOutcomesByDay(cards).map((b, i, arr) => {
+      const date = new Date(b.dayStart);
+      const dayOfMonth = date.getDate();
+      const showMonth = i === 0 || dayOfMonth === 1 || i === arr.length - 1;
+      const labelEveryNth = Math.max(1, Math.floor(arr.length / 30));
+      const showThis = i % labelEveryNth === 0 || i === arr.length - 1;
+      let label = ``;
+      if (showThis) {
+        label = showMonth
+          ? `${dayOfMonth} ${date.toLocaleDateString(undefined, { month: `short` })}`
+          : `${dayOfMonth}`;
+      }
+      return {
+        label,
+        tooltipLabel: shortDate(b.dayStart),
+        correct: b.correct,
+        incorrect: b.incorrect,
+      };
+    });
+  } else {
+    outcomeBuckets = aggregateOutcomesByHour(cards).map((b) => ({
+      label: b.hour % 3 === 0 ? `${b.hour}` : ``,
+      tooltipLabel: `${b.hour.toString().padStart(2, `0`)}:00`,
+      correct: b.correct,
+      incorrect: b.incorrect,
+    }));
+  }
+  const totalOutcomes = outcomeBuckets.reduce((s, b) => s + b.correct + b.incorrect, 0);
+  const maxOutcomeCount = Math.max(1, ...outcomeBuckets.flatMap((b) => [b.correct, b.incorrect]));
   const outcomeHigh = Math.max(5, Math.ceil(maxOutcomeCount * 1.1));
   const outcomeTicks = [0, Math.round(outcomeHigh / 2), outcomeHigh];
-  const outcomeGroupSlot =
-    outcomesByInterval.length > 0 ? innerW / outcomesByInterval.length : innerW;
-  const outcomeBarW = Math.min(40, outcomeGroupSlot * 0.35);
+  const outcomeGroupSlot = outcomeBuckets.length > 0 ? innerW / outcomeBuckets.length : innerW;
+  // When buckets are dense (day/hour modes can have many), narrow the bars.
+  const outcomeBarW = Math.min(40, Math.max(2, outcomeGroupSlot * 0.35));
   function outcomeGroupX(i: number): number {
     return PAD_L + i * outcomeGroupSlot + outcomeGroupSlot / 2;
   }
@@ -594,14 +643,38 @@ export function SrsStatsView({ language, cards, emptyMessage }: Props) {
         )}
       </div>
 
-      {totalOutcomes > 0 && (
+      {(totalOutcomes > 0 || outcomeMode !== `interval`) && (
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-4 mt-6">
           <div className="flex items-baseline justify-between gap-4 flex-wrap">
-            <p className="text-sm text-gray-500">{`Review outcomes by interval`}</p>
-            <div className="text-sm">
-              <span className="text-gray-500">{`Reviews logged: `}</span>
-              <span className="font-semibold text-gray-800">{totalOutcomes}</span>
+            <p className="text-sm text-gray-500">{`Review outcomes`}</p>
+            <div className="flex items-center gap-2">
+              {(
+                [
+                  [`interval`, `Per interval`],
+                  [`day`, `Per day`],
+                  [`hour`, `Per hour`],
+                ] as [OutcomeMode, string][]
+              ).map(([mode, label]) => (
+                <button
+                  key={mode}
+                  onClick={() => {
+                    setOutcomeMode(mode);
+                    setHoveredOutcome(null);
+                  }}
+                  className={`text-xs px-3 py-1 rounded-md transition cursor-pointer ${
+                    outcomeMode === mode
+                      ? `bg-green-100 text-green-700 font-medium`
+                      : `text-gray-500 hover:bg-gray-100`
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
             </div>
+          </div>
+          <div className="text-sm text-right">
+            <span className="text-gray-500">{`Reviews logged: `}</span>
+            <span className="font-semibold text-gray-800">{totalOutcomes}</span>
           </div>
 
           <svg
@@ -641,7 +714,7 @@ export function SrsStatsView({ language, cards, emptyMessage }: Props) {
               stroke="#e5e7eb"
             />
 
-            {outcomesByInterval.map((b, i) => {
+            {outcomeBuckets.map((b, i) => {
               const cx = outcomeGroupX(i);
               const correctX = cx - outcomeBarW - 1;
               const incorrectX = cx + 1;
@@ -653,7 +726,7 @@ export function SrsStatsView({ language, cards, emptyMessage }: Props) {
               const isHoveredIncorrect =
                 hoveredOutcome?.bucket === i && hoveredOutcome.side === `incorrect`;
               return (
-                <g key={b.intervalMs}>
+                <g key={i}>
                   {b.correct > 0 && (
                     <rect
                       x={correctX}
@@ -676,15 +749,17 @@ export function SrsStatsView({ language, cards, emptyMessage }: Props) {
                       rx="2"
                     />
                   )}
-                  <text
-                    x={cx}
-                    y={HEIGHT - PAD_B + 14}
-                    textAnchor="middle"
-                    className="fill-gray-500"
-                    fontSize="10"
-                  >
-                    {formatIntervalLabel(b.intervalMs)}
-                  </text>
+                  {b.label && (
+                    <text
+                      x={cx}
+                      y={HEIGHT - PAD_B + 14}
+                      textAnchor="middle"
+                      className="fill-gray-500"
+                      fontSize="10"
+                    >
+                      {b.label}
+                    </text>
+                  )}
                   <rect
                     x={cx - outcomeGroupSlot / 2}
                     y={PAD_T}
@@ -711,7 +786,7 @@ export function SrsStatsView({ language, cards, emptyMessage }: Props) {
 
             {hoveredOutcome !== null &&
               (() => {
-                const b = outcomesByInterval[hoveredOutcome.bucket];
+                const b = outcomeBuckets[hoveredOutcome.bucket];
                 const count = hoveredOutcome.side === `correct` ? b.correct : b.incorrect;
                 const cx = outcomeGroupX(hoveredOutcome.bucket);
                 const tx =
@@ -719,7 +794,7 @@ export function SrsStatsView({ language, cards, emptyMessage }: Props) {
                     ? cx - outcomeBarW / 2 - 1
                     : cx + outcomeBarW / 2 + 1;
                 return renderTooltip(tx, outcomeY(count), [
-                  `${formatIntervalLabel(b.intervalMs)} interval`,
+                  b.tooltipLabel,
                   `${count} ${hoveredOutcome.side}`,
                 ]);
               })()}

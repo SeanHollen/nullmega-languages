@@ -29,7 +29,12 @@ interface GenerateSession {
 }
 
 function todayString(): string {
-  return new Date().toISOString().slice(0, 10);
+  // Local date (matches streaks.ts and history.ts). UTC would roll over hours earlier or
+  // later than the user's actual midnight, so the counters and the streak record would
+  // disagree about which day "today" is — already-finished work could appear unfinished.
+  const d = new Date();
+  const pad = (n: number) => (n < 10 ? `0${n}` : String(n));
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 }
 
 function normalizeSettings(raw: Partial<GrammarSettings> | null | undefined): GrammarSettings {

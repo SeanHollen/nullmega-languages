@@ -26,6 +26,27 @@ describe("recordToday", () => {
     const all = await loadStreaks();
     expect(all.length).toBe(2);
   });
+
+  it("does upgrade a non-green day to green when the user finishes their obligations", async () => {
+    // Morning: not yet done. Evening: finished everything. The green status must stick.
+    await recordToday(false, true);
+    await recordToday(true, true);
+    const all = await loadStreaks();
+    expect(all.length).toBe(1);
+    expect(all[0]).toMatchObject({ complete: true, hadObligations: true });
+  });
+
+  it("does not downgrade a green day if a later call reports the day as incomplete", async () => {
+    // Once today has been recorded as complete + with obligations (a "green" day),
+    // a subsequent call with complete=false must not overwrite it. Otherwise mid-day
+    // events like a new vocab card coming due or a goal being raised retroactively
+    // un-green a day the user had already finished.
+    await recordToday(true, true);
+    await recordToday(false, true);
+    const all = await loadStreaks();
+    expect(all.length).toBe(1);
+    expect(all[0]).toMatchObject({ complete: true, hadObligations: true });
+  });
 });
 
 async function setHistory(

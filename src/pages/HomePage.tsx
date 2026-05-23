@@ -170,7 +170,12 @@ export function HomePage() {
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-gray-900 mb-2">{`The Language Lab`}</h1>
           <p className="text-gray-500">{`Any language, any level`}</p>
-          <div className="flex items-center justify-center gap-4 mt-3">
+          <div className="flex items-center justify-center flex-wrap gap-x-4 gap-y-1 mt-3">
+            {currentStreak > 0 && (
+              <span className="text-sm text-gray-500">
+                {`Current streak: ${currentStreak} ${currentStreak === 1 ? `day` : `days`}`}
+              </span>
+            )}
             <button
               onClick={() => navigate(`/goals`)}
               className="text-sm text-green-600 hover:text-green-700 font-medium cursor-pointer"
@@ -184,11 +189,6 @@ export function HomePage() {
               {`View streaks →`}
             </button>
           </div>
-          {currentStreak > 0 && (
-            <p className="text-sm text-gray-500 mt-2">
-              {`Current streak: ${currentStreak} ${currentStreak === 1 ? `day` : `days`}`}
-            </p>
-          )}
         </div>
 
         <div className="grid grid-cols-1 min-[420px]:grid-cols-2 gap-4">

@@ -27,7 +27,17 @@ export async function recordToday(
   complete: boolean,
   hadObligations: boolean,
 ): Promise<StreakRecord> {
-  const rec: StreakRecord = { date: todayStr(), hadObligations, complete };
+  const key = todayStr();
+  // Green is sticky for the day: once today has been recorded as complete with
+  // obligations, don't let a later call downgrade it. Mid-day events (new vocab
+  // cards coming due, a raised goal, etc.) recompute `complete` to false even
+  // though the user already finished their day's work, and overwriting here
+  // would silently un-green a day the user had already earned.
+  const existing = await db().streaks.get(key);
+  if (existing && existing.complete && existing.hadObligations) {
+    return existing;
+  }
+  const rec: StreakRecord = { date: key, hadObligations, complete };
   await db().streaks.put(rec);
   return rec;
 }

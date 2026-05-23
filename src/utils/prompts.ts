@@ -110,13 +110,21 @@ DIFFICULT WORDS — what to include and what to exclude:
 - Exclude: cognates and near-cognates — words whose meaning is obvious or easily inferred from their resemblance to English (e.g. "biodiversité", "naturellement", "décision", "organisation"). If an English speaker could look at the word and correctly guess its meaning, do not mark it as difficult.
 - Scale the list to the difficulty level: at low levels, even a few genuinely opaque words count; at high levels, include subtler vocabulary like register-specific or idiomatic terms
 
-QUESTION QUALITY:
-Before writing each question, apply this test: "Could someone answer this correctly by searching for the question's key noun or verb in the passage and picking the option whose words appear nearby?" If yes, rewrite it. Specifically:
-- Use paraphrase and synonyms in questions and answer choices rather than lifting phrases verbatim from the passage
-- Require inference, logical conclusion, understanding of word meaning in context, or recognition of tone/intent — not just recall
+THE COMMAND-F TEST:
+A learner must NOT be able to answer any question by Ctrl-F searching the passage for a keyword from the question or the correct option. For every question you write, mentally do this:
+1. Pick the most distinctive noun, verb, or adjective in the QUESTION. Search the passage for that word (and its obvious morphological variants — plural/singular, conjugations, gender forms). If you find it, the question is too easy to look up — rewrite the question using a paraphrase or synonym not found in the passage.
+2. Pick the most distinctive content word in the CORRECT OPTION. Search the passage for it. If it appears verbatim in the passage, the option is a giveaway — rewrite the correct option to paraphrase the underlying meaning using different vocabulary.
+3. Now check the WRONG OPTIONS: their distinctive content words should ALSO not appear verbatim, OR they should appear in the passage in ways that make them plausible-but-wrong (e.g. true statements that don't actually answer the question, near-correct conclusions that fail on a subtle point). What you must avoid: only the correct option's keywords appearing in the passage. That is pure lookup.
+
+Concretely:
+- BAD: Passage says "She walked to the bakery and bought bread." Q: "Where did she go?" Correct: "To the bakery." (lookup wins — both "bakery" appears verbatim)
+- GOOD: Same passage. Q: "What was her errand?" Correct: "Buying groceries." (paraphrased — no shared keyword)
+
+Additional rules:
 - Wrong options must be plausible: either true statements from the passage that don't actually answer the question, or near-correct conclusions that fail on a subtle point
-- A question or two can be more direct at lower difficulty levels, but even then the answer should require understanding, not matching
-- Questions should be about the meaning and understanding of the passage, not grammar questions.
+- Require inference, logical conclusion, understanding of word meaning in context, or recognition of tone/intent — not recall.
+- Questions should be about meaning and understanding, not grammar.
+- A question or two can be more direct at the lowest difficulty levels, but even then the answer should require understanding, not matching.
 
 ANSWER OPTION LENGTH:
 All four answer options for each question must be similar in length and grammatical complexity. Do not let the correct answer stand out by being noticeably longer, more detailed, or more qualified than the others. A reader should not be able to guess the answer from its length or structure alone.`;

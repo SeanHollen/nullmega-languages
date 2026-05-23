@@ -219,14 +219,14 @@
       {
         "passage": "The cat is on the table. I don't like milk. Where is the book? The book is under the chair. Where is the pen? The pen is on the desk. Where is the bag? The bag is next to the door. Where is the dog? The dog is in the garden. Where is the ball? The ball is under the bed. I don't like fish. I don't like rice. I don't like rain. The cup is on the table too. The plate is next to the cup. The spoon is in the cup. The keys are under the book. The hat is on the chair. The shoes are next to the bed. The cat sits next to the dog. The dog sleeps under the tree. The bird sits on the wall. The fish swims in the pond. I don't like the cold.",
         "question": {
-          "question": "If you wanted to find the book, where should you look?",
+          "question": "Which two items in the passage share the same type of location relative to another object?",
           "options": [
-            "A) On the table",
-            "B) Next to the cat",
-            "C) Under the chair",
-            "D) In the bag"
+            "A) The book and the ball, which are both beneath something",
+            "B) The cat and the dog, which are both beside each other",
+            "C) The pen and the bag, which are both on the desk",
+            "D) The keys and the hat, which are both on the chair"
           ],
-          "answer": 2
+          "answer": 0
         }
       },
       {
@@ -245,12 +245,12 @@
       {
         "passage": "There is a cat in the room. There are three apples on the table. How many dogs do you have? I have two dogs. There is one book on the shelf. There are two pens in the bag. There is one chair in the kitchen. There are four cups on the shelf. There are two windows in the room. There is one door. How many people are here? There are two people. There is one boy and one girl. There is bread on the table. There is milk in the cup. There are eggs in the bowl. How many eggs? There are two eggs. There is one orange in the bag. How many bags do you have? I have one bag. How many books do you have? I have ten books. There is one cat. There are two dogs. There are three apples. There are four cups.",
         "question": {
-          "question": "Which item in the passage has the largest quantity mentioned?",
+          "question": "Of all the items the speaker owns or has, which is mentioned in the greatest quantity?",
           "options": [
-            "A) Cats — there is one",
-            "B) Dogs — there are two",
-            "C) Apples — there are three",
-            "D) Tables — there is one"
+            "A) The pets they keep",
+            "B) The pieces of fruit on the table",
+            "C) The reading material they own",
+            "D) The bags they carry"
           ],
           "answer": 2
         }
@@ -284,9 +284,14 @@
       {
         "passage": "Tomorrow is Saturday. I do not work on Saturday. Yesterday was Friday. I worked all day. Today I will rest. On Monday I worked all day. On Tuesday I worked all day. On Wednesday I worked all day. On Thursday I worked all day. On Friday I worked all day. I worked five days this week. Tomorrow I do not work. On Sunday I do not work. I will rest two days. Today I am tired. Today I am at home. I will read a book. I will watch a film. I will eat good food. I will sleep a lot. I like rest days. I do not like work days. But I need work days for money. Tomorrow will be good. Yesterday was hard. Today is calm.",
         "question": {
-          "question": "On which day did the speaker work?",
-          "options": ["A) Today", "B) Tomorrow", "C) Yesterday", "D) Saturday"],
-          "answer": 2
+          "question": "What does the speaker plan for today, and what does that suggest about how they feel?",
+          "options": [
+            "A) Go in to the office, because they enjoy busy days",
+            "B) Remain at the house and recover, after a demanding week",
+            "C) Travel somewhere new, because they need a change of scene",
+            "D) Visit friends nearby, because they dislike being on their own"
+          ],
+          "answer": 1
         }
       }
     ]
@@ -349,25 +354,25 @@
       {
         "passage": "Yesterday morning I walked to the supermarket near my house. I bought some bread and some milk. The shop was full of people. I talked to my neighbor for a few minutes. She lived next to us for many years. Last night I cooked rice and chicken for my family. My sister helped me in the kitchen. We watched a movie after dinner. The movie ended late. This morning I waited for the bus. The bus arrived late, but I was patient. At school I studied math and history. I worked with my friends on a project. Last weekend we visited my grandmother in the village. She lived in a small house with a green garden. We picked apples from her tree. She talked about her childhood. Her stories were long but interesting.",
         "question": {
-          "question": "What did the speaker do last weekend?",
+          "question": "What can we say about the place where the speaker's grandmother lives?",
           "options": [
-            "A) Walked to the supermarket",
-            "B) Cooked dinner for the family",
-            "C) Visited their grandmother in the village",
-            "D) Studied math and history at school"
+            "A) It is in the city, near a large supermarket",
+            "B) It is a rural area with a house and growing land",
+            "C) It is by the sea, far from any orchards",
+            "D) It is in a tall apartment block near a school"
           ],
-          "answer": 2
+          "answer": 1
         }
       },
       {
         "passage": "Last weekend my brother and I cleaned the house. On Saturday morning we washed all the windows. The house looked much brighter after that. Then we washed the floors in every room. It took us about three hours. We listened to music while we worked. The work was easier with music. In the afternoon my brother and I helped our mother in the garden. We planted new flowers near the fence. We finished just before it started to rain. On Sunday I rested at home. I read a book about ships. The book belonged to my father. I talked to my brother about it later. He liked ships too, but he preferred trains. Last summer he visited a train museum in another city. He still talked about it many months later.",
         "question": {
-          "question": "What did the speaker and their brother do on Saturday afternoon?",
+          "question": "Why did the speaker and their brother stop their outdoor work when they did?",
           "options": [
-            "A) Washed the windows of the house",
-            "B) Helped their mother plant flowers in the garden",
-            "C) Listened to music inside the house",
-            "D) Read books about ships and trains"
+            "A) They had run out of new flowers to put in the soil",
+            "B) Bad weather was about to begin, so they hurried to finish",
+            "C) Their mother told them she no longer needed their help",
+            "D) Their music had stopped and they wanted to go inside"
           ],
           "answer": 1
         }
@@ -411,14 +416,14 @@
       {
         "passage": "I went to the store with my mom. We bought apples and bread. I like apples because they are sweet. My mom likes bread. We were happy. The store was near our house, and we walked there together. The man at the store was very kind, and he said hello to my mom. We took a small basket. We walked around the store and looked at the food. My mom put bread in the basket because we eat bread every day. I put apples in the basket because I like sweet things. We also bought milk because my brother drinks milk in the morning. We bought eggs because my dad cooks eggs on Sundays. We did not buy meat because we already had some at home. The bag was heavy, but my mom carried it. I carried the apples in my hand. We walked home slowly and talked about dinner.",
         "question": {
-          "question": "Why does the speaker like apples?",
+          "question": "What does the speaker say about their taste in apples?",
           "options": [
-            "A) Because their mom bought them",
-            "B) Because they went to the store",
-            "C) Because they are sweet",
-            "D) Because bread is not sweet"
+            "A) They enjoy them for their sugary flavor",
+            "B) They like them because their mother always buys them",
+            "C) They prefer apples to all other fruits at the store",
+            "D) They like apples because bread is too plain"
           ],
-          "answer": 2
+          "answer": 0
         }
       },
       {
@@ -442,12 +447,12 @@
       {
         "passage": "Tomorrow I will go to school. After school, I am going to play with my friends. We will eat dinner at six. It will be a good day. In the morning, I will wake up at seven. I will eat breakfast with my family. My mom will make eggs and bread. I will leave home at quarter to eight. I will walk to school with my sister. We will arrive at eight. I will have math class first, and then I will have art. After lunch, I will read a book in the library. School will end at three. I am going to meet my friends at the park. We are going to play football. After we play, I am going to go home. I am going to do my homework. We will eat dinner at six. After dinner, I am going to watch a film with my dad. Then I will go to bed.",
         "question": {
-          "question": "What is the speaker's plan immediately after school tomorrow?",
+          "question": "What activity does the speaker intend to do with their classmates once lessons end?",
           "options": [
-            "A) Eat dinner at six",
-            "B) Go to school early",
-            "C) Play with friends",
-            "D) Come home and rest"
+            "A) Share a meal at six o'clock",
+            "B) Read together in the school library",
+            "C) Meet up for a game at a nearby park",
+            "D) Watch a film at their dad's place"
           ],
           "answer": 2
         }
@@ -468,12 +473,12 @@
       {
         "passage": "My friend is tall and funny. She has long hair. Her dog is bigger than my dog. I am shorter than my friend, but I am faster. My friend is also kind and very smart. She is the smartest person in our class. She is taller than me, and she is taller than her brother too. Her brother is short and quiet. Her sister is the youngest in the family. The sister is small and shy. My friend has long brown hair, and she has dark eyes. I have short black hair and brown eyes. I am thin and small, but I run very fast. I am faster than my friend. I am also faster than her brother. My friend is funnier than me. She tells funny stories, and she makes everyone laugh. Her dog is big and friendly. My dog is smaller, but my dog is older. We are good friends.",
         "question": {
-          "question": "In what way does the speaker surpass their friend?",
+          "question": "In what one way does the speaker outdo their friend?",
           "options": [
-            "A) They are taller",
-            "B) They are funnier",
-            "C) Their dog is bigger",
-            "D) They are faster"
+            "A) Their height when standing side by side",
+            "B) Their ability to make others laugh",
+            "C) The size of the pet they own",
+            "D) Their speed when running"
           ],
           "answer": 3
         }
@@ -502,14 +507,14 @@
       {
         "passage": "To find the museum, walk to the river first. Then turn right and follow the path. The museum is between the old church and the bank. Do not cross the bridge. From the train station, leave by the main door. Walk straight ahead to the river. The river is very close. When you reach the river, turn right. Do not turn left. Follow the path along the water. Walk for about ten minutes. You will see an old church on your left. Keep walking past the church. The next building is the museum. The museum is between the church and the bank. The bank is on the other side of the museum. Do not cross the bridge over the river. The bridge goes to a different part of the town. After your visit, you can come back the same way. Or you can take a bus from the bank.",
         "question": {
-          "question": "Which two buildings stand on either side of the museum?",
+          "question": "Which structure should the visitor be careful NOT to use on their way to the museum?",
           "options": [
-            "A) The bank and the bridge",
-            "B) The church and the bank",
-            "C) The river and the path",
-            "D) The church and the bridge"
+            "A) The path along the water",
+            "B) The main door of the train station",
+            "C) The crossing over the water",
+            "D) The bus from outside the bank"
           ],
-          "answer": 1
+          "answer": 2
         }
       }
     ]
@@ -541,12 +546,12 @@
       {
         "passage": "Today it is sunny and warm. In winter, it is cold and it snows. I can swim in summer. Can you ski? I like spring because the flowers are beautiful. There are four seasons in my country. In spring, the weather is cool and rainy. The trees are green again, and the flowers come out. I like spring because the flowers are beautiful. In summer, the weather is hot and sunny. The days are long, and the nights are short. I can swim in the lake in summer. I can ride my bike too. In autumn, the weather is cool and windy. The leaves turn red and yellow. They fall from the trees. We can pick apples in autumn. In winter, the weather is very cold, and it snows a lot. The days are short and the nights are long. We can ski in the mountains. Can you ski? I cannot ski well, but I can swim well.",
         "question": {
-          "question": "Which season does the speaker most clearly express a positive feeling about, and why?",
+          "question": "Which season does the speaker most clearly express affection for, and what is the reason?",
           "options": [
-            "A) Summer, because it is warm",
-            "B) Winter, because it snows",
-            "C) Spring, because of the flowers",
-            "D) Today, because it is sunny"
+            "A) Summer, since the lake is warm enough to swim in",
+            "B) Winter, since the mountains offer good skiing",
+            "C) Spring, since the blossoms are lovely to look at",
+            "D) Autumn, since the apples are ready for picking"
           ],
           "answer": 2
         }
@@ -572,14 +577,14 @@
       {
         "passage": "For breakfast I eat eggs and bread. My mother cooks dinner every night. Would you like some soup? Yes, please. I like soup a lot. In our family, we eat three meals a day. For breakfast, I eat eggs and bread, and I drink tea. My father eats only fruit. My sister eats cereal with milk. My mother does not eat much in the morning. For lunch, we usually eat at school or at work. I take a sandwich and an apple in my bag. After school, I sometimes have a small snack at home. My mother cooks dinner every night. She is a very good cook. She often boils vegetables and fries fish. Sometimes she makes soup with rice. Tonight she is making chicken soup. My mother asks me, Would you like some soup? Yes, please. I like soup a lot, especially when it is cold outside. We sit at the table together and talk about our day.",
         "question": {
-          "question": "Who is responsible for preparing the evening meal in this household?",
+          "question": "Who is the one that makes the family's evening food?",
           "options": [
-            "A) The speaker alone",
-            "B) The speaker's mother",
-            "C) Both the speaker and the mother",
-            "D) The person being offered soup"
+            "A) The speaker's father",
+            "B) The speaker themselves",
+            "C) The parent who is a skilled cook",
+            "D) The sister, with cereal and milk"
           ],
-          "answer": 1
+          "answer": 2
         }
       },
       {
@@ -603,12 +608,12 @@
       {
         "passage": "Every weekday I get up at seven o'clock. I drink a cup of coffee and eat some toast for breakfast. At eight o'clock I leave the house and walk to the bus stop. The bus comes at quarter past eight. I get to work at nine. I usually eat lunch at one o'clock. My favorite lunch is a sandwich with cheese and a salad. In the afternoon I drink another coffee. I finish work at five. After work I sometimes go to the gym for an hour. I get home around seven. I cook dinner for me and my brother. We usually eat rice and vegetables, or sometimes pasta. In the evening I read a book or watch television. I go to bed at eleven. On the weekend I get up much later.",
         "question": {
-          "question": "What does the speaker usually do right after work?",
+          "question": "What activity does the speaker sometimes do once the working day is finished?",
           "options": [
-            "A) Cooks dinner for the family at home",
-            "B) Goes to the gym for about an hour",
-            "C) Reads a book or watches television",
-            "D) Eats a sandwich and a salad for lunch"
+            "A) Prepares the evening meal for themselves and a sibling",
+            "B) Spends about sixty minutes exercising at a fitness club",
+            "C) Sits down with a novel or turns on a show",
+            "D) Has a cheese sandwich together with some greens"
           ],
           "answer": 1
         }
@@ -616,12 +621,12 @@
       {
         "passage": "Maria works in a small bakery in the center of town. She starts very early — at four o'clock in the morning. She mixes the flour, the water, and the yeast in a large bowl. Then she lets the bread rise for an hour. While she waits, she boils water for tea and eats a small breakfast. At six the bakery opens. The first customers come for fresh bread and coffee. Maria serves them with a smile. She likes her customers and knows most of them by name. At noon she stops to eat lunch. She usually has soup or a small piece of pizza from the oven. The bakery closes at three. Maria goes home tired but happy. She often takes a short walk before dinner. She lives near a small park, and the walk helps her relax.",
         "question": {
-          "question": "What does Maria do during the hour while the bread rises?",
+          "question": "While Maria waits for the dough to rise, how does she spend that time?",
           "options": [
-            "A) Serves the first customers of the morning",
-            "B) Makes herself tea and a small breakfast",
-            "C) Goes for a walk in the park near her house",
-            "D) Eats soup or a small piece of pizza from the oven"
+            "A) Greeting the earliest people who arrive at the shop",
+            "B) Preparing a hot drink and a light morning meal for herself",
+            "C) Taking a short stroll through the small park nearby",
+            "D) Having a bowl of soup or a slice of pizza from the oven"
           ],
           "answer": 1
         }
@@ -665,14 +670,14 @@
       {
         "passage": "My house has three rooms. There is a big kitchen and a small garden. The room that I like most is the living room. It has a comfortable sofa. My house is small but very cozy. It has three rooms in total, plus a kitchen and a bathroom. There is a big kitchen with a wooden table that we eat at every day. The kitchen has a window that looks out on the small garden. There is a small garden behind the house, which has only one tree and some flowers. The first bedroom is mine. It has a small bed, a desk that I study at, and a shelf full of books. The second bedroom belongs to my parents. It is bigger than mine and has its own little bathroom. The room that I like most is the living room. It has a comfortable sofa, a soft rug on the floor, and a small table that we put our cups on when we have tea together every evening.",
         "question": {
-          "question": "What makes the speaker's favorite room appealing, according to the passage?",
+          "question": "What detail does the speaker give about their favorite room that suggests it is a place for relaxing together?",
           "options": [
-            "A) It has a big kitchen",
-            "B) It has a small garden",
-            "C) It has a comfortable sofa",
-            "D) It is the largest of the three rooms"
+            "A) A wooden table that the family eats at every day",
+            "B) A soft sofa, a rug, and a small table for evening tea",
+            "C) A desk that they use for studying alone",
+            "D) A shelf full of books and a small bed of their own"
           ],
-          "answer": 2
+          "answer": 1
         }
       },
       {
@@ -957,12 +962,12 @@
       {
         "passage": "Marie Curie was born in Poland in 1867 into a family of teachers. She loved science from a young age, but her path was not easy. She moved to Paris because women could not study at university in her country at that time. The journey to France was hard, and she had very little money. In Paris, she lived in a small cold room and often did not eat enough. She studied for many years and worked harder than most of her classmates. Later she met another scientist, Pierre Curie, and they were married. Together they began to study an unknown substance. There she discovered two new elements, which she named polonium and radium. The work was dangerous, and they did not yet understand how harmful it was. She later won the Nobel Prize twice, in two different fields of science, which no other woman had done.",
         "question": {
-          "question": "Why did Marie Curie leave Poland for Paris?",
+          "question": "What forced Marie Curie to seek out a different country in order to pursue her studies?",
           "options": [
-            "A) She wanted to discover new elements found only in France at that time",
-            "B) The university system in Poland was not open to women in her era",
-            "C) She had already won her first Nobel Prize and wished to continue her research",
-            "D) Polish scientists generally moved to Paris to work together on new discoveries"
+            "A) She had already discovered the elements polonium and radium and needed better laboratories",
+            "B) Higher education in her homeland was at the time closed off to her gender",
+            "C) The Nobel committee had asked her to relocate before granting her any award",
+            "D) Polish researchers generally collaborated with French ones on new discoveries"
           ],
           "answer": 1
         }
@@ -975,12 +980,12 @@
       {
         "passage": "I think that learning a language is one of the most important things a person can do today. The world is more connected than ever, and meeting people from different places has become a normal part of life. In my opinion, learning a language helps you understand other people. When you speak someone's language, even just a little, they open up to you in a different way. You also begin to see how they think, because language and thinking are closely connected. I agree that it is hard work. You have to study every day, and you will make many mistakes before you start to feel comfortable. There will be days when you want to give up, especially when grammar feels confusing. But it is also very interesting, and the work brings real rewards. I think every person should try to learn at least one new language in their life.",
         "question": {
-          "question": "According to the speaker, what is the main benefit of learning a language?",
+          "question": "What does the speaker say is the deepest gain from picking up a new language?",
           "options": [
-            "A) It is an interesting hobby to have",
-            "B) It helps you get a better job",
-            "C) It helps you understand other people",
-            "D) It is not as hard as people think"
+            "A) It gives you an enjoyable pastime to fill your free hours",
+            "B) It improves your career prospects and earning potential",
+            "C) It gives you genuine insight into how others see the world",
+            "D) It turns out to be less demanding than most people expect"
           ],
           "answer": 2
         }
@@ -1037,12 +1042,12 @@
       {
         "passage": "Cooking pasta is one of the simplest meals, but each step still matters. First, fill a large pot with water and add a little salt. Place the pot on the stove and turn the heat to high. Boil the water completely before you do anything else. Then add the pasta and stir gently with a wooden spoon to stop it sticking. Cook it for ten minutes, but check it from time to time, because some types of pasta cook more quickly. Test one piece by tasting it. It should be soft but still firm in the middle. After that, drain the water in a clean strainer over the sink. Put the pasta back in the pot, and add the sauce. Mix everything together until each piece is covered in sauce. Serve hot, with a little cheese on top if you like.",
         "question": {
-          "question": "At what point in the process is the sauce added?",
+          "question": "At what stage in the process is the sauce combined with the pasta?",
           "options": [
-            "A) Before the water is boiled",
-            "B) While the pasta is still cooking",
-            "C) After the water has been drained",
-            "D) At the same time as the pasta"
+            "A) Right at the start, before any heat is applied",
+            "B) Halfway through, while the pasta is still in the pot of water",
+            "C) Once the cooking liquid has been poured off",
+            "D) Together with the pasta when it first enters the water"
           ],
           "answer": 2
         }
@@ -1287,10 +1292,10 @@
         "question": {
           "question": "Which of the following is NOT given as a reason why people choose to live in cities?",
           "options": [
-            "A) Better employment prospects",
-            "B) Lower cost of living",
-            "C) More cultural activities",
-            "D) Superior transport connections"
+            "A) Stronger chances of finding work",
+            "B) A cheaper everyday lifestyle",
+            "C) A richer cultural and social life",
+            "D) More convenient ways of getting around"
           ],
           "answer": 1
         }
@@ -1319,9 +1324,9 @@
           "question": "According to the passage, what is the ultimate consequence of young people leaving rural areas?",
           "options": [
             "A) Cities become too crowded to absorb new arrivals",
-            "B) Rural industries grow stronger without young workers",
-            "C) The rural decline deepens as workforce shortages build on each other",
-            "D) Small towns build new schools to attract young people back"
+            "B) Rural businesses thrive because they need fewer staff",
+            "C) The decline feeds itself, with each loss making the next more likely",
+            "D) Small towns open new schools to draw young families back"
           ],
           "answer": 2
         }
@@ -1411,10 +1416,10 @@
         "question": {
           "question": "According to the passage, what is the key condition for eventually feeling at home abroad?",
           "options": [
-            "A) Learning the local language as quickly as possible",
-            "B) Changing your habits to match the local culture",
-            "C) Allowing enough time to pass without rushing it",
-            "D) Finding familiar food and recognizable greetings"
+            "A) Quickly mastering the local language",
+            "B) Adopting local habits in place of your own",
+            "C) Patience, and refusing to force the adjustment",
+            "D) Seeking out food and customs that remind you of home"
           ],
           "answer": 2
         }
@@ -1440,10 +1445,10 @@
       {
         "passage": "Public libraries are often described as outdated, but in fact they are quietly becoming more important, not less. With most of life now lived through screens, the library is one of the few places where a person can spend several hours without being asked to buy anything. That alone is worth defending. Libraries also serve as informal community centers — places where new residents can meet neighbors, where children's reading clubs gather, and where people without internet access at home can apply for jobs. Critics point out that book lending itself accounts for less of a library's activity than it used to, and they are right. But this misses the point: the library has adapted, taking on functions the market refuses to provide. Whether that adaptation continues depends largely on whether municipal budgets continue to support it.",
         "question": {
-          "question": "What does the writer concede to the critics?",
+          "question": "Which observation by detractors does the author accept as accurate?",
           "options": [
             "A) That libraries have become less important than they once were",
-            "B) That book lending now accounts for less of a library's activity",
+            "B) That circulating books is no longer the institution's dominant function",
             "C) That commercial bookstores serve communities better than libraries do",
             "D) That municipal budgets should be redirected to other priorities"
           ],
@@ -1533,12 +1538,12 @@
       {
         "passage": "In many cultures, sharing a meal is much more than just eating. It is a tradition that brings family members closer together and marks important events. The food itself is often less important than the meaning of eating together.",
         "question": {
-          "question": "What is the passage's central claim about communal meals?",
+          "question": "What does the writer identify as the main value of dining together?",
           "options": [
-            "A) The quality of the food is what makes a shared meal meaningful",
-            "B) Shared meals matter most during formal religious occasions",
-            "C) The social meaning of eating together outweighs the food itself",
-            "D) Shared meals are mainly important for bonding with strangers"
+            "A) The quality of the dishes is what makes such gatherings worthwhile",
+            "B) Such gatherings matter most during formal religious occasions",
+            "C) The human connection it creates carries more weight than what is served",
+            "D) They are mainly important for bonding with strangers"
           ],
           "answer": 2
         }

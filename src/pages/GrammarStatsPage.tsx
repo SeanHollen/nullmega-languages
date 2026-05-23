@@ -23,11 +23,7 @@ export function GrammarStatsPage() {
     <div className="min-h-screen bg-green-100 py-10 px-4">
       <div className="max-w-3xl mx-auto">
         <BackHeader title="Grammar Stats" to="/grammar" />
-        <SrsStatsView
-          language={language}
-          cards={cards}
-          emptyMessage={`No grammar cards yet for ${language}.`}
-        />
+        <SrsStatsView cards={cards} emptyMessage={`No grammar cards yet for ${language}.`} />
       </div>
     </div>
   );

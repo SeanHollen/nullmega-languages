@@ -222,7 +222,7 @@ export function GrammarCardTable({ cards, language }: Props) {
         {actionMessage && <span className="text-xs text-gray-500 ml-2">{actionMessage}</span>}
         <Link
           to={`/grammar/stats`}
-          className="ml-auto text-xs text-green-600 hover:text-green-700 font-medium"
+          className="ml-auto text-[0.8125rem] text-green-600 hover:text-green-700 font-medium"
         >
           {`View stats →`}
         </Link>

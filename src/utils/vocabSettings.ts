@@ -22,8 +22,8 @@ const DEFAULTS: VocabSettings = {
   order: `random`,
   generateAudio: true,
   autoplayAudio: true,
-  showText: true,
-  showUpcomingBeforeLearning: true,
+  showText: false,
+  showUpcomingBeforeLearning: false,
   showDueBeforeRelearning: true,
 };
 

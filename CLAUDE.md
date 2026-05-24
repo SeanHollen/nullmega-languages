@@ -19,3 +19,23 @@ npm run check
 ```
 
 This runs oxlint (linting) and oxfmt (formatting) across the `src/` directory and auto-fixes issues in place.
+
+## Don't write defensive runtime validation in internal code
+
+No `throw new Error(...)` for "unexpected value" branches on parameters whose type the compiler already constrains. Trust the type system. Only validate at system boundaries (user input, external APIs, deserialized data from disk/network).
+
+## Use `undefined`, not `null`, for absent/optional values
+
+Optional parameters are `gender?: NarratorGender`, not `gender: NarratorGender | null`. Use `null` only when an existing API forces it.
+
+## Don't invent probabilistic logic
+
+If a function picks from a pool, pick uniformly from that pool. Don't add an artificial 50/50 gate before the pick unless the user specifically asked for stratified sampling. Uniform random over the actual options is the default.
+
+## No explanatory comments above function bodies
+
+Don't write `// This function does X because Y.` above a function. The name, signature, and contents should communicate. Only write comments where the WHY is non-obvious from the code itself (a workaround, a non-local invariant, a bug fix tied to a specific incident).
+
+## Reuse exported types instead of redeclaring inline unions
+
+If `NarratorGender` is exported from `types.ts`, import it. Don't write `"male" | "female"` inline in another file. The compiler won't catch the drift if the union changes.

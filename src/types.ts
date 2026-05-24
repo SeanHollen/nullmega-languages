@@ -16,10 +16,13 @@ export interface ExerciseLlmResponse {
 
 export type ReadingLength = "short" | "medium" | "long";
 
+export type NarratorGender = "male" | "female";
+
 export interface Exercise extends ExerciseLlmResponse {
   id?: string;
   languageComplexity: number;
   length: ReadingLength;
+  narratorGender: NarratorGender;
 }
 
 export type Phase = "setup" | "reading" | "results";

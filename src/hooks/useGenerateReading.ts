@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import type { Exercise, ExerciseLlmResponse } from "../types";
+import type { Exercise, ExerciseLlmResponse, NarratorGender } from "../types";
 import { callChat } from "../utils/api";
 import { getUserId } from "../utils/user";
 import { getPastSummariesByComplexity } from "../utils/history";
@@ -11,12 +11,14 @@ async function fetchExercise(
   length: ReadingLength,
   mode: "reading" | "listening",
 ): Promise<Exercise> {
+  const narratorGender: NarratorGender = Math.random() < 0.5 ? `male` : `female`;
   const pastSummaries = await getPastSummariesByComplexity(mode, language, languageComplexity, 100);
   const prompt = buildReadingExercisePrompt({
     language,
     languageComplexity,
     length,
     pastSummaries,
+    narratorGender,
   });
 
   const data = await callChat({
@@ -26,7 +28,7 @@ async function fetchExercise(
     metadata: { mode, language, difficulty: languageComplexity, userId: await getUserId() },
   });
   const parsed = JSON.parse(data.choices[0].message.content) as ExerciseLlmResponse;
-  return { ...parsed, languageComplexity, length };
+  return { ...parsed, languageComplexity, length, narratorGender };
 }
 
 export function useGenerateReading() {

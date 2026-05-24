@@ -1,11 +1,15 @@
-import type { Exercise } from "../types";
+import type { Exercise, NarratorGender } from "../types";
 import { callTTS } from "../utils/api";
 import { saveAudio } from "../utils/db";
 
-const VOICES = ["alloy", "echo", "fable", "onyx", "nova", "shimmer"] as const;
+const MALE_VOICES = ["echo", "fable", "onyx"] as const;
+const FEMALE_VOICES = ["nova", "shimmer"] as const;
 
-function pickVoice(): string {
-  return VOICES[Math.floor(Math.random() * VOICES.length)];
+export function pickVoice(gender?: NarratorGender): string {
+  let pool: readonly string[] = [...MALE_VOICES, ...FEMALE_VOICES];
+  if (gender === `male`) pool = MALE_VOICES;
+  if (gender === `female`) pool = FEMALE_VOICES;
+  return pool[Math.floor(Math.random() * pool.length)];
 }
 
 async function tts(text: string, voice: string): Promise<Blob> {
@@ -26,7 +30,7 @@ export async function generateExerciseAudio(
   exercise: Exercise,
   keys: ExerciseAudioKeys,
 ): Promise<ExerciseAudio> {
-  const voice = pickVoice();
+  const voice = pickVoice(exercise.narratorGender);
   const blobs = await Promise.all([
     tts(exercise.passage, voice),
     ...exercise.questions.map((q) => tts(q.question, voice)),

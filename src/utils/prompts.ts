@@ -2,7 +2,7 @@
 // built here, so the wording can be reviewed in one place.
 
 import { referenceBlocks } from "./levelReferences";
-import type { ReadingLength } from "../types";
+import type { NarratorGender, ReadingLength } from "../types";
 
 export type { ReadingLength };
 
@@ -71,8 +71,9 @@ export function buildReadingExercisePrompt(args: {
   languageComplexity: number;
   length: ReadingLength;
   pastSummaries: string[];
+  narratorGender: NarratorGender;
 }): string {
-  const { language, languageComplexity, length, pastSummaries } = args;
+  const { language, languageComplexity, length, pastSummaries, narratorGender } = args;
   const referenceBlock = `Difficulty references (based on English examples — these illustrate the difficulty gradient, not the topic):
 ${referenceBlocks(languageComplexity, { includeQuestion: true })}
 
@@ -80,6 +81,8 @@ Match the difficulty of the target level. The topic and content of your passage 
   const avoidanceBlock = pastTitlesBlock(`PAST PASSAGE SUMMARIES`, pastSummaries);
 
   return `Generate a reading comprehension exercise in ${language} at difficulty ${languageComplexity}/100.
+
+Narrator: ${narratorGender}
 
 ${referenceBlock}${avoidanceBlock}${NARRATIVE_BLOCK}
 

@@ -49,6 +49,7 @@ export async function generateContextsFor(card: Flashcard, settings: VocabSettin
   const generated = await generateContexts({
     word: card.source,
     translation: card.translation,
+    includeTranslation: settings.includeTranslationInContexts,
     language: card.language,
     count: settings.contextsPerCard,
   });

@@ -19,6 +19,7 @@ describe("loadVocabSettings", () => {
       showText: false,
       showUpcomingBeforeLearning: false,
       showDueBeforeRelearning: true,
+      includeTranslationInContexts: false,
     });
   });
 
@@ -32,6 +33,7 @@ describe("loadVocabSettings", () => {
       showText: false,
       showUpcomingBeforeLearning: false,
       showDueBeforeRelearning: false,
+      includeTranslationInContexts: true,
     });
     const s = await loadVocabSettings();
     expect(s).toEqual({
@@ -43,6 +45,7 @@ describe("loadVocabSettings", () => {
       showText: false,
       showUpcomingBeforeLearning: false,
       showDueBeforeRelearning: false,
+      includeTranslationInContexts: true,
     });
   });
 
@@ -56,6 +59,7 @@ describe("loadVocabSettings", () => {
       showText: true,
       showUpcomingBeforeLearning: true,
       showDueBeforeRelearning: true,
+      includeTranslationInContexts: false,
     });
     const s = await loadVocabSettings();
     expect(s.newWordsPerDay).toBe(50);

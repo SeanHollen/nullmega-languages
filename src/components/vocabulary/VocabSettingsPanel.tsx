@@ -74,7 +74,7 @@ export function VocabSettingsPanel({ settings, onUpdate }: Props) {
                   onChange={(e) => onUpdate({ showText: e.target.checked })}
                   className="accent-green-600 cursor-pointer"
                 />
-                <span className="text-gray-600">{`Show text`}</span>
+                <span className="text-gray-600">{`Show text by default`}</span>
               </label>
               <label className="flex items-center gap-2 cursor-pointer select-none">
                 <input
@@ -98,25 +98,36 @@ export function VocabSettingsPanel({ settings, onUpdate }: Props) {
           </div>
         )}
         {open && (
-          <div className="px-6 pb-4 flex flex-col items-center gap-3 text-sm">
-            <label className="flex items-center gap-2 cursor-pointer select-none">
-              <input
-                type="checkbox"
-                checked={settings.showUpcomingBeforeLearning}
-                onChange={(e) => onUpdate({ showUpcomingBeforeLearning: e.target.checked })}
-                className="accent-green-600 cursor-pointer"
-              />
-              <span className="text-gray-600">{`show upcoming before learning`}</span>
-            </label>
-            <label className="flex items-center gap-2 cursor-pointer select-none">
-              <input
-                type="checkbox"
-                checked={settings.showDueBeforeRelearning}
-                onChange={(e) => onUpdate({ showDueBeforeRelearning: e.target.checked })}
-                className="accent-green-600 cursor-pointer"
-              />
-              <span className="text-gray-600">{`show due before relearning`}</span>
-            </label>
+          <div className="px-6 pb-4 flex justify-center text-sm">
+            <div className="flex flex-col items-start gap-3">
+              <label className="flex items-center gap-2 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={settings.showUpcomingBeforeLearning}
+                  onChange={(e) => onUpdate({ showUpcomingBeforeLearning: e.target.checked })}
+                  className="accent-green-600 cursor-pointer"
+                />
+                <span className="text-gray-600">{`show upcoming before learning`}</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={settings.showDueBeforeRelearning}
+                  onChange={(e) => onUpdate({ showDueBeforeRelearning: e.target.checked })}
+                  className="accent-green-600 cursor-pointer"
+                />
+                <span className="text-gray-600">{`show due before relearning`}</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={settings.includeTranslationInContexts}
+                  onChange={(e) => onUpdate({ includeTranslationInContexts: e.target.checked })}
+                  className="accent-green-600 cursor-pointer"
+                />
+                <span className="text-gray-600">{`include translation in context generation`}</span>
+              </label>
+            </div>
           </div>
         )}
       </div>

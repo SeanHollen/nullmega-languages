@@ -11,6 +11,7 @@ export interface VocabSettings {
   showText: boolean;
   showUpcomingBeforeLearning: boolean;
   showDueBeforeRelearning: boolean;
+  includeTranslationInContexts: boolean;
 }
 
 const SETTINGS_KEY = `vocab_settings`;
@@ -25,6 +26,7 @@ const DEFAULTS: VocabSettings = {
   showText: false,
   showUpcomingBeforeLearning: false,
   showDueBeforeRelearning: true,
+  includeTranslationInContexts: false,
 };
 
 export const NEW_WORDS_PER_DAY_MIN = 1;
@@ -75,6 +77,10 @@ function normalize(raw: Partial<VocabSettings> | null | undefined): VocabSetting
       typeof raw.showDueBeforeRelearning === `boolean`
         ? raw.showDueBeforeRelearning
         : DEFAULTS.showDueBeforeRelearning,
+    includeTranslationInContexts:
+      typeof raw.includeTranslationInContexts === `boolean`
+        ? raw.includeTranslationInContexts
+        : DEFAULTS.includeTranslationInContexts,
   };
 }
 

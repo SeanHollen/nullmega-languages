@@ -9,6 +9,7 @@ export interface GeneratedContext {
 interface Params {
   word: string;
   translation: string;
+  includeTranslation: boolean;
   language: string;
   count: number;
 }
@@ -16,10 +17,11 @@ interface Params {
 export async function generateContexts({
   word,
   translation,
+  includeTranslation,
   language,
   count,
 }: Params): Promise<GeneratedContext[]> {
-  const prompt = buildContextsPrompt({ language, word, translation, count });
+  const prompt = buildContextsPrompt({ language, word, translation, includeTranslation, count });
 
   const data = await callContexts({
     model: "o4-mini",

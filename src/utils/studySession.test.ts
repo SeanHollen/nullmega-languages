@@ -65,6 +65,7 @@ const settings: VocabSettings = {
   showText: true,
   showUpcomingBeforeLearning: true,
   showDueBeforeRelearning: true,
+  includeTranslationInContexts: false,
 };
 
 async function makeCardDue(id: string): Promise<void> {

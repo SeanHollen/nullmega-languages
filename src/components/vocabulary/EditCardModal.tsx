@@ -1,6 +1,8 @@
 import { useState } from "react";
+import { FaChevronDown, FaChevronRight } from "react-icons/fa";
 import type { Flashcard, FlashcardStatus } from "../../utils/flashcards";
 import { patchFlashcard, updateFlashcardTags } from "../../utils/flashcards";
+import { relativeTime } from "../../utils/relativeTime";
 
 const DAY = 24 * 60 * 60 * 1000;
 const ALL_STATUSES: FlashcardStatus[] = ["new", "learning", "scheduled", "dropped"];
@@ -29,6 +31,7 @@ export function EditCardModal({ card, onSave, onClose }: Props) {
   );
   const [intervalDays, setIntervalDays] = useState(nearestDays);
   const [tags, setTags] = useState(card.tags.join(`, `));
+  const [detailsOpen, setDetailsOpen] = useState(false);
 
   function save() {
     const trimmedSource = source.trim();
@@ -53,7 +56,7 @@ export function EditCardModal({ card, onSave, onClose }: Props) {
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 space-y-4">
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 space-y-4 max-h-[90vh] overflow-y-auto">
         <h2 className="text-base font-semibold text-gray-800">{`Edit card`}</h2>
         <div className="space-y-3">
           <div>
@@ -117,6 +120,24 @@ export function EditCardModal({ card, onSave, onClose }: Props) {
             />
           </div>
         </div>
+        <div>
+          <button
+            onClick={() => setDetailsOpen((p) => !p)}
+            className="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg border border-gray-200 bg-gray-50 hover:bg-gray-100 hover:border-gray-300 text-sm font-medium text-gray-700 cursor-pointer transition"
+          >
+            <span>{`Card details`}</span>
+            {detailsOpen ? (
+              <FaChevronDown className="text-gray-500 text-xs" />
+            ) : (
+              <FaChevronRight className="text-gray-500 text-xs" />
+            )}
+          </button>
+          {detailsOpen && (
+            <div className="mt-2">
+              <DetailsBlock card={card} />
+            </div>
+          )}
+        </div>
         <div className="flex justify-end gap-2 pt-1">
           <button
             onClick={onClose}
@@ -133,5 +154,56 @@ export function EditCardModal({ card, onSave, onClose }: Props) {
         </div>
       </div>
     </div>
+  );
+}
+
+function DetailsBlock({ card }: { card: Flashcard }) {
+  const reviews = card.reviewHistory ?? [];
+  const correct = reviews.filter((r) => r.outcome === `correct`).length;
+  const incorrect = reviews.length - correct;
+  const accuracy = reviews.length > 0 ? `${Math.round((correct / reviews.length) * 100)}%` : `—`;
+  const lastReview = reviews.length > 0 ? reviews[reviews.length - 1] : null;
+  const inRelearning = card.relearningStartedAt !== null;
+
+  return (
+    <div className="rounded-lg bg-gray-50 border border-gray-100 p-3 text-xs text-gray-600 grid grid-cols-2 gap-x-4 gap-y-1.5">
+      <Row label="Language" value={card.language} />
+      <Row label="Added" value={relativeTime(card.addedAt)} />
+      <Row label="Last reviewed" value={relativeTime(card.lastReviewed)} />
+      <Row label="Reviews" value={`${reviews.length} (${correct} ✓ / ${incorrect} ✗)`} />
+      <Row label="Accuracy" value={accuracy} />
+      <Row
+        label="Contexts"
+        value={
+          card.contexts.length === 0
+            ? `none`
+            : `${card.contexts.length}${
+                card.dateContextGenerated ? ` · ${relativeTime(card.dateContextGenerated)}` : ``
+              }`
+        }
+      />
+      {card.learningCorrectCount !== null && (
+        <Row label="Learning streak" value={String(card.learningCorrectCount)} />
+      )}
+      {inRelearning && (
+        <Row label="Relearning since" value={relativeTime(card.relearningStartedAt)} />
+      )}
+      {lastReview && (
+        <Row
+          label="Last answer"
+          value={`${lastReview.outcome} · ${relativeTime(lastReview.timestamp)}`}
+        />
+      )}
+      <Row label="ID" value={<span className="font-mono text-[10px]">{card.id}</span>} />
+    </div>
+  );
+}
+
+function Row({ label, value }: { label: string; value: React.ReactNode }) {
+  return (
+    <>
+      <span className="text-gray-400">{label}</span>
+      <span className="text-gray-700 truncate">{value}</span>
+    </>
   );
 }

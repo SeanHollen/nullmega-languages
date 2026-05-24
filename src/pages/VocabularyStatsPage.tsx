@@ -87,7 +87,7 @@ export function VocabularyStatsPage() {
               onChange={(e) => setDraft(e.target.value)}
               onKeyDown={handleKeyDown}
               onBlur={commitDraft}
-              placeholder={tags.length === 0 ? `type tags` : ``}
+              placeholder={tags.length === 0 ? `tag1 tag2` : ``}
               className="flex-1 min-w-[6rem] outline-none text-gray-700 py-0.5"
             />
           </div>

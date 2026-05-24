@@ -357,10 +357,12 @@ export function buildContextsPrompt(args: {
   language: string;
   word: string;
   translation: string;
+  includeTranslation: boolean;
   count: number;
 }): string {
-  const { language, word, translation, count } = args;
-  return `Generate ${count} short example contexts for the ${language} word/phrase "${word}" (English meaning: "${translation}").
+  const { language, word, translation, includeTranslation, count } = args;
+  const meaningClause = includeTranslation ? ` (English meaning: "${translation}")` : ``;
+  return `Generate ${count} short example contexts for the ${language} word/phrase "${word}"${meaningClause}.
 
 Each context is a short sentence or fragment in ${language} (5-15 words) that uses a form of "${word}".
 

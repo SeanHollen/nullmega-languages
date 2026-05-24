@@ -131,10 +131,10 @@ export function HomePage() {
   const allModes = Object.keys(DEFAULT_LANGUAGE_COMPLEXITY) as Mode[];
   const completedTodayByMode = useLiveQuery(async () => {
     const entries = await Promise.all(
-      allModes.map(async (m) => [m, await getCompletedToday(m)] as const),
+      allModes.map(async (m) => [m, await getCompletedToday(m, language)] as const),
     );
     return Object.fromEntries(entries) as Record<Mode, number>;
-  }, []) ?? { reading: 0, listening: 0, writing: 0, pronunciation: 0 };
+  }, [language]) ?? { reading: 0, listening: 0, writing: 0, pronunciation: 0 };
   const ratingsByMode = useLiveQuery(async () => {
     const entries = await Promise.all(
       allModes.map(async (m) => [m, await loadAbility(language, m)] as const),
@@ -142,7 +142,7 @@ export function HomePage() {
     return Object.fromEntries(entries) as Record<Mode, number | null>;
   }, [language]) ?? { reading: null, listening: null, writing: null, pronunciation: null };
 
-  const streakRecords = useLiveQuery(() => loadStreaks(), []);
+  const streakRecords = useLiveQuery(() => loadStreaks(language), [language]);
   const currentStreak = streakRecords ? computeCurrentStreak(streakRecords) : 0;
   const dayState =
     goals && vocabSettings && grammarSettings
@@ -161,8 +161,8 @@ export function HomePage() {
   const hadObligations = dayState?.hadObligations ?? null;
   useEffect(() => {
     if (complete === null || hadObligations === null) return;
-    void recordToday(complete, hadObligations);
-  }, [complete, hadObligations]);
+    void recordToday(language, complete, hadObligations);
+  }, [language, complete, hadObligations]);
 
   return (
     <div className="min-h-screen bg-green-100 flex flex-col items-center px-4 pt-12">
@@ -205,8 +205,7 @@ export function HomePage() {
               kind === `vocab` && vocabSettings
                 ? vocabStudyCount(vocabCards, vocabNewLimit, learnedToday)
                 : null;
-            const showStudyBadge =
-              studyCount !== null && cardCount !== null && (cardCount > 0 || vocabNewLimit > 0);
+            const showStudyBadge = studyCount !== null && cardCount !== null && cardCount > 0;
 
             const grammarCount = kind === `grammar` ? grammarCards.length : null;
             const grammarNewLimit = grammarSettings?.newCardsPerDay ?? 0;
@@ -215,9 +214,7 @@ export function HomePage() {
                 ? grammarStudyCount(grammarCards, grammarNewLimit, grammarGeneratedToday)
                 : null;
             const showGrammarStudyBadge =
-              grammarStudyCountValue !== null &&
-              grammarCount !== null &&
-              (grammarCount > 0 || grammarNewLimit > 0);
+              grammarStudyCountValue !== null && grammarCount !== null && grammarCount > 0;
             return (
               <button
                 key={label}

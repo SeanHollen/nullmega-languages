@@ -18,6 +18,7 @@ import { saveAssessment, updateAssessment } from "../utils/history";
 import { uploadAssessment } from "../utils/api";
 import { getUserId } from "../utils/user";
 import { resolveSliderComplexity } from "../utils/sliderComplexity";
+import { loadPerModeDefault } from "../utils/onboarding";
 
 type Phase = "setup" | "exercise" | "results";
 
@@ -40,11 +41,13 @@ export function PronunciationPage() {
       : null;
   const savedRating =
     useLiveQuery(() => loadAbility(language, `pronunciation`), [language]) ?? null;
+  const onboardingDefault =
+    useLiveQuery(() => loadPerModeDefault(language, `pronunciation`), [language]) ?? null;
   const [complexityOverride, setComplexityOverride] = useState<number | null>(null);
   const sliderComplexity = resolveSliderComplexity({
     override: complexityOverride,
     savedRating,
-    defaultComplexity: DEFAULT_LANGUAGE_COMPLEXITY.pronunciation,
+    defaultComplexity: onboardingDefault ?? DEFAULT_LANGUAGE_COMPLEXITY.pronunciation,
   });
   const [rated, setRated] = useState(true);
   const [phase, setPhase] = useState<Phase>(() => (resumeBody ? `exercise` : `setup`));

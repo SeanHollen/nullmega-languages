@@ -63,13 +63,15 @@ describe("getHistory", () => {
 });
 
 describe("getCompletedToday", () => {
-  it("counts today's completions for a mode", async () => {
+  it("counts today's completions for a mode in the given language only", async () => {
     const now = Date.now();
     await saveAssessment({ ...baseRec(), completedAt: now });
     await saveAssessment({ ...baseRec(), completedAt: now });
     await saveAssessment({ ...baseRec(), completedAt: now - 7 * 24 * 60 * 60 * 1000 });
     await saveAssessment({ ...baseRec(), mode: `writing`, completedAt: now });
-    expect(await getCompletedToday(`reading`)).toBe(2);
+    await saveAssessment({ ...baseRec(), language: `French`, completedAt: now });
+    expect(await getCompletedToday(`reading`, `Spanish`)).toBe(2);
+    expect(await getCompletedToday(`reading`, `French`)).toBe(1);
   });
 });
 

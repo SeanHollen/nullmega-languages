@@ -26,6 +26,7 @@ import { saveAssessment, updateAssessment } from "../utils/history";
 import { uploadAssessment } from "../utils/api";
 import { getUserId } from "../utils/user";
 import { resolveSliderComplexity } from "../utils/sliderComplexity";
+import { loadPerModeDefault } from "../utils/onboarding";
 
 type Phase = "setup" | "listening" | "writing" | "results";
 
@@ -60,11 +61,13 @@ export function WritingPage() {
       : null;
   const resumeBody = resume ? (resume.record.body as WritingBody | undefined) : undefined;
   const savedRating = useLiveQuery(() => loadAbility(language, `writing`), [language]) ?? null;
+  const onboardingDefault =
+    useLiveQuery(() => loadPerModeDefault(language, `writing`), [language]) ?? null;
   const [complexityOverride, setComplexityOverride] = useState<number | null>(null);
   const sliderComplexity = resolveSliderComplexity({
     override: complexityOverride,
     savedRating,
-    defaultComplexity: DEFAULT_LANGUAGE_COMPLEXITY.writing,
+    defaultComplexity: onboardingDefault ?? DEFAULT_LANGUAGE_COMPLEXITY.writing,
   });
   const [rated, setRated] = useState(true);
   const [mode, setMode] = useState<WritingMode | null>(() => resumeBody?.exercise?.mode ?? null);

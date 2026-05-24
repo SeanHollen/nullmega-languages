@@ -1,5 +1,9 @@
 # Claude instructions
 
+## Backend location
+
+The active backend is **Convex** at `../language-learning-backend-convex/`. The Express backend at `../language-learning-backend/` is deprecated — do not edit it. Frontend talks to Convex via `VITE_BACKEND_URL` (typically `http://127.0.0.1:3211` for local dev). HTTP routes live in `convex/http.ts`; backing actions live alongside (`convex/generate.ts`, `convex/onboarding.ts`, etc.). Start with `npx convex dev` from the convex backend repo.
+
 ## No useEffect
 
 `useEffect` is forbidden unless there is absolutely no other option. If something happens because a user clicked something, it must be triggered by that click handler — not by a reactive effect watching state. Before reaching for `useEffect`, ask: what user action caused this? Put the logic there instead.

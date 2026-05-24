@@ -106,11 +106,11 @@ function sameDay(a: number, b: number): boolean {
   );
 }
 
-export async function getCompletedToday(mode: Mode): Promise<number> {
+export async function getCompletedToday(mode: Mode, language: string): Promise<number> {
   const now = Date.now();
   const records = await db()
     .assessments.where(`[mode+language]`)
-    .between([mode, ``], [mode, `￿`])
+    .equals([mode, language])
     .toArray();
   return records.filter((r) => typeof r.completedAt === `number` && sameDay(r.completedAt, now))
     .length;

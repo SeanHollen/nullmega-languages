@@ -1,6 +1,7 @@
 import { db } from "./db";
 
 export interface StreakRecord {
+  language: string;
   date: string; // YYYY-MM-DD (local time)
   hadObligations: boolean;
   complete: boolean;
@@ -18,27 +19,28 @@ export function todayStr(): string {
   return dateStr(new Date());
 }
 
-export async function loadStreaks(): Promise<StreakRecord[]> {
-  const all = await db().streaks.toArray();
+export async function loadStreaks(language: string): Promise<StreakRecord[]> {
+  const all = await db().streaksLang.where(`language`).equals(language).toArray();
   return all.sort((a, b) => a.date.localeCompare(b.date));
 }
 
 export async function recordToday(
+  language: string,
   complete: boolean,
   hadObligations: boolean,
 ): Promise<StreakRecord> {
-  const key = todayStr();
+  const date = todayStr();
   // Green is sticky for the day: once today has been recorded as complete with
   // obligations, don't let a later call downgrade it. Mid-day events (new vocab
   // cards coming due, a raised goal, etc.) recompute `complete` to false even
   // though the user already finished their day's work, and overwriting here
   // would silently un-green a day the user had already earned.
-  const existing = await db().streaks.get(key);
+  const existing = await db().streaksLang.get([language, date]);
   if (existing && existing.complete && existing.hadObligations) {
     return existing;
   }
-  const rec: StreakRecord = { date: key, hadObligations, complete };
-  await db().streaks.put(rec);
+  const rec: StreakRecord = { language, date, hadObligations, complete };
+  await db().streaksLang.put(rec);
   return rec;
 }
 

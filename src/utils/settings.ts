@@ -17,7 +17,14 @@ const KEYS = {
   textGen: `settings_textGen`,
   tts: `settings_tts`,
   backendUrl: `settings_backendUrl`,
+  authToken: `authToken`,
+  authUserId: `authUserId`,
 };
+
+export interface AuthInfo {
+  token: string;
+  userId: string;
+}
 
 async function getValue<T>(key: string): Promise<T | null> {
   const row = await db().kv.get(key);
@@ -50,4 +57,17 @@ export async function saveSettings(s: AppSettings): Promise<void> {
   else await db().kv.delete(KEYS.tts);
   if (s.backendUrl) await putValue(KEYS.backendUrl, s.backendUrl);
   else await db().kv.delete(KEYS.backendUrl);
+}
+
+export async function loadAuthInfo(): Promise<AuthInfo | null> {
+  const [token, userId] = await Promise.all([
+    getValue<string>(KEYS.authToken),
+    getValue<string>(KEYS.authUserId),
+  ]);
+  return token && userId ? { token, userId } : null;
+}
+
+export async function saveAuthInfo(info: AuthInfo): Promise<void> {
+  await putValue(KEYS.authToken, info.token);
+  await putValue(KEYS.authUserId, info.userId);
 }

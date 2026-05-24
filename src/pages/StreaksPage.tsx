@@ -3,6 +3,7 @@ import { FaArrowLeft } from "react-icons/fa";
 import { useLiveQuery } from "dexie-react-hooks";
 import { loadStreaks, computeCurrentStreak, dateStr, type StreakRecord } from "../utils/streaks";
 import { loadListeningSeconds, formatListeningDuration } from "../utils/listeningStats";
+import { useLanguage } from "../contexts/LanguageContext";
 
 const WEEKS = 26;
 const DAY_LABELS = [`Sun`, `Mon`, `Tue`, `Wed`, `Thu`, `Fri`, `Sat`];
@@ -47,7 +48,8 @@ function cellTitle(cell: Cell): string {
 
 export function StreaksPage() {
   const navigate = useNavigate();
-  const records = useLiveQuery(() => loadStreaks(), []) ?? [];
+  const { language } = useLanguage();
+  const records = useLiveQuery(() => loadStreaks(language), [language]) ?? [];
   const byDate = new Map(records.map((r) => [r.date, r]));
   const currentStreak = computeCurrentStreak(records);
   const listeningSeconds = useLiveQuery(() => loadListeningSeconds(), []) ?? 0;

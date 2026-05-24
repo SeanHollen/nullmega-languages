@@ -133,6 +133,32 @@ async function isBYOK(): Promise<boolean> {
   return (await loadSettings()).textGen !== null;
 }
 
+export async function callAuthLogin(): Promise<{ token: string; userId: string }> {
+  const res = await fetch(`${await resolvedBackendUrl()}/api/auth/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ provider: "placeholder" }),
+  });
+  if (!res.ok) throw new Error(`Login failed: ${res.status}`);
+  return res.json() as Promise<{ token: string; userId: string }>;
+}
+
+// Onboarding always uses the backend — the user hasn't set up BYOK or authenticated yet,
+// so we cannot route through callChat (which falls through to OpenAI directly when a key
+// is present in env or storage).
+export async function callOnboardingComplexityExamples(
+  language: string,
+): Promise<Record<string, unknown>> {
+  const res = await fetch(`${await resolvedBackendUrl()}/api/onboarding/complexity-examples`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ language }),
+  });
+  if (!res.ok) throw new Error(`Examples request failed: ${res.status}`);
+  const { examples } = (await res.json()) as { examples: Record<string, unknown> };
+  return examples;
+}
+
 async function postJsonFireAndForget(path: string, payload: object): Promise<void> {
   const url = `${await resolvedBackendUrl()}${path}`;
   if (!url || url.startsWith(path)) return;

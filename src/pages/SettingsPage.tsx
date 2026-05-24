@@ -4,14 +4,13 @@ import { useLiveQuery } from "dexie-react-hooks";
 import { FaArrowLeft } from "react-icons/fa";
 import type { Provider } from "../utils/settings";
 import { loadSettings, saveSettings } from "../utils/settings";
+import { TextGenKeySection } from "../components/onboarding/TextGenKeySection";
 
 export function SettingsPage() {
   const navigate = useNavigate();
   const initial = useLiveQuery(() => loadSettings(), []);
 
   const [textGenKey, setTextGenKey] = useState<string | null>(null);
-  const [showTextGenKey, setShowTextGenKey] = useState(false);
-  const [textGenKeyTouched, setTextGenKeyTouched] = useState(false);
   const [sameTTS, setSameTTS] = useState<boolean | null>(null);
   const [ttsKey, setTtsKey] = useState<string | null>(null);
   const [showTtsKey, setShowTtsKey] = useState(false);
@@ -57,60 +56,7 @@ export function SettingsPage() {
 
         {initial && textGenKey !== null && ttsKey !== null && sameTTS !== null && (
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-6">
-            <section>
-              <h2 className="text-lg font-semibold text-gray-800 mb-1">{`Text Generation`}</h2>
-              <p className="text-sm text-gray-400 mb-4">
-                {`Enter your OpenAI API key to call the model directly (BYOK). Leave blank to route through the backend.`}
-              </p>
-              <div className="space-y-3">
-                <div>
-                  <label className="block text-sm font-medium text-gray-600 mb-1">{`Provider`}</label>
-                  <select className="w-full border border-gray-200 rounded-xl px-3 py-2 text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-green-500 cursor-pointer">
-                    <option>{`OpenAI`}</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-600 mb-1">{`API Key`}</label>
-                  <input
-                    type={showTextGenKey ? `text` : `password`}
-                    value={textGenKey}
-                    onChange={(e) => setTextGenKey(e.target.value)}
-                    onBlur={() => setTextGenKeyTouched(true)}
-                    placeholder={`sk-…`}
-                    autoComplete="off"
-                    data-1p-ignore="true"
-                    data-lpignore="true"
-                    className="w-full border border-gray-200 rounded-xl px-3 py-2 text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-500"
-                  />
-                  <div className="flex items-center justify-between mt-2">
-                    <label className="flex items-center gap-2 cursor-pointer select-none">
-                      <input
-                        type="checkbox"
-                        checked={showTextGenKey}
-                        onChange={(e) => setShowTextGenKey(e.target.checked)}
-                        className="accent-green-500 cursor-pointer"
-                      />
-                      <span className="text-xs text-gray-500">{`Show key`}</span>
-                    </label>
-                    {textGenKey && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setTextGenKey(``);
-                          setTextGenKeyTouched(false);
-                        }}
-                        className="text-xs text-gray-500 hover:text-gray-700 cursor-pointer"
-                      >
-                        {`Clear`}
-                      </button>
-                    )}
-                  </div>
-                  {textGenKeyTouched && textGenKey && !textGenKey.startsWith(`sk-`) && (
-                    <p className="text-xs text-red-500 mt-1">{`Key should start with "sk-"`}</p>
-                  )}
-                </div>
-              </div>
-            </section>
+            <TextGenKeySection value={textGenKey} onChange={setTextGenKey} />
 
             <hr className="border-gray-100" />
 

@@ -25,7 +25,7 @@ Where the form supports it, give the passage genuine interest. Aim for at least 
 - Concrete specifics (names, places, gestures) over abstract description
 Avoid 
 - Avoid bland filler — passages should be the kind of thing a reader would actually want to keep reading.
-- Avoid cliches, like "When I was a child, I did X, now that I'm an adult, I do Y." If a theme has appeared in a prior story, you should probably not do the same thing.
+- Avoid cliches, like "When I was a child, I did X, now that I'm an adult, I do Y." or "It was a great and fun experience!". If a theme has appeared in a prior story, you should probably not do the same thing.
 - Avoid re-using the same themes as described in difficuty levels. The point of the examples is to explain the difficulty, NOT to give you a type of story you should copy.
 `;
 

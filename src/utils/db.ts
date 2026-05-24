@@ -25,7 +25,8 @@ export interface AbilityRow {
 
 class LanguageLabDB extends Dexie {
   audio!: Table<Blob, string>;
-  streaks!: Table<StreakRecord, string>;
+  streaks!: Table<StreakRecord, string>; // legacy table, unused since v10
+  streaksLang!: Table<StreakRecord, [string, string]>;
   goals!: Table<GoalsRow, string>;
   kv!: Table<KVRow, string>;
   abilities!: Table<AbilityRow, string>;
@@ -90,6 +91,37 @@ class LanguageLabDB extends Dexie {
       grammarCards: `&id, language, [language+title]`,
       assessments: `&id, [mode+language], completedAt, createdAt`,
     });
+    // v10: per-language streaks. Dexie can't change a table's primary key in-place,
+    // so we add a new table `streaksLang` with compound PK [language+date] and migrate
+    // existing global records into it, attributing them to whatever language was
+    // selected at upgrade time. The legacy `streaks` table is left in place unused.
+    this.version(10)
+      .stores({
+        audio: ``,
+        streaks: `&date`,
+        streaksLang: `&[language+date], date, language`,
+        goals: `&language`,
+        kv: `&key`,
+        abilities: `&id, [language+mode]`,
+        customLanguages: `&name`,
+        flashcards: `&id, language, [language+source]`,
+        grammarCards: `&id, language, [language+title]`,
+        assessments: `&id, [mode+language], completedAt, createdAt`,
+      })
+      .upgrade(async (tx) => {
+        const kvRow = (await tx.table(`kv`).get(`selectedLanguage`)) as
+          | { value?: unknown }
+          | undefined;
+        const lang = typeof kvRow?.value === `string` ? kvRow.value : `French`;
+        const oldRecords = (await tx.table(`streaks`).toArray()) as {
+          date: string;
+          hadObligations: boolean;
+          complete: boolean;
+        }[];
+        for (const r of oldRecords) {
+          await tx.table(`streaksLang`).put({ ...r, language: lang });
+        }
+      });
   }
 }
 

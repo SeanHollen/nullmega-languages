@@ -20,6 +20,7 @@ import { saveAssessment, updateAssessment } from "../utils/history";
 import { uploadAssessment } from "../utils/api";
 import { getUserId } from "../utils/user";
 import { resolveSliderComplexity } from "../utils/sliderComplexity";
+import { loadPerModeDefault } from "../utils/onboarding";
 import type { ReadingLength } from "../utils/prompts";
 import type { Exercise } from "../types";
 
@@ -35,11 +36,13 @@ export function ListeningPage() {
       : null;
   const resumeBody = resume ? (resume.record.body as ListeningBody | undefined) : undefined;
   const savedRating = useLiveQuery(() => loadAbility(language, `listening`), [language]) ?? null;
+  const onboardingDefault =
+    useLiveQuery(() => loadPerModeDefault(language, `listening`), [language]) ?? null;
   const [complexityOverride, setComplexityOverride] = useState<number | null>(null);
   const sliderComplexity = resolveSliderComplexity({
     override: complexityOverride,
     savedRating,
-    defaultComplexity: DEFAULT_LANGUAGE_COMPLEXITY.listening,
+    defaultComplexity: onboardingDefault ?? DEFAULT_LANGUAGE_COMPLEXITY.listening,
   });
   const [rated, setRated] = useState(true);
   const [length, setLength] = useState<ReadingLength>(

@@ -150,10 +150,16 @@ export function StudyPage() {
       advanceCard();
       return;
     }
+    // Put the card back in the queue (as if the user never saw it) and pick a
+    // different card to show next. If this card is the only one left, we'll see it
+    // again — that's fine.
     const updatedCard = { ...current, ...patch };
-    setRemaining((rs) => rs.map((c) => (c.id === current.id ? updatedCard : c)));
-    setCurrent(updatedCard);
-    showCard(updatedCard);
+    const updatedRemaining = remaining.map((c) => (c.id === current.id ? updatedCard : c));
+    setRemaining(updatedRemaining);
+    const others = updatedRemaining.filter((c) => c.id !== current.id);
+    const nextCard = pickNextCard(others.length > 0 ? others : updatedRemaining, tierFn);
+    setCurrent(nextCard);
+    if (nextCard) showCard(nextCard);
   }
 
   const ctx = current && current.contexts[contextIndex];

@@ -198,6 +198,22 @@ describe("computeAnswerPatch", () => {
     expect(`contexts` in patch).toBe(false);
   });
 
+  it("does NOT append to reviewHistory when answering a relearning card (avoids double-counting in per-day stats)", () => {
+    const existing = [{ outcome: "incorrect" as const, timestamp: 500, currentInterval: DAY }];
+    const card = cardWithContexts({
+      status: "scheduled",
+      currentInterval: 0,
+      relearningStartedAt: 500,
+      lastReviewed: 500,
+      reviewHistory: existing,
+    });
+    const { patch: rightPatch } = computeAnswerPatch(card, "review", true, 1000);
+    expect(rightPatch.reviewHistory).toEqual(existing);
+
+    const { patch: wrongPatch } = computeAnswerPatch(card, "review", false, 1000);
+    expect(wrongPatch.reviewHistory).toEqual(existing);
+  });
+
   it("graduates a relearning card on a single right answer in review mode, with interval reset to INITIAL_INTERVAL (does NOT re-advance via nextInterval, which would silently undo the wrong's reset)", () => {
     const card = cardWithContexts({
       status: "scheduled",

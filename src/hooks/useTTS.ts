@@ -1,5 +1,5 @@
 import type { Exercise } from "../types";
-import { pickVoice, tts } from "../utils/tts";
+import { pickVoice, tts, type TtsKind } from "../utils/tts";
 import { saveAudio } from "../utils/db";
 
 export interface ExerciseAudio {
@@ -18,8 +18,8 @@ export async function generateExerciseAudio(
 ): Promise<ExerciseAudio> {
   const voice = pickVoice(exercise.narratorGender);
   const blobs = await Promise.all([
-    tts(exercise.passage, voice, `tts-1-hd`),
-    ...exercise.questions.map((q) => tts(q.question, voice, `tts-1-hd`)),
+    tts(exercise.passage, voice, `passage`),
+    ...exercise.questions.map((q) => tts(q.question, voice, `passage`)),
   ]);
   await saveAudio(keys.passage, blobs[0]);
   await Promise.all(exercise.questions.map((_, i) => saveAudio(keys.questions[i], blobs[i + 1])));
@@ -29,9 +29,13 @@ export async function generateExerciseAudio(
   };
 }
 
-export async function generatePhrasesAudio(phrases: string[], keys: string[]): Promise<string[]> {
+export async function generatePhrasesAudio(
+  phrases: string[],
+  keys: string[],
+  kind: TtsKind,
+): Promise<string[]> {
   const voice = pickVoice();
-  const blobs = await Promise.all(phrases.map((p) => tts(p, voice, `tts-1-hd`)));
+  const blobs = await Promise.all(phrases.map((p) => tts(p, voice, kind)));
   await Promise.all(blobs.map((b, i) => saveAudio(keys[i], b)));
   return blobs.map((b) => URL.createObjectURL(b));
 }

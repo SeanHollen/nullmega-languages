@@ -21,7 +21,7 @@ async function populateAudio(
     contexts.map(async (ctx, i) => {
       if (ctx.audioKey) return ctx;
       try {
-        const blob = await tts(ctx.source, voice, `tts-1`);
+        const blob = await tts(ctx.source, voice, `phrase`);
         const key = audioKey(cardId, i);
         await saveAudio(key, blob);
         return { ...ctx, audioKey: key };

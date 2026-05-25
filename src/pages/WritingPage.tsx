@@ -147,7 +147,11 @@ export function WritingPage() {
               task.update(`Generating audio…`);
               try {
                 const audioKeyPassage = `assessment-${id}-passage`;
-                const [url] = await generatePhrasesAudio([data.passage], [audioKeyPassage]);
+                const [url] = await generatePhrasesAudio(
+                  [data.passage],
+                  [audioKeyPassage],
+                  `passage`,
+                );
                 setAudioUrl(url);
                 await updateAssessment(id, {
                   body: {

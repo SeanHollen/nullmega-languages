@@ -113,14 +113,23 @@ export function computeAnswerPatch(
   }
   // Cards persisted before this feature shipped may not have reviewHistory; default to []
   // so we don't blow up spreading undefined.
-  const reviewHistory = [
-    ...(card.reviewHistory ?? []),
-    {
-      outcome: (right ? "correct" : "incorrect") as "correct" | "incorrect",
-      timestamp: now,
-      currentInterval: card.currentInterval,
-    },
-  ];
+  //
+  // Only original "due event" answers are recorded — relearning-practice answers
+  // (subsequent answers on a card already flagged as relearning) are follow-ups to an
+  // already-recorded "incorrect" entry. Recording them too inflates per-day stats
+  // (wrong-then-right would contribute 2 entries instead of 1).
+  const existing = card.reviewHistory ?? [];
+  const isRelearningPractice = card.relearningStartedAt !== null;
+  const reviewHistory = isRelearningPractice
+    ? existing
+    : [
+        ...existing,
+        {
+          outcome: (right ? "correct" : "incorrect") as "correct" | "incorrect",
+          timestamp: now,
+          currentInterval: card.currentInterval,
+        },
+      ];
   if (right) {
     // A card that was demoted earlier (relearningStartedAt !== null) graduates back to
     // scheduled at INITIAL_INTERVAL — don't re-advance via nextInterval(), or the

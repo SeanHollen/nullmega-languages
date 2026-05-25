@@ -4,11 +4,11 @@ import { callTTS } from "./api";
 const MALE_VOICES = ["echo", "fable", "onyx"] as const;
 const FEMALE_VOICES = ["nova", "shimmer"] as const;
 
-// tts-1-hd has better prosody on longer narrative text but tends to over-interpret short
-// fragments (inserted pauses, guessed pronunciations of unusual words, aggressive
-// abbreviation expansion). tts-1 is more literal and predictable — better for vocab
-// card contexts where short and faithful is more important than expressive.
-export type TtsModel = "tts-1" | "tts-1-hd";
+// Describes what's being spoken so this module can pick the right model. Callers should
+// not pick models directly: tts-1-hd has better prosody on long narrative text but
+// over-interprets short fragments (inserted pauses, guessed pronunciations, aggressive
+// abbreviation expansion); tts-1 is more literal — better for vocab card contexts.
+export type TtsKind = "passage" | "phrase";
 
 export function pickVoice(gender?: NarratorGender): string {
   let pool: readonly string[] = [...MALE_VOICES, ...FEMALE_VOICES];
@@ -23,6 +23,7 @@ function stripBold(text: string): string {
   return text.split("**").join("");
 }
 
-export async function tts(text: string, voice: string, model: TtsModel): Promise<Blob> {
+export async function tts(text: string, voice: string, kind: TtsKind): Promise<Blob> {
+  const model = kind === `passage` ? `tts-1-hd` : `tts-1`;
   return callTTS({ model, voice, input: stripBold(text) });
 }

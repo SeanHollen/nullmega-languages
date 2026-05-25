@@ -3,9 +3,13 @@ import { useNavigate, useLocation, useParams } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa";
 import { StudyEmptyState } from "../components/StudyEmptyState";
 import type { GrammarCard } from "../utils/grammarCards";
-import { computeGrammarStatus, patchGrammarCard } from "../utils/grammarCards";
-import type { GrammarSessionData } from "../utils/grammarSession";
-import { INITIAL_INTERVAL, nextInterval, pickRandom } from "../utils/studySession";
+import { patchGrammarCard } from "../utils/grammarCards";
+import { computeSrsStatus } from "../utils/srs";
+import {
+  type GrammarSessionData,
+  computeGrammarAnswerPatch,
+  pickNextGrammarCard,
+} from "../utils/grammarSession";
 
 type Phase = "answering" | "results";
 
@@ -53,29 +57,21 @@ export function GrammarStudyPage() {
   function handleCardAnswer(right: boolean) {
     if (!current) return;
     const now = Date.now();
-    const cardStatus = computeGrammarStatus(current);
-
-    let patch: Partial<GrammarCard> | null = null;
-    if (right) {
-      const interval =
-        cardStatus === `due` ? nextInterval(current.currentInterval) : INITIAL_INTERVAL;
-      patch = { status: `scheduled`, lastReviewed: now, currentInterval: interval };
-    } else if (cardStatus === `due`) {
-      patch = { status: `learning`, lastReviewed: now, currentInterval: INITIAL_INTERVAL };
-    }
-    if (patch) {
-      void patchGrammarCard(current.id, patch);
-    }
+    // Grammar uses N=1 — a single right answer in learn mode graduates the card.
+    const derivedStatus = computeSrsStatus(current);
+    const mode: "learn" | "review" = derivedStatus === `learning` ? `learn` : `review`;
+    const { patch } = computeGrammarAnswerPatch(current, mode, right, now, 1);
+    void patchGrammarCard(current.id, patch);
 
     // Reflect the patch in our in-memory session state so subsequent answers on the same
-    // card don't operate on stale values (e.g. wrong → right on the same card was treating
-    // the second answer as if no wrong had ever happened).
-    const updatedCurrent: GrammarCard = patch ? { ...current, ...patch } : current;
+    // card don't operate on stale values.
+    const updatedCurrent: GrammarCard = { ...current, ...patch };
     const remainingAfterPatch = remaining.map((c) => (c.id === current.id ? updatedCurrent : c));
-    const nextRemaining = right
-      ? remainingAfterPatch.filter((c) => c.id !== current.id)
-      : remainingAfterPatch;
-    const nextCard = nextRemaining.length > 0 ? pickRandom(nextRemaining) : null;
+    const { card: nextCard, nextRemaining } = pickNextGrammarCard(
+      remainingAfterPatch,
+      updatedCurrent,
+      right,
+    );
 
     setRemaining(nextRemaining);
     setCurrent(nextCard);

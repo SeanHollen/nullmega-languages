@@ -1,12 +1,12 @@
 import { callGrammar } from "./api";
-import type { GrammarCategory, QuizQuestion } from "./grammarCards";
+import type { QuizQuestion } from "./grammarCards";
 import { pickClosest } from "./proximity";
 import { buildGrammarCardsPrompt, GRAMMAR_CARDS_SYSTEM_MESSAGE } from "./prompts";
 
 export interface RawGrammarCard {
   title: string;
   prompt: string;
-  category: GrammarCategory;
+  tags: string[];
   questions: QuizQuestion[];
 }
 

@@ -14,7 +14,7 @@ function rawCard(title: string) {
   return {
     title,
     prompt: `prompt`,
-    category: `tense-conjugation` as const,
+    tags: [`tense`],
     questions: [{ type: `write-in` as const, prompt: `Fill: ___`, answer: `va` }],
   };
 }

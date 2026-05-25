@@ -1,7 +1,11 @@
 import { db } from "./db";
+import type { SrsCard } from "./srs";
 
-export type GrammarCardStatus = "new" | "learning" | "scheduled" | "due" | "dropped";
-export type GrammarCategory = "tense-conjugation" | "word-order" | "parts-of-speech" | "misc";
+// Re-export for backwards compatibility with existing imports.
+export type {
+  SrsStoredStatus as GrammarCardStatus,
+  SrsStatus as GrammarCardStatusDerived,
+} from "./srs";
 
 export interface QuizQuestion {
   type: "multiple-choice" | "write-in";
@@ -10,26 +14,12 @@ export interface QuizQuestion {
   answer: string;
 }
 
-export interface GrammarCard {
-  id: string;
-  language: string;
+export interface GrammarCard extends SrsCard {
   title: string;
   prompt: string;
-  category: GrammarCategory;
   questions: QuizQuestion[];
   level: number;
-  status: GrammarCardStatus;
-  addedAt: number;
-  lastReviewed: number | null;
-  currentInterval: number;
 }
-
-const VALID_CATEGORIES: GrammarCategory[] = [
-  `tense-conjugation`,
-  `word-order`,
-  `parts-of-speech`,
-  `misc`,
-];
 
 function normalizeQuestion(raw: unknown): QuizQuestion | null {
   if (!raw || typeof raw !== `object`) return null;
@@ -52,7 +42,7 @@ export async function addGrammarCards(
   raw: Array<{
     title: string;
     prompt: string;
-    category: GrammarCategory;
+    tags: string[];
     questions: QuizQuestion[];
   }>,
   level: number,
@@ -65,9 +55,13 @@ export async function addGrammarCards(
       level,
       id: `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`,
       addedAt: Date.now(),
+      tags: c.tags,
       lastReviewed: null,
       currentInterval: 0,
       status: `learning`,
+      relearningStartedAt: null,
+      learningCorrectCount: null,
+      reviewHistory: [],
     };
     added.push(card);
   }
@@ -89,18 +83,13 @@ export async function patchGrammarCard(id: string, patch: Partial<GrammarCard>):
   return true;
 }
 
-export function computeGrammarStatus(card: GrammarCard): GrammarCardStatus {
-  if (card.status === `dropped`) return `dropped`;
-  if (card.status === `learning`) return `learning`;
-  if (card.lastReviewed === null) return `new`;
-  if (card.lastReviewed + card.currentInterval <= Date.now()) return `due`;
-  return `scheduled`;
-}
+// Thin alias over the shared SRS status fn — kept for backwards compatibility.
+export { computeSrsStatus as computeGrammarStatus } from "./srs";
 
 export interface ImportableGrammarCard {
   title: string;
   prompt: string;
-  category: GrammarCategory;
+  tags: string[];
   questions: QuizQuestion[];
   level: number;
 }
@@ -110,7 +99,7 @@ export async function exportGrammarCards(language: string): Promise<string> {
   const out = cards.map<ImportableGrammarCard>((c) => ({
     title: c.title,
     prompt: c.prompt,
-    category: c.category,
+    tags: c.tags,
     questions: c.questions,
     level: c.level,
   }));
@@ -156,22 +145,25 @@ export async function importGrammarCards(
       skipped++;
       continue;
     }
-    const category: GrammarCategory = VALID_CATEGORIES.includes(r.category as GrammarCategory)
-      ? (r.category as GrammarCategory)
-      : `misc`;
+    const tags = Array.isArray(r.tags)
+      ? (r.tags as unknown[]).filter((t): t is string => typeof t === `string`)
+      : [];
     const level = typeof r.level === `number` ? r.level : 1;
     const card: GrammarCard = {
       id: `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`,
       language,
       title: r.title,
       prompt: r.prompt,
-      category,
       questions,
       level,
       addedAt: Date.now(),
+      tags,
       lastReviewed: null,
       currentInterval: 0,
       status: `learning`,
+      relearningStartedAt: null,
+      learningCorrectCount: null,
+      reviewHistory: [],
     };
     toInsert.push(card);
     existingTitles.add(r.title.toLowerCase());

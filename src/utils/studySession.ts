@@ -4,23 +4,13 @@ import type { VocabSettings, VocabOrder } from "./vocabSettings";
 import { getLearnedTodayCount, recordLearnedToday } from "./vocabSettings";
 import { generateContextsFor, addMissingAudioFor } from "./contextOrchestrator";
 import { loadAudio } from "./db";
+import { computeSrsAnswerPatch } from "./srs";
+
+// Re-exports — the canonical definitions live in srs.ts. Kept here so existing imports
+// continue to work without a sweep of every caller.
+export { INTERVALS, INITIAL_INTERVAL, nextInterval, easyInterval } from "./srs";
 
 export const DAY = 24 * 60 * 60 * 1000;
-export const INTERVALS = [1, 3, 7, 14, 30, 90, 180, 365].map((d) => d * DAY);
-export const INITIAL_INTERVAL = INTERVALS[0];
-
-export function nextInterval(currentInterval: number): number {
-  const idx = INTERVALS.findIndex((i) => i > currentInterval);
-  return idx >= 0 ? INTERVALS[idx] : INTERVALS[INTERVALS.length - 1];
-}
-
-export function easyInterval(currentInterval: number): number {
-  let interval = currentInterval;
-  for (let i = 0; i < 3; i++) {
-    interval = nextInterval(interval);
-  }
-  return interval;
-}
 
 export interface StudySessionData {
   cards: Flashcard[];
@@ -75,88 +65,23 @@ export function buildTierFn(
 
 export const LEARN_STEPS_REQUIRED = 2;
 
-// Pure computation: given a card and an answer, returns the patch to apply and whether
-// this answer graduates the card out of the session. Extracted from StudyPage so the
-// transition logic is testable.
+// Vocab wrapper around the shared SRS state machine. Delegates the state transition to
+// computeSrsAnswerPatch, then layers vocab-specific context clearing on graduation
+// (forces fresh context regeneration when the card next surfaces).
 export function computeAnswerPatch(
   card: Flashcard,
   mode: "learn" | "review",
   right: boolean,
   now: number,
 ): { patch: Partial<Flashcard>; graduate: boolean } {
-  if (mode === "learn") {
-    if (right) {
-      const newCount = (card.learningCorrectCount ?? 0) + 1;
-      if (newCount >= LEARN_STEPS_REQUIRED) {
-        return {
-          graduate: true,
-          patch: {
-            status: "scheduled",
-            lastReviewed: now,
-            currentInterval: INITIAL_INTERVAL,
-            learningCorrectCount: 0,
-            relearningStartedAt: null,
-            contexts: [],
-            dateContextGenerated: null,
-          },
-        };
-      }
-      return {
-        graduate: false,
-        patch: { lastReviewed: now, learningCorrectCount: newCount },
-      };
-    }
-    return {
-      graduate: false,
-      patch: { lastReviewed: now, learningCorrectCount: 0 },
-    };
-  }
-  // Cards persisted before this feature shipped may not have reviewHistory; default to []
-  // so we don't blow up spreading undefined.
-  //
-  // Only original "due event" answers are recorded — relearning-practice answers
-  // (subsequent answers on a card already flagged as relearning) are follow-ups to an
-  // already-recorded "incorrect" entry. Recording them too inflates per-day stats
-  // (wrong-then-right would contribute 2 entries instead of 1).
-  const existing = card.reviewHistory ?? [];
-  const isRelearningPractice = card.relearningStartedAt !== null;
-  const reviewHistory = isRelearningPractice
-    ? existing
-    : [
-        ...existing,
-        {
-          outcome: (right ? "correct" : "incorrect") as "correct" | "incorrect",
-          timestamp: now,
-          currentInterval: card.currentInterval,
-        },
-      ];
-  if (right) {
-    // A card that was demoted earlier (relearningStartedAt !== null) graduates back to
-    // scheduled at INITIAL_INTERVAL — don't re-advance via nextInterval(), or the
-    // wrong answer's interval reset gets silently undone.
-    const wasRelearning = card.relearningStartedAt !== null;
+  const { patch, graduate } = computeSrsAnswerPatch(card, mode, right, now, LEARN_STEPS_REQUIRED);
+  if (graduate) {
     return {
       graduate: true,
-      patch: {
-        status: "scheduled",
-        lastReviewed: now,
-        currentInterval: wasRelearning ? INITIAL_INTERVAL : nextInterval(card.currentInterval),
-        relearningStartedAt: null,
-        contexts: [],
-        dateContextGenerated: null,
-        reviewHistory,
-      },
+      patch: { ...patch, contexts: [], dateContextGenerated: null },
     };
   }
-  return {
-    graduate: false,
-    patch: {
-      lastReviewed: now,
-      currentInterval: 0,
-      relearningStartedAt: now,
-      reviewHistory,
-    },
-  };
+  return { patch, graduate };
 }
 
 // Pure computation: returns the patch for removing a single context from a card.

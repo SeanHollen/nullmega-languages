@@ -400,7 +400,7 @@ const GRAMMAR_LEVEL_DESCRIPTIONS: Record<number, string> = {
   10: `expert — literary forms, archaic usage, advanced stylistics, subtle grammatical nuance`,
 };
 
-export const GRAMMAR_CARDS_SYSTEM_MESSAGE = `You generate grammar quiz cards for language learners. Card titles must be as narrow and specific as the category allows — ideally pinned to a particular lexical item (verb, preposition, particle, idiom, etc.) rather than a whole grammatical class. Examples of GOOD titles: "Present-tense conjugation of 'aller'", "Subjunctive after 'pour que'", "Avoir vs être as auxiliary in passé composé". Examples of BAD titles (too broad — do not use these): "Present Conjugation of -er Verbs", "Past Tense Practice", "Adjective Agreement". Only fall back to a broader title when the concept genuinely cannot be tied to a specific word (e.g. a sentence-structure rule). Titles should be concise but informative, typically 4–10 words.`;
+export const GRAMMAR_CARDS_SYSTEM_MESSAGE = `You generate grammar quiz cards for language learners. Card titles must be as narrow and specific as possible — ideally pinned to a particular lexical item (verb, preposition, particle, idiom, etc.) rather than a whole grammatical class. Examples of GOOD titles: "Present-tense conjugation of 'aller'", "Subjunctive after 'pour que'", "Avoir vs être as auxiliary in passé composé". Examples of BAD titles (too broad — do not use these): "Present Conjugation of -er Verbs", "Past Tense Practice", "Adjective Agreement". Only fall back to a broader title when the concept genuinely cannot be tied to a specific word (e.g. a sentence-structure rule). Titles should be concise but informative, typically 4–10 words.`;
 
 export function buildGrammarCardsPrompt(args: {
   language: string;
@@ -420,18 +420,18 @@ export function buildGrammarCardsPrompt(args: {
 
   return `Generate ${count} grammar quiz card${count === 1 ? `` : `s`} for a ${language} learner at difficulty level ${safeLevel}/100 (${levelDesc}).
 
-Each card tests one specific grammar concept. Include a mix of these categories:
-- tense-conjugation: verb tenses, conjugation rules and patterns
-- word-order: sentence structure, clause ordering, constituent placement
-- parts-of-speech: nouns, adjectives, pronouns, prepositions, articles
-- misc: register and formality, honorifics and addressee deference (e.g. tu/vous, du/Sie, Japanese keigo, Korean speech levels), politeness strategies (hedging, softening, indirectness), idioms and set phrases, wordplay and humor (puns, irony, register-mismatch jokes), discourse markers and fillers, sociolinguistic conventions, regional/dialectal variation, connotation, punctuation, orthography, common learner errors, and any other ${language}-specific feature not covered by the categories above
+Each card tests one specific grammar concept. Include a mix of topics:
+- tense / conjugation: verb tenses, conjugation rules and patterns
+- word order: sentence structure, clause ordering, constituent placement
+- parts of speech: nouns, adjectives, pronouns, prepositions, articles
+- misc: register and formality, honorifics and addressee deference (e.g. tu/vous, du/Sie, Japanese keigo, Korean speech levels), politeness strategies (hedging, softening, indirectness), idioms and set phrases, wordplay and humor (puns, irony, register-mismatch jokes), discourse markers and fillers, sociolinguistic conventions, regional/dialectal variation, connotation, punctuation, orthography, common learner errors, and any other ${language}-specific feature
 
-Scale topic choice to the level. Up to level ~50, stay grounded in core grammar (the first three categories). From level ~60 upward, increasingly weight the misc category, and connotation becomes essential at advanced levels. Only generate honorifics/keigo-style cards for languages that actually have such systems.
+Scale topic choice to the level. Up to level ~50, stay grounded in core grammar (tense, word order, parts of speech). From level ~60 upward, weight misc/register/connotation topics more. Only generate honorifics/keigo-style cards for languages that actually have such systems.
 
 Card structure:
 - title: 2-10 words naming the concept. Pin to a specific word when possible (e.g. "Present-tense conjugation of 'aller'", "Gender agreement of 'beau'/'belle'", "Subjunctive after 'pour que'"). Avoid broad titles like "-er verbs", "irregular verbs", "past tense" — pick a specific verb/word/construction and test that.
 - prompt: 5-40 words describing what the quiz tests
-- category: one of "tense-conjugation", "word-order", "parts-of-speech", "misc"
+- tags: an array of 1-4 short lowercase tags describing what the card is about. Use established tags when applicable (e.g. "tense", "conjugation", "word-order", "register", "idiom", "preposition", "subjunctive", "passive"). Add a language-specific tag if relevant (e.g. "keigo" for Japanese honorifics). Don't pluralize. Don't include the language name itself as a tag.
 - questions: 1-8 questions, each either:
   - multiple-choice: {"type":"multiple-choice","prompt":"...","choices":["a","b","c","d"],"answer":"exact text of correct choice"}
   - write-in: {"type":"write-in","prompt":"Fill in: Je ___ (aller) au marché hier.","answer":"suis allé"}
@@ -441,9 +441,9 @@ Rules:
 - Use real ${language} examples in questions
 - Write-in answers should be 1-4 words and unambiguous
 - Multiple-choice distractors should be plausible but clearly wrong
-- For tense-conjugation cards, strongly prefer write-in questions — use multiple-choice only when the answer would be genuinely ambiguous as a free-form fill-in
+- For tense/conjugation cards, strongly prefer write-in questions — use multiple-choice only when the answer would be genuinely ambiguous as a free-form fill-in
 - Do NOT mix question types for the sake of variety; choose the type that best fits each question${avoidNote}
 
 Return ONLY valid JSON:
-{"cards":[{"title":"...","prompt":"...","category":"...","questions":[...]}]}`;
+{"cards":[{"title":"...","prompt":"...","tags":["..."],"questions":[...]}]}`;
 }

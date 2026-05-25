@@ -1,7 +1,10 @@
 import { db } from "./db";
+import type { SrsCard, SrsStatus, SrsStoredStatus } from "./srs";
 
-export type FlashcardStatus = "new" | "learning" | "scheduled" | "dropped";
-export type FlashcardStatusDerived = FlashcardStatus | "due" | "relearning";
+// Re-export for backwards compatibility with existing imports.
+export type { ReviewEntry } from "./srs";
+export type FlashcardStatus = SrsStoredStatus;
+export type FlashcardStatusDerived = SrsStatus;
 
 export interface FlashcardContext {
   source: string;
@@ -9,39 +12,12 @@ export interface FlashcardContext {
   audioKey: string | null;
 }
 
-export interface ReviewEntry {
-  outcome: "correct" | "incorrect";
-  timestamp: number;
-  // The interval the card had at the moment it was reviewed (i.e., the SRS slot
-  // that was just tested). Stored alongside outcome so future analyses can compute
-  // retention curves per interval.
-  currentInterval: number;
-}
-
-export interface Flashcard {
-  id: string;
+export interface Flashcard extends SrsCard {
   source: string;
   translation: string;
-  language: string;
-  addedAt: number;
-  lastReviewed: number | null;
-  currentInterval: number;
-  tags: string[];
-  status: FlashcardStatus;
   contexts: FlashcardContext[];
   dateContextGenerated: number | null;
-  // Number of consecutive correct answers given while in `learning` status. Used to require
-  // multiple correct passes before graduating to `scheduled`. `null` means the card has
-  // never been shown to the user — flips to a number (0 or 1) on the first learn-mode answer.
-  // Only meaningful when status === "learning"; ignored otherwise.
-  learningCorrectCount: number | null;
-  // Timestamp of the most recent relearning event (when a due card was answered wrong).
-  // Set when the card is demoted to relearning; cleared when it next graduates back to a
-  // clean scheduled state. A scheduled+due card with this flag set is "relearning" — a
-  // flavor of due, not a separate flow.
-  relearningStartedAt: number | null;
   contextCursor?: number;
-  reviewHistory: ReviewEntry[];
 }
 
 export async function loadFlashcards(language: string): Promise<Flashcard[]> {
@@ -185,13 +161,5 @@ export async function pickNextContext(card: Flashcard): Promise<number> {
   return idx;
 }
 
-export function computeStatus(card: Flashcard): FlashcardStatusDerived {
-  if (card.status === `dropped`) return `dropped`;
-  if (card.status === `new`) return `new`;
-  if (card.status === `learning`) return `learning`;
-  // status === "scheduled"
-  const isDue =
-    card.lastReviewed !== null && card.lastReviewed + card.currentInterval <= Date.now();
-  if (!isDue) return `scheduled`;
-  return card.relearningStartedAt !== null ? `relearning` : `due`;
-}
+// Thin alias over the shared SRS status fn — kept for backwards compatibility.
+export { computeSrsStatus as computeStatus } from "./srs";

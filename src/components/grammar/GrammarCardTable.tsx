@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { FaFileImport, FaFileExport } from "react-icons/fa";
-import type { GrammarCard, GrammarCategory, GrammarCardStatus } from "../../utils/grammarCards";
+import type { GrammarCard, GrammarCardStatusDerived } from "../../utils/grammarCards";
 import {
   computeGrammarStatus,
   removeGrammarCard,
@@ -11,34 +11,22 @@ import {
 import { relativeTime } from "../../utils/relativeTime";
 import { SortableHeader, type SortDir } from "../SortableHeader";
 
-const CATEGORY_LABELS: Record<GrammarCategory, string> = {
-  "tense-conjugation": `Tense`,
-  "word-order": `Word Order`,
-  "parts-of-speech": `Parts of Speech`,
-  misc: `Misc`,
-};
-
-const CATEGORY_COLORS: Record<GrammarCategory, string> = {
-  "tense-conjugation": `bg-blue-100 text-blue-700`,
-  "word-order": `bg-purple-100 text-purple-700`,
-  "parts-of-speech": `bg-green-100 text-green-700`,
-  misc: `bg-gray-100 text-gray-600`,
-};
-
-const STATUS_STYLES: Record<GrammarCardStatus, string> = {
+const STATUS_STYLES: Record<GrammarCardStatusDerived, string> = {
   new: `bg-gray-100 text-gray-600`,
   learning: `bg-yellow-100 text-yellow-700`,
+  relearning: `bg-red-100 text-red-700`,
   scheduled: `bg-blue-100 text-blue-700`,
   due: `bg-orange-100 text-orange-700`,
   dropped: `bg-gray-100 text-gray-400 line-through`,
 };
 
-const STATUS_ORDER: Record<GrammarCardStatus, number> = {
+const STATUS_ORDER: Record<GrammarCardStatusDerived, number> = {
   due: 0,
-  learning: 1,
-  new: 2,
-  scheduled: 3,
-  dropped: 4,
+  relearning: 1,
+  learning: 2,
+  new: 3,
+  scheduled: 4,
+  dropped: 5,
 };
 
 const LEVEL_LABELS: Record<number, string> = {
@@ -63,14 +51,7 @@ function formatInterval(ms: number): string {
 
 const PAGE_SIZE = 1000;
 
-type SortCol =
-  | "title"
-  | "category"
-  | "level"
-  | "questions"
-  | "status"
-  | "lastReviewed"
-  | "interval";
+type SortCol = "title" | "tags" | "level" | "questions" | "status" | "lastReviewed" | "interval";
 
 function sortCards(cards: GrammarCard[], col: SortCol, dir: SortDir): GrammarCard[] {
   const sign = dir === "asc" ? 1 : -1;
@@ -80,8 +61,8 @@ function sortCards(cards: GrammarCard[], col: SortCol, dir: SortDir): GrammarCar
       case "title":
         cmp = a.title.localeCompare(b.title);
         break;
-      case "category":
-        cmp = a.category.localeCompare(b.category);
+      case "tags":
+        cmp = (a.tags[0] ?? ``).localeCompare(b.tags[0] ?? ``);
         break;
       case "level":
         cmp = a.level - b.level;
@@ -176,7 +157,7 @@ export function GrammarCardTable({ cards, language }: Props) {
         (c) =>
           c.title.toLowerCase().includes(q) ||
           c.prompt.toLowerCase().includes(q) ||
-          CATEGORY_LABELS[c.category].toLowerCase().includes(q),
+          c.tags.some((t) => t.toLowerCase().includes(q)),
       )
     : cards;
 
@@ -241,7 +222,7 @@ export function GrammarCardTable({ cards, language }: Props) {
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder={`Search title, prompt, or category…`}
+              placeholder={`Search title, prompt, or tags…`}
               className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
             />
           </div>
@@ -276,7 +257,7 @@ export function GrammarCardTable({ cards, language }: Props) {
               <thead className="border-b border-gray-100 bg-gray-50 text-xs font-semibold text-gray-500">
                 <tr className="text-left">
                   {th("title", "Title")}
-                  {th("category", "Category")}
+                  {th("tags", "Tags")}
                   {th("level", "Level")}
                   {th("questions", "Questions")}
                   {th("status", "Status")}
@@ -299,11 +280,16 @@ export function GrammarCardTable({ cards, language }: Props) {
                       <tr key={c.id}>
                         <td className="px-4 py-3 font-medium text-gray-800">{c.title}</td>
                         <td className="px-4 py-3">
-                          <span
-                            className={`text-xs font-medium px-2 py-0.5 rounded-full ${CATEGORY_COLORS[c.category]}`}
-                          >
-                            {CATEGORY_LABELS[c.category]}
-                          </span>
+                          <div className="flex flex-wrap gap-1">
+                            {c.tags.map((tag) => (
+                              <span
+                                key={tag}
+                                className="text-xs font-medium px-2 py-0.5 rounded-full bg-gray-100 text-gray-600"
+                              >
+                                {tag}
+                              </span>
+                            ))}
+                          </div>
                         </td>
                         <td className="px-4 py-3 text-gray-500 text-xs">
                           {LEVEL_LABELS[c.level] ?? `L${c.level}`}

@@ -87,12 +87,13 @@ export function GrammarPage() {
 
   const learningCount = cards.filter((c) => computeGrammarStatus(c) === `learning`).length;
   const dueCount = cards.filter((c) => computeGrammarStatus(c) === `due`).length;
+  const relearningCount = cards.filter((c) => computeGrammarStatus(c) === `relearning`).length;
   const canGenerate = settings ? Math.max(0, settings.newCardsPerDay - generatedToday) : 0;
   const learnDisabled = !settings || (learningCount === 0 && canGenerate === 0);
 
   const activeCards = cards.filter((c) => {
     const s = computeGrammarStatus(c);
-    return s === `learning` || s === `due`;
+    return s === `learning` || s === `due` || s === `relearning`;
   });
 
   return (
@@ -118,7 +119,7 @@ export function GrammarPage() {
               >
                 <div>{`Learn new cards →`}</div>
                 <div className="text-sm font-normal text-green-600 mt-1">
-                  {`learning: ${learningCount} · generate: ${canGenerate}`}
+                  {`generate: ${canGenerate} · learning: ${learningCount}`}
                 </div>
               </button>
               {learnError && <p className="text-xs text-red-500">{learnError}</p>}
@@ -127,11 +128,13 @@ export function GrammarPage() {
             <div className="flex flex-col items-center gap-1">
               <button
                 onClick={handleReview}
-                disabled={dueCount === 0}
+                disabled={dueCount === 0 && relearningCount === 0}
                 className="bg-white border-2 border-green-400 text-green-700 px-8 py-4 rounded-2xl font-bold text-base hover:bg-green-50 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition text-center min-w-48"
               >
                 <div>{`Review cards →`}</div>
-                <div className="text-sm font-normal text-green-600 mt-1">{`due: ${dueCount}`}</div>
+                <div className="text-sm font-normal text-green-600 mt-1">
+                  {`due: ${dueCount} · relearning: ${relearningCount}`}
+                </div>
               </button>
               {reviewError && <p className="text-xs text-red-500">{reviewError}</p>}
             </div>

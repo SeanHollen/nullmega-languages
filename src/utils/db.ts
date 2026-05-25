@@ -153,6 +153,61 @@ class LanguageLabDB extends Dexie {
           }
         }
       });
+    // v12: grammar cards now share the full SrsCard shape (tags, learningCorrectCount,
+    // reviewHistory, relearningStartedAt). Backfill missing fields on existing rows.
+    this.version(12)
+      .stores({
+        audio: ``,
+        streaks: `&date`,
+        streaksLang: `&[language+date], date, language`,
+        goals: `&language`,
+        kv: `&key`,
+        abilities: `&id, [language+mode]`,
+        customLanguages: `&name`,
+        flashcards: `&id, language, [language+source]`,
+        grammarCards: `&id, language, [language+title]`,
+        assessments: `&id, [mode+language], completedAt, createdAt`,
+      })
+      .upgrade(async (tx) => {
+        const cards = (await tx.table(`grammarCards`).toArray()) as Partial<GrammarCard>[];
+        for (const c of cards) {
+          if (!c.id) continue;
+          await tx.table(`grammarCards`).put({
+            ...c,
+            tags: c.tags ?? [],
+            relearningStartedAt: c.relearningStartedAt ?? null,
+            learningCorrectCount: c.learningCorrectCount ?? null,
+            reviewHistory: c.reviewHistory ?? [],
+          });
+        }
+      });
+    // v13: grammar cards' `category` field is replaced by `tags`. Convert existing
+    // categories into a single tag and drop the field.
+    this.version(13)
+      .stores({
+        audio: ``,
+        streaks: `&date`,
+        streaksLang: `&[language+date], date, language`,
+        goals: `&language`,
+        kv: `&key`,
+        abilities: `&id, [language+mode]`,
+        customLanguages: `&name`,
+        flashcards: `&id, language, [language+source]`,
+        grammarCards: `&id, language, [language+title]`,
+        assessments: `&id, [mode+language], completedAt, createdAt`,
+      })
+      .upgrade(async (tx) => {
+        const cards = (await tx.table(`grammarCards`).toArray()) as (Partial<GrammarCard> & {
+          category?: string;
+        })[];
+        for (const c of cards) {
+          if (!c.id) continue;
+          const { category, ...rest } = c;
+          const tagFromCategory = typeof category === `string` ? [category] : [];
+          const mergedTags = [...new Set([...(c.tags ?? []), ...tagFromCategory])];
+          await tx.table(`grammarCards`).put({ ...rest, tags: mergedTags });
+        }
+      });
   }
 }
 

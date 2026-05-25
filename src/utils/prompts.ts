@@ -23,10 +23,10 @@ Where the form supports it, give the passage genuine interest. Aim for at least 
 - An unexpected detail, observation, or insight that earns its place
 - A protagonist with a recognisable motivation, not a generic actor
 - Concrete specifics (names, places, gestures) over abstract description
-Avoid 
-- Avoid bland filler — passages should be the kind of thing a reader would actually want to keep reading.
-- Avoid cliches, like "When I was a child, I did X, now that I'm an adult, I do Y." or "It was a great and fun experience!". If a theme has appeared in a prior story, you should probably not do the same thing.
-- Avoid re-using the same themes as described in difficuty levels. The point of the examples is to explain the difficulty, NOT to give you a type of story you should copy.
+Avoid:
+- Bland filler — passages should be the kind of thing a reader would actually want to keep reading.
+- Cliches, like "When I was a child, I did X, now that I'm an adult, I do Y." or "It was a great and fun experience!".
+- Re-using themes from prior stories you've generated.
 `;
 
 // ---------- Reading / Listening exercise ----------
@@ -74,10 +74,11 @@ export function buildReadingExercisePrompt(args: {
   narratorGender: NarratorGender;
 }): string {
   const { language, languageComplexity, length, pastSummaries, narratorGender } = args;
-  const referenceBlock = `Difficulty references (based on English examples — these illustrate the difficulty gradient, not the topic):
+  const referenceBlock = `Difficulty references (English examples for calibration ONLY):
 ${referenceBlocks(languageComplexity, { includeQuestion: true })}
 
-Match the difficulty of the target level. The topic and content of your passage should be chosen independently — do not anchor on the topics in the examples above.`;
+The ONLY purpose of these examples is to show you the vocabulary band and sentence complexity appropriate at the target level. Many different valid passages exist at any difficulty.
+DO NOT copy from the examples: their themes, narrative shapes, protagonists, settings, openings, rhetorical strategies, or grammatical constructions. If the examples all use a particular tense or sentence pattern, that does NOT mean your passage should — it means the writer of those examples happened to pick that. Choose your own subject and structure freely.`;
   const avoidanceBlock = pastTitlesBlock(`PAST PASSAGE SUMMARIES`, pastSummaries);
 
   return `Generate a reading comprehension exercise in ${language} at difficulty ${languageComplexity}/100.
@@ -184,10 +185,11 @@ export function buildWritingExercisePrompt(args: {
     mode === `dictogloss`
       ? dictoglossPassageLengthGuide(languageComplexity)
       : writingPassageLengthGuide(languageComplexity);
-  const referenceBlock = `Difficulty references (these illustrate the difficulty gradient, not the topic):
+  const referenceBlock = `Difficulty references (English examples for calibration ONLY):
 ${referenceBlocks(languageComplexity)}
 
-Match the difficulty of the target level. Choose your own topic independently.`;
+The ONLY purpose of these examples is to show you the vocabulary band and sentence complexity appropriate at the target level. Many different valid passages exist at any difficulty.
+DO NOT copy from the examples: their themes, narrative shapes, protagonists, settings, openings, rhetorical strategies, or grammatical constructions. Choose your own subject and structure freely.`;
   const avoidanceBlock = pastTitlesBlock(`PAST PASSAGE SUMMARIES`, pastSummaries);
 
   return `Generate a writing exercise in ${language} at difficulty ${languageComplexity}/100.

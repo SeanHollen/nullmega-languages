@@ -1,6 +1,6 @@
 import { db } from "./db";
 
-export type VocabOrder = "added" | "random";
+export type VocabOrder = "random" | "first-added" | "latest-added";
 
 export interface VocabSettings {
   newWordsPerDay: number;
@@ -52,41 +52,24 @@ function todayString(): string {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 }
 
-function normalize(raw: Partial<VocabSettings> | null | undefined): VocabSettings {
-  if (!raw) return { ...DEFAULTS };
-  return {
-    newWordsPerDay:
-      typeof raw.newWordsPerDay === `number`
-        ? clamp(raw.newWordsPerDay, NEW_WORDS_PER_DAY_MIN, NEW_WORDS_PER_DAY_MAX)
-        : DEFAULTS.newWordsPerDay,
-    contextsPerCard:
-      typeof raw.contextsPerCard === `number`
-        ? clamp(raw.contextsPerCard, CONTEXTS_PER_CARD_MIN, CONTEXTS_PER_CARD_MAX)
-        : DEFAULTS.contextsPerCard,
-    order: raw.order === `added` ? `added` : `random`,
-    generateAudio:
-      typeof raw.generateAudio === `boolean` ? raw.generateAudio : DEFAULTS.generateAudio,
-    autoplayAudio:
-      typeof raw.autoplayAudio === `boolean` ? raw.autoplayAudio : DEFAULTS.autoplayAudio,
-    showText: typeof raw.showText === `boolean` ? raw.showText : DEFAULTS.showText,
-    showUpcomingBeforeLearning:
-      typeof raw.showUpcomingBeforeLearning === `boolean`
-        ? raw.showUpcomingBeforeLearning
-        : DEFAULTS.showUpcomingBeforeLearning,
-    showDueBeforeRelearning:
-      typeof raw.showDueBeforeRelearning === `boolean`
-        ? raw.showDueBeforeRelearning
-        : DEFAULTS.showDueBeforeRelearning,
-    includeTranslationInContexts:
-      typeof raw.includeTranslationInContexts === `boolean`
-        ? raw.includeTranslationInContexts
-        : DEFAULTS.includeTranslationInContexts,
-  };
-}
-
 export async function loadVocabSettings(): Promise<VocabSettings> {
   const row = await db().kv.get(SETTINGS_KEY);
-  return normalize(row?.value as Partial<VocabSettings> | undefined);
+  const stored = row?.value as Partial<VocabSettings> | undefined;
+  if (!stored) return { ...DEFAULTS };
+  return {
+    ...DEFAULTS,
+    ...stored,
+    newWordsPerDay: clamp(
+      stored.newWordsPerDay ?? DEFAULTS.newWordsPerDay,
+      NEW_WORDS_PER_DAY_MIN,
+      NEW_WORDS_PER_DAY_MAX,
+    ),
+    contextsPerCard: clamp(
+      stored.contextsPerCard ?? DEFAULTS.contextsPerCard,
+      CONTEXTS_PER_CARD_MIN,
+      CONTEXTS_PER_CARD_MAX,
+    ),
+  };
 }
 
 export async function saveVocabSettings(settings: VocabSettings): Promise<void> {

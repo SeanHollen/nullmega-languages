@@ -208,6 +208,30 @@ class LanguageLabDB extends Dexie {
           await tx.table(`grammarCards`).put({ ...rest, tags: mergedTags });
         }
       });
+    // v14: vocab settings' `order` field renamed: "added" → "latest-added" (and a new
+    // "first-added" option is also available).
+    this.version(14)
+      .stores({
+        audio: ``,
+        streaks: `&date`,
+        streaksLang: `&[language+date], date, language`,
+        goals: `&language`,
+        kv: `&key`,
+        abilities: `&id, [language+mode]`,
+        customLanguages: `&name`,
+        flashcards: `&id, language, [language+source]`,
+        grammarCards: `&id, language, [language+title]`,
+        assessments: `&id, [mode+language], completedAt, createdAt`,
+      })
+      .upgrade(async (tx) => {
+        const row = (await tx.table(`kv`).get(`vocab_settings`)) as
+          | { key: string; value: Record<string, unknown> }
+          | undefined;
+        if (!row?.value || typeof row.value !== `object`) return;
+        if (row.value.order === `added`) {
+          await tx.table(`kv`).put({ ...row, value: { ...row.value, order: `latest-added` } });
+        }
+      });
   }
 }
 

@@ -27,7 +27,7 @@ describe("loadVocabSettings", () => {
     await saveVocabSettings({
       newWordsPerDay: 10,
       contextsPerCard: 7,
-      order: `added`,
+      order: `latest-added`,
       generateAudio: false,
       autoplayAudio: false,
       showText: false,
@@ -39,7 +39,7 @@ describe("loadVocabSettings", () => {
     expect(s).toEqual({
       newWordsPerDay: 10,
       contextsPerCard: 7,
-      order: `added`,
+      order: `latest-added`,
       generateAudio: false,
       autoplayAudio: false,
       showText: false,
@@ -63,20 +63,6 @@ describe("loadVocabSettings", () => {
     });
     const s = await loadVocabSettings();
     expect(s.newWordsPerDay).toBe(50);
-  });
-
-  it("falls back to default for invalid order value", async () => {
-    await saveVocabSettings({
-      newWordsPerDay: 5,
-      contextsPerCard: 3,
-      // @ts-expect-error testing invalid input
-      order: `nonsense`,
-      generateAudio: true,
-      autoplayAudio: true,
-      showText: true,
-    });
-    const s = await loadVocabSettings();
-    expect(s.order).toBe(`random`);
   });
 });
 

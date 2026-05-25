@@ -11,7 +11,11 @@ export interface QuizQuestion {
   type: "multiple-choice" | "write-in";
   prompt: string;
   choices?: string[];
-  answer: string;
+  answer: string | string[];
+}
+
+export function acceptedAnswers(q: QuizQuestion): string[] {
+  return Array.isArray(q.answer) ? q.answer : [q.answer];
 }
 
 export interface GrammarCard extends SrsCard {
@@ -25,8 +29,17 @@ function normalizeQuestion(raw: unknown): QuizQuestion | null {
   if (!raw || typeof raw !== `object`) return null;
   const r = raw as Record<string, unknown>;
   if (r.type !== `multiple-choice` && r.type !== `write-in`) return null;
-  if (typeof r.prompt !== `string` || typeof r.answer !== `string`) return null;
-  const q: QuizQuestion = { type: r.type, prompt: r.prompt, answer: r.answer };
+  if (typeof r.prompt !== `string`) return null;
+  let answer: string | string[];
+  if (typeof r.answer === `string`) {
+    answer = r.answer;
+  } else if (Array.isArray(r.answer) && r.answer.every((a) => typeof a === `string`)) {
+    answer = r.answer as string[];
+    if (answer.length === 0) return null;
+  } else {
+    return null;
+  }
+  const q: QuizQuestion = { type: r.type, prompt: r.prompt, answer };
   if (r.type === `multiple-choice` && Array.isArray(r.choices)) {
     q.choices = (r.choices as unknown[]).filter((c): c is string => typeof c === `string`);
   }

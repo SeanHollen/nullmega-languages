@@ -5,7 +5,7 @@ import { db } from "./db";
 describe("loadGoals", () => {
   it("returns DEFAULTS when no goals have been saved for the language", async () => {
     const goals = await loadGoals(`French`);
-    expect(goals).toEqual({ reading: 1, listening: 1, pronunciation: 1, writing: 1 });
+    expect(goals).toEqual({ reading: 0, listening: 2, pronunciation: 1, writing: 0 });
   });
 
   it("returns saved values for the matching language", async () => {
@@ -26,7 +26,7 @@ describe("loadGoals", () => {
     await db().goals.put({ language: `French`, reading: 5 } as never);
     const goals = await loadGoals(`French`);
     expect(goals.reading).toBe(5);
-    expect(goals.listening).toBe(1);
+    expect(goals.listening).toBe(2);
   });
 });
 

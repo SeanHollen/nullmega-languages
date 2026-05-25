@@ -9,11 +9,11 @@ const SETTINGS_KEY = `grammar_settings`;
 const LEARN_SESSION_KEY = `grammar_learn_session`;
 
 const DEFAULTS: GrammarSettings = {
-  newCardsPerDay: 3,
+  newCardsPerDay: 0,
   level: 20,
 };
 
-export const NEW_CARDS_PER_DAY_MIN = 1;
+export const NEW_CARDS_PER_DAY_MIN = 0;
 export const NEW_CARDS_PER_DAY_MAX = 20;
 export const GRAMMAR_LEVEL_MIN = 10;
 export const GRAMMAR_LEVEL_MAX = 100;
@@ -37,23 +37,20 @@ function todayString(): string {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 }
 
-function normalizeSettings(raw: Partial<GrammarSettings> | null | undefined): GrammarSettings {
-  if (!raw) return { ...DEFAULTS };
-  return {
-    newCardsPerDay:
-      typeof raw.newCardsPerDay === `number`
-        ? clamp(raw.newCardsPerDay, NEW_CARDS_PER_DAY_MIN, NEW_CARDS_PER_DAY_MAX)
-        : DEFAULTS.newCardsPerDay,
-    level:
-      typeof raw.level === `number`
-        ? clamp(raw.level, GRAMMAR_LEVEL_MIN, GRAMMAR_LEVEL_MAX)
-        : DEFAULTS.level,
-  };
-}
-
 export async function loadGrammarSettings(): Promise<GrammarSettings> {
   const row = await db().kv.get(SETTINGS_KEY);
-  return normalizeSettings(row?.value as Partial<GrammarSettings> | undefined);
+  const stored = row?.value as Partial<GrammarSettings> | undefined;
+  if (!stored) return { ...DEFAULTS };
+  return {
+    ...DEFAULTS,
+    ...stored,
+    newCardsPerDay: clamp(
+      stored.newCardsPerDay ?? DEFAULTS.newCardsPerDay,
+      NEW_CARDS_PER_DAY_MIN,
+      NEW_CARDS_PER_DAY_MAX,
+    ),
+    level: clamp(stored.level ?? DEFAULTS.level, GRAMMAR_LEVEL_MIN, GRAMMAR_LEVEL_MAX),
+  };
 }
 
 export async function saveGrammarSettings(settings: GrammarSettings): Promise<void> {

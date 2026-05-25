@@ -42,31 +42,37 @@ export function VocabSettingsPanel({ settings, onUpdate }: Props) {
           <span>{`Advanced`}</span>
         </button>
         {open && (
-          <div className="px-6 pb-4 flex justify-center gap-16 text-sm">
-            <div className="grid grid-cols-[auto_auto] gap-x-3 gap-y-3 items-center">
-              <span className="text-gray-600">{`New word selection order`}</span>
-              <select
-                value={settings.order}
-                onChange={(e) =>
-                  onUpdate({ order: e.target.value === `added` ? `added` : `random` })
-                }
-                className="border border-gray-200 rounded-lg px-2 py-1 bg-white cursor-pointer focus:outline-none focus:ring-2 focus:ring-green-500"
-              >
-                <option value="random">{`Random`}</option>
-                <option value="added">{`Order added`}</option>
-              </select>
-              <span className="text-gray-600">{`Contexts per card`}</span>
-              <input
-                type="number"
-                min={CONTEXTS_PER_CARD_MIN}
-                max={CONTEXTS_PER_CARD_MAX}
-                value={settings.contextsPerCard}
-                onChange={(e) => onUpdate({ contextsPerCard: parseInt(e.target.value, 10) || 1 })}
-                onWheel={(e) => e.currentTarget.blur()}
-                className="w-16 border border-gray-200 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-green-500"
-              />
-            </div>
-            <div className="flex flex-col gap-3 justify-center">
+          <div className="px-6 pb-4 flex justify-center text-sm">
+            <div className="flex flex-col gap-3 items-start">
+              <div className="flex items-center gap-3">
+                <span className="text-gray-600">{`New word selection order`}</span>
+                <select
+                  value={settings.order}
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    if (v === `first-added` || v === `latest-added` || v === `random`) {
+                      onUpdate({ order: v });
+                    }
+                  }}
+                  className="border border-gray-200 rounded-lg px-2 py-1 bg-white cursor-pointer focus:outline-none focus:ring-2 focus:ring-green-500"
+                >
+                  <option value="random">{`Random`}</option>
+                  <option value="first-added">{`First added`}</option>
+                  <option value="latest-added">{`Latest added`}</option>
+                </select>
+              </div>
+              <div className="flex items-center gap-3">
+                <span className="text-gray-600">{`Contexts per card`}</span>
+                <input
+                  type="number"
+                  min={CONTEXTS_PER_CARD_MIN}
+                  max={CONTEXTS_PER_CARD_MAX}
+                  value={settings.contextsPerCard}
+                  onChange={(e) => onUpdate({ contextsPerCard: parseInt(e.target.value, 10) || 1 })}
+                  onWheel={(e) => e.currentTarget.blur()}
+                  className="w-16 border border-gray-200 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-green-500"
+                />
+              </div>
               <label className="flex items-center gap-2 cursor-pointer select-none">
                 <input
                   type="checkbox"
@@ -94,12 +100,6 @@ export function VocabSettingsPanel({ settings, onUpdate }: Props) {
                 />
                 <span className="text-gray-600">{`Autoplay audio if existing`}</span>
               </label>
-            </div>
-          </div>
-        )}
-        {open && (
-          <div className="px-6 pb-4 flex justify-center text-sm">
-            <div className="flex flex-col items-start gap-3">
               <label className="flex items-center gap-2 cursor-pointer select-none">
                 <input
                   type="checkbox"
@@ -107,7 +107,7 @@ export function VocabSettingsPanel({ settings, onUpdate }: Props) {
                   onChange={(e) => onUpdate({ showUpcomingBeforeLearning: e.target.checked })}
                   className="accent-green-600 cursor-pointer"
                 />
-                <span className="text-gray-600">{`show upcoming before learning`}</span>
+                <span className="text-gray-600">{`Show upcoming before learning`}</span>
               </label>
               <label className="flex items-center gap-2 cursor-pointer select-none">
                 <input
@@ -116,7 +116,7 @@ export function VocabSettingsPanel({ settings, onUpdate }: Props) {
                   onChange={(e) => onUpdate({ showDueBeforeRelearning: e.target.checked })}
                   className="accent-green-600 cursor-pointer"
                 />
-                <span className="text-gray-600">{`show due before relearning`}</span>
+                <span className="text-gray-600">{`Show due before relearning`}</span>
               </label>
               <label className="flex items-center gap-2 cursor-pointer select-none">
                 <input
@@ -125,7 +125,7 @@ export function VocabSettingsPanel({ settings, onUpdate }: Props) {
                   onChange={(e) => onUpdate({ includeTranslationInContexts: e.target.checked })}
                   className="accent-green-600 cursor-pointer"
                 />
-                <span className="text-gray-600">{`include translation in context generation`}</span>
+                <span className="text-gray-600">{`Include translation in context generation`}</span>
               </label>
             </div>
           </div>

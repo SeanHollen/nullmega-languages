@@ -4,10 +4,10 @@ import { db } from "./db";
 export type Goals = Record<Mode, number>;
 
 const DEFAULTS: Goals = {
-  reading: 1,
-  listening: 1,
+  reading: 0,
+  listening: 2,
   pronunciation: 1,
-  writing: 1,
+  writing: 0,
 };
 
 export const GOAL_MIN = 0;

@@ -26,7 +26,9 @@ This runs oxlint (linting) and oxfmt (formatting) across the `src/` directory an
 
 ## Don't write defensive runtime validation in internal code
 
-No `throw new Error(...)` for "unexpected value" branches on parameters whose type the compiler already constrains. Trust the type system. Only validate at system boundaries (user input, external APIs, deserialized data from disk/network).
+No `throw new Error(...)` for "unexpected value" branches on parameters whose type the compiler already constrains. Trust the type system.
+
+Validate at the boundary where the data actually comes from outside our control: user-pasted JSON, external API responses, file uploads. Dexie is NOT that boundary — it's our own storage with migrations. Reading from Dexie, trust the type. If the on-disk shape changes, write a migration; don't sprinkle `typeof raw.x === "number" ? raw.x : DEFAULTS.x` checks in load functions. Those checks are noise that obscures intent and never actually fires in practice.
 
 ## Use `undefined`, not `null`, for absent/optional values
 

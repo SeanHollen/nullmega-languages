@@ -9,7 +9,7 @@ import {
 
 describe("loadGrammarSettings", () => {
   it("returns DEFAULTS when nothing is saved", async () => {
-    expect(await loadGrammarSettings()).toEqual({ newCardsPerDay: 3, level: 20 });
+    expect(await loadGrammarSettings()).toEqual({ newCardsPerDay: 0, level: 20 });
   });
 
   it("round-trips saved values", async () => {

@@ -3,7 +3,7 @@ import { useNavigate, useLocation, useParams } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa";
 import { StudyEmptyState } from "../components/StudyEmptyState";
 import type { GrammarCard } from "../utils/grammarCards";
-import { patchGrammarCard } from "../utils/grammarCards";
+import { acceptedAnswers, patchGrammarCard } from "../utils/grammarCards";
 import { computeSrsStatus } from "../utils/srs";
 import {
   type GrammarSessionData,
@@ -15,6 +15,11 @@ type Phase = "answering" | "results";
 
 function normalizeAnswer(s: string): string {
   return s.trim().toLowerCase();
+}
+
+function matchesAnyAnswer(user: string, accepted: string[]): boolean {
+  const u = normalizeAnswer(user);
+  return accepted.some((a) => normalizeAnswer(a) === u);
 }
 
 export function GrammarStudyPage() {
@@ -47,8 +52,8 @@ export function GrammarStudyPage() {
 
   function submitAnswers() {
     if (!current) return;
-    const results = current.questions.map(
-      (q, i) => normalizeAnswer(answers[i] ?? ``) === normalizeAnswer(q.answer),
+    const results = current.questions.map((q, i) =>
+      matchesAnyAnswer(answers[i] ?? ``, acceptedAnswers(q)),
     );
     setQuestionResults(results);
     setPhase(`results`);
@@ -179,7 +184,7 @@ export function GrammarStudyPage() {
                   ) : (
                     <span className="text-xs flex-shrink-0 font-medium">
                       <span className="line-through opacity-60">{answers[i]}</span>
-                      {` → ${q.answer}`}
+                      {` → ${acceptedAnswers(q)[0]}`}
                     </span>
                   )}
                 </div>

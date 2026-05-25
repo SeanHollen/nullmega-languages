@@ -116,17 +116,18 @@ function pickInitial(
       const s = computeStatus(c);
       return s === "due" || s === "relearning";
     });
-    return order === "added"
-      ? [...due].sort((a, b) => b.addedAt - a.addedAt)
-      : [...due].sort((a, b) => suffixOf(a.id).localeCompare(suffixOf(b.id)));
+    return sortByOrder(due, order);
   }
   const newCards = cards.filter((c) => computeStatus(c) === "new");
   const learningCards = cards.filter((c) => computeStatus(c) === "learning");
-  const sortedNew =
-    order === "added"
-      ? [...newCards].sort((a, b) => b.addedAt - a.addedAt)
-      : [...newCards].sort((a, b) => suffixOf(a.id).localeCompare(suffixOf(b.id)));
+  const sortedNew = sortByOrder(newCards, order);
   return [...sortedNew.slice(0, newLimit), ...learningCards];
+}
+
+function sortByOrder(cards: Flashcard[], order: VocabOrder): Flashcard[] {
+  if (order === "first-added") return [...cards].sort((a, b) => a.addedAt - b.addedAt);
+  if (order === "latest-added") return [...cards].sort((a, b) => b.addedAt - a.addedAt);
+  return [...cards].sort((a, b) => suffixOf(a.id).localeCompare(suffixOf(b.id)));
 }
 
 async function reloadCards(language: string, cards: Flashcard[]): Promise<Flashcard[]> {

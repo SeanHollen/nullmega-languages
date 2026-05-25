@@ -122,6 +122,37 @@ class LanguageLabDB extends Dexie {
           await tx.table(`streaksLang`).put({ ...r, language: lang });
         }
       });
+    // v11: relearning is now a derived state of `due + relearningStartedAt`, not of
+    // `learning + relearningStartedAt`. Convert legacy relearning cards (stored as
+    // status=learning with the flag set) into the new representation: status=scheduled,
+    // currentInterval=0 so they're immediately due, relearningStartedAt preserved.
+    this.version(11)
+      .stores({
+        audio: ``,
+        streaks: `&date`,
+        streaksLang: `&[language+date], date, language`,
+        goals: `&language`,
+        kv: `&key`,
+        abilities: `&id, [language+mode]`,
+        customLanguages: `&name`,
+        flashcards: `&id, language, [language+source]`,
+        grammarCards: `&id, language, [language+title]`,
+        assessments: `&id, [mode+language], completedAt, createdAt`,
+      })
+      .upgrade(async (tx) => {
+        const cards = (await tx.table(`flashcards`).toArray()) as Flashcard[];
+        for (const c of cards) {
+          if (c.status === `learning` && c.relearningStartedAt !== null) {
+            await tx.table(`flashcards`).put({
+              ...c,
+              status: `scheduled`,
+              lastReviewed: c.lastReviewed ?? Date.now(),
+              currentInterval: 0,
+              learningCorrectCount: 0,
+            });
+          }
+        }
+      });
   }
 }
 

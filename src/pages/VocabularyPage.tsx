@@ -65,11 +65,9 @@ export function VocabularyPage() {
         ),
       )
     : 0;
-  const learningCount = cards.filter((c) => {
-    const s = computeStatus(c);
-    return s === `learning` || s === `relearning`;
-  }).length;
+  const learningCount = cards.filter((c) => computeStatus(c) === `learning`).length;
   const dueCount = cards.filter((c) => computeStatus(c) === `due`).length;
+  const relearningCount = cards.filter((c) => computeStatus(c) === `relearning`).length;
 
   return (
     <div className="min-h-screen bg-green-100 py-10 px-4">
@@ -101,11 +99,13 @@ export function VocabularyPage() {
           <div className="flex flex-col items-center gap-1">
             <button
               onClick={handleStartReview}
-              disabled={!settings || dueCount === 0}
+              disabled={!settings || (dueCount === 0 && relearningCount === 0)}
               className="bg-white border-2 border-green-400 text-green-700 px-8 py-4 rounded-2xl font-bold text-base hover:bg-green-50 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition text-center min-w-48"
             >
               <div>{`Review cards →`}</div>
-              <div className="text-sm font-normal text-green-600 mt-1">{`due: ${dueCount}`}</div>
+              <div className="text-sm font-normal text-green-600 mt-1">
+                {`due: ${dueCount} · relearning: ${relearningCount}`}
+              </div>
             </button>
             {reviewError && <p className="text-xs text-red-500">{reviewError}</p>}
           </div>

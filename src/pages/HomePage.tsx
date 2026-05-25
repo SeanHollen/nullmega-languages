@@ -60,11 +60,11 @@ function vocabStudyCount(
   vocabNewLimit: number,
   vocabLearnedToday: number,
 ): number {
-  const due = vocabCards.filter((c) => computeStatus(c) === `due`).length;
-  const learning = vocabCards.filter((c) => {
+  const due = vocabCards.filter((c) => {
     const s = computeStatus(c);
-    return s === `learning` || s === `relearning`;
+    return s === `due` || s === `relearning`;
   }).length;
+  const learning = vocabCards.filter((c) => computeStatus(c) === `learning`).length;
   const remainingNewGoal = Math.max(0, vocabNewLimit - vocabLearnedToday);
   return due + learning + remainingNewGoal;
 }

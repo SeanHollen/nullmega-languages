@@ -124,6 +124,7 @@ export function StudyPage() {
         status: "scheduled",
         lastReviewed: now,
         currentInterval: easyInterval(current.currentInterval),
+        relearningStartedAt: null,
         contexts: [],
         dateContextGenerated: null,
       });

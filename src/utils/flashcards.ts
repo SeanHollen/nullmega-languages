@@ -31,20 +31,16 @@ export interface Flashcard {
   contexts: FlashcardContext[];
   dateContextGenerated: number | null;
   // Number of consecutive correct answers given while in `learning` status. Used to require
-  // multiple correct passes before graduating to `scheduled`. Resets to 0 on wrong answer and
-  // on entering relearning. `null` means the card has never been shown to the user — flips
-  // to a number (0 or 1) on the first learn-mode answer.
+  // multiple correct passes before graduating to `scheduled`. `null` means the card has
+  // never been shown to the user — flips to a number (0 or 1) on the first learn-mode answer.
+  // Only meaningful when status === "learning"; ignored otherwise.
   learningCorrectCount: number | null;
-  // Timestamp of the most recent relearning event (when a `due` card was answered wrong and
-  // dropped back to `learning`). null if the card has never been relearned. Persisted for
-  // future stats; not currently used to drive behavior.
+  // Timestamp of the most recent relearning event (when a due card was answered wrong).
+  // Set when the card is demoted to relearning; cleared when it next graduates back to a
+  // clean scheduled state. A scheduled+due card with this flag set is "relearning" — a
+  // flavor of due, not a separate flow.
   relearningStartedAt: number | null;
-  // Index of the next context to show. Advances (mod contexts.length) after each
-  // presentation so the user cycles through contexts in order. Treated as 0 when absent.
   contextCursor?: number;
-  // History of review answers (status was `scheduled` / `due` when shown). Relearning
-  // practice answers are NOT recorded here — only the original review that determines
-  // whether the SRS interval advances or resets.
   reviewHistory: ReviewEntry[];
 }
 
@@ -192,10 +188,10 @@ export async function pickNextContext(card: Flashcard): Promise<number> {
 export function computeStatus(card: Flashcard): FlashcardStatusDerived {
   if (card.status === `dropped`) return `dropped`;
   if (card.status === `new`) return `new`;
-  if (card.status === `learning`) {
-    return card.relearningStartedAt !== null ? `relearning` : `learning`;
-  }
-  if (card.lastReviewed !== null && card.lastReviewed + card.currentInterval <= Date.now())
-    return `due`;
-  return `scheduled`;
+  if (card.status === `learning`) return `learning`;
+  // status === "scheduled"
+  const isDue =
+    card.lastReviewed !== null && card.lastReviewed + card.currentInterval <= Date.now();
+  if (!isDue) return `scheduled`;
+  return card.relearningStartedAt !== null ? `relearning` : `due`;
 }

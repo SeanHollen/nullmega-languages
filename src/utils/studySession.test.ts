@@ -125,14 +125,12 @@ describe("buildTierFn", () => {
     expect(buildTierFn(`review`, true, false)).toBeUndefined();
   });
 
-  it("ranks upcoming < learning < relearning in learn mode when the flag is on", () => {
+  it("ranks upcoming < in-progress learning in learn mode when the flag is on", () => {
     const tier = buildTierFn(`learn`, true, true)!;
     const upcomingCard = makeCard("u", null); // learningCorrectCount === null
     const learningCard = { ...makeCard("l", null), learningCorrectCount: 1 };
-    const relearningCard = makeCard("r", Date.now());
     expect(tier(upcomingCard)).toBe(0);
     expect(tier(learningCard)).toBe(1);
-    expect(tier(relearningCard)).toBe(2);
   });
 
   it("ranks non-relearning < relearning in review mode when the flag is on", () => {
@@ -192,17 +190,20 @@ describe("computeAnswerPatch", () => {
   it("does not clear contexts when a review-mode card is answered wrong (relearning)", () => {
     const card = cardWithContexts({ status: "scheduled", currentInterval: DAY });
     const { patch } = computeAnswerPatch(card, "review", false, 1000);
-    expect(patch.status).toBe("learning");
+    // Wrong-on-review keeps status="scheduled" but marks the card immediately due and
+    // sets the relearning flag. status doesn't appear in the patch (no change).
+    expect(`status` in patch).toBe(false);
+    expect(patch.currentInterval).toBe(0);
     expect(patch.relearningStartedAt).toBe(1000);
     expect(`contexts` in patch).toBe(false);
   });
 
-  it("graduates a relearning card on a single right answer in review mode, but keeps interval at INITIAL_INTERVAL (does NOT re-advance via nextInterval, which would silently undo the wrong's reset)", () => {
+  it("graduates a relearning card on a single right answer in review mode, with interval reset to INITIAL_INTERVAL (does NOT re-advance via nextInterval, which would silently undo the wrong's reset)", () => {
     const card = cardWithContexts({
-      status: "learning",
-      currentInterval: INITIAL_INTERVAL,
+      status: "scheduled",
+      currentInterval: 0,
       relearningStartedAt: 500,
-      learningCorrectCount: 0,
+      lastReviewed: 500,
     });
     const { patch, graduate } = computeAnswerPatch(card, "review", true, 1000);
     expect(graduate).toBe(true);
@@ -348,6 +349,26 @@ describe("prepareReviewSession", () => {
     expect(finalCard).toBeDefined();
     expect(finalCard!.contexts.every((ctx) => ctx.audioKey !== null)).toBe(true);
     expect(session!.audioUrl).toMatch(/^blob:/);
+  });
+
+  it("includes relearning cards (so they survive a re-entry into the review session)", async () => {
+    const due = (await addFlashcard("Spanish", "manzana", "apple"))!;
+    await makeCardDue(due.id);
+    const relearning = (await addFlashcard("Spanish", "pera", "pear"))!;
+    // Relearning under the new model = scheduled + immediately due + flag set.
+    await patchFlashcard(relearning.id, {
+      status: "scheduled",
+      lastReviewed: Date.now(),
+      currentInterval: 0,
+      relearningStartedAt: Date.now(),
+    });
+
+    const session = await prepareReviewSession("Spanish", settings);
+
+    expect(session).not.toBeNull();
+    const ids = session!.cards.map((c) => c.id);
+    expect(ids).toContain(due.id);
+    expect(ids).toContain(relearning.id);
   });
 
   it("does not call TTS when generateAudio is false", async () => {

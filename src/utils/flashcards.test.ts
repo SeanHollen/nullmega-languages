@@ -39,6 +39,7 @@ const settings: VocabSettings = {
   showText: true,
   showUpcomingBeforeLearning: true,
   showDueBeforeRelearning: true,
+  includeTranslationInContexts: false,
 };
 
 describe("addFlashcard", () => {
@@ -98,17 +99,26 @@ describe("computeStatus", () => {
     expect(computeStatus(updated)).toBe("dropped");
   });
 
-  it("returns 'relearning' for a learning card with relearningStartedAt set", async () => {
+  it("returns 'relearning' for a due card with relearningStartedAt set", async () => {
     const card = (await addFlashcard("Spanish", "hola", "hello"))!;
     await patchFlashcard(card.id, {
-      status: "learning",
+      status: "scheduled",
+      lastReviewed: Date.now() - 2 * DAY,
+      currentInterval: INITIAL_INTERVAL,
       relearningStartedAt: Date.now(),
     });
     const [updated] = await loadFlashcards("Spanish");
     expect(computeStatus(updated)).toBe("relearning");
   });
 
-  it("returns 'learning' (not relearning) when relearningStartedAt is null", async () => {
+  it("returns 'learning' (never 'relearning') for status=learning regardless of the flag", async () => {
+    const card = (await addFlashcard("Spanish", "hola", "hello"))!;
+    await patchFlashcard(card.id, { status: "learning", relearningStartedAt: Date.now() });
+    const [updated] = await loadFlashcards("Spanish");
+    expect(computeStatus(updated)).toBe("learning");
+  });
+
+  it("returns 'learning' when relearningStartedAt is null", async () => {
     const card = (await addFlashcard("Spanish", "hola", "hello"))!;
     await patchFlashcard(card.id, { status: "learning", relearningStartedAt: null });
     const [updated] = await loadFlashcards("Spanish");

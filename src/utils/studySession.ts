@@ -65,13 +65,11 @@ export function buildTierFn(
 ): TierFn | undefined {
   if (mode === "learn") {
     if (!showUpcomingBeforeLearning) return undefined;
-    return (c) => {
-      if (c.relearningStartedAt !== null) return 2;
-      if (c.learningCorrectCount === null) return 0;
-      return 1;
-    };
+    // 0 = upcoming (never seen), 1 = in-progress learning.
+    return (c) => (c.learningCorrectCount === null ? 0 : 1);
   }
   if (!showDueBeforeRelearning) return undefined;
+  // 0 = clean due, 1 = relearning (due + flag).
   return (c) => (c.relearningStartedAt !== null ? 1 : 0);
 }
 
@@ -144,10 +142,8 @@ export function computeAnswerPatch(
   return {
     graduate: false,
     patch: {
-      status: "learning",
       lastReviewed: now,
-      currentInterval: INITIAL_INTERVAL,
-      learningCorrectCount: 0,
+      currentInterval: 0,
       relearningStartedAt: now,
       reviewHistory,
     },
@@ -182,16 +178,16 @@ function pickInitial(
   newLimit: number,
 ): Flashcard[] {
   if (mode === "review") {
-    const due = cards.filter((c) => computeStatus(c) === "due");
+    const due = cards.filter((c) => {
+      const s = computeStatus(c);
+      return s === "due" || s === "relearning";
+    });
     return order === "added"
       ? [...due].sort((a, b) => b.addedAt - a.addedAt)
       : [...due].sort((a, b) => suffixOf(a.id).localeCompare(suffixOf(b.id)));
   }
   const newCards = cards.filter((c) => computeStatus(c) === "new");
-  const learningCards = cards.filter((c) => {
-    const s = computeStatus(c);
-    return s === "learning" || s === "relearning";
-  });
+  const learningCards = cards.filter((c) => computeStatus(c) === "learning");
   const sortedNew =
     order === "added"
       ? [...newCards].sort((a, b) => b.addedAt - a.addedAt)

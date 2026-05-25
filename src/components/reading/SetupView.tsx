@@ -13,7 +13,7 @@ interface Props {
   onLengthChange?: (l: ReadingLength) => void;
   writingMode?: WritingMode | null;
   onWritingModeChange?: (m: WritingMode) => void;
-  writingModeBlockedReason?: string | null;
+  disabledReason?: string | null;
   onLanguageComplexityChange: (d: number) => void;
   onRatedChange: (r: boolean) => void;
   onGenerate: () => void;
@@ -49,7 +49,7 @@ export function SetupView({
   onLengthChange,
   writingMode,
   onWritingModeChange,
-  writingModeBlockedReason,
+  disabledReason,
   onLanguageComplexityChange,
   onRatedChange,
   onGenerate,
@@ -136,8 +136,8 @@ export function SetupView({
               {WRITING_MODE_OPTIONS.find((o) => o.mode === writingMode)?.description}
             </p>
           )}
-          {writingMode && writingModeBlockedReason && (
-            <p className="text-xs text-amber-600 mt-2">{writingModeBlockedReason}</p>
+          {writingMode && disabledReason && (
+            <p className="text-xs text-amber-600 mt-2">{disabledReason}</p>
           )}
         </div>
       )}
@@ -152,15 +152,20 @@ export function SetupView({
         </div>
       )}
 
-      <button
-        onClick={onGenerate}
-        disabled={
-          (onWritingModeChange !== undefined && !writingMode) || Boolean(writingModeBlockedReason)
-        }
-        className="w-full bg-green-600 text-white py-3 rounded-xl font-semibold hover:bg-green-700 disabled:opacity-40 disabled:cursor-not-allowed transition cursor-pointer"
-      >
-        {rated ? generateLabel : `${generateLabel} (Unrated)`}
-      </button>
+      <div className={`relative group ${disabledReason ? `cursor-not-allowed` : ``}`}>
+        <button
+          onClick={onGenerate}
+          disabled={!!disabledReason}
+          className="w-full bg-green-600 text-white py-3 rounded-xl font-semibold hover:bg-green-700 disabled:opacity-40 disabled:cursor-not-allowed transition cursor-pointer"
+        >
+          {rated ? generateLabel : `${generateLabel} (Unrated)`}
+        </button>
+        {disabledReason && (
+          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-gray-800 text-white text-xs rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition pointer-events-none">
+            {disabledReason}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

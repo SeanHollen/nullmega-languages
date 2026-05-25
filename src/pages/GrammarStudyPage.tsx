@@ -152,6 +152,7 @@ export function GrammarStudyPage() {
             <button
               onClick={submitAnswers}
               disabled={!allAnswered}
+              title={!allAnswered ? `Not all questions answered` : undefined}
               className="w-full bg-green-600 text-white py-3 rounded-xl font-semibold hover:bg-green-700 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition"
             >
               {`Check answers →`}

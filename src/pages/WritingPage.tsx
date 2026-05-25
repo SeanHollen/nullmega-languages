@@ -322,6 +322,13 @@ export function WritingPage() {
 
   const error = generateWriting.error?.message ?? gradeWriting.error?.message ?? ``;
 
+  function computeDisabledReason(): string | null {
+    if (!mode) return `Pick a writing mode first`;
+    if (mode === `vocab-paragraph` && upcomingVocabCount === 0) {
+      return `You have no upcoming vocab cards. Add words to your vocabulary first.`;
+    }
+    return null;
+  }
   return (
     <div className="min-h-screen bg-green-100 py-10 px-4">
       <div className="max-w-2xl mx-auto">
@@ -338,11 +345,7 @@ export function WritingPage() {
               generateLabel={`Generate Writing Exercise`}
               writingMode={mode}
               onWritingModeChange={setMode}
-              writingModeBlockedReason={
-                mode === `vocab-paragraph` && upcomingVocabCount === 0
-                  ? `You have no upcoming vocab cards. Add words to your vocabulary first.`
-                  : null
-              }
+              disabledReason={computeDisabledReason()}
               onLanguageComplexityChange={setComplexityOverride}
               onRatedChange={setRated}
               onGenerate={handleGenerate}

@@ -59,6 +59,7 @@ export function VocabParagraphWritingView({
       <button
         onClick={onSubmit}
         disabled={!canSubmit}
+        title={!canSubmit ? `Paragraph not written` : undefined}
         className="w-full bg-green-600 text-white py-3 rounded-xl font-semibold hover:bg-green-700 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition"
       >
         {`Submit paragraph`}

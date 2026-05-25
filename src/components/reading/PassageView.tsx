@@ -45,6 +45,7 @@ export function PassageView({
       <button
         onClick={onSubmit}
         disabled={!allAnswered}
+        title={!allAnswered ? `Not all questions answered` : undefined}
         className="w-full bg-green-600 text-white py-3 rounded-xl font-semibold hover:bg-green-700 disabled:opacity-40 transition cursor-pointer"
       >
         {`Submit Answers`}

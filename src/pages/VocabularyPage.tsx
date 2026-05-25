@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLiveQuery } from "dexie-react-hooks";
-import { FaArrowLeft } from "react-icons/fa";
 import { useLanguage } from "../contexts/LanguageContext";
+import { BackHeader } from "../components/BackHeader";
 import { useLoading } from "../contexts/LoadingContext";
 import { loadFlashcards, computeStatus } from "../utils/flashcards";
 import type { VocabSettings } from "../utils/vocabSettings";
@@ -72,15 +72,7 @@ export function VocabularyPage() {
   return (
     <div className="min-h-screen bg-green-100 py-10 px-4">
       <div className="max-w-4xl mx-auto">
-        <div className="flex items-center gap-4 mb-6">
-          <button
-            onClick={() => navigate(`/`)}
-            className="text-gray-400 hover:text-gray-600 transition cursor-pointer"
-          >
-            <FaArrowLeft />
-          </button>
-          <h1 className="text-2xl font-bold text-gray-800">{`Vocabulary Flashcards`}</h1>
-        </div>
+        <BackHeader title="Vocabulary Flashcards" to="/" />
 
         <div className="flex flex-col min-[420px]:flex-row justify-center gap-4 mb-8">
           <div className="flex flex-col items-center gap-1">

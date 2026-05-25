@@ -1,6 +1,5 @@
-import { useNavigate } from "react-router-dom";
-import { FaArrowLeft } from "react-icons/fa";
 import { useLiveQuery } from "dexie-react-hooks";
+import { BackHeader } from "../components/BackHeader";
 import type { Mode } from "../hooks/useAbility";
 import { loadGoals, saveGoals, GOAL_MIN, GOAL_MAX } from "../utils/goals";
 import { useLanguage } from "../contexts/LanguageContext";
@@ -15,7 +14,6 @@ const MODE_LABELS: Record<Mode, string> = {
 const MODES: Mode[] = [`reading`, `listening`, `pronunciation`, `writing`];
 
 export function GoalsPage() {
-  const navigate = useNavigate();
   const { language } = useLanguage();
   const goals = useLiveQuery(() => loadGoals(language), [language]);
 
@@ -27,15 +25,7 @@ export function GoalsPage() {
   return (
     <div className="min-h-screen bg-green-100 py-10 px-4">
       <div className="max-w-2xl mx-auto">
-        <div className="flex items-center gap-4 mb-8">
-          <button
-            onClick={() => navigate(`/`)}
-            className="text-gray-400 hover:text-gray-600 transition cursor-pointer"
-          >
-            <FaArrowLeft />
-          </button>
-          <h1 className="text-2xl font-bold text-gray-800">{`Daily Goals`}</h1>
-        </div>
+        <BackHeader title="Daily Goals" to="/" />
 
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-6">
           <p className="text-sm text-gray-500">

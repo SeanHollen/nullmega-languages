@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLiveQuery } from "dexie-react-hooks";
-import { FaArrowLeft } from "react-icons/fa";
+import { BackHeader } from "../components/BackHeader";
 import type { Provider } from "../utils/settings";
 import { loadSettings, saveSettings } from "../utils/settings";
 import { TextGenKeySection } from "../components/onboarding/TextGenKeySection";
@@ -44,15 +44,7 @@ export function SettingsPage() {
   return (
     <div className="min-h-screen bg-green-100 py-10 px-4">
       <div className="max-w-2xl mx-auto">
-        <div className="flex items-center gap-4 mb-8">
-          <button
-            onClick={() => navigate(`/`)}
-            className="text-gray-400 hover:text-gray-600 transition cursor-pointer"
-          >
-            <FaArrowLeft />
-          </button>
-          <h1 className="text-2xl font-bold text-gray-800">{`Settings`}</h1>
-        </div>
+        <BackHeader title="Settings" to="/" />
 
         {initial && textGenKey !== null && ttsKey !== null && sameTTS !== null && (
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-6">

@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { useNavigate, useLocation, useParams } from "react-router-dom";
-import { FaArrowLeft } from "react-icons/fa";
+import { useLocation, useParams } from "react-router-dom";
 import { StudyEmptyState } from "../components/StudyEmptyState";
+import { BackHeader } from "../components/BackHeader";
 import type { GrammarCard } from "../utils/grammarCards";
 import { acceptedAnswers, patchGrammarCard } from "../utils/grammarCards";
 import { computeSrsStatus } from "../utils/srs";
@@ -23,7 +23,6 @@ function matchesAnyAnswer(user: string, accepted: string[]): boolean {
 }
 
 export function GrammarStudyPage() {
-  const navigate = useNavigate();
   const location = useLocation();
   const { mode: modeParam } = useParams<{ mode: string }>();
   const mode = modeParam === `review` ? `review` : `learn`;
@@ -88,20 +87,15 @@ export function GrammarStudyPage() {
   return (
     <div className="min-h-screen bg-green-100 py-10 px-4">
       <div className="max-w-2xl mx-auto">
-        <div className="flex items-center justify-between gap-4 mb-8">
-          <div className="flex items-center gap-4 min-w-0">
-            <button
-              onClick={() => navigate(`/grammar`)}
-              className="text-gray-400 hover:text-gray-600 transition cursor-pointer"
-            >
-              <FaArrowLeft />
-            </button>
-            <h1 className="text-2xl font-bold text-gray-800">{title}</h1>
-          </div>
-          {remaining.length > 0 && (
-            <span className="text-sm text-gray-500">{`${remaining.length} left`}</span>
-          )}
-        </div>
+        <BackHeader
+          title={title}
+          to="/grammar"
+          right={
+            remaining.length > 0 ? (
+              <span className="text-sm text-gray-500">{`${remaining.length} left`}</span>
+            ) : undefined
+          }
+        />
 
         {current === null && <StudyEmptyState mode={mode} />}
         {current !== null && phase === `answering` && (

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useLiveQuery } from "dexie-react-hooks";
 import { FaArrowLeft } from "react-icons/fa";
+import { BackHeader } from "../components/BackHeader";
 import type { Mode } from "../hooks/useAbility";
 import { useLanguage } from "../contexts/LanguageContext";
 import { getHistory, pointsForRecord } from "../utils/history";
@@ -185,15 +186,7 @@ export function StatsPage() {
   return (
     <div className="min-h-screen bg-green-100 py-10 px-4">
       <div className="max-w-3xl mx-auto">
-        <div className="flex items-center gap-4 mb-8">
-          <button
-            onClick={() => navigate(`/${mode}`)}
-            className="text-gray-400 hover:text-gray-600 transition cursor-pointer"
-          >
-            <FaArrowLeft />
-          </button>
-          <h1 className="text-2xl font-bold text-gray-800">{`${label} Stats`}</h1>
-        </div>
+        <BackHeader title={`${label} Stats`} to={`/${mode}`} />
 
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-4">
           <div className="flex items-baseline justify-between gap-4 flex-wrap">

@@ -15,11 +15,12 @@ export function BackHeader({ title, to, right }: Props) {
       <div className="flex items-center gap-4 min-w-0">
         <button
           onClick={() => navigate(to)}
-          className="text-gray-400 hover:text-gray-600 transition cursor-pointer"
+          aria-label="Back"
+          className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white border border-gray-200 text-gray-600 shadow-sm hover:bg-gray-50 hover:text-gray-800 hover:border-gray-300 transition cursor-pointer"
         >
           <FaArrowLeft />
         </button>
-        <h1 className="text-2xl font-bold text-gray-800">{title}</h1>
+        <h1 className="text-2xl font-bold text-gray-800 truncate">{title}</h1>
       </div>
       {right}
     </div>

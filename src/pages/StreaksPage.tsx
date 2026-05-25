@@ -1,6 +1,5 @@
-import { useNavigate } from "react-router-dom";
-import { FaArrowLeft } from "react-icons/fa";
 import { useLiveQuery } from "dexie-react-hooks";
+import { BackHeader } from "../components/BackHeader";
 import { loadStreaks, computeCurrentStreak, dateStr, type StreakRecord } from "../utils/streaks";
 import { loadListeningSeconds, formatListeningDuration } from "../utils/listeningStats";
 import { useLanguage } from "../contexts/LanguageContext";
@@ -47,7 +46,6 @@ function cellTitle(cell: Cell): string {
 }
 
 export function StreaksPage() {
-  const navigate = useNavigate();
   const { language } = useLanguage();
   const records = useLiveQuery(() => loadStreaks(language), [language]) ?? [];
   const byDate = new Map(records.map((r) => [r.date, r]));
@@ -98,15 +96,7 @@ export function StreaksPage() {
   return (
     <div className="min-h-screen bg-green-100 py-10 px-4">
       <div className="max-w-2xl mx-auto">
-        <div className="flex items-center gap-4 mb-8">
-          <button
-            onClick={() => navigate(`/`)}
-            className="text-gray-400 hover:text-gray-600 transition cursor-pointer"
-          >
-            <FaArrowLeft />
-          </button>
-          <h1 className="text-2xl font-bold text-gray-800">{`Streaks`}</h1>
-        </div>
+        <BackHeader title="Streaks" to="/" />
 
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-6">
           <div className="grid grid-cols-3 gap-4">

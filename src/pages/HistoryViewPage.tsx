@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useLiveQuery } from "dexie-react-hooks";
-import { FaArrowLeft } from "react-icons/fa";
+import { BackHeader } from "../components/BackHeader";
 import { useLanguage } from "../contexts/LanguageContext";
 import { ResultsView } from "../components/reading-listening/ResultsView";
 import { WritingResultsView } from "../components/writing/WritingResultsView";
@@ -177,12 +177,7 @@ export function HistoryViewPage() {
     return (
       <div className="min-h-screen bg-green-100 py-10 px-4">
         <div className="max-w-2xl mx-auto">
-          <button
-            onClick={() => navigate(`/`)}
-            className="text-gray-400 hover:text-gray-600 transition cursor-pointer mb-6"
-          >
-            <FaArrowLeft />
-          </button>
+          <BackHeader title="" to="/" />
           <p className="text-gray-500">{`Assessment not found.`}</p>
         </div>
       </div>
@@ -195,15 +190,7 @@ export function HistoryViewPage() {
   return (
     <div className="min-h-screen bg-green-100 py-10 px-4">
       <div className="max-w-2xl mx-auto">
-        <div className="flex items-center gap-4 mb-8">
-          <button
-            onClick={() => navigate(`/${record.mode}`)}
-            className="text-gray-400 hover:text-gray-600 transition cursor-pointer"
-          >
-            <FaArrowLeft />
-          </button>
-          <h1 className="text-2xl font-bold text-gray-800">{PAGE_TITLE[record.mode]}</h1>
-        </div>
+        <BackHeader title={PAGE_TITLE[record.mode]} to={`/${record.mode}`} />
 
         {record.body ? (
           <BodyView record={record} language={language} onGoAgain={onGoAgain} onHome={onHome} />

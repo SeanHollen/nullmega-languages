@@ -1,7 +1,8 @@
 import { useRef, useState } from "react";
-import { useNavigate, useParams, useLocation } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 import { useLiveQuery } from "dexie-react-hooks";
-import { FaArrowLeft, FaEllipsisV } from "react-icons/fa";
+import { FaEllipsisV } from "react-icons/fa";
+import { BackHeader } from "../components/BackHeader";
 import { StudyEmptyState } from "../components/StudyEmptyState";
 import type { Flashcard } from "../utils/flashcards";
 import { patchFlashcard, computeStatus, pickNextContext } from "../utils/flashcards";
@@ -21,7 +22,6 @@ import {
 type StudyMode = "learn" | "review";
 
 export function StudyPage() {
-  const navigate = useNavigate();
   const location = useLocation();
   const { mode: modeParam } = useParams<{ mode: string }>();
   const mode: StudyMode = modeParam === "review" ? "review" : "learn";
@@ -187,20 +187,15 @@ export function StudyPage() {
   return (
     <div className="min-h-screen bg-green-100 py-10 px-4">
       <div className="max-w-2xl mx-auto">
-        <div className="flex items-center justify-between gap-4 mb-8">
-          <div className="flex items-center gap-4 min-w-0">
-            <button
-              onClick={() => navigate(`/vocabulary`)}
-              className="text-gray-400 hover:text-gray-600 transition cursor-pointer"
-            >
-              <FaArrowLeft />
-            </button>
-            <h1 className="text-2xl font-bold text-gray-800">{title}</h1>
-          </div>
-          {countParts.length > 0 && (
-            <span className="text-sm text-gray-500">{countParts.join(` · `)}</span>
-          )}
-        </div>
+        <BackHeader
+          title={title}
+          to="/vocabulary"
+          right={
+            countParts.length > 0 ? (
+              <span className="text-sm text-gray-500">{countParts.join(` · `)}</span>
+            ) : undefined
+          }
+        />
 
         {current === null && <StudyEmptyState mode={mode} learnSuggestsAddingCards />}
         {current !== null && ctx && (

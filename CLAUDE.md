@@ -34,6 +34,10 @@ Validate at the boundary where the data actually comes from outside our control:
 
 Optional parameters are `gender?: NarratorGender`, not `gender: NarratorGender | null`. Use `null` only when an existing API forces it.
 
+## Never write language-specific logic
+
+The app supports any language the user types in, not a fixed list. Don't hardcode behavior, regexes, or heuristics that only work for certain languages — no "if French, do X", no per-language string-match tables ("Forme de verbe" | "Verb form" | "Konjugierte Form"), no per-language fallback chains. Find a structural / language-agnostic signal instead (HTML structure, ISO codes, token length, etc.). If a language-agnostic solution genuinely doesn't exist, stop and ask before adding a partial one.
+
 ## Don't invent probabilistic logic
 
 If a function picks from a pool, pick uniformly from that pool. Don't add an artificial 50/50 gate before the pick unless the user specifically asked for stratified sampling. Uniform random over the actual options is the default.

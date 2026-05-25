@@ -1,5 +1,9 @@
+import { useState } from "react";
+import { useLiveQuery } from "dexie-react-hooks";
 import type { Exercise } from "../../types";
 import { QuestionCard } from "./QuestionCard";
+import { WordDefinitionPanel } from "./WordDefinitionPanel";
+import { loadDictionaryEnabled, saveDictionaryEnabled } from "../../utils/dictionarySettings";
 
 interface Props {
   exercise: Exercise;
@@ -10,6 +14,31 @@ interface Props {
   onSubmit: () => void;
 }
 
+const WORD_RE = /\p{L}+(?:[’'-]\p{L}+)*/gu;
+
+interface Token {
+  text: string;
+  isWord: boolean;
+}
+
+function tokenize(text: string): Token[] {
+  const tokens: Token[] = [];
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+  WORD_RE.lastIndex = 0;
+  while ((match = WORD_RE.exec(text)) !== null) {
+    if (match.index > lastIndex) {
+      tokens.push({ text: text.slice(lastIndex, match.index), isWord: false });
+    }
+    tokens.push({ text: match[0], isWord: true });
+    lastIndex = match.index + match[0].length;
+  }
+  if (lastIndex < text.length) {
+    tokens.push({ text: text.slice(lastIndex), isWord: false });
+  }
+  return tokens;
+}
+
 export function PassageView({
   exercise,
   language,
@@ -18,18 +47,54 @@ export function PassageView({
   onSelect,
   onSubmit,
 }: Props) {
+  const [selectedWord, setSelectedWord] = useState<string | null>(null);
+  const dictionaryEnabled = useLiveQuery(() => loadDictionaryEnabled(), []) ?? true;
   const allAnswered = selected.every((s) => s !== null);
+  const tokens = tokenize(exercise.passage);
 
   return (
     <div className="space-y-6">
       <div className="bg-white rounded-2xl border border-green-100 shadow-sm p-8">
-        {exercise.title && (
-          <h2 className="text-xl font-semibold text-gray-800 mb-1">{exercise.title}</h2>
-        )}
-        <p className="text-xs text-gray-400 uppercase tracking-wide mb-4">
-          {`${language} · Complexity ${languageComplexity}`}
+        <div className="flex items-start justify-between gap-4 mb-4">
+          <div>
+            {exercise.title && (
+              <h2 className="text-xl font-semibold text-gray-800 mb-1">{exercise.title}</h2>
+            )}
+            <p className="text-xs text-gray-400 uppercase tracking-wide">
+              {`${language} · Complexity ${languageComplexity}`}
+            </p>
+          </div>
+          <label className="flex items-center gap-2 cursor-pointer select-none shrink-0">
+            <input
+              type="checkbox"
+              checked={dictionaryEnabled}
+              onChange={(e) => void saveDictionaryEnabled(e.target.checked)}
+              className="w-4 h-4 accent-green-600 cursor-pointer"
+            />
+            <span className="text-xs text-gray-500">{`Dictionary`}</span>
+          </label>
+        </div>
+        <p className="text-gray-800 leading-relaxed whitespace-pre-wrap">
+          {dictionaryEnabled
+            ? tokens.map((t, i) =>
+                t.isWord ? (
+                  <span
+                    key={i}
+                    onClick={() => setSelectedWord(t.text)}
+                    className={`cursor-pointer rounded ${
+                      selectedWord && selectedWord.toLowerCase() === t.text.toLowerCase()
+                        ? `bg-green-200 text-green-900`
+                        : `hover:bg-yellow-100`
+                    }`}
+                  >
+                    {t.text}
+                  </span>
+                ) : (
+                  <span key={i}>{t.text}</span>
+                ),
+              )
+            : exercise.passage}
         </p>
-        <p className="text-gray-800 leading-relaxed whitespace-pre-wrap">{exercise.passage}</p>
       </div>
 
       {exercise.questions.map((q, qi) => (
@@ -50,6 +115,14 @@ export function PassageView({
       >
         {`Submit Answers`}
       </button>
+
+      {dictionaryEnabled && (
+        <WordDefinitionPanel
+          word={selectedWord}
+          language={language}
+          onClose={() => setSelectedWord(null)}
+        />
+      )}
     </div>
   );
 }

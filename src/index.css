@@ -5,3 +5,11 @@ body {
   background-color: #dcfce7; /* green-100 — matches the page background everywhere */
   overscroll-behavior: none;
 }
+
+.wiktionary-entry a {
+  color: #2563eb; /* blue-600 */
+  text-decoration: none;
+}
+.wiktionary-entry a:hover {
+  text-decoration: underline;
+}

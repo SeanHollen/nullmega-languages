@@ -2,6 +2,7 @@ import { FaExclamationTriangle } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import type { ReadingLength } from "../../utils/prompts";
 import type { WritingMode } from "../../hooks/useGenerateWriting";
+import type { PronunciationMode } from "../../pages/PronunciationPage";
 import { Button } from "../Button";
 
 interface Props {
@@ -15,6 +16,8 @@ interface Props {
   onLengthChange?: (l: ReadingLength) => void;
   writingMode?: WritingMode | null;
   onWritingModeChange?: (m: WritingMode) => void;
+  pronunciationMode?: PronunciationMode;
+  onPronunciationModeChange?: (m: PronunciationMode) => void;
   disabledReason?: string | null;
   onLanguageComplexityChange: (d: number) => void;
   onRatedChange: (r: boolean) => void;
@@ -40,6 +43,16 @@ const WRITING_MODE_DESCRIPTIONS: Record<WritingMode, string> = {
   "vocab-paragraph": `Write a paragraph that uses the 5–8 vocab cards from your deck that are about to become due. Reinforces words you're about to forget in productive context.`,
 };
 
+const PRONUNCIATION_MODES: PronunciationMode[] = [`mirror`, `test`];
+const PRONUNCIATION_MODE_LABELS: Record<PronunciationMode, string> = {
+  mirror: `Mirror`,
+  test: `Test`,
+};
+const PRONUNCIATION_MODE_DESCRIPTIONS: Record<PronunciationMode, string> = {
+  mirror: `Listen first`,
+  test: `Read first`,
+};
+
 export function SetupView({
   language,
   languageComplexity,
@@ -51,6 +64,8 @@ export function SetupView({
   onLengthChange,
   writingMode,
   onWritingModeChange,
+  pronunciationMode,
+  onPronunciationModeChange,
   disabledReason,
   onLanguageComplexityChange,
   onRatedChange,
@@ -117,6 +132,29 @@ export function SetupView({
           </div>
         )}
       </div>
+
+      {onPronunciationModeChange && pronunciationMode && (
+        <div>
+          <div className="inline-flex rounded-xl border border-gray-200 overflow-hidden divide-x divide-gray-200">
+            {PRONUNCIATION_MODES.map((mode) => (
+              <Button
+                key={mode}
+                onClick={() => onPronunciationModeChange(mode)}
+                className={`px-3 py-1 text-sm transition cursor-pointer ${
+                  pronunciationMode === mode
+                    ? `bg-green-600 text-white`
+                    : `bg-white text-gray-600 hover:bg-gray-50`
+                }`}
+              >
+                {t(PRONUNCIATION_MODE_LABELS[mode])}
+              </Button>
+            ))}
+          </div>
+          <p className="text-xs text-gray-500 mt-2">
+            {t(PRONUNCIATION_MODE_DESCRIPTIONS[pronunciationMode])}
+          </p>
+        </div>
+      )}
 
       {onWritingModeChange && (
         <div>

@@ -22,6 +22,7 @@ import { resolveSliderComplexity } from "../utils/sliderComplexity";
 import { loadPerModeDefault } from "../utils/onboarding";
 
 type Phase = "setup" | "exercise" | "results";
+export type PronunciationMode = "mirror" | "test";
 
 export function PronunciationPage() {
   const navigate = useNavigate();
@@ -52,6 +53,7 @@ export function PronunciationPage() {
     defaultComplexity: onboardingDefault ?? DEFAULT_LANGUAGE_COMPLEXITY.pronunciation,
   });
   const [rated, setRated] = useState(true);
+  const [practiceMode, setPracticeMode] = useState<PronunciationMode>(`mirror`);
   const [phase, setPhase] = useState<Phase>(() => (resumeBody ? `exercise` : `setup`));
   const [exercise, setExercise] = useState<PronunciationExercise | null>(() => resumeExercise);
   const [audioUrls, setAudioUrls] = useState<string[]>(
@@ -213,6 +215,8 @@ export function PronunciationPage() {
               savedRating={savedRating}
               error={error}
               generateLabel={t(`Generate Pronunciation Exercise`)}
+              pronunciationMode={practiceMode}
+              onPronunciationModeChange={setPracticeMode}
               onLanguageComplexityChange={setComplexityOverride}
               onRatedChange={setRated}
               onGenerate={handleGenerate}
@@ -229,6 +233,7 @@ export function PronunciationPage() {
             languageComplexity={exercise.languageComplexity}
             title={exercise.title}
             ratings={ratings}
+            practiceMode={practiceMode}
             onRate={handleRate}
             onSubmit={handleSubmit}
           />

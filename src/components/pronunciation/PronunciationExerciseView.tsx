@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { PronunciationPhrase } from "../../hooks/useGeneratePronunciation";
+import type { PronunciationMode } from "../../pages/PronunciationPage";
 import { PhraseCard } from "./PhraseCard";
 import { Button } from "../Button";
 
@@ -11,6 +12,7 @@ interface Props {
   languageComplexity: number;
   title?: string;
   ratings: ("good" | "medium" | "bad" | null)[];
+  practiceMode: PronunciationMode;
   onRate: (index: number, rating: "good" | "medium" | "bad") => void;
   onSubmit: () => void;
 }
@@ -22,13 +24,14 @@ export function PronunciationExerciseView({
   languageComplexity,
   title,
   ratings,
+  practiceMode,
   onRate,
   onSubmit,
 }: Props) {
   const { t } = useTranslation();
   const allRated = ratings.every((r) => r !== null);
   const [showPhrasesByDefault, setShowPhrasesByDefault] = useState(true);
-  const [showTranslationsByDefault, setShowTranslationsByDefault] = useState(false);
+  const [showTranslationsByDefault, setShowTranslationsByDefault] = useState(true);
 
   return (
     <div className="space-y-6">
@@ -41,26 +44,22 @@ export function PronunciationExerciseView({
           })}
         </p>
         <p className="text-sm text-gray-400 mt-1">
-          {t(`Listen to each phrase, practise speaking it, then rate yourself.`)}
+          {practiceMode === `mirror` ? t(`Listen first`) : t(`Read first`)}
         </p>
-        <label className="flex items-center gap-2 mt-3 cursor-pointer select-none">
-          <input
-            type="checkbox"
-            checked={showPhrasesByDefault}
-            onChange={(e) => setShowPhrasesByDefault(e.target.checked)}
-            className="accent-green-600 cursor-pointer"
-          />
-          <span className="text-sm text-gray-600">{t(`Show phrases by default`)}</span>
-        </label>
-        <label className="flex items-center gap-2 mt-1 cursor-pointer select-none">
-          <input
-            type="checkbox"
-            checked={showTranslationsByDefault}
-            onChange={(e) => setShowTranslationsByDefault(e.target.checked)}
-            className="accent-green-600 cursor-pointer"
-          />
-          <span className="text-sm text-gray-600">{t(`Show translations by default`)}</span>
-        </label>
+        <div className="flex flex-wrap gap-2 mt-3">
+          <Button
+            onClick={() => setShowPhrasesByDefault((p) => !p)}
+            className="cursor-pointer text-xs px-3 py-1.5 rounded-lg border border-gray-200 text-gray-600 hover:border-gray-300 hover:text-gray-800 transition"
+          >
+            {showPhrasesByDefault ? t(`Hide all phrases`) : t(`Show all phrases`)}
+          </Button>
+          <Button
+            onClick={() => setShowTranslationsByDefault((p) => !p)}
+            className="cursor-pointer text-xs px-3 py-1.5 rounded-lg border border-gray-200 text-gray-600 hover:border-gray-300 hover:text-gray-800 transition"
+          >
+            {showTranslationsByDefault ? t(`Hide all translations`) : t(`Show all translations`)}
+          </Button>
+        </div>
       </div>
 
       {phrases.map((p, i) => (
@@ -72,6 +71,7 @@ export function PronunciationExerciseView({
           language={language}
           audioUrl={audioUrls[i]}
           rating={ratings[i]}
+          practiceMode={practiceMode}
           defaultTextRevealed={showPhrasesByDefault}
           defaultTranslationRevealed={showTranslationsByDefault}
           onRate={(r) => onRate(i, r)}

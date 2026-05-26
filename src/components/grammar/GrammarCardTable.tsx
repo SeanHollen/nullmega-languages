@@ -11,6 +11,7 @@ import {
 } from "../../utils/grammarCards";
 import { relativeTime } from "../../utils/relativeTime";
 import { SortableHeader, type SortDir } from "../SortableHeader";
+import { ConfirmModal } from "../ConfirmModal";
 
 const STATUS_STYLES: Record<GrammarCardStatusDerived, string> = {
   new: `bg-gray-100 text-gray-600`,
@@ -97,6 +98,7 @@ export function GrammarCardTable({ cards, language }: Props) {
   const [sort, setSort] = useState<{ col: SortCol; dir: SortDir } | null>(null);
   const [page, setPage] = useState(0);
   const [trackedPageKey, setTrackedPageKey] = useState(``);
+  const [pendingDelete, setPendingDelete] = useState<GrammarCard | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   function handleSort(col: SortCol) {
@@ -341,9 +343,7 @@ export function GrammarCardTable({ cards, language }: Props) {
                         </td>
                         <td className="px-4 py-3">
                           <button
-                            onClick={() => {
-                              void removeGrammarCard(c.id);
-                            }}
+                            onClick={() => setPendingDelete(c)}
                             className="text-gray-300 hover:text-red-400 transition cursor-pointer"
                             title={t(`Delete card`)}
                           >
@@ -359,6 +359,20 @@ export function GrammarCardTable({ cards, language }: Props) {
           </div>
         </div>
       )}
+      <ConfirmModal
+        open={pendingDelete !== null}
+        title={t(`Delete card?`)}
+        body={
+          pendingDelete ? t(`Permanently delete "{{title}}"?`, { title: pendingDelete.title }) : ``
+        }
+        confirmLabel={t(`Delete`)}
+        destructive
+        onCancel={() => setPendingDelete(null)}
+        onConfirm={() => {
+          if (pendingDelete) void removeGrammarCard(pendingDelete.id);
+          setPendingDelete(null);
+        }}
+      />
     </>
   );
 }

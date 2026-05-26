@@ -1,6 +1,7 @@
 import { db } from "./db";
 
 export type VocabOrder = "random" | "first-added" | "latest-added";
+export type TextDisplay = "show" | "hide" | "cloze";
 
 export interface VocabSettings {
   newWordsPerDay: number;
@@ -8,7 +9,7 @@ export interface VocabSettings {
   order: VocabOrder;
   generateAudio: boolean;
   autoplayAudio: boolean;
-  showText: boolean;
+  textDisplay: TextDisplay;
   showUpcomingBeforeLearning: boolean;
   showDueBeforeRelearning: boolean;
   includeTranslationInContexts: boolean;
@@ -23,7 +24,7 @@ const DEFAULTS: VocabSettings = {
   order: `random`,
   generateAudio: true,
   autoplayAudio: true,
-  showText: false,
+  textDisplay: `cloze`,
   showUpcomingBeforeLearning: false,
   showDueBeforeRelearning: true,
   includeTranslationInContexts: false,

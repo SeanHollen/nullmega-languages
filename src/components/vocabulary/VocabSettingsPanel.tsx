@@ -77,15 +77,20 @@ export function VocabSettingsPanel({ settings, onUpdate }: Props) {
                   className="w-16 border border-gray-200 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-green-500"
                 />
               </div>
-              <label className="flex items-center gap-2 cursor-pointer select-none">
-                <input
-                  type="checkbox"
-                  checked={settings.showText}
-                  onChange={(e) => onUpdate({ showText: e.target.checked })}
-                  className="accent-green-600 cursor-pointer"
-                />
-                <span className="text-gray-600">{t(`Show text by default`)}</span>
-              </label>
+              <div className="flex items-center gap-2">
+                <span className="text-gray-600">{t(`Text default`)}</span>
+                <select
+                  value={settings.textDisplay}
+                  onChange={(e) =>
+                    onUpdate({ textDisplay: e.target.value as VocabSettings[`textDisplay`] })
+                  }
+                  className="border border-gray-200 rounded-lg px-2 py-1 bg-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                >
+                  <option value="show">{t(`Show text by default`)}</option>
+                  <option value="hide">{t(`Hide text by default`)}</option>
+                  <option value="cloze">{t(`Show cloze by default`)}</option>
+                </select>
+              </div>
               <label className="flex items-center gap-2 cursor-pointer select-none">
                 <input
                   type="checkbox"

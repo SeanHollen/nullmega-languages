@@ -232,6 +232,33 @@ class LanguageLabDB extends Dexie {
           await tx.table(`kv`).put({ ...row, value: { ...row.value, order: `latest-added` } });
         }
       });
+    // v15: vocab settings' boolean `showText` becomes a tri-state `textDisplay`.
+    // Existing `true` → "show"; existing `false` → "hide" (preserve behavior). New users
+    // get the new default ("cloze") via DEFAULTS in vocabSettings.ts.
+    this.version(15)
+      .stores({
+        audio: ``,
+        streaks: `&date`,
+        streaksLang: `&[language+date], date, language`,
+        goals: `&language`,
+        kv: `&key`,
+        abilities: `&id, [language+mode]`,
+        customLanguages: `&name`,
+        flashcards: `&id, language, [language+source]`,
+        grammarCards: `&id, language, [language+title]`,
+        assessments: `&id, [mode+language], completedAt, createdAt`,
+      })
+      .upgrade(async (tx) => {
+        const row = (await tx.table(`kv`).get(`vocab_settings`)) as
+          | { key: string; value: Record<string, unknown> }
+          | undefined;
+        if (!row?.value || typeof row.value !== `object`) return;
+        if (typeof row.value.showText === `boolean`) {
+          const textDisplay = row.value.showText ? `show` : `hide`;
+          const { showText: _showText, ...rest } = row.value;
+          await tx.table(`kv`).put({ ...row, value: { ...rest, textDisplay } });
+        }
+      });
   }
 }
 

@@ -34,6 +34,10 @@ Validate at the boundary where the data actually comes from outside our control:
 
 Optional parameters are `gender?: NarratorGender`, not `gender: NarratorGender | null`. Use `null` only when an existing API forces it.
 
+## Never use window.confirm or window.alert
+
+Native browser dialogs are not allowed. They can't be styled, they break the app's visual language, and they're not testable or i18n-friendly. Build an in-app modal instead — the `ConfirmModal` component in `src/components/ConfirmModal.tsx` is the established pattern for confirmations. Same rule applies to `window.prompt`.
+
 ## Never write language-specific logic
 
 The app supports any language the user types in, not a fixed list. Don't hardcode behavior, regexes, or heuristics that only work for certain languages — no "if French, do X", no per-language string-match tables ("Forme de verbe" | "Verb form" | "Konjugierte Form"), no per-language fallback chains. Find a structural / language-agnostic signal instead (HTML structure, ISO codes, token length, etc.). If a language-agnostic solution genuinely doesn't exist, stop and ask before adding a partial one.

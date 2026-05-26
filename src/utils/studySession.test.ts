@@ -62,7 +62,7 @@ const settings: VocabSettings = {
   order: "random",
   generateAudio: true,
   autoplayAudio: false,
-  showText: true,
+  textDisplay: `show`,
   showUpcomingBeforeLearning: true,
   showDueBeforeRelearning: true,
   includeTranslationInContexts: false,

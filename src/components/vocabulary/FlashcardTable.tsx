@@ -14,6 +14,7 @@ import type { Flashcard, FlashcardStatusDerived } from "../../utils/flashcards";
 import { relativeTime } from "../../utils/relativeTime";
 import { SortableHeader, type SortDir } from "../SortableHeader";
 import { EditCardModal } from "./EditCardModal";
+import { ConfirmModal } from "../ConfirmModal";
 
 const STATUS_STYLES: Record<FlashcardStatusDerived, string> = {
   new: `bg-gray-100 text-gray-600`,
@@ -99,6 +100,7 @@ export function FlashcardTable({ cards, language }: Props) {
   const { t } = useTranslation();
   const [search, setSearch] = useState(``);
   const [editingCard, setEditingCard] = useState<Flashcard | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<Flashcard | null>(null);
   const [addingCard, setAddingCard] = useState(false);
   const [newSource, setNewSource] = useState(``);
   const [newTranslation, setNewTranslation] = useState(``);
@@ -455,9 +457,7 @@ export function FlashcardTable({ cards, language }: Props) {
                               <FaPen className="text-xs" />
                             </button>
                             <button
-                              onClick={() => {
-                                void removeFlashcard(language, c.source);
-                              }}
+                              onClick={() => setPendingDelete(c)}
                               className="text-gray-300 hover:text-red-400 transition cursor-pointer"
                               title={t(`Delete card`)}
                             >
@@ -474,6 +474,22 @@ export function FlashcardTable({ cards, language }: Props) {
           </div>
         </div>
       )}
+      <ConfirmModal
+        open={pendingDelete !== null}
+        title={t(`Delete card?`)}
+        body={
+          pendingDelete
+            ? t(`Permanently delete "{{source}}"?`, { source: pendingDelete.source })
+            : ``
+        }
+        confirmLabel={t(`Delete`)}
+        destructive
+        onCancel={() => setPendingDelete(null)}
+        onConfirm={() => {
+          if (pendingDelete) void removeFlashcard(language, pendingDelete.source);
+          setPendingDelete(null);
+        }}
+      />
     </>
   );
 }

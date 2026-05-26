@@ -22,6 +22,45 @@ import {
 
 type StudyMode = "learn" | "review";
 
+interface CardSourceProps {
+  source: string;
+  mode: "show" | "hide" | "cloze";
+  revealedFull: boolean;
+  onRevealText: () => void;
+}
+
+function CardSource({ source, mode, revealedFull, onRevealText }: CardSourceProps) {
+  const { t } = useTranslation();
+  const revealButton = (
+    <button
+      onClick={onRevealText}
+      className="text-sm text-gray-400 hover:text-gray-600 underline underline-offset-2 transition cursor-pointer"
+    >
+      {t(`Show text`)}
+    </button>
+  );
+  if (mode === `show` || revealedFull) {
+    return (
+      <p
+        className={`text-2xl text-gray-800 break-words leading-relaxed ${mode === `show` ? `` : `opacity-70`}`}
+      >
+        <BoldWord text={source} />
+      </p>
+    );
+  }
+  if (mode === `cloze`) {
+    return (
+      <>
+        <p className="text-2xl text-gray-800 break-words leading-relaxed">
+          <BoldWord text={source} cloze />
+        </p>
+        {revealButton}
+      </>
+    );
+  }
+  return revealButton;
+}
+
 export function StudyPage() {
   const location = useLocation();
   const { t } = useTranslation();
@@ -203,21 +242,12 @@ export function StudyPage() {
         {current === null && <StudyEmptyState mode={mode} learnSuggestsAddingCards />}
         {current !== null && ctx && (
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-10 space-y-6 text-center">
-            {(settings.showText || textRevealed || revealed) && (
-              <p
-                className={`text-2xl text-gray-800 break-words leading-relaxed ${settings.showText ? `` : `opacity-70`}`}
-              >
-                <BoldWord text={ctx.source} />
-              </p>
-            )}
-            {!settings.showText && !textRevealed && !revealed && (
-              <button
-                onClick={() => setTextRevealed(true)}
-                className="text-sm text-gray-400 hover:text-gray-600 underline underline-offset-2 transition cursor-pointer"
-              >
-                {t(`Show text`)}
-              </button>
-            )}
+            <CardSource
+              source={ctx.source}
+              mode={settings.textDisplay}
+              revealedFull={textRevealed || revealed}
+              onRevealText={() => setTextRevealed(true)}
+            />
             {audioUrl && (
               <div className="flex justify-center">
                 <AudioPlayer src={audioUrl} autoplay={settings.autoplayAudio} />

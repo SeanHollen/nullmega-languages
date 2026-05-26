@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLiveQuery } from "dexie-react-hooks";
+import { useTranslation } from "react-i18next";
 import { useLanguage } from "../contexts/LanguageContext";
 import { BackHeader } from "../components/BackHeader";
 import { useLoading } from "../contexts/LoadingContext";
@@ -38,6 +39,7 @@ export function GrammarPage() {
   const navigate = useNavigate();
   const { language } = useLanguage();
   const { beginLoading } = useLoading();
+  const { t } = useTranslation();
   const cards =
     useLiveQuery(
       async () => (await loadGrammarCards(language)).sort((a, b) => b.addedAt - a.addedAt),
@@ -56,7 +58,7 @@ export function GrammarPage() {
   async function handleLearn() {
     if (!settings) return;
     setLearnError(null);
-    const task = beginLoading(`Generating grammar cards…`);
+    const task = beginLoading(t(`Generating grammar cards…`));
     try {
       const data = await prepareGrammarLearnSession(language, settings);
       if (data) void navigate(`/grammar/learn`, { state: data });
@@ -68,7 +70,7 @@ export function GrammarPage() {
 
   async function handleReview() {
     setReviewError(null);
-    const task = beginLoading(`Preparing grammar review…`);
+    const task = beginLoading(t(`Preparing grammar review…`));
     try {
       const data = await prepareGrammarReviewSession(language);
       if (data) void navigate(`/grammar/review`, { state: data });
@@ -99,7 +101,7 @@ export function GrammarPage() {
   return (
     <div className="min-h-screen bg-green-100 py-10 px-4">
       <div className="max-w-4xl mx-auto">
-        <BackHeader title="Grammar Quizzes" to="/" />
+        <BackHeader title={t(`Grammar Quizzes`)} to="/" />
 
         <div className="flex flex-col items-center gap-3 mb-8">
           <div className="flex flex-col min-[420px]:flex-row justify-center gap-4">
@@ -109,9 +111,12 @@ export function GrammarPage() {
                 disabled={learnDisabled}
                 className="bg-white border-2 border-green-400 text-green-700 px-8 py-4 rounded-2xl font-bold text-base hover:bg-green-50 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition text-center min-w-48"
               >
-                <div>{`Learn new cards →`}</div>
+                <div>{t(`Learn new cards →`)}</div>
                 <div className="text-sm font-normal text-green-600 mt-1">
-                  {`generate: ${canGenerate} · learning: ${learningCount}`}
+                  {t(`generate: {{generate}} · learning: {{learning}}`, {
+                    generate: canGenerate,
+                    learning: learningCount,
+                  })}
                 </div>
               </button>
               {learnError && <p className="text-xs text-red-500">{learnError}</p>}
@@ -123,9 +128,12 @@ export function GrammarPage() {
                 disabled={dueCount === 0 && relearningCount === 0}
                 className="bg-white border-2 border-green-400 text-green-700 px-8 py-4 rounded-2xl font-bold text-base hover:bg-green-50 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition text-center min-w-48"
               >
-                <div>{`Review cards →`}</div>
+                <div>{t(`Review cards →`)}</div>
                 <div className="text-sm font-normal text-green-600 mt-1">
-                  {`due: ${dueCount} · relearning: ${relearningCount}`}
+                  {t(`due: {{due}} · relearning: {{relearning}}`, {
+                    due: dueCount,
+                    relearning: relearningCount,
+                  })}
                 </div>
               </button>
               {reviewError && <p className="text-xs text-red-500">{reviewError}</p>}
@@ -138,10 +146,12 @@ export function GrammarPage() {
         <div className="mb-6">
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
             <div className="px-6 pt-4 pb-1 text-center">
-              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">{`Settings`}</p>
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">
+                {t(`Settings`)}
+              </p>
             </div>
             <div className="px-6 py-3 flex items-center justify-center gap-3 text-sm">
-              <span className="text-gray-600">{`New cards per day`}</span>
+              <span className="text-gray-600">{t(`New cards per day`)}</span>
               <input
                 type="number"
                 min={NEW_CARDS_PER_DAY_MIN}
@@ -156,7 +166,7 @@ export function GrammarPage() {
               />
             </div>
             <div className="px-6 py-3 flex flex-col items-center gap-1 text-sm">
-              <span className="text-gray-600">{`Level`}</span>
+              <span className="text-gray-600">{t(`Level`)}</span>
               <input
                 type="range"
                 min={GRAMMAR_LEVEL_MIN}
@@ -168,7 +178,12 @@ export function GrammarPage() {
                 className="w-48 accent-green-500 cursor-pointer"
               />
               <span className="text-xs text-gray-400">
-                {settings ? `${settings.level} — ${LEVEL_LABELS[settings.level]}` : `—`}
+                {settings
+                  ? t(`{{level}} — {{label}}`, {
+                      level: settings.level,
+                      label: t(LEVEL_LABELS[settings.level]),
+                    })
+                  : `—`}
               </span>
             </div>
           </div>

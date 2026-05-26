@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import type { RatingResult } from "../hooks/useAbility";
 
 const OUTCOME_STYLE = {
@@ -26,17 +27,18 @@ export function ResultsScoreCard({
   language,
   ratingLabelSuffix = ``,
 }: Props) {
+  const { t } = useTranslation();
   const outcome = ratingResult ? OUTCOME_STYLE[ratingResult.outcome] : null;
   // Pre-extraction wording (preserved exactly):
   //   suffix=""           → placement "${lang} initial rating:" / normal "${lang} rating:"
   //   suffix="writing"    → placement "${lang} writing rating:"  / normal "${lang} writing:"
   //   suffix="pronunciation" → placement "${lang} pronunciation rating:" / normal "${lang} pronunciation:"
   const placementLabel = ratingLabelSuffix
-    ? `${language} ${ratingLabelSuffix} rating:`
-    : `${language} initial rating:`;
+    ? t(`{{language}} {{suffix}} rating:`, { language, suffix: ratingLabelSuffix })
+    : t(`{{language}} initial rating:`, { language });
   const normalLabel = ratingLabelSuffix
-    ? `${language} ${ratingLabelSuffix}:`
-    : `${language} rating:`;
+    ? t(`{{language}} {{suffix}}:`, { language, suffix: ratingLabelSuffix })
+    : t(`{{language}} rating:`, { language });
 
   return (
     <div
@@ -45,7 +47,7 @@ export function ResultsScoreCard({
       {title && <h2 className="text-lg font-semibold text-gray-700 mb-2">{title}</h2>}
       {outcome && (
         <p className={`text-sm font-semibold uppercase tracking-widest mb-2 ${outcome.color}`}>
-          {outcome.label}
+          {t(outcome.label)}
         </p>
       )}
       <p className="text-5xl font-bold text-gray-800 mb-3">{scoreText}</p>
@@ -70,7 +72,7 @@ export function ResultsScoreCard({
           </div>
         )
       ) : (
-        <p className="text-sm text-gray-400">{`Unrated exercise`}</p>
+        <p className="text-sm text-gray-400">{t(`Unrated exercise`)}</p>
       )}
     </div>
   );

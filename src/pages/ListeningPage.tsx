@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useLiveQuery } from "dexie-react-hooks";
+import { useTranslation } from "react-i18next";
 import { BackHeader } from "../components/BackHeader";
 import { SetupView } from "../components/reading/SetupView";
 import { ListeningPassageView } from "../components/listening/ListeningPassageView";
@@ -30,6 +31,7 @@ export function ListeningPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { language } = useLanguage();
+  const { t } = useTranslation();
   const resume =
     (location.state as ResumeState | null)?.record?.mode === `listening`
       ? (location.state as ResumeState)
@@ -91,7 +93,7 @@ export function ListeningPage() {
 
   function handleGenerate() {
     setAudioError(``);
-    const task = beginLoading(`Generating passage…`);
+    const task = beginLoading(t(`Generating passage…`));
     mutate(
       { language, languageComplexity: sliderComplexity, length, mode: `listening` },
       {
@@ -117,7 +119,7 @@ export function ListeningPage() {
             setAssessmentId(id);
             setExercise(data);
             setSelected(initialSelected);
-            task.update(`Generating audio…`);
+            task.update(t(`Generating audio…`));
             try {
               const exerciseAudio = await generateExerciseAudio(data, {
                 passage: audioKeyPassage,
@@ -134,7 +136,7 @@ export function ListeningPage() {
               });
               setPhase(`listening`);
             } catch {
-              setAudioError(`Failed to generate audio. Please try again.`);
+              setAudioError(t(`Failed to generate audio. Please try again.`));
             }
             task.done();
           })();
@@ -219,7 +221,7 @@ export function ListeningPage() {
   return (
     <div className="min-h-screen bg-green-100 py-10 px-4">
       <div className="max-w-2xl mx-auto">
-        <BackHeader title="Listening Comprehension" to="/" />
+        <BackHeader title={t(`Listening Comprehension`)} to="/" />
 
         {phase === `setup` && (
           <>
@@ -229,7 +231,7 @@ export function ListeningPage() {
               rated={rated}
               savedRating={savedRating}
               error={error}
-              generateLabel={`Generate Listening Exercise`}
+              generateLabel={t(`Generate Listening Exercise`)}
               length={length}
               onLengthChange={setLength}
               onLanguageComplexityChange={setComplexityOverride}

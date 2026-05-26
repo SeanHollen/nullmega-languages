@@ -1,4 +1,5 @@
 import type { ReactElement } from "react";
+import { useTranslation } from "react-i18next";
 import { FaCheck, FaTimes, FaMinus } from "react-icons/fa";
 import type { PronunciationPhrase } from "../../hooks/useGeneratePronunciation";
 import type { RatingResult } from "../../hooks/useAbility";
@@ -48,6 +49,7 @@ export function PronunciationResultsView({
   onGoAgain,
   onHome,
 }: Props) {
+  const { t } = useTranslation();
   const goodCount = ratings.filter((r) => r === "good").length;
   const mediumCount = ratings.filter((r) => r === "medium").length;
   const badCount = ratings.filter((r) => r === "bad").length;
@@ -59,10 +61,14 @@ export function PronunciationResultsView({
       <ResultsScoreCard
         title={title}
         scoreText={`${formatScore(weighted)}/${total}`}
-        subtext={`${goodCount} easy · ${mediumCount} medium · ${badCount} hard`}
+        subtext={t(`{{good}} easy · {{medium}} medium · {{bad}} hard`, {
+          good: goodCount,
+          medium: mediumCount,
+          bad: badCount,
+        })}
         ratingResult={ratingResult}
         language={language}
-        ratingLabelSuffix="pronunciation"
+        ratingLabelSuffix={t(`pronunciation`)}
       />
 
       <div className="space-y-3">
@@ -74,7 +80,9 @@ export function PronunciationResultsView({
           return (
             <div key={i} className={`bg-white rounded-2xl border shadow-sm p-5 ${border}`}>
               <div className="flex items-center gap-3 mb-2">
-                <span className="text-xs text-gray-400 font-medium">{`Phrase ${i + 1}`}</span>
+                <span className="text-xs text-gray-400 font-medium">
+                  {t(`Phrase {{n}}`, { n: i + 1 })}
+                </span>
                 {audioUrl && <AudioPlayer src={audioUrl} small />}
                 <span className="ml-auto">{icon}</span>
               </div>
@@ -94,13 +102,13 @@ export function PronunciationResultsView({
           onClick={onGoAgain}
           className="flex-1 bg-green-600 text-white py-3 rounded-xl font-semibold hover:bg-green-700 transition cursor-pointer"
         >
-          {`Go Again`}
+          {t(`Go Again`)}
         </button>
         <button
           onClick={onHome}
           className="flex-1 bg-white border border-gray-200 text-gray-600 py-3 rounded-xl font-semibold hover:bg-gray-50 hover:border-gray-300 transition cursor-pointer"
         >
-          {`Home`}
+          {t(`Home`)}
         </button>
       </div>
     </div>

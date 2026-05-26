@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { useTranslation } from "react-i18next";
 import * as Select from "@radix-ui/react-select";
 import { FaCheck, FaChevronDown, FaPen } from "react-icons/fa";
 
@@ -36,6 +37,7 @@ function Item({
 }
 
 export function LanguageSelect({ value, languages, onChange }: Props) {
+  const { t } = useTranslation();
   return (
     <Select.Root value={value} onValueChange={onChange}>
       <Select.Trigger className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/20 text-white text-sm font-medium border border-white/30 focus:outline-none focus:ring-2 focus:ring-white/50 cursor-pointer hover:bg-white/30 transition">
@@ -54,7 +56,7 @@ export function LanguageSelect({ value, languages, onChange }: Props) {
           <Select.Viewport>
             <Item
               value="__other__"
-              label="Write it"
+              label={t(`Write it`)}
               icon={<FaPen className="text-xs text-gray-400" />}
             />
             <Select.Separator className="my-1 h-px bg-gray-300" />

@@ -1,6 +1,8 @@
+import { useTranslation } from "react-i18next";
 import { useLoading } from "../contexts/LoadingContext";
 
 export function LoadingOverlay() {
+  const { t } = useTranslation();
   const { isLoading, messages } = useLoading();
   if (!isLoading) return null;
 
@@ -9,7 +11,7 @@ export function LoadingOverlay() {
       className="fixed inset-0 z-50 bg-black/10 flex items-center justify-center"
       role="status"
       aria-live="polite"
-      aria-label="Loading"
+      aria-label={t(`Loading`)}
     >
       <style>{`
         @keyframes bigBounce {

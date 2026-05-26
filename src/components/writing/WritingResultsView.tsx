@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import type { WritingExercise } from "../../hooks/useGenerateWriting";
 import type { WritingGrade } from "../../hooks/useGradeWriting";
 import type { RatingResult } from "../../hooks/useAbility";
@@ -34,6 +35,7 @@ export function WritingResultsView({
   onGoAgain,
   onHome,
 }: Props) {
+  const { t } = useTranslation();
   const total = grades.reduce((sum, g) => sum + g.score, 0);
   const maxTotal = grades.length * 5;
 
@@ -44,12 +46,12 @@ export function WritingResultsView({
         scoreText={`${total}/${maxTotal}`}
         ratingResult={ratingResult}
         language={language}
-        ratingLabelSuffix="writing"
+        ratingLabelSuffix={t(`writing`)}
       />
 
       {exercise.mode === `vocab-paragraph` ? (
         <div className="bg-white rounded-2xl border border-green-100 shadow-sm p-8 space-y-2">
-          <p className="text-xs text-gray-400 uppercase tracking-wide">{`Required words`}</p>
+          <p className="text-xs text-gray-400 uppercase tracking-wide">{t(`Required words`)}</p>
           <ul className="flex flex-wrap gap-x-4 gap-y-1 text-sm">
             {(exercise.requiredWords ?? []).map((w, i) => (
               <li key={i} className="text-gray-700">
@@ -61,13 +63,15 @@ export function WritingResultsView({
         </div>
       ) : (
         <div className="bg-white rounded-2xl border border-green-100 shadow-sm p-8 space-y-4">
-          <p className="text-xs text-gray-400 uppercase tracking-wide">{`Passage`}</p>
+          <p className="text-xs text-gray-400 uppercase tracking-wide">{t(`Passage`)}</p>
           <p className="text-gray-800 leading-relaxed whitespace-pre-wrap">
             <ClickableText text={exercise.passage} language={language} />
           </p>
           {exercise.translation && (
             <div className="border-t border-green-100 pt-4">
-              <p className="text-xs text-gray-400 uppercase tracking-wide mb-2">{`English Translation`}</p>
+              <p className="text-xs text-gray-400 uppercase tracking-wide mb-2">
+                {t(`English Translation`)}
+              </p>
               <p className="text-gray-500 leading-relaxed italic text-sm whitespace-pre-wrap">
                 {exercise.translation}
               </p>
@@ -75,13 +79,17 @@ export function WritingResultsView({
           )}
           {exercise.insight && (
             <div className="border-t border-green-100 pt-4">
-              <p className="text-xs text-gray-400 uppercase tracking-wide mb-2">{`Language Note`}</p>
+              <p className="text-xs text-gray-400 uppercase tracking-wide mb-2">
+                {t(`Language Note`)}
+              </p>
               <p className="text-gray-600 text-sm leading-relaxed">{exercise.insight}</p>
             </div>
           )}
           {exercise.difficultWords.length > 0 && (
             <div className="border-t border-green-100 pt-4">
-              <p className="text-xs text-gray-400 uppercase tracking-wide mb-2">{`Vocabulary`}</p>
+              <p className="text-xs text-gray-400 uppercase tracking-wide mb-2">
+                {t(`Vocabulary`)}
+              </p>
               <div className="flex flex-wrap gap-x-4 gap-y-1">
                 {exercise.difficultWords.map((w, i) => (
                   <span key={i} className="text-sm text-gray-500">
@@ -100,7 +108,7 @@ export function WritingResultsView({
         <div className="bg-white rounded-2xl border border-green-100 shadow-sm p-6 space-y-3">
           <div className="flex items-start justify-between gap-4">
             <p className="font-medium text-gray-800">
-              {exercise.mode === `vocab-paragraph` ? `Your paragraph` : `Your summary`}
+              {exercise.mode === `vocab-paragraph` ? t(`Your paragraph`) : t(`Your summary`)}
             </p>
             {grades[0] && (
               <span className={`text-lg font-bold shrink-0 ${scoreColor(grades[0].score)}`}>
@@ -151,7 +159,10 @@ export function WritingResultsView({
 
       {exercise.summary && (
         <p className="text-sm text-gray-500 leading-relaxed italic">
-          <span className="text-xs text-gray-400 uppercase tracking-wide not-italic">{`Summary — `}</span>
+          <span className="text-xs text-gray-400 uppercase tracking-wide not-italic">
+            {t(`Summary —`)}
+            {` `}
+          </span>
           {exercise.summary}
         </p>
       )}
@@ -161,13 +172,13 @@ export function WritingResultsView({
           onClick={onGoAgain}
           className="flex-1 bg-green-600 text-white py-3 rounded-xl font-semibold hover:bg-green-700 transition cursor-pointer"
         >
-          {`Go Again`}
+          {t(`Go Again`)}
         </button>
         <button
           onClick={onHome}
           className="flex-1 bg-white border border-gray-200 text-gray-600 py-3 rounded-xl font-semibold hover:bg-gray-50 hover:border-gray-300 transition cursor-pointer"
         >
-          {`Home`}
+          {t(`Home`)}
         </button>
       </div>
     </div>

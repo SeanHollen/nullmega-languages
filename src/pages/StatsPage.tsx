@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useLiveQuery } from "dexie-react-hooks";
+import { useTranslation } from "react-i18next";
 import { FaArrowLeft } from "react-icons/fa";
 import { BackHeader } from "../components/BackHeader";
 import type { Mode } from "../hooks/useAbility";
@@ -80,6 +81,7 @@ function renderTooltip(ax: number, ay: number, lines: string[]) {
 export function StatsPage() {
   const navigate = useNavigate();
   const { language } = useLanguage();
+  const { t } = useTranslation();
   const { mode: modeParam } = useParams<{ mode: string }>();
   const [hoveredRating, setHoveredRating] = useState<number | null>(null);
   const [hoveredDay, setHoveredDay] = useState<number | null>(null);
@@ -104,9 +106,9 @@ export function StatsPage() {
             className="text-gray-400 hover:text-gray-600 transition cursor-pointer mb-6 flex items-center gap-2"
           >
             <FaArrowLeft />
-            <span>{`Home`}</span>
+            <span>{t(`Home`)}</span>
           </button>
-          <p className="text-gray-500">{`Unknown mode.`}</p>
+          <p className="text-gray-500">{t(`Unknown mode.`)}</p>
         </div>
       </div>
     );
@@ -129,7 +131,7 @@ export function StatsPage() {
     dailyMap.set(day, { points: prev.points + pointsForRecord(r), count: prev.count + 1 });
   }
   const dailyPoints: DailyPoint[] = [...dailyMap.entries()]
-    .map(([t, agg]) => ({ t, points: agg.points, count: agg.count }))
+    .map(([ts, agg]) => ({ t: ts, points: agg.points, count: agg.count }))
     .sort((a, b) => a.t - b.t);
   const hasDailyData = dailyPoints.length > 0;
   const totalPoints = dailyPoints.reduce((sum, d) => sum + d.points, 0);
@@ -155,9 +157,9 @@ export function StatsPage() {
   const innerW = WIDTH - PAD_L - PAD_R;
   const innerH = HEIGHT - PAD_T - PAD_B;
 
-  function x(t: number): number {
+  function x(ts: number): number {
     if (tSpan === 0) return PAD_L + innerW / 2;
-    return PAD_L + ((t - tMin) / tSpan) * innerW;
+    return PAD_L + ((ts - tMin) / tSpan) * innerW;
   }
 
   function y(rating: number): number {
@@ -166,8 +168,8 @@ export function StatsPage() {
 
   const dayWidth = innerW / totalDaySlots;
 
-  function xDay(t: number): number {
-    const dayIndex = Math.round((t - dayTMin) / DAY_MS);
+  function xDay(ts: number): number {
+    const dayIndex = Math.round((ts - dayTMin) / DAY_MS);
     return PAD_L + dayIndex * dayWidth + dayWidth / 2;
   }
 
@@ -186,19 +188,22 @@ export function StatsPage() {
   return (
     <div className="min-h-screen bg-green-100 py-10 px-4">
       <div className="max-w-3xl mx-auto">
-        <BackHeader title={`${label} Stats`} to={`/${mode}`} />
+        <BackHeader title={t(`{{label}} Stats`, { label: t(label) })} to={`/${mode}`} />
 
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-4">
           <div className="flex items-baseline justify-between gap-4 flex-wrap">
-            <p className="text-sm text-gray-500">{`Rating over time — ${language}`}</p>
+            <p className="text-sm text-gray-500">
+              {t(`Rating over time — {{language}}`, { language })}
+            </p>
             {hasData && (
               <div className="text-sm">
-                <span className="text-gray-500">{`Latest: `}</span>
+                <span className="text-gray-500">{t(`Latest:`)} </span>
                 <span className="font-semibold text-gray-800">{latest}</span>
                 {first !== latest && (
                   <span className={`ml-2 text-xs font-medium ${deltaColor(delta)}`}>
                     {delta > 0 ? `+${delta.toFixed(1)}` : delta.toFixed(1)}
-                    {` overall`}
+                    {` `}
+                    {t(`overall`)}
                   </span>
                 )}
               </div>
@@ -210,7 +215,7 @@ export function StatsPage() {
               viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
               className="w-full"
               role="img"
-              aria-label={`${label} rating chart`}
+              aria-label={t(`{{label}} rating chart`, { label: t(label) })}
             >
               {yTicks.map((tick) => (
                 <g key={tick}>
@@ -286,29 +291,36 @@ export function StatsPage() {
               {hoveredRating !== null &&
                 renderTooltip(x(points[hoveredRating].t), y(points[hoveredRating].rating), [
                   `${shortDate(points[hoveredRating].t)}`,
-                  `Rating ${points[hoveredRating].rating}`,
-                  points[hoveredRating].title || `Untitled`,
+                  t(`Rating {{rating}}`, { rating: points[hoveredRating].rating }),
+                  points[hoveredRating].title || t(`Untitled`),
                 ])}
             </svg>
           ) : (
             <p className="text-sm text-gray-400 italic py-8 text-center">
-              {`No rated ${label.toLowerCase()} exercises yet for ${language}.`}
+              {t(`No rated {{label}} exercises yet for {{language}}.`, {
+                label: t(label).toLowerCase(),
+                language,
+              })}
             </p>
           )}
 
           {hasData && (
             <p className="text-xs text-gray-400 pt-2 border-t border-gray-50">
-              {`${points.length} rated exercise${points.length === 1 ? `` : `s`}`}
+              {points.length === 1
+                ? t(`{{count}} rated exercise`, { count: points.length })
+                : t(`{{count}} rated exercises`, { count: points.length })}
             </p>
           )}
         </div>
 
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-4 mt-6">
           <div className="flex items-baseline justify-between gap-4 flex-wrap">
-            <p className="text-sm text-gray-500">{`Points per day — ${language}`}</p>
+            <p className="text-sm text-gray-500">
+              {t(`Points per day — {{language}}`, { language })}
+            </p>
             {hasDailyData && (
               <div className="text-sm">
-                <span className="text-gray-500">{`Total: `}</span>
+                <span className="text-gray-500">{t(`Total:`)} </span>
                 <span className="font-semibold text-gray-800">{totalPoints.toFixed(0)}</span>
               </div>
             )}
@@ -319,7 +331,7 @@ export function StatsPage() {
               viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
               className="w-full"
               role="img"
-              aria-label={`${label} points-per-day chart`}
+              aria-label={t(`{{label}} points-per-day chart`, { label: t(label) })}
             >
               {pTicks.map((tick) => (
                 <g key={tick}>
@@ -400,20 +412,27 @@ export function StatsPage() {
                   yPoints(dailyPoints[hoveredDay].points),
                   [
                     `${shortDate(dailyPoints[hoveredDay].t)}`,
-                    `${dailyPoints[hoveredDay].points.toFixed(0)} pts`,
-                    `${dailyPoints[hoveredDay].count} exercise${dailyPoints[hoveredDay].count === 1 ? `` : `s`}`,
+                    t(`{{points}} pts`, { points: dailyPoints[hoveredDay].points.toFixed(0) }),
+                    dailyPoints[hoveredDay].count === 1
+                      ? t(`{{count}} exercise`, { count: dailyPoints[hoveredDay].count })
+                      : t(`{{count}} exercises`, { count: dailyPoints[hoveredDay].count }),
                   ],
                 )}
             </svg>
           ) : (
             <p className="text-sm text-gray-400 italic py-8 text-center">
-              {`No ${label.toLowerCase()} exercises yet for ${language}.`}
+              {t(`No {{label}} exercises yet for {{language}}.`, {
+                label: t(label).toLowerCase(),
+                language,
+              })}
             </p>
           )}
 
           {hasDailyData && (
             <p className="text-xs text-gray-400 pt-2 border-t border-gray-50">
-              {`${dailyPoints.length} day${dailyPoints.length === 1 ? `` : `s`} of activity`}
+              {dailyPoints.length === 1
+                ? t(`{{count}} day of activity`, { count: dailyPoints.length })
+                : t(`{{count}} days of activity`, { count: dailyPoints.length })}
             </p>
           )}
         </div>

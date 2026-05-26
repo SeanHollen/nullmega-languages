@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLiveQuery } from "dexie-react-hooks";
+import { useTranslation } from "react-i18next";
 import { useLanguage } from "../contexts/LanguageContext";
 import { addCustomLanguage, LANGUAGES, setStoredLanguage } from "../utils/language";
 import {
@@ -30,6 +31,7 @@ const STAGE_TITLES: Record<Stage, string> = {
 export function OnboardingPage() {
   const navigate = useNavigate();
   const { setLanguage } = useLanguage();
+  const { t } = useTranslation();
   const [stage, setStage] = useState<Stage>(`language`);
   const [language, setLocalLanguage] = useState<string | null>(null);
   const [complexity, setComplexity] = useState<number>(50);
@@ -107,7 +109,7 @@ export function OnboardingPage() {
     <div className="min-h-screen bg-green-100 py-10 px-4">
       <div className="max-w-2xl mx-auto">
         <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold text-gray-900">{STAGE_TITLES[stage]}</h1>
+          <h1 className="text-2xl font-bold text-gray-900">{t(STAGE_TITLES[stage])}</h1>
           <StageDots stage={stage} />
         </div>
 
@@ -143,7 +145,7 @@ export function OnboardingPage() {
                 }}
                 className="text-sm text-gray-500 px-4 py-2 rounded-xl border border-gray-200 hover:border-gray-300 cursor-pointer transition"
               >
-                {`Back`}
+                {t(`Back`)}
               </button>
             ) : (
               <span />
@@ -154,7 +156,7 @@ export function OnboardingPage() {
                 disabled={!byokKey?.startsWith(`sk-`)}
                 className="text-sm bg-green-600 text-white px-6 py-2 rounded-xl font-semibold hover:bg-green-700 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition"
               >
-                {`Finish`}
+                {t(`Finish`)}
               </button>
             )}
             {stage !== `auth` && (
@@ -163,7 +165,7 @@ export function OnboardingPage() {
                 disabled={!canAdvance}
                 className="text-sm bg-green-600 text-white px-6 py-2 rounded-xl font-semibold hover:bg-green-700 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition"
               >
-                {`Next`}
+                {t(`Next`)}
               </button>
             )}
           </div>

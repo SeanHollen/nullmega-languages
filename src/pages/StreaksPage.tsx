@@ -1,4 +1,6 @@
 import { useLiveQuery } from "dexie-react-hooks";
+import { useTranslation } from "react-i18next";
+import type { TFunction } from "i18next";
 import { BackHeader } from "../components/BackHeader";
 import { loadStreaks, computeCurrentStreak, dateStr, type StreakRecord } from "../utils/streaks";
 import { loadListeningSeconds, formatListeningDuration } from "../utils/listeningStats";
@@ -36,17 +38,19 @@ function cellColor(cell: Cell): string {
   return `bg-gray-300`;
 }
 
-function cellTitle(cell: Cell): string {
+function cellTitle(cell: Cell, t: TFunction): string {
   const d = cell.date.toLocaleDateString();
   if (cell.isFuture) return d;
-  if (!cell.record) return `${d} — not visited`;
-  if (cell.record.complete && cell.record.hadObligations) return `${d} — all goals met`;
-  if (cell.record.complete) return `${d} — no goals set`;
-  return `${d} — incomplete`;
+  if (!cell.record) return t(`{{date}} — not visited`, { date: d });
+  if (cell.record.complete && cell.record.hadObligations)
+    return t(`{{date}} — all goals met`, { date: d });
+  if (cell.record.complete) return t(`{{date}} — no goals set`, { date: d });
+  return t(`{{date}} — incomplete`, { date: d });
 }
 
 export function StreaksPage() {
   const { language } = useLanguage();
+  const { t } = useTranslation();
   const records = useLiveQuery(() => loadStreaks(language), [language]) ?? [];
   const byDate = new Map(records.map((r) => [r.date, r]));
   const currentStreak = computeCurrentStreak(records);
@@ -96,28 +100,30 @@ export function StreaksPage() {
   return (
     <div className="min-h-screen bg-green-100 py-10 px-4">
       <div className="max-w-2xl mx-auto">
-        <BackHeader title="Streaks" to="/" />
+        <BackHeader title={t(`Streaks`)} to="/" />
 
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-6">
           <div className="grid grid-cols-3 gap-4">
             <div>
-              <p className="text-xs text-gray-400 uppercase tracking-wide">{`Current streak`}</p>
+              <p className="text-xs text-gray-400 uppercase tracking-wide">{t(`Current streak`)}</p>
               <p className="text-3xl font-bold text-green-600">{currentStreak}</p>
-              <p className="text-xs text-gray-400 mt-0.5">{currentStreak === 1 ? `day` : `days`}</p>
-            </div>
-            <div>
-              <p className="text-xs text-gray-400 uppercase tracking-wide">{`Green days`}</p>
-              <p className="text-3xl font-bold text-gray-800">{greenDays}</p>
               <p className="text-xs text-gray-400 mt-0.5">
-                {total > 0 ? `of ${total} tracked` : `no days tracked yet`}
+                {currentStreak === 1 ? t(`day`) : t(`days`)}
               </p>
             </div>
             <div>
-              <p className="text-xs text-gray-400 uppercase tracking-wide">{`Time listening`}</p>
+              <p className="text-xs text-gray-400 uppercase tracking-wide">{t(`Green days`)}</p>
+              <p className="text-3xl font-bold text-gray-800">{greenDays}</p>
+              <p className="text-xs text-gray-400 mt-0.5">
+                {total > 0 ? t(`of {{total}} tracked`, { total }) : t(`no days tracked yet`)}
+              </p>
+            </div>
+            <div>
+              <p className="text-xs text-gray-400 uppercase tracking-wide">{t(`Time listening`)}</p>
               <p className="text-3xl font-bold text-gray-800">
                 {formatListeningDuration(listeningSeconds)}
               </p>
-              <p className="text-xs text-gray-400 mt-0.5">{`total`}</p>
+              <p className="text-xs text-gray-400 mt-0.5">{t(`total`)}</p>
             </div>
           </div>
 
@@ -128,7 +134,7 @@ export function StreaksPage() {
                   const label = monthLabels.find((m) => m.col === w);
                   return (
                     <div key={w} className="w-3 text-[10px] text-gray-400">
-                      {label?.label ?? ``}
+                      {label?.label ? t(label.label) : ``}
                     </div>
                   );
                 })}
@@ -141,7 +147,7 @@ export function StreaksPage() {
                       className="h-3 flex items-center"
                       style={{ visibility: i % 2 === 1 ? `visible` : `hidden` }}
                     >
-                      {d}
+                      {t(d)}
                     </div>
                   ))}
                 </div>
@@ -150,7 +156,7 @@ export function StreaksPage() {
                     {col.map((cell) => (
                       <div
                         key={cell.key}
-                        title={cellTitle(cell)}
+                        title={cellTitle(cell, t)}
                         className={`w-3 h-3 rounded-sm ${cellColor(cell)}`}
                       />
                     ))}
@@ -163,19 +169,19 @@ export function StreaksPage() {
           <div className="flex items-center gap-4 text-xs text-gray-500 flex-wrap">
             <span className="flex items-center gap-1.5">
               <span className="w-3 h-3 rounded-sm bg-green-500" />
-              {`All goals met`}
+              {t(`All goals met`)}
             </span>
             <span className="flex items-center gap-1.5">
               <span className="w-3 h-3 rounded-sm bg-green-200" />
-              {`Visited (no goals)`}
+              {t(`Visited (no goals)`)}
             </span>
             <span className="flex items-center gap-1.5">
               <span className="w-3 h-3 rounded-sm bg-gray-300" />
-              {`Visited, incomplete`}
+              {t(`Visited, incomplete`)}
             </span>
             <span className="flex items-center gap-1.5">
               <span className="w-3 h-3 rounded-sm bg-gray-200" />
-              {`Not visited`}
+              {t(`Not visited`)}
             </span>
           </div>
         </div>

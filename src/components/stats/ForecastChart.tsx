@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { DAY } from "../../utils/studySession";
 import type { SrsCardWithStatus } from "./SrsStatsView";
 import { forecastDueDays } from "../../utils/srsForecast";
@@ -24,6 +25,7 @@ interface Props {
 }
 
 export function ForecastChart({ cards }: Props) {
+  const { t } = useTranslation();
   const [now] = useState(() => Date.now());
   const [hovered, setHovered] = useState<number | null>(null);
 
@@ -56,11 +58,11 @@ export function ForecastChart({ cards }: Props) {
 
   return (
     <ChartCard
-      title={`Future review forecast (${HORIZON_DAYS} days)`}
+      title={t(`Future review forecast ({{days}} days)`, { days: HORIZON_DAYS })}
       right={
         totalDueInWindow > 0 ? (
           <div className="text-sm">
-            <span className="text-gray-500">{`Reviews due: `}</span>
+            <span className="text-gray-500">{t(`Reviews due:`)} </span>
             <span className="font-semibold text-gray-800">{totalDueInWindow}</span>
           </div>
         ) : null
@@ -68,14 +70,14 @@ export function ForecastChart({ cards }: Props) {
     >
       {totalDueInWindow === 0 ? (
         <p className="text-sm text-gray-400 italic py-8 text-center">
-          {`No reviews scheduled in the next ${HORIZON_DAYS} days.`}
+          {t(`No reviews scheduled in the next {{days}} days.`, { days: HORIZON_DAYS })}
         </p>
       ) : (
         <svg
           viewBox={`0 0 ${CHART_WIDTH} ${CHART_HEIGHT}`}
           className="w-full"
           role="img"
-          aria-label="Future review forecast"
+          aria-label={t(`Future review forecast`)}
         >
           <ChartFrame ticks={ticks} toY={toY} />
           {forecastDays.map((d, i) => {
@@ -141,7 +143,9 @@ export function ForecastChart({ cards }: Props) {
           {hovered !== null &&
             renderTooltip(barX(hovered), toY(forecastDays[hovered].count), [
               shortDate(forecastDays[hovered].t),
-              `${forecastDays[hovered].count} card${forecastDays[hovered].count === 1 ? `` : `s`} due`,
+              forecastDays[hovered].count === 1
+                ? t(`{{count}} card due`, { count: forecastDays[hovered].count })
+                : t(`{{count}} cards due`, { count: forecastDays[hovered].count }),
             ])}
         </svg>
       )}

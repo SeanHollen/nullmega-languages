@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 interface Props {
   value: string;
@@ -6,24 +7,27 @@ interface Props {
 }
 
 export function TextGenKeySection({ value, onChange }: Props) {
+  const { t } = useTranslation();
   const [showKey, setShowKey] = useState(false);
   const [touched, setTouched] = useState(false);
 
   return (
     <section>
-      <h2 className="text-lg font-semibold text-gray-800 mb-1">{`Text Generation`}</h2>
+      <h2 className="text-lg font-semibold text-gray-800 mb-1">{t(`Text Generation`)}</h2>
       <p className="text-sm text-gray-400 mb-4">
-        {`Enter your OpenAI API key to call the model directly (BYOK). Leave blank to route through the backend.`}
+        {t(
+          `Enter your OpenAI API key to call the model directly (BYOK). Leave blank to route through the backend.`,
+        )}
       </p>
       <div className="space-y-3">
         <div>
-          <label className="block text-sm font-medium text-gray-600 mb-1">{`Provider`}</label>
+          <label className="block text-sm font-medium text-gray-600 mb-1">{t(`Provider`)}</label>
           <select className="w-full border border-gray-200 rounded-xl px-3 py-2 text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-green-500 cursor-pointer">
-            <option>{`OpenAI`}</option>
+            <option>{t(`OpenAI`)}</option>
           </select>
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-600 mb-1">{`API Key`}</label>
+          <label className="block text-sm font-medium text-gray-600 mb-1">{t(`API Key`)}</label>
           <input
             type={showKey ? `text` : `password`}
             value={value}
@@ -43,7 +47,7 @@ export function TextGenKeySection({ value, onChange }: Props) {
                 onChange={(e) => setShowKey(e.target.checked)}
                 className="accent-green-500 cursor-pointer"
               />
-              <span className="text-xs text-gray-500">{`Show key`}</span>
+              <span className="text-xs text-gray-500">{t(`Show key`)}</span>
             </label>
             {value && (
               <button
@@ -54,12 +58,12 @@ export function TextGenKeySection({ value, onChange }: Props) {
                 }}
                 className="text-xs text-gray-500 hover:text-gray-700 cursor-pointer"
               >
-                {`Clear`}
+                {t(`Clear`)}
               </button>
             )}
           </div>
           {touched && value && !value.startsWith(`sk-`) && (
-            <p className="text-xs text-red-500 mt-1">{`Key should start with "sk-"`}</p>
+            <p className="text-xs text-red-500 mt-1">{t(`Key should start with "sk-"`)}</p>
           )}
         </div>
       </div>

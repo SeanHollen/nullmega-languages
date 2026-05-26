@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import type { GrammarCard } from "../../utils/grammarCards";
 import { computeGrammarStatus } from "../../utils/grammarCards";
 
@@ -13,6 +14,7 @@ interface Props {
 }
 
 export function ActiveCardsList({ cards, onPlay }: Props) {
+  const { t } = useTranslation();
   if (cards.length === 0) return null;
 
   return (
@@ -43,7 +45,7 @@ export function ActiveCardsList({ cards, onPlay }: Props) {
               <span
                 className={`text-xs font-medium px-2 py-0.5 rounded-full flex-shrink-0 ${statusColor}`}
               >
-                {status}
+                {t(status)}
               </span>
             </button>
           );

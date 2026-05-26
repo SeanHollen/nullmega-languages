@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import { useParams, useLocation } from "react-router-dom";
 import { useLiveQuery } from "dexie-react-hooks";
+import { useTranslation } from "react-i18next";
 import { FaEllipsisV } from "react-icons/fa";
 import { BackHeader } from "../components/BackHeader";
 import { StudyEmptyState } from "../components/StudyEmptyState";
@@ -23,6 +24,7 @@ type StudyMode = "learn" | "review";
 
 export function StudyPage() {
   const location = useLocation();
+  const { t } = useTranslation();
   const { mode: modeParam } = useParams<{ mode: string }>();
   const mode: StudyMode = modeParam === "review" ? "review" : "learn";
 
@@ -164,7 +166,7 @@ export function StudyPage() {
   }
 
   const ctx = current && current.contexts[contextIndex];
-  const title = mode === "learn" ? `Learn new words` : `Review`;
+  const title = mode === "learn" ? t(`Learn new words`) : t(`Review`);
 
   const counts = { upcoming: 0, learning: 0, relearning: 0, reviewing: 0 };
   for (const c of remaining) {
@@ -177,10 +179,11 @@ export function StudyPage() {
     }
   }
   const countParts: string[] = [];
-  if (counts.reviewing > 0) countParts.push(`${counts.reviewing} reviewing`);
-  if (counts.upcoming > 0) countParts.push(`${counts.upcoming} upcoming`);
-  if (counts.learning > 0) countParts.push(`${counts.learning} learning`);
-  if (counts.relearning > 0) countParts.push(`${counts.relearning} relearning`);
+  if (counts.reviewing > 0) countParts.push(t(`{{count}} reviewing`, { count: counts.reviewing }));
+  if (counts.upcoming > 0) countParts.push(t(`{{count}} upcoming`, { count: counts.upcoming }));
+  if (counts.learning > 0) countParts.push(t(`{{count}} learning`, { count: counts.learning }));
+  if (counts.relearning > 0)
+    countParts.push(t(`{{count}} relearning`, { count: counts.relearning }));
 
   if (!settings) return null;
 
@@ -212,7 +215,7 @@ export function StudyPage() {
                 onClick={() => setTextRevealed(true)}
                 className="text-sm text-gray-400 hover:text-gray-600 underline underline-offset-2 transition cursor-pointer"
               >
-                {`Show text`}
+                {t(`Show text`)}
               </button>
             )}
             {audioUrl && (
@@ -233,7 +236,7 @@ export function StudyPage() {
                   onClick={() => setRevealed(true)}
                   className="w-full bg-green-600 text-white py-3 rounded-xl font-semibold hover:bg-green-700 transition cursor-pointer"
                 >
-                  {`Show answer`}
+                  {t(`Show answer`)}
                 </button>
               ) : (
                 <div className="flex gap-3">
@@ -241,13 +244,13 @@ export function StudyPage() {
                     onClick={() => handleAnswer(false)}
                     className="flex-1 border-2 border-red-200 bg-red-50 text-gray-700 py-3 rounded-xl font-semibold hover:bg-red-100 transition cursor-pointer"
                   >
-                    {`Wrong`}
+                    {t(`Wrong`)}
                   </button>
                   <button
                     onClick={() => handleAnswer(true)}
                     className="flex-1 border-2 border-blue-200 bg-blue-50 text-gray-700 py-3 rounded-xl font-semibold hover:bg-blue-100 transition cursor-pointer"
                   >
-                    {`Right`}
+                    {t(`Right`)}
                   </button>
                   <div className="relative">
                     {menuOpen && (
@@ -265,19 +268,19 @@ export function StudyPage() {
                           onClick={handleEasy}
                           className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-800 cursor-pointer"
                         >
-                          {`Easy`}
+                          {t(`Easy`)}
                         </button>
                         <button
                           onClick={handleSuspend}
                           className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-700 cursor-pointer"
                         >
-                          {`Suspend`}
+                          {t(`Suspend`)}
                         </button>
                         <button
                           onClick={handleRemoveContext}
                           className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-700 cursor-pointer"
                         >
-                          {`Remove this context`}
+                          {t(`Remove this context`)}
                         </button>
                       </div>
                     )}

@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
+import { useTranslation } from "react-i18next";
 import { translateOne } from "../hooks/useTranslate";
 import { loadFlashcards, addFlashcard, removeFlashcard } from "../utils/flashcards";
 
@@ -73,6 +74,7 @@ function buildFlashcardMask(text: string, sources: string[]): boolean[] {
 }
 
 export function ClickableText({ text, language }: Props) {
+  const { t } = useTranslation();
   const [popup, setPopup] = useState<Popup | null>(null);
   const savedSources =
     useLiveQuery(
@@ -102,9 +104,9 @@ export function ClickableText({ text, language }: Props) {
     setPopup({ text: rawText, translation: cached ?? null, x, y: rect.bottom + 4 });
     if (cached) return;
     void (async () => {
-      const t = await translateOne(rawText);
-      cache.set(key, t);
-      setPopup((prev) => (prev?.text === rawText ? { ...prev, translation: t } : prev));
+      const translated = await translateOne(rawText);
+      cache.set(key, translated);
+      setPopup((prev) => (prev?.text === rawText ? { ...prev, translation: translated } : prev));
     })();
   }
 
@@ -175,7 +177,7 @@ export function ClickableText({ text, language }: Props) {
           }}
           className="z-50 inline-flex flex-col items-center gap-1.5 bg-white border border-gray-200 rounded-lg shadow-lg px-3 py-2 text-sm text-gray-700 max-w-xs"
         >
-          <span className="text-center">{popup.translation ?? `Translating…`}</span>
+          <span className="text-center">{popup.translation ?? t(`Translating…`)}</span>
           {language && popup.translation && (
             <button
               onClick={alreadySaved ? handleRemoveFlashcard : handleAddFlashcard}
@@ -187,11 +189,11 @@ export function ClickableText({ text, language }: Props) {
             >
               {alreadySaved ? (
                 <>
-                  <span className="group-hover:hidden">{`✓ saved`}</span>
-                  <span className="hidden group-hover:inline">{`× remove`}</span>
+                  <span className="group-hover:hidden">{t(`✓ saved`)}</span>
+                  <span className="hidden group-hover:inline">{t(`× remove`)}</span>
                 </>
               ) : (
-                `+ flashcard`
+                t(`+ flashcard`)
               )}
             </button>
           )}

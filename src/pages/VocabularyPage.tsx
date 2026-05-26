@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLiveQuery } from "dexie-react-hooks";
+import { useTranslation } from "react-i18next";
 import { useLanguage } from "../contexts/LanguageContext";
 import { BackHeader } from "../components/BackHeader";
 import { useLoading } from "../contexts/LoadingContext";
@@ -15,6 +16,7 @@ export function VocabularyPage() {
   const navigate = useNavigate();
   const { language } = useLanguage();
   const { beginLoading } = useLoading();
+  const { t } = useTranslation();
   const cards =
     useLiveQuery(
       async () => (await loadFlashcards(language)).sort((a, b) => b.addedAt - a.addedAt),
@@ -33,7 +35,7 @@ export function VocabularyPage() {
   async function handleStartLearn() {
     if (!settings) return;
     setLearnError(null);
-    const task = beginLoading(`Generating contexts…`);
+    const task = beginLoading(t(`Generating contexts…`));
     try {
       const data = await prepareLearnSession(language, settings);
       if (data) void navigate(`/vocabulary/learn`, { state: data });
@@ -46,7 +48,7 @@ export function VocabularyPage() {
   async function handleStartReview() {
     if (!settings) return;
     setReviewError(null);
-    const task = beginLoading(`Regenerating contexts…`);
+    const task = beginLoading(t(`Regenerating contexts…`));
     try {
       const data = await prepareReviewSession(language, settings);
       if (data) void navigate(`/vocabulary/review`, { state: data });
@@ -72,7 +74,7 @@ export function VocabularyPage() {
   return (
     <div className="min-h-screen bg-green-100 py-10 px-4">
       <div className="max-w-4xl mx-auto">
-        <BackHeader title="Vocabulary Flashcards" to="/" />
+        <BackHeader title={t(`Vocabulary Flashcards`)} to="/" />
 
         <div className="flex flex-col min-[420px]:flex-row justify-center gap-4 mb-8">
           <div className="flex flex-col items-center gap-1">
@@ -81,9 +83,12 @@ export function VocabularyPage() {
               disabled={!settings || (availableNewCount === 0 && learningCount === 0)}
               className="bg-white border-2 border-green-400 text-green-700 px-8 py-4 rounded-2xl font-bold text-base hover:bg-green-50 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition text-center min-w-48"
             >
-              <div>{`Learn new cards →`}</div>
+              <div>{t(`Learn new cards →`)}</div>
               <div className="text-sm font-normal text-green-600 mt-1">
-                {`new: ${availableNewCount} · learning: ${learningCount}`}
+                {t(`new: {{new}} · learning: {{learning}}`, {
+                  new: availableNewCount,
+                  learning: learningCount,
+                })}
               </div>
             </button>
             {learnError && <p className="text-xs text-red-500">{learnError}</p>}
@@ -94,9 +99,12 @@ export function VocabularyPage() {
               disabled={!settings || (dueCount === 0 && relearningCount === 0)}
               className="bg-white border-2 border-green-400 text-green-700 px-8 py-4 rounded-2xl font-bold text-base hover:bg-green-50 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition text-center min-w-48"
             >
-              <div>{`Review cards →`}</div>
+              <div>{t(`Review cards →`)}</div>
               <div className="text-sm font-normal text-green-600 mt-1">
-                {`due: ${dueCount} · relearning: ${relearningCount}`}
+                {t(`due: {{due}} · relearning: {{relearning}}`, {
+                  due: dueCount,
+                  relearning: relearningCount,
+                })}
               </div>
             </button>
             {reviewError && <p className="text-xs text-red-500">{reviewError}</p>}

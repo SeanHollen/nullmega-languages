@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import type { ComplexityExamples } from "../../hooks/useGenerateComplexityExample";
 
 interface Props {
@@ -31,13 +32,14 @@ function nearestExample(examples: ComplexityExamples, level: number): string {
 }
 
 export function ComplexitySlider({ value, onChange, examples, error }: Props) {
+  const { t } = useTranslation();
   const example = examples ? nearestExample(examples, value) : ``;
 
   return (
     <div className="space-y-6">
       <div>
         <div className="flex items-baseline justify-between mb-2">
-          <label className="text-sm font-medium text-gray-700">{`Difficulty level`}</label>
+          <label className="text-sm font-medium text-gray-700">{t(`Difficulty level`)}</label>
           <span className="text-2xl font-bold text-green-600">
             {value}
             <span className="text-sm font-medium text-gray-500 ml-2">{cefrFor(value)}</span>
@@ -52,14 +54,16 @@ export function ComplexitySlider({ value, onChange, examples, error }: Props) {
           className="w-full accent-green-600 cursor-pointer"
         />
         <div className="flex justify-between text-xs text-gray-400 mt-1">
-          {CEFR_TICKS.map((t) => (
-            <span key={t}>{t}</span>
+          {CEFR_TICKS.map((tick) => (
+            <span key={tick}>{tick}</span>
           ))}
         </div>
       </div>
       <div className="bg-gray-50 border border-gray-100 rounded-xl p-4 min-h-[5rem] flex items-center justify-center">
         {error && (
-          <span className="text-sm text-red-500">{`Could not generate examples: ${error}`}</span>
+          <span className="text-sm text-red-500">
+            {t(`Could not generate examples: {{error}}`, { error })}
+          </span>
         )}
         {!error && !examples && (
           <div className="flex flex-col items-center gap-3">
@@ -69,9 +73,9 @@ export function ComplexitySlider({ value, onChange, examples, error }: Props) {
               <span className="w-2.5 h-2.5 rounded-full bg-green-500 animate-bounce" />
             </div>
             <p className="text-sm font-medium text-gray-600">
-              {`Generating 100 example sentences at every difficulty level…`}
+              {t(`Generating 100 example sentences at every difficulty level…`)}
             </p>
-            <p className="text-xs text-gray-400">{`This usually takes 30–60 seconds.`}</p>
+            <p className="text-xs text-gray-400">{t(`This usually takes 30–60 seconds.`)}</p>
           </div>
         )}
         {!error && example && (

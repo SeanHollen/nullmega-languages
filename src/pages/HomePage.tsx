@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   FaBook,
   FaPen,
@@ -121,6 +122,7 @@ function computeDayState(
 export function HomePage() {
   const navigate = useNavigate();
   const { language } = useLanguage();
+  const { t } = useTranslation();
   const goals = useLiveQuery(() => loadGoals(language), [language]);
   const vocabSettings = useLiveQuery(() => loadVocabSettings(), []);
   const learnedToday = useLiveQuery(() => getLearnedTodayCount(), []) ?? 0;
@@ -168,25 +170,27 @@ export function HomePage() {
     <div className="min-h-screen bg-green-100 flex flex-col items-center px-4 pt-12">
       <div className="w-full max-w-lg">
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">{`The Language Lab`}</h1>
-          <p className="text-gray-500">{`Any language, any level`}</p>
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">{t(`The Language Lab`)}</h1>
+          <p className="text-gray-500">{t(`Any language, any level`)}</p>
           <div className="flex items-center justify-center flex-wrap gap-x-4 gap-y-1 mt-3">
             {currentStreak > 0 && (
               <span className="text-sm text-gray-500">
-                {`Current streak: ${currentStreak} ${currentStreak === 1 ? `day` : `days`}`}
+                {currentStreak === 1
+                  ? t(`Current streak: {{count}} day`, { count: currentStreak })
+                  : t(`Current streak: {{count}} days`, { count: currentStreak })}
               </span>
             )}
             <button
               onClick={() => navigate(`/goals`)}
               className="text-sm text-green-600 hover:text-green-700 font-medium cursor-pointer"
             >
-              {`Set daily goals →`}
+              {t(`Set daily goals →`)}
             </button>
             <button
               onClick={() => navigate(`/streaks`)}
               className="text-sm text-green-600 hover:text-green-700 font-medium cursor-pointer"
             >
-              {`View streaks →`}
+              {t(`View streaks →`)}
             </button>
           </div>
         </div>
@@ -223,20 +227,22 @@ export function HomePage() {
               >
                 <Icon className="text-3xl text-gray-500 group-hover:text-green-500 transition" />
                 <span className="font-semibold text-gray-800 group-hover:text-green-600 transition">
-                  {label}
+                  {t(label)}
                 </span>
                 {mode && (
                   <span className="text-xs font-medium">
                     {rating !== null ? (
-                      <span className="text-green-600">{`Rating: ${rating}`}</span>
+                      <span className="text-green-600">{t(`Rating: {{rating}}`, { rating })}</span>
                     ) : (
-                      <span className="text-gray-300">{`Unrated`}</span>
+                      <span className="text-gray-300">{t(`Unrated`)}</span>
                     )}
                   </span>
                 )}
                 {cardCount !== null && (
                   <span className="text-xs font-medium text-green-600">
-                    {cardCount === 1 ? `1 card saved` : `${cardCount} cards saved`}
+                    {cardCount === 1
+                      ? t(`1 card saved`)
+                      : t(`{{count}} cards saved`, { count: cardCount })}
                   </span>
                 )}
                 {showStudyBadge && (
@@ -247,12 +253,16 @@ export function HomePage() {
                         : `text-green-700 bg-green-100`
                     }`}
                   >
-                    {studyCount > 0 ? `${studyCount} cards left` : `All caught up!`}
+                    {studyCount > 0
+                      ? t(`{{count}} cards left`, { count: studyCount })
+                      : t(`All caught up!`)}
                   </span>
                 )}
                 {grammarCount !== null && (
                   <span className="text-xs font-medium text-green-600">
-                    {grammarCount === 1 ? `1 card` : `${grammarCount} cards`}
+                    {grammarCount === 1
+                      ? t(`1 card`)
+                      : t(`{{count}} cards`, { count: grammarCount })}
                   </span>
                 )}
                 {showGrammarStudyBadge && (
@@ -264,8 +274,8 @@ export function HomePage() {
                     }`}
                   >
                     {grammarStudyCountValue > 0
-                      ? `${grammarStudyCountValue} cards left`
-                      : `All caught up!`}
+                      ? t(`{{count}} cards left`, { count: grammarStudyCountValue })
+                      : t(`All caught up!`)}
                   </span>
                 )}
                 {showBadge && (
@@ -275,8 +285,11 @@ export function HomePage() {
                     }`}
                   >
                     {goal > 0
-                      ? `${completedToday}/${goal} completed today`
-                      : `${completedToday} completed today`}
+                      ? t(`{{completed}}/{{goal}} completed today`, {
+                          completed: completedToday,
+                          goal,
+                        })
+                      : t(`{{completed}} completed today`, { completed: completedToday })}
                   </span>
                 )}
               </button>

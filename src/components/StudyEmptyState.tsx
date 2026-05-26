@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { FaCheckCircle } from "react-icons/fa";
 
 interface Props {
@@ -8,14 +9,15 @@ interface Props {
 }
 
 export function StudyEmptyState({ mode, learnSuggestsAddingCards = false }: Props) {
-  const heading = mode === `learn` ? `You're all caught up!` : `Nothing due — nice work!`;
+  const { t } = useTranslation();
+  const heading = mode === `learn` ? t(`You're all caught up!`) : t(`Nothing due — nice work!`);
   let subtext: string;
   if (mode === `learn`) {
     subtext = learnSuggestsAddingCards
-      ? `No new cards to learn right now. Come back tomorrow, or add more cards if you ran out.`
-      : `No new cards to learn right now. Come back tomorrow for more.`;
+      ? t(`No new cards to learn right now. Come back tomorrow, or add more cards if you ran out.`)
+      : t(`No new cards to learn right now. Come back tomorrow for more.`);
   } else {
-    subtext = `No cards are due for review. Your future self will thank you.`;
+    subtext = t(`No cards are due for review. Your future self will thank you.`);
   }
 
   return (

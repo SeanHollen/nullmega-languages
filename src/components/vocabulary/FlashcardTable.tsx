@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { FaPlus, FaFileImport, FaFileExport, FaPen } from "react-icons/fa";
 import {
   updateFlashcardTags,
@@ -43,8 +44,8 @@ function formatInterval(ms: number): string {
 function parseTags(input: string): string[] {
   return input
     .split(`,`)
-    .map((t) => t.trim())
-    .filter((t) => t.length > 0);
+    .map((tag) => tag.trim())
+    .filter((tag) => tag.length > 0);
 }
 
 const PAGE_SIZE = 1000;
@@ -95,6 +96,7 @@ interface Props {
 }
 
 export function FlashcardTable({ cards, language }: Props) {
+  const { t } = useTranslation();
   const [search, setSearch] = useState(``);
   const [editingCard, setEditingCard] = useState<Flashcard | null>(null);
   const [addingCard, setAddingCard] = useState(false);
@@ -133,9 +135,9 @@ export function FlashcardTable({ cards, language }: Props) {
       if (card) {
         const tags = parseTags(newTags);
         if (tags.length > 0) await updateFlashcardTags(card.id, tags);
-        setActionMessage(`Added "${source}"`);
+        setActionMessage(t(`Added "{{source}}"`, { source }));
       } else {
-        setActionMessage(`"${source}" already exists`);
+        setActionMessage(t(`"{{source}}" already exists`, { source }));
       }
       setNewSource(``);
       setNewTranslation(``);
@@ -156,7 +158,11 @@ export function FlashcardTable({ cards, language }: Props) {
       a.download = `flashcards-${slug}-${date}.json`;
       a.click();
       URL.revokeObjectURL(url);
-      setActionMessage(`Exported ${cards.length} card${cards.length === 1 ? `` : `s`}`);
+      setActionMessage(
+        cards.length === 1
+          ? t(`Exported {{count}} card`, { count: cards.length })
+          : t(`Exported {{count}} cards`, { count: cards.length }),
+      );
     })();
   }
 
@@ -168,16 +174,18 @@ export function FlashcardTable({ cards, language }: Props) {
     try {
       json = await file.text();
     } catch (err) {
-      setActionMessage(`Read failed: ${String(err)}`);
+      setActionMessage(t(`Read failed: {{error}}`, { error: String(err) }));
       return;
     }
     try {
       const { added, skipped } = await importFlashcards(language, json);
-      setActionMessage(
-        `Imported ${added} card${added === 1 ? `` : `s`}${skipped > 0 ? ` (skipped ${skipped})` : ``}`,
-      );
+      const base =
+        added === 1
+          ? t(`Imported {{count}} card`, { count: added })
+          : t(`Imported {{count}} cards`, { count: added });
+      setActionMessage(skipped > 0 ? `${base} ${t(`(skipped {{skipped}})`, { skipped })}` : base);
     } catch (err) {
-      setActionMessage(`Import failed: ${String(err)}`);
+      setActionMessage(t(`Import failed: {{error}}`, { error: String(err) }));
     }
   }
 
@@ -187,7 +195,7 @@ export function FlashcardTable({ cards, language }: Props) {
         (c) =>
           c.source.toLowerCase().includes(q) ||
           c.translation.toLowerCase().includes(q) ||
-          c.tags.some((t) => t.toLowerCase().includes(q)),
+          c.tags.some((tag) => tag.toLowerCase().includes(q)),
       )
     : cards;
 
@@ -204,6 +212,24 @@ export function FlashcardTable({ cards, language }: Props) {
   const pageStart = clampedPage * PAGE_SIZE;
   const pageEnd = Math.min(pageStart + PAGE_SIZE, total);
   const paginated = sorted.slice(pageStart, pageEnd);
+
+  let showingLabel: string;
+  if (total === 0) {
+    showingLabel = t(`No matches`);
+  } else if (q) {
+    showingLabel = t(`Showing {{start}}–{{end}} of {{total}} (filtered from {{all}})`, {
+      start: pageStart + 1,
+      end: pageEnd,
+      total,
+      all: cards.length,
+    });
+  } else {
+    showingLabel = t(`Showing {{start}}–{{end}} of {{total}}`, {
+      start: pageStart + 1,
+      end: pageEnd,
+      total,
+    });
+  }
 
   return (
     <>
@@ -225,11 +251,11 @@ export function FlashcardTable({ cards, language }: Props) {
           className="flex items-center gap-1.5 bg-white border border-gray-200 text-gray-700 px-3 py-1.5 rounded-lg text-sm font-medium hover:border-gray-300 hover:bg-gray-50 transition cursor-pointer"
         >
           <FaPlus className="text-xs" />
-          {addingCard ? `Cancel` : `Card`}
+          {addingCard ? t(`Cancel`) : t(`Card`)}
         </button>
         <button
           onClick={() => fileInputRef.current?.click()}
-          title={`Import cards from JSON`}
+          title={t(`Import cards from JSON`)}
           className="bg-white border border-gray-200 text-gray-500 p-2 rounded-lg hover:border-gray-300 hover:bg-gray-50 hover:text-gray-700 transition cursor-pointer"
         >
           <FaFileImport />
@@ -237,7 +263,7 @@ export function FlashcardTable({ cards, language }: Props) {
         <button
           onClick={handleExport}
           disabled={cards.length === 0}
-          title={`Export cards to JSON`}
+          title={t(`Export cards to JSON`)}
           className="bg-white border border-gray-200 text-gray-500 p-2 rounded-lg hover:border-gray-300 hover:bg-gray-50 hover:text-gray-700 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition"
         >
           <FaFileExport />
@@ -254,7 +280,7 @@ export function FlashcardTable({ cards, language }: Props) {
           to={`/vocabulary/stats`}
           className="ml-auto text-[0.8125rem] text-green-600 hover:text-green-700 font-medium"
         >
-          {`View stats →`}
+          {t(`View stats →`)}
         </Link>
       </div>
 
@@ -265,13 +291,13 @@ export function FlashcardTable({ cards, language }: Props) {
               autoFocus
               value={newSource}
               onChange={(e) => setNewSource(e.target.value)}
-              placeholder={`Source (${language})`}
+              placeholder={t(`Source ({{language}})`, { language })}
               className="text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
             />
             <input
               value={newTranslation}
               onChange={(e) => setNewTranslation(e.target.value)}
-              placeholder={`English translation`}
+              placeholder={t(`English translation`)}
               className="text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
             />
           </div>
@@ -287,7 +313,7 @@ export function FlashcardTable({ cards, language }: Props) {
                 setNewTags(``);
               }
             }}
-            placeholder={`Tags (comma-separated, optional)`}
+            placeholder={t(`Tags (comma-separated, optional)`)}
             className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
           />
           <div className="flex justify-end gap-2">
@@ -300,14 +326,14 @@ export function FlashcardTable({ cards, language }: Props) {
               }}
               className="text-sm text-gray-500 px-3 py-1.5 rounded-lg border border-gray-200 hover:border-gray-300 cursor-pointer transition"
             >
-              {`Cancel`}
+              {t(`Cancel`)}
             </button>
             <button
               onClick={handleAddCard}
               disabled={!newSource.trim() || !newTranslation.trim()}
               className="text-sm bg-green-600 text-white px-4 py-1.5 rounded-lg font-semibold hover:bg-green-700 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition"
             >
-              {`Add card`}
+              {t(`Add card`)}
             </button>
           </div>
         </div>
@@ -316,7 +342,9 @@ export function FlashcardTable({ cards, language }: Props) {
       {cards.length === 0 ? (
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 text-center">
           <p className="text-gray-500">
-            {`No flashcards yet. Save words from any exercise, click + Card above, or import from JSON.`}
+            {t(
+              `No flashcards yet. Save words from any exercise, click + Card above, or import from JSON.`,
+            )}
           </p>
         </div>
       ) : (
@@ -326,16 +354,12 @@ export function FlashcardTable({ cards, language }: Props) {
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder={`Search source, translation, or tags…`}
+              placeholder={t(`Search source, translation, or tags…`)}
               className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
             />
           </div>
           <div className="flex items-center justify-between gap-3 px-4 py-2 border-b border-gray-100 text-xs text-gray-500">
-            <span>
-              {total === 0
-                ? `No matches`
-                : `Showing ${pageStart + 1}–${pageEnd} of ${total}${q ? ` (filtered from ${cards.length})` : ``}`}
-            </span>
+            <span>{showingLabel}</span>
             {pageCount > 1 && (
               <div className="flex items-center gap-2">
                 <button
@@ -343,15 +367,20 @@ export function FlashcardTable({ cards, language }: Props) {
                   disabled={clampedPage === 0}
                   className="px-2 py-1 rounded border border-gray-200 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 cursor-pointer"
                 >
-                  {`Prev`}
+                  {t(`Prev`)}
                 </button>
-                <span>{`Page ${clampedPage + 1} of ${pageCount}`}</span>
+                <span>
+                  {t(`Page {{page}} of {{pages}}`, {
+                    page: clampedPage + 1,
+                    pages: pageCount,
+                  })}
+                </span>
                 <button
                   onClick={() => setPage((p) => Math.min(pageCount - 1, p + 1))}
                   disabled={clampedPage >= pageCount - 1}
                   className="px-2 py-1 rounded border border-gray-200 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 cursor-pointer"
                 >
-                  {`Next`}
+                  {t(`Next`)}
                 </button>
               </div>
             )}
@@ -360,13 +389,13 @@ export function FlashcardTable({ cards, language }: Props) {
             <table className="w-full text-sm">
               <thead className="border-b border-gray-100 bg-gray-50 text-xs font-semibold text-gray-500">
                 <tr className="text-left">
-                  {th("source", "Source")}
-                  {th("translation", "Translation")}
-                  {th("status", "Status")}
-                  {th("lastReviewed", "Last reviewed")}
-                  {th("interval", "Interval")}
-                  {th("tags", "Tags")}
-                  {th("addedAt", "Added")}
+                  {th("source", t(`Source`))}
+                  {th("translation", t(`Translation`))}
+                  {th("status", t(`Status`))}
+                  {th("lastReviewed", t(`Last reviewed`))}
+                  {th("interval", t(`Interval`))}
+                  {th("tags", t(`Tags`))}
+                  {th("addedAt", t(`Added`))}
                   <th className="px-4 py-3" />
                 </tr>
               </thead>
@@ -374,7 +403,7 @@ export function FlashcardTable({ cards, language }: Props) {
                 {paginated.length === 0 ? (
                   <tr>
                     <td colSpan={8} className="px-4 py-6 text-center text-gray-400 text-sm">
-                      {`No matches for "${search}"`}
+                      {t(`No matches for "{{search}}"`, { search })}
                     </td>
                   </tr>
                 ) : (
@@ -388,7 +417,7 @@ export function FlashcardTable({ cards, language }: Props) {
                           <span
                             className={`text-xs font-medium px-2 py-0.5 rounded-full ${STATUS_STYLES[status]}`}
                           >
-                            {status}
+                            {t(status)}
                           </span>
                         </td>
                         <td className="px-4 py-3 text-gray-500 text-xs">
@@ -402,12 +431,12 @@ export function FlashcardTable({ cards, language }: Props) {
                             {c.tags.length === 0 ? (
                               <span className="text-gray-300">{`—`}</span>
                             ) : (
-                              c.tags.map((t) => (
+                              c.tags.map((tag) => (
                                 <span
-                                  key={t}
+                                  key={tag}
                                   className="bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded"
                                 >
-                                  {t}
+                                  {tag}
                                 </span>
                               ))
                             )}
@@ -421,7 +450,7 @@ export function FlashcardTable({ cards, language }: Props) {
                             <button
                               onClick={() => setEditingCard(c)}
                               className="text-gray-300 hover:text-blue-400 transition cursor-pointer"
-                              title={`Edit card`}
+                              title={t(`Edit card`)}
                             >
                               <FaPen className="text-xs" />
                             </button>
@@ -430,7 +459,7 @@ export function FlashcardTable({ cards, language }: Props) {
                                 void removeFlashcard(language, c.source);
                               }}
                               className="text-gray-300 hover:text-red-400 transition cursor-pointer"
-                              title={`Delete card`}
+                              title={t(`Delete card`)}
                             >
                               ✕
                             </button>

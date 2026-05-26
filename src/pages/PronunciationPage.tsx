@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useLiveQuery } from "dexie-react-hooks";
+import { useTranslation } from "react-i18next";
 import { BackHeader } from "../components/BackHeader";
 import { SetupView } from "../components/reading/SetupView";
 import { PronunciationExerciseView } from "../components/pronunciation/PronunciationExerciseView";
@@ -26,6 +27,7 @@ export function PronunciationPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { language } = useLanguage();
+  const { t } = useTranslation();
   const resume =
     (location.state as ResumeState | null)?.record?.mode === `pronunciation`
       ? (location.state as ResumeState)
@@ -81,7 +83,7 @@ export function PronunciationPage() {
 
   function handleGenerate() {
     setAudioError(``);
-    const task = beginLoading(`Generating phrases…`);
+    const task = beginLoading(t(`Generating phrases…`));
     mutate(
       { language, languageComplexity: sliderComplexity },
       {
@@ -106,7 +108,7 @@ export function PronunciationPage() {
             setAssessmentId(id);
             setExercise(data);
             setRatings(initialRatings);
-            task.update(`Generating audio…`);
+            task.update(t(`Generating audio…`));
             try {
               const urls = await generatePhrasesAudio(
                 data.phrases.map((p) => p.phrase),
@@ -124,7 +126,7 @@ export function PronunciationPage() {
               });
               setPhase(`exercise`);
             } catch {
-              setAudioError(`Failed to generate audio. Please try again.`);
+              setAudioError(t(`Failed to generate audio. Please try again.`));
             }
             task.done();
           })();
@@ -200,7 +202,7 @@ export function PronunciationPage() {
   return (
     <div className="min-h-screen bg-green-100 py-10 px-4">
       <div className="max-w-2xl mx-auto">
-        <BackHeader title="Pronunciation Practice" to="/" />
+        <BackHeader title={t(`Pronunciation Practice`)} to="/" />
 
         {phase === `setup` && (
           <>
@@ -210,7 +212,7 @@ export function PronunciationPage() {
               rated={rated}
               savedRating={savedRating}
               error={error}
-              generateLabel={`Generate Pronunciation Exercise`}
+              generateLabel={t(`Generate Pronunciation Exercise`)}
               onLanguageComplexityChange={setComplexityOverride}
               onRatedChange={setRated}
               onGenerate={handleGenerate}

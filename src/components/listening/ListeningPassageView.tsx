@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import type { Exercise } from "../../types";
 import type { ExerciseAudio } from "../../hooks/useTTS";
 import { AudioPlayer } from "./AudioPlayer";
@@ -22,6 +23,7 @@ export function ListeningPassageView({
   onSelect,
   onSubmit,
 }: Props) {
+  const { t } = useTranslation();
   const allAnswered = selected.every((s) => s !== null);
 
   return (
@@ -31,15 +33,18 @@ export function ListeningPassageView({
           <h2 className="text-xl font-semibold text-gray-800 mb-1">{exercise.title}</h2>
         )}
         <p className="text-xs text-gray-400 uppercase tracking-wide mb-4">
-          {`${language} · Complexity ${languageComplexity}`}
+          {t(`{{language}} · Complexity {{complexity}}`, {
+            language,
+            complexity: languageComplexity,
+          })}
         </p>
         <p className="text-sm text-gray-400 mb-4">
-          {`Listen to the passage, then answer the questions below.`}
+          {t(`Listen to the passage, then answer the questions below.`)}
         </p>
-        <AudioPlayer src={audio.passageUrl} label={`Play passage`} />
+        <AudioPlayer src={audio.passageUrl} label={t(`Play passage`)} />
         {exercise.difficultWords.length > 0 && (
           <div className="mt-5 pt-4 border-t border-green-100">
-            <p className="text-xs text-gray-300 uppercase tracking-wide mb-2">{`Vocabulary`}</p>
+            <p className="text-xs text-gray-300 uppercase tracking-wide mb-2">{t(`Vocabulary`)}</p>
             <div className="flex flex-wrap gap-x-4 gap-y-1">
               {exercise.difficultWords.map((w, i) => (
                 <span key={i} className="text-sm text-gray-400">
@@ -60,17 +65,19 @@ export function ListeningPassageView({
           index={qi}
           selected={selected[qi]}
           onSelect={(oi) => onSelect(qi, oi)}
-          headerSlot={<AudioPlayer src={audio.questionUrls[qi]} label={`Question ${qi + 1}`} />}
+          headerSlot={
+            <AudioPlayer src={audio.questionUrls[qi]} label={t(`Question {{n}}`, { n: qi + 1 })} />
+          }
         />
       ))}
 
       <button
         onClick={onSubmit}
         disabled={!allAnswered}
-        title={!allAnswered ? `Not all questions answered` : undefined}
+        title={!allAnswered ? t(`Not all questions answered`) : undefined}
         className="w-full bg-green-600 text-white py-3 rounded-xl font-semibold hover:bg-green-700 disabled:opacity-40 transition cursor-pointer"
       >
-        {`Submit Answers`}
+        {t(`Submit Answers`)}
       </button>
     </div>
   );

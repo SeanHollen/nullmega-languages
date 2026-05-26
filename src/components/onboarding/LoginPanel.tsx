@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { callAuthLogin } from "../../utils/api";
 import { saveAuthInfo } from "../../utils/settings";
 
@@ -7,6 +8,7 @@ interface Props {
 }
 
 export function LoginPanel({ onSuccess }: Props) {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -29,9 +31,9 @@ export function LoginPanel({ onSuccess }: Props) {
   return (
     <div className="space-y-4 text-center">
       <p className="text-sm text-gray-500">
-        {`Sign in to sync your progress and use the `}
-        <em>{`The Language Lab`}</em>
-        {` backend.`}
+        {t(`Sign in to sync your progress and use the `)}
+        <em>{t(`The Language Lab`)}</em>
+        {t(` backend.`)}
       </p>
       <button
         onClick={handleLogin}
@@ -39,11 +41,11 @@ export function LoginPanel({ onSuccess }: Props) {
         className="w-full bg-green-600 text-white rounded-xl py-3 font-semibold hover:bg-green-700 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer transition"
       >
         {loading ? (
-          `Signing in…`
+          t(`Signing in…`)
         ) : (
           <>
-            {`Login with `}
-            <em>{`The Language Lab`}</em>
+            {t(`Login with `)}
+            <em>{t(`The Language Lab`)}</em>
           </>
         )}
       </button>

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
+import { useTranslation } from "react-i18next";
 import { useLanguage } from "../../contexts/LanguageContext";
 import { BackHeader } from "../BackHeader";
 import { SrsStatsView } from "./SrsStatsView";
@@ -15,6 +16,7 @@ interface Props {
 
 export function SrsStatsPageShell({ title, backTo, loadCards, emptyMessage }: Props) {
   const { language } = useLanguage();
+  const { t } = useTranslation();
   const [tags, setTags] = useState<string[]>([]);
   const [draft, setDraft] = useState(``);
 
@@ -23,13 +25,13 @@ export function SrsStatsPageShell({ title, backTo, loadCards, emptyMessage }: Pr
   const allTags = [...new Set(raw.flatMap((c) => c.tags))].sort();
 
   // AND semantics — adding more tags narrows the result.
-  const normalizedTags = tags.map((t) => t.toLowerCase());
+  const normalizedTags = tags.map((tag) => tag.toLowerCase());
   const filtered =
     normalizedTags.length === 0
       ? raw
       : raw.filter((c) => {
-          const cardTags = c.tags.map((t) => t.toLowerCase());
-          return normalizedTags.every((t) => cardTags.includes(t));
+          const cardTags = c.tags.map((tag) => tag.toLowerCase());
+          return normalizedTags.every((tag) => cardTags.includes(tag));
         });
 
   const cards = filtered.map((c) => ({
@@ -41,16 +43,16 @@ export function SrsStatsPageShell({ title, backTo, loadCards, emptyMessage }: Pr
   }));
 
   function commitDraft() {
-    const t = draft.trim();
-    if (!t) return;
-    if (!tags.some((existing) => existing.toLowerCase() === t.toLowerCase())) {
-      setTags([...tags, t]);
+    const tag = draft.trim();
+    if (!tag) return;
+    if (!tags.some((existing) => existing.toLowerCase() === tag.toLowerCase())) {
+      setTags([...tags, tag]);
     }
     setDraft(``);
   }
 
   function removeTag(tag: string) {
-    setTags(tags.filter((t) => t !== tag));
+    setTags(tags.filter((existing) => existing !== tag));
   }
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
@@ -68,7 +70,7 @@ export function SrsStatsPageShell({ title, backTo, loadCards, emptyMessage }: Pr
         <BackHeader title={title} to={backTo} />
         <div className="mb-4 flex items-center gap-2 text-sm flex-wrap">
           <label htmlFor="tag-filter" className="text-gray-600">
-            {`Filter by tag:`}
+            {t(`Filter by tag:`)}
           </label>
           <div className="flex items-center gap-1.5 flex-wrap bg-white border border-gray-200 rounded-lg px-2 py-1 focus-within:ring-2 focus-within:ring-green-200">
             {tags.map((tag) => (
@@ -80,7 +82,7 @@ export function SrsStatsPageShell({ title, backTo, loadCards, emptyMessage }: Pr
                 <button
                   onClick={() => removeTag(tag)}
                   className="text-green-600 hover:text-green-800 cursor-pointer"
-                  aria-label={`Remove ${tag}`}
+                  aria-label={t(`Remove {{tag}}`, { tag })}
                 >
                   {`×`}
                 </button>
@@ -94,7 +96,7 @@ export function SrsStatsPageShell({ title, backTo, loadCards, emptyMessage }: Pr
               onChange={(e) => setDraft(e.target.value)}
               onKeyDown={handleKeyDown}
               onBlur={commitDraft}
-              placeholder={tags.length === 0 ? `tag1 tag2` : ``}
+              placeholder={tags.length === 0 ? t(`tag1 tag2`) : ``}
               className="flex-1 min-w-[6rem] outline-none text-gray-700 py-0.5"
             />
           </div>
@@ -111,7 +113,7 @@ export function SrsStatsPageShell({ title, backTo, loadCards, emptyMessage }: Pr
               }}
               className="text-xs text-gray-500 hover:text-gray-700 cursor-pointer"
             >
-              {`Clear`}
+              {t(`Clear`)}
             </button>
           )}
         </div>

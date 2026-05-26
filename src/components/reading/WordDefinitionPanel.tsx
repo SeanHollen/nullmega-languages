@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { FaTimes, FaExternalLinkAlt } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
 import {
   fetchWiktionaryEntry,
   wiktionaryPageUrl,
@@ -14,6 +15,7 @@ interface Props {
 }
 
 export function WordDefinitionPanel({ word, language, onClose }: Props) {
+  const { t } = useTranslation();
   const [trackedWord, setTrackedWord] = useState<string | null>(null);
   const [viewingWord, setViewingWord] = useState<string | null>(null);
   const [requestedWord, setRequestedWord] = useState<string | null>(null);
@@ -79,7 +81,7 @@ export function WordDefinitionPanel({ word, language, onClose }: Props) {
         <button
           onClick={onClose}
           className="text-gray-400 hover:text-gray-600 transition cursor-pointer p-1"
-          aria-label="Close"
+          aria-label={t(`Close`)}
         >
           <FaTimes />
         </button>
@@ -88,7 +90,7 @@ export function WordDefinitionPanel({ word, language, onClose }: Props) {
       <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
         {!supported && (
           <p className="text-sm text-gray-500">
-            {`Dictionary lookup isn't supported for ${language}.`}
+            {t(`Dictionary lookup isn't supported for {{language}}.`, { language })}
           </p>
         )}
 
@@ -97,11 +99,11 @@ export function WordDefinitionPanel({ word, language, onClose }: Props) {
             onClick={() => lookup(viewingWord)}
             className="w-full bg-green-600 text-white py-2.5 rounded-xl font-semibold hover:bg-green-700 transition cursor-pointer"
           >
-            {`View translation`}
+            {t(`View translation`)}
           </button>
         )}
 
-        {loading && <p className="text-sm text-gray-500">{`Looking up…`}</p>}
+        {loading && <p className="text-sm text-gray-500">{t(`Looking up…`)}</p>}
 
         {error && <p className="text-sm text-red-600">{error}</p>}
 
@@ -109,7 +111,7 @@ export function WordDefinitionPanel({ word, language, onClose }: Props) {
           <>
             {showingFor.word.toLowerCase() !== viewingWord.toLowerCase() && (
               <p className="text-xs text-gray-500">
-                {`Showing entry for `}
+                {`${t(`Showing entry for`)} `}
                 <span className="font-medium text-gray-700">{showingFor.word}</span>
               </p>
             )}
@@ -124,14 +126,14 @@ export function WordDefinitionPanel({ word, language, onClose }: Props) {
               rel="noreferrer"
               className="inline-flex items-center gap-1.5 text-xs text-blue-600 hover:underline"
             >
-              {`Open on Wiktionary`} <FaExternalLinkAlt className="text-[10px]" />
+              {t(`Open on Wiktionary`)} <FaExternalLinkAlt className="text-[10px]" />
             </a>
           </>
         )}
 
         {showingFor && !showingFor.html && (
           <div className="space-y-2">
-            <p className="text-sm text-gray-600">{`No entry found.`}</p>
+            <p className="text-sm text-gray-600">{t(`No entry found.`)}</p>
             {fallbackUrl && (
               <a
                 href={fallbackUrl}
@@ -139,7 +141,7 @@ export function WordDefinitionPanel({ word, language, onClose }: Props) {
                 rel="noreferrer"
                 className="inline-flex items-center gap-1.5 text-xs text-blue-600 hover:underline"
               >
-                {`Search on Wiktionary`} <FaExternalLinkAlt className="text-[10px]" />
+                {t(`Search on Wiktionary`)} <FaExternalLinkAlt className="text-[10px]" />
               </a>
             )}
           </div>

@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { FaPlay, FaPause, FaUndo } from "react-icons/fa";
 import { addListeningSeconds } from "../../utils/listeningStats";
 
@@ -19,6 +20,7 @@ function formatTime(seconds: number): string {
 }
 
 export function AudioPlayer({ src, label, autoplay = false, small = false }: Props) {
+  const { t } = useTranslation();
   const [trackedSrc, setTrackedSrc] = useState(src);
   const [playing, setPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -114,7 +116,7 @@ export function AudioPlayer({ src, label, autoplay = false, small = false }: Pro
       <button
         onClick={toggle}
         className={`flex items-center gap-3 hover:brightness-90 transition cursor-pointer ${small ? `px-3 py-1.5` : `px-4 py-1`}`}
-        aria-label={playing ? `Pause` : `Play`}
+        aria-label={playing ? t(`Pause`) : t(`Play`)}
       >
         {playing ? <FaPause className="shrink-0" /> : <FaPlay className="shrink-0" />}
         {small
@@ -135,8 +137,8 @@ export function AudioPlayer({ src, label, autoplay = false, small = false }: Pro
         onClick={restart}
         disabled={progress === 0}
         className={`transition enabled:hover:brightness-90 enabled:cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed ${small ? `px-2 py-1.5` : `px-3 py-2`}`}
-        title={`Restart`}
-        aria-label={`Restart`}
+        title={t(`Restart`)}
+        aria-label={t(`Restart`)}
       >
         <FaUndo className="shrink-0" />
       </button>

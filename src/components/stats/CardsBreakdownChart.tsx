@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
+import type { TFunction } from "i18next";
 import type { SrsCardWithStatus } from "./SrsStatsView";
 import { formatIntervalLabel } from "../../utils/outcomesByInterval";
 import {
@@ -43,11 +45,11 @@ interface BucketResult {
   excludedLabel?: string;
 }
 
-function buildBuckets(cards: SrsCardWithStatus[], mode: CardsMode): BucketResult {
+function buildBuckets(cards: SrsCardWithStatus[], mode: CardsMode, t: TFunction): BucketResult {
   if (mode === `status`) {
     return {
       buckets: STATUSES.map((s) => ({
-        label: s,
+        label: t(s),
         count: cards.filter((c) => c.status === s).length,
         color: STATUS_COLOR[s] ?? `#9ca3af`,
       })).filter((b) => b.count > 0),
@@ -73,18 +75,18 @@ function buildBuckets(cards: SrsCardWithStatus[], mode: CardsMode): BucketResult
     return {
       buckets,
       excludedCount: noInterval,
-      excludedLabel: `with no interval yet`,
+      excludedLabel: t(`with no interval yet`),
     };
   }
   // ease: bucket cards by accuracy on reviewHistory (correct / total). Each entry in
   // reviewHistory is the answer given when the card came due, so this is "how often the
   // user got it right when it came due." Cards with no review history don't get a bar.
   const easeBuckets: CardsBucket[] = [
-    { label: `0-25%`, color: `#ef4444`, count: 0, tooltipLabel: `0-25% correct` },
-    { label: `26-50%`, color: `#f97316`, count: 0, tooltipLabel: `26-50% correct` },
-    { label: `51-75%`, color: `#f59e0b`, count: 0, tooltipLabel: `51-75% correct` },
-    { label: `76-99%`, color: `#84cc16`, count: 0, tooltipLabel: `76-99% correct` },
-    { label: `100%`, color: `#16a34a`, count: 0, tooltipLabel: `100% correct` },
+    { label: `0-25%`, color: `#ef4444`, count: 0, tooltipLabel: t(`0-25% correct`) },
+    { label: `26-50%`, color: `#f97316`, count: 0, tooltipLabel: t(`26-50% correct`) },
+    { label: `51-75%`, color: `#f59e0b`, count: 0, tooltipLabel: t(`51-75% correct`) },
+    { label: `76-99%`, color: `#84cc16`, count: 0, tooltipLabel: t(`76-99% correct`) },
+    { label: `100%`, color: `#16a34a`, count: 0, tooltipLabel: t(`100% correct`) },
   ];
   let untested = 0;
   for (const c of cards) {
@@ -101,7 +103,7 @@ function buildBuckets(cards: SrsCardWithStatus[], mode: CardsMode): BucketResult
     else if (ratio >= 0.26) easeBuckets[1].count++;
     else easeBuckets[0].count++;
   }
-  return { buckets: easeBuckets, excludedCount: untested, excludedLabel: `untested` };
+  return { buckets: easeBuckets, excludedCount: untested, excludedLabel: t(`untested`) };
 }
 
 interface Props {
@@ -110,10 +112,11 @@ interface Props {
 }
 
 export function CardsBreakdownChart({ cards, emptyMessage }: Props) {
+  const { t } = useTranslation();
   const [mode, setMode] = useState<CardsMode>(`status`);
   const [hovered, setHovered] = useState<number | null>(null);
 
-  const { buckets, excludedCount, excludedLabel } = buildBuckets(cards, mode);
+  const { buckets, excludedCount, excludedLabel } = buildBuckets(cards, mode, t);
   const maxCount = Math.max(1, ...buckets.map((b) => b.count));
   const barSlot = buckets.length > 0 ? INNER_W / buckets.length : INNER_W;
   const barW = Math.min(80, barSlot * 0.6);
@@ -131,14 +134,14 @@ export function CardsBreakdownChart({ cards, emptyMessage }: Props) {
 
   return (
     <ChartCard
-      title="Cards"
+      title={t(`Cards`)}
       right={
         <ChartToggle
           value={mode}
           options={[
-            [`status`, `Status`],
-            [`interval`, `Interval`],
-            [`ease`, `Ease`],
+            [`status`, t(`Status`)],
+            [`interval`, t(`Interval`)],
+            [`ease`, t(`Ease`)],
           ]}
           onChange={(next) => {
             setMode(next);
@@ -148,7 +151,7 @@ export function CardsBreakdownChart({ cards, emptyMessage }: Props) {
       }
       trailing={
         <div className="text-sm text-right">
-          <span className="text-gray-500">{`Total: `}</span>
+          <span className="text-gray-500">{t(`Total:`)} </span>
           <span className="font-semibold text-gray-800">{totalCards}</span>
         </div>
       }
@@ -160,7 +163,7 @@ export function CardsBreakdownChart({ cards, emptyMessage }: Props) {
           viewBox={`0 0 ${CHART_WIDTH} ${CHART_HEIGHT}`}
           className="w-full"
           role="img"
-          aria-label="Cards breakdown"
+          aria-label={t(`Cards breakdown`)}
         >
           <ChartFrame ticks={ticks} toY={toY} />
           {buckets.map((b, i) => {
@@ -203,11 +206,15 @@ export function CardsBreakdownChart({ cards, emptyMessage }: Props) {
           {hovered !== null &&
             renderTooltip(barX(hovered), toY(buckets[hovered].count), [
               buckets[hovered].tooltipLabel ?? buckets[hovered].label,
-              `${buckets[hovered].count} card${buckets[hovered].count === 1 ? `` : `s`}`,
+              buckets[hovered].count === 1
+                ? t(`{{count}} card`, { count: buckets[hovered].count })
+                : t(`{{count}} cards`, { count: buckets[hovered].count }),
             ])}
           {excludedCount !== undefined && excludedCount > 0 && (
             <text x={PAD_L} y={CHART_HEIGHT - 2} className="fill-gray-400" fontSize="10">
-              {`${excludedCount} ${excludedCount === 1 ? `card` : `cards`} ${excludedLabel}`}
+              {excludedCount === 1
+                ? t(`{{count}} card {{label}}`, { count: excludedCount, label: excludedLabel })
+                : t(`{{count}} cards {{label}}`, { count: excludedCount, label: excludedLabel })}
             </text>
           )}
         </svg>

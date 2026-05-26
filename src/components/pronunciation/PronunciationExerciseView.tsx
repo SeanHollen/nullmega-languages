@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import type { PronunciationPhrase } from "../../hooks/useGeneratePronunciation";
 import { PhraseCard } from "./PhraseCard";
 
@@ -23,6 +24,7 @@ export function PronunciationExerciseView({
   onRate,
   onSubmit,
 }: Props) {
+  const { t } = useTranslation();
   const allRated = ratings.every((r) => r !== null);
   const [showPhrasesByDefault, setShowPhrasesByDefault] = useState(true);
   const [showTranslationsByDefault, setShowTranslationsByDefault] = useState(false);
@@ -32,10 +34,13 @@ export function PronunciationExerciseView({
       <div className="bg-white rounded-2xl border border-green-100 shadow-sm px-6 py-4">
         {title && <h2 className="text-xl font-semibold text-gray-800 mb-1">{title}</h2>}
         <p className="text-xs text-gray-400 uppercase tracking-wide">
-          {`${language} · Complexity ${languageComplexity}`}
+          {t(`{{language}} · Complexity {{complexity}}`, {
+            language,
+            complexity: languageComplexity,
+          })}
         </p>
         <p className="text-sm text-gray-400 mt-1">
-          {`Listen to each phrase, practise speaking it, then rate yourself.`}
+          {t(`Listen to each phrase, practise speaking it, then rate yourself.`)}
         </p>
         <label className="flex items-center gap-2 mt-3 cursor-pointer select-none">
           <input
@@ -44,7 +49,7 @@ export function PronunciationExerciseView({
             onChange={(e) => setShowPhrasesByDefault(e.target.checked)}
             className="accent-green-600 cursor-pointer"
           />
-          <span className="text-sm text-gray-600">{`Show phrases by default`}</span>
+          <span className="text-sm text-gray-600">{t(`Show phrases by default`)}</span>
         </label>
         <label className="flex items-center gap-2 mt-1 cursor-pointer select-none">
           <input
@@ -53,7 +58,7 @@ export function PronunciationExerciseView({
             onChange={(e) => setShowTranslationsByDefault(e.target.checked)}
             className="accent-green-600 cursor-pointer"
           />
-          <span className="text-sm text-gray-600">{`Show translations by default`}</span>
+          <span className="text-sm text-gray-600">{t(`Show translations by default`)}</span>
         </label>
       </div>
 
@@ -78,11 +83,11 @@ export function PronunciationExerciseView({
           disabled={!allRated}
           className="w-full bg-green-600 text-white py-3 rounded-xl font-semibold hover:bg-green-700 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition"
         >
-          {`Submit`}
+          {t(`Submit`)}
         </button>
         {!allRated && (
           <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-gray-800 text-white text-xs rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition pointer-events-none">
-            {`Rate yourself on each phrase before submitting`}
+            {t(`Rate yourself on each phrase before submitting`)}
           </div>
         )}
       </div>

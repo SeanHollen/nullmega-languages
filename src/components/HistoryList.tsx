@@ -1,5 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useLiveQuery } from "dexie-react-hooks";
+import { useTranslation } from "react-i18next";
+import type { TFunction } from "i18next";
 import type { Mode } from "../hooks/useAbility";
 import type { WritingMode } from "../hooks/useGenerateWriting";
 import {
@@ -33,15 +35,15 @@ function writingModeOf(r: AssessmentRecord): WritingMode | null {
   return body?.exercise?.mode ?? null;
 }
 
-function relativeTime(ts: number): string {
+function relativeTime(ts: number, t: TFunction): string {
   const diff = Date.now() - ts;
   const mins = Math.floor(diff / 60000);
-  if (mins < 1) return `Just now`;
-  if (mins < 60) return `${mins}m ago`;
+  if (mins < 1) return t(`Just now`);
+  if (mins < 60) return t(`{{mins}}m ago`, { mins });
   const hours = Math.floor(mins / 60);
-  if (hours < 24) return `${hours}h ago`;
+  if (hours < 24) return t(`{{hours}}h ago`, { hours });
   const days = Math.floor(hours / 24);
-  if (days < 7) return `${days}d ago`;
+  if (days < 7) return t(`{{days}}d ago`, { days });
   return new Date(ts).toLocaleDateString();
 }
 
@@ -68,6 +70,7 @@ export interface ResumeState {
 }
 
 export function HistoryList({ mode, language, limit = 10, writingMode }: Props) {
+  const { t } = useTranslation();
   const records =
     useLiveQuery(async () => {
       const all = await getHistory(mode, language);
@@ -83,7 +86,7 @@ export function HistoryList({ mode, language, limit = 10, writingMode }: Props) 
       void navigate(`/${r.mode}`);
       return;
     }
-    const task = beginLoading(`Resuming…`);
+    const task = beginLoading(t(`Resuming…`));
     const state: ResumeState = { record: r };
     if (r.mode === `listening`) {
       const body = r.body as ListeningBody;
@@ -106,12 +109,12 @@ export function HistoryList({ mode, language, limit = 10, writingMode }: Props) 
   return (
     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mt-6">
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm font-semibold text-gray-700">{`Recent exercises`}</h3>
+        <h3 className="text-sm font-semibold text-gray-700">{t(`Recent exercises`)}</h3>
         <Link
           to={`/stats/${mode}`}
           className="text-xs text-green-600 hover:text-green-700 font-medium"
         >
-          {`View stats →`}
+          {t(`View stats →`)}
         </Link>
       </div>
       <div className="divide-y divide-gray-50">
@@ -129,23 +132,25 @@ export function HistoryList({ mode, language, limit = 10, writingMode }: Props) 
             <>
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
-                  <p className="text-sm text-gray-700 truncate">{r.title || `Untitled`}</p>
+                  <p className="text-sm text-gray-700 truncate">{r.title || t(`Untitled`)}</p>
                   {writingCategory && (
                     <span className="text-[10px] uppercase tracking-wide text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded shrink-0">
-                      {WRITING_MODE_LABEL[writingCategory]}
+                      {t(WRITING_MODE_LABEL[writingCategory])}
                     </span>
                   )}
                 </div>
                 <p className="text-xs text-gray-400">
-                  {inProgress ? `In progress` : relativeTime(r.completedAt!)}
+                  {inProgress ? t(`In progress`) : relativeTime(r.completedAt!, t)}
                 </p>
               </div>
               <div className="flex items-center gap-4 text-xs shrink-0">
-                <span className="text-gray-500">{`Complexity ${r.difficulty}`}</span>
+                <span className="text-gray-500">
+                  {t(`Complexity {{complexity}}`, { complexity: r.difficulty })}
+                </span>
                 {!inProgress && (
                   <>
                     <span className={points > 0 ? `text-green-600 font-medium` : `text-gray-400`}>
-                      {`${formatScore(points)} pts`}
+                      {t(`{{points}} pts`, { points: formatScore(points) })}
                     </span>
                     {showRating && (
                       <span className={`font-medium ${ratingClass}`}>
@@ -157,7 +162,7 @@ export function HistoryList({ mode, language, limit = 10, writingMode }: Props) 
                     </span>
                   </>
                 )}
-                {inProgress && <span className="text-yellow-600 font-medium">{`Resume →`}</span>}
+                {inProgress && <span className="text-yellow-600 font-medium">{t(`Resume →`)}</span>}
               </div>
             </>
           );

@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
+import type { TFunction } from "i18next";
 import type { SrsCardWithStatus } from "./SrsStatsView";
 import {
   aggregateOutcomesByDay,
@@ -31,13 +33,17 @@ interface OutcomeBucket {
   incorrect: number;
 }
 
-function buildBuckets(cards: SrsCardWithStatus[], mode: OutcomeMode): OutcomeBucket[] {
+function buildBuckets(
+  cards: SrsCardWithStatus[],
+  mode: OutcomeMode,
+  t: TFunction,
+): OutcomeBucket[] {
   if (mode === `interval`) {
     return aggregateOutcomesByInterval(cards).map((b) => {
       const lbl = formatIntervalLabel(b.intervalMs);
       return {
         label: lbl,
-        tooltipLabel: `${lbl} interval`,
+        tooltipLabel: t(`{{interval}} interval`, { interval: lbl }),
         correct: b.correct,
         incorrect: b.incorrect,
       };
@@ -83,13 +89,14 @@ interface Props {
 }
 
 export function ReviewOutcomesChart({ cards }: Props) {
+  const { t } = useTranslation();
   const [mode, setMode] = useState<OutcomeMode>(`interval`);
   const [scale, setScale] = useState<OutcomeScale>(`totals`);
   const [hovered, setHovered] = useState<{ bucket: number; side: "correct" | "incorrect" } | null>(
     null,
   );
 
-  const buckets = buildBuckets(cards, mode);
+  const buckets = buildBuckets(cards, mode, t);
   const totalOutcomes = buckets.reduce((s, b) => s + b.correct + b.incorrect, 0);
   if (totalOutcomes === 0 && mode === `interval`) return null;
 
@@ -97,10 +104,10 @@ export function ReviewOutcomesChart({ cards }: Props) {
   // buckets render as zero-height bars without NaN.
   const values = buckets.map((b) => {
     if (scale === `totals`) return { correctVal: b.correct, incorrectVal: b.incorrect };
-    const t = b.correct + b.incorrect;
+    const total = b.correct + b.incorrect;
     return {
-      correctVal: t > 0 ? (b.correct / t) * 100 : 0,
-      incorrectVal: t > 0 ? (b.incorrect / t) * 100 : 0,
+      correctVal: total > 0 ? (b.correct / total) * 100 : 0,
+      incorrectVal: total > 0 ? (b.incorrect / total) * 100 : 0,
     };
   });
   const maxCount =
@@ -128,14 +135,14 @@ export function ReviewOutcomesChart({ cards }: Props) {
 
   return (
     <ChartCard
-      title="Review outcomes"
+      title={t(`Review outcomes`)}
       right={
         <ChartToggle
           value={mode}
           options={[
-            [`interval`, `Per interval`],
-            [`day`, `Per day`],
-            [`hour`, `Per time of day`],
+            [`interval`, t(`Per interval`)],
+            [`day`, t(`Per day`)],
+            [`hour`, t(`Per time of day`)],
           ]}
           onChange={(next) => {
             setMode(next);
@@ -145,7 +152,7 @@ export function ReviewOutcomesChart({ cards }: Props) {
       }
       trailing={
         <div className="text-sm text-right">
-          <span className="text-gray-500">{`Reviews logged: `}</span>
+          <span className="text-gray-500">{t(`Reviews logged:`)} </span>
           <span className="font-semibold text-gray-800">{totalOutcomes}</span>
         </div>
       }
@@ -154,7 +161,7 @@ export function ReviewOutcomesChart({ cards }: Props) {
         viewBox={`0 0 ${CHART_WIDTH} ${CHART_HEIGHT}`}
         className="w-full"
         role="img"
-        aria-label="Review outcomes"
+        aria-label={t(`Review outcomes`)}
       >
         <ChartFrame ticks={ticks} toY={toY} formatTick={formatTick} />
         {buckets.map((b, i) => {
@@ -241,7 +248,9 @@ export function ReviewOutcomesChart({ cards }: Props) {
             const tx = hovered.side === `correct` ? cx - barW / 2 - 1 : cx + barW / 2 + 1;
             return renderTooltip(tx, toY(value), [
               b.tooltipLabel,
-              `${formatValue(value)} ${hovered.side}`,
+              hovered.side === `correct`
+                ? t(`{{value}} correct`, { value: formatValue(value) })
+                : t(`{{value}} incorrect`, { value: formatValue(value) }),
             ]);
           })()}
       </svg>
@@ -250,18 +259,18 @@ export function ReviewOutcomesChart({ cards }: Props) {
         <div className="flex items-center gap-4 text-xs text-gray-500">
           <span className="flex items-center gap-1.5">
             <span className="w-3 h-3 rounded-sm bg-green-600" />
-            {`Correct`}
+            {t(`Correct`)}
           </span>
           <span className="flex items-center gap-1.5">
             <span className="w-3 h-3 rounded-sm bg-red-500" />
-            {`Incorrect`}
+            {t(`Incorrect`)}
           </span>
         </div>
         <ChartToggle
           value={scale}
           options={[
-            [`totals`, `Totals`],
-            [`percent`, `Percent`],
+            [`totals`, t(`Totals`)],
+            [`percent`, t(`Percent`)],
           ]}
           onChange={(next) => {
             setScale(next);

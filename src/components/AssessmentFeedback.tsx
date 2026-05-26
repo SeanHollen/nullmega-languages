@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { FaThumbsUp, FaThumbsDown } from "react-icons/fa";
 import { updateFeedback } from "../utils/history";
 import { submitFeedback } from "../utils/api";
@@ -20,6 +21,7 @@ function voteButtonClass(
 }
 
 export function AssessmentFeedback({ assessmentId }: Props) {
+  const { t } = useTranslation();
   const [voted, setVoted] = useState<boolean | null>(null);
 
   function vote(helpful: boolean) {
@@ -36,7 +38,7 @@ export function AssessmentFeedback({ assessmentId }: Props) {
   return (
     <div className="bg-white rounded-2xl border border-green-100 shadow-sm p-5 flex items-center justify-between gap-4">
       <p className="text-sm text-gray-600">
-        {unvoted ? `Was this assessment helpful?` : `Thanks for the feedback!`}
+        {unvoted ? t(`Was this assessment helpful?`) : t(`Thanks for the feedback!`)}
       </p>
       <div className="flex items-center gap-2">
         <button
@@ -48,7 +50,7 @@ export function AssessmentFeedback({ assessmentId }: Props) {
             `bg-green-100 text-green-600`,
             `text-gray-400 hover:text-green-600 hover:bg-green-50`,
           )}`}
-          title={`Helpful`}
+          title={t(`Helpful`)}
         >
           <FaThumbsUp />
         </button>
@@ -61,7 +63,7 @@ export function AssessmentFeedback({ assessmentId }: Props) {
             `bg-red-100 text-red-600`,
             `text-gray-400 hover:text-red-600 hover:bg-red-50`,
           )}`}
-          title={`Not helpful`}
+          title={t(`Not helpful`)}
         >
           <FaThumbsDown />
         </button>

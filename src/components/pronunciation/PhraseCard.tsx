@@ -1,4 +1,5 @@
 import { useState, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { FaMicrophone, FaStop, FaQuestion } from "react-icons/fa";
 import { AudioPlayer } from "../listening/AudioPlayer";
 import { useSpeechToText } from "../../hooks/useSpeechToText";
@@ -34,6 +35,7 @@ export function PhraseCard({
   defaultTranslationRevealed = false,
   onRate,
 }: Props) {
+  const { t } = useTranslation();
   const [textRevealed, setTextRevealed] = useState(defaultTextRevealed);
   const [trackedTextDefault, setTrackedTextDefault] = useState(defaultTextRevealed);
   const [translationRevealed, setTranslationRevealed] = useState(defaultTranslationRevealed);
@@ -79,7 +81,7 @@ export function PhraseCard({
         if (prev) URL.revokeObjectURL(prev);
         return URL.createObjectURL(blob);
       });
-      stream.getTracks().forEach((t) => t.stop());
+      stream.getTracks().forEach((track) => track.stop());
     };
     setTranscript(``);
     setCheckRevealed(false);
@@ -108,18 +110,20 @@ export function PhraseCard({
   return (
     <div className={`bg-white rounded-2xl border shadow-sm p-6 space-y-4 ${borderColor}`}>
       <div className="flex items-center flex-wrap gap-x-3 gap-y-2">
-        <span className="text-xs text-gray-400 font-medium">{`Phrase ${index + 1}`}</span>
+        <span className="text-xs text-gray-400 font-medium">
+          {t(`Phrase {{n}}`, { n: index + 1 })}
+        </span>
         <button
           onClick={() => setTextRevealed((p) => !p)}
           className="cursor-pointer text-xs px-3 py-1.5 rounded-lg border border-gray-200 text-gray-500 hover:border-gray-300 hover:text-gray-700 transition"
         >
-          {textRevealed ? `Hide phrase` : `Show phrase`}
+          {textRevealed ? t(`Hide phrase`) : t(`Show phrase`)}
         </button>
         <button
           onClick={() => setTranslationRevealed((p) => !p)}
           className="cursor-pointer text-xs px-3 py-1.5 rounded-lg border border-gray-200 text-gray-500 hover:border-gray-300 hover:text-gray-700 transition"
         >
-          {translationRevealed ? `Hide translation` : `Show translation`}
+          {translationRevealed ? t(`Hide translation`) : t(`Show translation`)}
         </button>
       </div>
 
@@ -138,7 +142,7 @@ export function PhraseCard({
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-2 flex-wrap">
             {userRecordingUrl && !isRecording && (
-              <AudioPlayer src={userRecordingUrl} label={`Your recording`} small />
+              <AudioPlayer src={userRecordingUrl} label={t(`Your recording`)} small />
             )}
             {isRecording ? (
               <button
@@ -146,7 +150,7 @@ export function PhraseCard({
                 className="cursor-pointer flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg bg-red-50 border border-red-200 text-red-600 hover:bg-red-100 transition font-medium"
               >
                 <FaStop className="shrink-0" />
-                {`Stop`}
+                {t(`Stop`)}
               </button>
             ) : (
               <button
@@ -154,7 +158,7 @@ export function PhraseCard({
                 className="cursor-pointer flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg border border-gray-200 text-gray-500 hover:border-gray-300 hover:text-gray-700 transition"
               >
                 <FaMicrophone className="shrink-0" />
-                {userRecordingUrl ? `Re-record` : `Record`}
+                {userRecordingUrl ? t(`Re-record`) : t(`Record`)}
               </button>
             )}
             {userRecordingUrl && !isRecording && stt.isSupported && (
@@ -163,7 +167,7 @@ export function PhraseCard({
                 className="cursor-pointer flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg border border-gray-200 text-gray-500 hover:border-gray-300 hover:text-gray-700 transition"
               >
                 <FaQuestion className="shrink-0" />
-                {`Check`}
+                {t(`Check`)}
               </button>
             )}
           </div>
@@ -177,7 +181,7 @@ export function PhraseCard({
                   : `border-gray-200 text-gray-500 hover:border-green-300 hover:text-green-600`
               }`}
             >
-              {`Easy`}
+              {t(`Easy`)}
             </button>
             <button
               onClick={() => onRate("medium")}
@@ -187,7 +191,7 @@ export function PhraseCard({
                   : `border-gray-200 text-gray-500 hover:border-yellow-300 hover:text-yellow-600`
               }`}
             >
-              {`Medium`}
+              {t(`Medium`)}
             </button>
             <button
               onClick={() => onRate("bad")}
@@ -197,7 +201,7 @@ export function PhraseCard({
                   : `border-gray-200 text-gray-500 hover:border-red-300 hover:text-red-600`
               }`}
             >
-              {`Hard`}
+              {t(`Hard`)}
             </button>
           </div>
         </div>
@@ -206,7 +210,7 @@ export function PhraseCard({
           <p
             className={`text-sm italic ${transcriptMatches ? `text-green-600` : `text-yellow-600`}`}
           >
-            {transcript || `(no speech detected)`}
+            {transcript || t(`(no speech detected)`)}
           </p>
         )}
       </div>

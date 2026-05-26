@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useLocation, useParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { StudyEmptyState } from "../components/StudyEmptyState";
 import { BackHeader } from "../components/BackHeader";
 import type { GrammarCard } from "../utils/grammarCards";
@@ -25,6 +26,7 @@ function matchesAnyAnswer(user: string, accepted: string[]): boolean {
 export function GrammarStudyPage() {
   const location = useLocation();
   const { mode: modeParam } = useParams<{ mode: string }>();
+  const { t } = useTranslation();
   const mode = modeParam === `review` ? `review` : `learn`;
 
   const sessionData = location.state as GrammarSessionData | null;
@@ -37,7 +39,7 @@ export function GrammarStudyPage() {
   );
   const [questionResults, setQuestionResults] = useState<boolean[]>([]);
 
-  const title = mode === `learn` ? `Learn Grammar` : `Review Grammar`;
+  const title = mode === `learn` ? t(`Learn Grammar`) : t(`Review Grammar`);
 
   const allAnswered = current !== null && answers.every((a) => a.trim() !== ``);
 
@@ -92,7 +94,9 @@ export function GrammarStudyPage() {
           to="/grammar"
           right={
             remaining.length > 0 ? (
-              <span className="text-sm text-gray-500">{`${remaining.length} left`}</span>
+              <span className="text-sm text-gray-500">
+                {t(`{{count}} left`, { count: remaining.length })}
+              </span>
             ) : undefined
           }
         />
@@ -135,7 +139,7 @@ export function GrammarStudyPage() {
                       onKeyDown={(e) => {
                         if (e.key === `Enter` && allAnswered) submitAnswers();
                       }}
-                      placeholder={`Type your answer…`}
+                      placeholder={t(`Type your answer…`)}
                       className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500 text-gray-700"
                     />
                   )}
@@ -146,10 +150,10 @@ export function GrammarStudyPage() {
             <button
               onClick={submitAnswers}
               disabled={!allAnswered}
-              title={!allAnswered ? `Not all questions answered` : undefined}
+              title={!allAnswered ? t(`Not all questions answered`) : undefined}
               className="w-full bg-green-600 text-white py-3 rounded-xl font-semibold hover:bg-green-700 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition"
             >
-              {`Check answers →`}
+              {t(`Check answers →`)}
             </button>
           </div>
         )}
@@ -163,7 +167,7 @@ export function GrammarStudyPage() {
               <p className="text-3xl font-bold text-gray-800">
                 {`${questionResults.filter(Boolean).length} / ${questionResults.length}`}
               </p>
-              <p className="text-sm text-gray-500 mt-1">{`questions correct`}</p>
+              <p className="text-sm text-gray-500 mt-1">{t(`questions correct`)}</p>
             </div>
 
             <div className="space-y-2">
@@ -190,7 +194,7 @@ export function GrammarStudyPage() {
               onClick={() => handleCardAnswer(questionResults.every(Boolean))}
               className="w-full bg-green-600 text-white py-3 rounded-xl font-semibold hover:bg-green-700 transition cursor-pointer"
             >
-              {`Continue →`}
+              {t(`Continue →`)}
             </button>
           </div>
         )}

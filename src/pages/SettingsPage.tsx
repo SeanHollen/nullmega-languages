@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLiveQuery } from "dexie-react-hooks";
+import { useTranslation } from "react-i18next";
 import { BackHeader } from "../components/BackHeader";
 import type { Provider } from "../utils/settings";
 import { loadSettings, saveSettings } from "../utils/settings";
@@ -8,6 +9,7 @@ import { TextGenKeySection } from "../components/onboarding/TextGenKeySection";
 
 export function SettingsPage() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const initial = useLiveQuery(() => loadSettings(), []);
 
   const [textGenKey, setTextGenKey] = useState<string | null>(null);
@@ -44,7 +46,7 @@ export function SettingsPage() {
   return (
     <div className="min-h-screen bg-green-100 py-10 px-4">
       <div className="max-w-2xl mx-auto">
-        <BackHeader title="Settings" to="/" />
+        <BackHeader title={t(`Settings`)} to="/" />
 
         {initial && textGenKey !== null && ttsKey !== null && sameTTS !== null && (
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-6">
@@ -53,9 +55,9 @@ export function SettingsPage() {
             <hr className="border-gray-100" />
 
             <section>
-              <h2 className="text-lg font-semibold text-gray-800 mb-1">{`Text-to-Speech`}</h2>
+              <h2 className="text-lg font-semibold text-gray-800 mb-1">{t(`Text-to-Speech`)}</h2>
               <p className="text-sm text-gray-400 mb-4">
-                {`Configure a separate key for TTS, or reuse the text generation key.`}
+                {t(`Configure a separate key for TTS, or reuse the text generation key.`)}
               </p>
               <label className="flex items-center gap-2 mb-4 cursor-pointer select-none">
                 <input
@@ -64,18 +66,24 @@ export function SettingsPage() {
                   onChange={(e) => setSameTTS(e.target.checked)}
                   className="accent-green-500 cursor-pointer"
                 />
-                <span className="text-sm text-gray-600">{`Use same key as text generation`}</span>
+                <span className="text-sm text-gray-600">
+                  {t(`Use same key as text generation`)}
+                </span>
               </label>
               {!sameTTS && (
                 <div className="space-y-3">
                   <div>
-                    <label className="block text-sm font-medium text-gray-600 mb-1">{`Provider`}</label>
+                    <label className="block text-sm font-medium text-gray-600 mb-1">
+                      {t(`Provider`)}
+                    </label>
                     <select className="w-full border border-gray-200 rounded-xl px-3 py-2 text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-green-500 cursor-pointer">
-                      <option>{`OpenAI`}</option>
+                      <option>{t(`OpenAI`)}</option>
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-600 mb-1">{`API Key`}</label>
+                    <label className="block text-sm font-medium text-gray-600 mb-1">
+                      {t(`API Key`)}
+                    </label>
                     <input
                       type={showTtsKey ? `text` : `password`}
                       value={ttsKey}
@@ -95,7 +103,7 @@ export function SettingsPage() {
                           onChange={(e) => setShowTtsKey(e.target.checked)}
                           className="accent-green-500 cursor-pointer"
                         />
-                        <span className="text-xs text-gray-500">{`Show key`}</span>
+                        <span className="text-xs text-gray-500">{t(`Show key`)}</span>
                       </label>
                       {ttsKey && (
                         <button
@@ -106,12 +114,14 @@ export function SettingsPage() {
                           }}
                           className="text-xs text-gray-500 hover:text-gray-700 cursor-pointer"
                         >
-                          {`Clear`}
+                          {t(`Clear`)}
                         </button>
                       )}
                     </div>
                     {ttsKeyTouched && ttsKey && !ttsKey.startsWith(`sk-`) && (
-                      <p className="text-xs text-red-500 mt-1">{`Key should start with "sk-"`}</p>
+                      <p className="text-xs text-red-500 mt-1">
+                        {t(`Key should start with "sk-"`)}
+                      </p>
                     )}
                   </div>
                 </div>
@@ -122,7 +132,7 @@ export function SettingsPage() {
               onClick={handleSave}
               className="w-full bg-green-600 text-white rounded-xl py-3 font-semibold hover:bg-green-700 transition cursor-pointer"
             >
-              {`Save`}
+              {t(`Save`)}
             </button>
           </div>
         )}

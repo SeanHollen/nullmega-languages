@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { DAY } from "../../utils/studySession";
 import type { SrsCardWithStatus } from "./SrsStatsView";
 import {
@@ -25,6 +26,7 @@ interface Props {
 }
 
 export function CardsAddedChart({ cards, emptyMessage }: Props) {
+  const { t } = useTranslation();
   const [now] = useState(() => Date.now());
   const [mode, setMode] = useState<AddedMode>(`perDay`);
   const [hovered, setHovered] = useState<number | null>(null);
@@ -61,13 +63,13 @@ export function CardsAddedChart({ cards, emptyMessage }: Props) {
 
   return (
     <ChartCard
-      title="Cards added over time"
+      title={t(`Cards added over time`)}
       right={
         <ChartToggle
           value={mode}
           options={[
-            [`perDay`, `Per day`],
-            [`cumulative`, `Cumulative`],
+            [`perDay`, t(`Per day`)],
+            [`cumulative`, t(`Cumulative`)],
           ]}
           onChange={setMode}
         />
@@ -80,7 +82,7 @@ export function CardsAddedChart({ cards, emptyMessage }: Props) {
           viewBox={`0 0 ${CHART_WIDTH} ${CHART_HEIGHT}`}
           className="w-full"
           role="img"
-          aria-label="Cards added over time"
+          aria-label={t(`Cards added over time`)}
         >
           <ChartFrame ticks={ticks} toY={toY} />
           {series.map((d, i) => {
@@ -186,7 +188,10 @@ export function CardsAddedChart({ cards, emptyMessage }: Props) {
             (() => {
               const d = series[hovered];
               const value = mode === `perDay` ? d.count : d.cumulative;
-              const valueLine = mode === `perDay` ? `${d.count} added` : `${d.cumulative} total`;
+              const valueLine =
+                mode === `perDay`
+                  ? t(`{{count}} added`, { count: d.count })
+                  : t(`{{count}} total`, { count: d.cumulative });
               return renderTooltip(barX(hovered), toY(value), [shortDate(d.t), valueLine]);
             })()}
         </svg>

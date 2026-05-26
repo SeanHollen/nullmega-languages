@@ -56,7 +56,7 @@ export function ChartFrame({
   toY: (value: number) => number;
   formatTick?: (tick: number) => string;
 }) {
-  const fmt = formatTick ?? ((t) => `${t}`);
+  const fmt = formatTick ?? ((tick) => `${tick}`);
   return (
     <>
       {ticks.map((tick) => (

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
+import { useTranslation } from "react-i18next";
 import type { Exercise } from "../../types";
 import { QuestionCard } from "./QuestionCard";
 import { WordDefinitionPanel } from "./WordDefinitionPanel";
@@ -51,6 +52,7 @@ export function PassageView({
   const dictionaryEnabled = useLiveQuery(() => loadDictionaryEnabled(), []) ?? true;
   const allAnswered = selected.every((s) => s !== null);
   const tokens = tokenize(exercise.passage);
+  const { t } = useTranslation();
 
   return (
     <div className="space-y-6">
@@ -61,7 +63,10 @@ export function PassageView({
               <h2 className="text-xl font-semibold text-gray-800 mb-1">{exercise.title}</h2>
             )}
             <p className="text-xs text-gray-400 uppercase tracking-wide">
-              {`${language} · Complexity ${languageComplexity}`}
+              {t(`{{language}} · Complexity {{complexity}}`, {
+                language,
+                complexity: languageComplexity,
+              })}
             </p>
           </div>
           <label className="flex items-center gap-2 cursor-pointer select-none shrink-0">
@@ -71,26 +76,26 @@ export function PassageView({
               onChange={(e) => void saveDictionaryEnabled(e.target.checked)}
               className="w-4 h-4 accent-green-600 cursor-pointer"
             />
-            <span className="text-xs text-gray-500">{`Dictionary`}</span>
+            <span className="text-xs text-gray-500">{t(`Dictionary`)}</span>
           </label>
         </div>
         <p className="text-gray-800 leading-relaxed whitespace-pre-wrap">
           {dictionaryEnabled
-            ? tokens.map((t, i) =>
-                t.isWord ? (
+            ? tokens.map((token, i) =>
+                token.isWord ? (
                   <span
                     key={i}
-                    onClick={() => setSelectedWord(t.text)}
+                    onClick={() => setSelectedWord(token.text)}
                     className={`cursor-pointer rounded ${
-                      selectedWord && selectedWord.toLowerCase() === t.text.toLowerCase()
+                      selectedWord && selectedWord.toLowerCase() === token.text.toLowerCase()
                         ? `bg-green-200 text-green-900`
                         : `hover:bg-yellow-100`
                     }`}
                   >
-                    {t.text}
+                    {token.text}
                   </span>
                 ) : (
-                  <span key={i}>{t.text}</span>
+                  <span key={i}>{token.text}</span>
                 ),
               )
             : exercise.passage}
@@ -110,10 +115,10 @@ export function PassageView({
       <button
         onClick={onSubmit}
         disabled={!allAnswered}
-        title={!allAnswered ? `Not all questions answered` : undefined}
+        title={!allAnswered ? t(`Not all questions answered`) : undefined}
         className="w-full bg-green-600 text-white py-3 rounded-xl font-semibold hover:bg-green-700 disabled:opacity-40 transition cursor-pointer"
       >
-        {`Submit Answers`}
+        {t(`Submit Answers`)}
       </button>
 
       {dictionaryEnabled && (

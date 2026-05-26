@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useLiveQuery } from "dexie-react-hooks";
+import { useTranslation } from "react-i18next";
 import { BackHeader } from "../components/BackHeader";
 import { SetupView } from "../components/reading/SetupView";
 import { PassageView } from "../components/reading/PassageView";
@@ -26,6 +27,7 @@ export function ReadingPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { language } = useLanguage();
+  const { t } = useTranslation();
   const resume =
     (location.state as ResumeState | null)?.record?.mode === `reading`
       ? (location.state as ResumeState)
@@ -70,7 +72,7 @@ export function ReadingPage() {
   }
 
   function handleGenerate() {
-    const task = beginLoading(`Generating passage…`);
+    const task = beginLoading(t(`Generating passage…`));
     mutate(
       { language, languageComplexity: sliderComplexity, length },
       {
@@ -170,7 +172,7 @@ export function ReadingPage() {
   return (
     <div className="min-h-screen bg-green-100 py-10 px-4">
       <div className="max-w-2xl mx-auto">
-        <BackHeader title="Reading Comprehension" to="/" />
+        <BackHeader title={t(`Reading Comprehension`)} to="/" />
 
         {phase === `setup` && (
           <>
@@ -180,7 +182,7 @@ export function ReadingPage() {
               rated={rated}
               savedRating={savedRating}
               error={error?.message ?? ``}
-              generateLabel={`Generate Reading Exercise`}
+              generateLabel={t(`Generate Reading Exercise`)}
               length={length}
               onLengthChange={setLength}
               onLanguageComplexityChange={setComplexityOverride}

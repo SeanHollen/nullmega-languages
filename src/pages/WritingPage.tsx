@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useLiveQuery } from "dexie-react-hooks";
+import { useTranslation } from "react-i18next";
 import { BackHeader } from "../components/BackHeader";
 import { SetupView } from "../components/reading/SetupView";
 import { WritingPassageView } from "../components/writing/WritingPassageView";
@@ -55,6 +56,7 @@ export function WritingPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { language } = useLanguage();
+  const { t } = useTranslation();
   const resume =
     (location.state as ResumeState | null)?.record?.mode === `writing`
       ? (location.state as ResumeState)
@@ -119,7 +121,7 @@ export function WritingPage() {
       return;
     }
     const llmMode = mode;
-    const task = beginLoading(`Generating passage…`);
+    const task = beginLoading(t(`Generating passage…`));
     generateWriting.mutate(
       { language, languageComplexity: sliderComplexity, mode: llmMode },
       {
@@ -144,7 +146,7 @@ export function WritingPage() {
             setAnswers(answersSeed);
 
             if (data.mode === `dictogloss`) {
-              task.update(`Generating audio…`);
+              task.update(t(`Generating audio…`));
               try {
                 const audioKeyPassage = `assessment-${id}-passage`;
                 const [url] = await generatePhrasesAudio(
@@ -177,7 +179,7 @@ export function WritingPage() {
   }
 
   async function handleGenerateVocabParagraph() {
-    const task = beginLoading(`Picking vocab…`);
+    const task = beginLoading(t(`Picking vocab…`));
     const cards = await loadFlashcards(language);
     const picked = pickUpcomingVocabWords(cards);
     if (picked.length === 0) {
@@ -192,7 +194,7 @@ export function WritingPage() {
     const id = await saveAssessment({
       mode: `writing`,
       language,
-      title: `Vocab paragraph`,
+      title: t(`Vocab paragraph`),
       difficulty: data.languageComplexity,
       scoreEarned: 0,
       scoreMax: gradingMaxScore(data),
@@ -228,7 +230,7 @@ export function WritingPage() {
 
   function handleSubmit() {
     if (!exercise || !assessmentId) return;
-    const task = beginLoading(`Grading your answers…`);
+    const task = beginLoading(t(`Grading your answers…`));
 
     const onGraded = async (result: { grades: WritingGrade[] }) => {
       setGrades(result.grades);
@@ -323,16 +325,16 @@ export function WritingPage() {
   const error = generateWriting.error?.message ?? gradeWriting.error?.message ?? ``;
 
   function computeDisabledReason(): string | null {
-    if (!mode) return `Pick a writing mode first`;
+    if (!mode) return t(`Pick a writing mode first`);
     if (mode === `vocab-paragraph` && upcomingVocabCount === 0) {
-      return `You have no upcoming vocab cards. Add words to your vocabulary first.`;
+      return t(`You have no upcoming vocab cards. Add words to your vocabulary first.`);
     }
     return null;
   }
   return (
     <div className="min-h-screen bg-green-100 py-10 px-4">
       <div className="max-w-2xl mx-auto">
-        <BackHeader title="Writing Practice" to="/" />
+        <BackHeader title={t(`Writing Practice`)} to="/" />
 
         {phase === `setup` && (
           <>
@@ -342,7 +344,7 @@ export function WritingPage() {
               rated={rated}
               savedRating={savedRating}
               error={error}
-              generateLabel={`Generate Writing Exercise`}
+              generateLabel={t(`Generate Writing Exercise`)}
               writingMode={mode}
               onWritingModeChange={setMode}
               disabledReason={computeDisabledReason()}

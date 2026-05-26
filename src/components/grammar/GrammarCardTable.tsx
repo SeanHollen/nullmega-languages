@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { FaFileImport, FaFileExport } from "react-icons/fa";
 import type { GrammarCard, GrammarCardStatusDerived } from "../../utils/grammarCards";
 import {
@@ -90,6 +91,7 @@ interface Props {
 }
 
 export function GrammarCardTable({ cards, language }: Props) {
+  const { t } = useTranslation();
   const [search, setSearch] = useState(``);
   const [actionMessage, setActionMessage] = useState<string | null>(null);
   const [sort, setSort] = useState<{ col: SortCol; dir: SortDir } | null>(null);
@@ -126,7 +128,11 @@ export function GrammarCardTable({ cards, language }: Props) {
       a.download = `grammar-${slug}-${date}.json`;
       a.click();
       URL.revokeObjectURL(url);
-      setActionMessage(`Exported ${cards.length} card${cards.length === 1 ? `` : `s`}`);
+      setActionMessage(
+        cards.length === 1
+          ? t(`Exported {{count}} card`, { count: cards.length })
+          : t(`Exported {{count}} cards`, { count: cards.length }),
+      );
     })();
   }
 
@@ -138,16 +144,18 @@ export function GrammarCardTable({ cards, language }: Props) {
     try {
       json = await file.text();
     } catch (err) {
-      setActionMessage(`Read failed: ${String(err)}`);
+      setActionMessage(t(`Read failed: {{error}}`, { error: String(err) }));
       return;
     }
     try {
       const { added, skipped } = await importGrammarCards(language, json);
-      setActionMessage(
-        `Imported ${added} card${added === 1 ? `` : `s`}${skipped > 0 ? ` (skipped ${skipped})` : ``}`,
-      );
+      const base =
+        added === 1
+          ? t(`Imported {{count}} card`, { count: added })
+          : t(`Imported {{count}} cards`, { count: added });
+      setActionMessage(skipped > 0 ? `${base} ${t(`(skipped {{skipped}})`, { skipped })}` : base);
     } catch (err) {
-      setActionMessage(`Import failed: ${String(err)}`);
+      setActionMessage(t(`Import failed: {{error}}`, { error: String(err) }));
     }
   }
 
@@ -157,7 +165,7 @@ export function GrammarCardTable({ cards, language }: Props) {
         (c) =>
           c.title.toLowerCase().includes(q) ||
           c.prompt.toLowerCase().includes(q) ||
-          c.tags.some((t) => t.toLowerCase().includes(q)),
+          c.tags.some((tag) => tag.toLowerCase().includes(q)),
       )
     : cards;
 
@@ -175,12 +183,30 @@ export function GrammarCardTable({ cards, language }: Props) {
   const pageEnd = Math.min(pageStart + PAGE_SIZE, total);
   const paginated = sorted.slice(pageStart, pageEnd);
 
+  let showingLabel: string;
+  if (total === 0) {
+    showingLabel = t(`No matches`);
+  } else if (q) {
+    showingLabel = t(`Showing {{start}}–{{end}} of {{total}} (filtered from {{all}})`, {
+      start: pageStart + 1,
+      end: pageEnd,
+      total,
+      all: cards.length,
+    });
+  } else {
+    showingLabel = t(`Showing {{start}}–{{end}} of {{total}}`, {
+      start: pageStart + 1,
+      end: pageEnd,
+      total,
+    });
+  }
+
   return (
     <>
       <div className="flex flex-wrap items-center gap-2 mb-4">
         <button
           onClick={() => fileInputRef.current?.click()}
-          title={`Import cards from JSON`}
+          title={t(`Import cards from JSON`)}
           className="bg-white border border-gray-200 text-gray-500 p-2 rounded-lg hover:border-gray-300 hover:bg-gray-50 hover:text-gray-700 transition cursor-pointer"
         >
           <FaFileImport />
@@ -188,7 +214,7 @@ export function GrammarCardTable({ cards, language }: Props) {
         <button
           onClick={handleExport}
           disabled={cards.length === 0}
-          title={`Export cards to JSON`}
+          title={t(`Export cards to JSON`)}
           className="bg-white border border-gray-200 text-gray-500 p-2 rounded-lg hover:border-gray-300 hover:bg-gray-50 hover:text-gray-700 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition"
         >
           <FaFileExport />
@@ -205,14 +231,16 @@ export function GrammarCardTable({ cards, language }: Props) {
           to={`/grammar/stats`}
           className="ml-auto text-[0.8125rem] text-green-600 hover:text-green-700 font-medium"
         >
-          {`View stats →`}
+          {t(`View stats →`)}
         </Link>
       </div>
 
       {cards.length === 0 ? (
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 text-center">
           <p className="text-gray-500">
-            {`No grammar cards yet. Click "Learn new cards" to generate your first set, or import from JSON.`}
+            {t(
+              `No grammar cards yet. Click "Learn new cards" to generate your first set, or import from JSON.`,
+            )}
           </p>
         </div>
       ) : (
@@ -222,16 +250,12 @@ export function GrammarCardTable({ cards, language }: Props) {
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder={`Search title, prompt, or tags…`}
+              placeholder={t(`Search title, prompt, or tags…`)}
               className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
             />
           </div>
           <div className="flex items-center justify-between gap-3 px-4 py-2 border-b border-gray-100 text-xs text-gray-500">
-            <span>
-              {total === 0
-                ? `No matches`
-                : `Showing ${pageStart + 1}–${pageEnd} of ${total}${q ? ` (filtered from ${cards.length})` : ``}`}
-            </span>
+            <span>{showingLabel}</span>
             {pageCount > 1 && (
               <div className="flex items-center gap-2">
                 <button
@@ -239,15 +263,20 @@ export function GrammarCardTable({ cards, language }: Props) {
                   disabled={clampedPage === 0}
                   className="px-2 py-1 rounded border border-gray-200 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 cursor-pointer"
                 >
-                  {`Prev`}
+                  {t(`Prev`)}
                 </button>
-                <span>{`Page ${clampedPage + 1} of ${pageCount}`}</span>
+                <span>
+                  {t(`Page {{page}} of {{pages}}`, {
+                    page: clampedPage + 1,
+                    pages: pageCount,
+                  })}
+                </span>
                 <button
                   onClick={() => setPage((p) => Math.min(pageCount - 1, p + 1))}
                   disabled={clampedPage >= pageCount - 1}
                   className="px-2 py-1 rounded border border-gray-200 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 cursor-pointer"
                 >
-                  {`Next`}
+                  {t(`Next`)}
                 </button>
               </div>
             )}
@@ -256,13 +285,13 @@ export function GrammarCardTable({ cards, language }: Props) {
             <table className="w-full text-sm">
               <thead className="border-b border-gray-100 bg-gray-50 text-xs font-semibold text-gray-500">
                 <tr className="text-left">
-                  {th("title", "Title")}
-                  {th("tags", "Tags")}
-                  {th("level", "Level")}
-                  {th("questions", "Questions")}
-                  {th("status", "Status")}
-                  {th("lastReviewed", "Last reviewed")}
-                  {th("interval", "Interval")}
+                  {th("title", t(`Title`))}
+                  {th("tags", t(`Tags`))}
+                  {th("level", t(`Level`))}
+                  {th("questions", t(`Questions`))}
+                  {th("status", t(`Status`))}
+                  {th("lastReviewed", t(`Last reviewed`))}
+                  {th("interval", t(`Interval`))}
                   <th className="px-4 py-3" />
                 </tr>
               </thead>
@@ -270,7 +299,7 @@ export function GrammarCardTable({ cards, language }: Props) {
                 {paginated.length === 0 ? (
                   <tr>
                     <td colSpan={8} className="px-4 py-6 text-center text-gray-400 text-sm">
-                      {`No matches for "${search}"`}
+                      {t(`No matches for "{{search}}"`, { search })}
                     </td>
                   </tr>
                 ) : (
@@ -292,14 +321,16 @@ export function GrammarCardTable({ cards, language }: Props) {
                           </div>
                         </td>
                         <td className="px-4 py-3 text-gray-500 text-xs">
-                          {LEVEL_LABELS[c.level] ?? `L${c.level}`}
+                          {LEVEL_LABELS[c.level]
+                            ? t(LEVEL_LABELS[c.level])
+                            : t(`L{{level}}`, { level: c.level })}
                         </td>
                         <td className="px-4 py-3 text-gray-500 text-xs">{c.questions.length}</td>
                         <td className="px-4 py-3">
                           <span
                             className={`text-xs font-medium px-2 py-0.5 rounded-full ${STATUS_STYLES[status]}`}
                           >
-                            {status}
+                            {t(status)}
                           </span>
                         </td>
                         <td className="px-4 py-3 text-gray-500 text-xs">
@@ -314,7 +345,7 @@ export function GrammarCardTable({ cards, language }: Props) {
                               void removeGrammarCard(c.id);
                             }}
                             className="text-gray-300 hover:text-red-400 transition cursor-pointer"
-                            title={`Delete card`}
+                            title={t(`Delete card`)}
                           >
                             ✕
                           </button>

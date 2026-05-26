@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useLiveQuery } from "dexie-react-hooks";
+import { useTranslation } from "react-i18next";
 import { BackHeader } from "../components/BackHeader";
 import { useLanguage } from "../contexts/LanguageContext";
 import { ResultsView } from "../components/reading-listening/ResultsView";
@@ -167,6 +168,7 @@ export function HistoryViewPage() {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const { language } = useLanguage();
+  const { t } = useTranslation();
   const record = useLiveQuery(async () => (id ? await getAssessment(id) : null), [id]);
 
   // useLiveQuery returns undefined until the first read resolves; treat that as "loading"
@@ -178,7 +180,7 @@ export function HistoryViewPage() {
       <div className="min-h-screen bg-green-100 py-10 px-4">
         <div className="max-w-2xl mx-auto">
           <BackHeader title="" to="/" />
-          <p className="text-gray-500">{`Assessment not found.`}</p>
+          <p className="text-gray-500">{t(`Assessment not found.`)}</p>
         </div>
       </div>
     );
@@ -190,13 +192,15 @@ export function HistoryViewPage() {
   return (
     <div className="min-h-screen bg-green-100 py-10 px-4">
       <div className="max-w-2xl mx-auto">
-        <BackHeader title={PAGE_TITLE[record.mode]} to={`/${record.mode}`} />
+        <BackHeader title={t(PAGE_TITLE[record.mode])} to={`/${record.mode}`} />
 
         {record.body ? (
           <BodyView record={record} language={language} onGoAgain={onGoAgain} onHome={onHome} />
         ) : (
           <p className="text-gray-400 italic text-center">
-            {`This assessment was completed before full bodies were saved, so only the summary is available.`}
+            {t(
+              `This assessment was completed before full bodies were saved, so only the summary is available.`,
+            )}
           </p>
         )}
       </div>

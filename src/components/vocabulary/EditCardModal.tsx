@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { FaChevronDown, FaChevronRight } from "react-icons/fa";
 import type { Flashcard, FlashcardStatus } from "../../utils/flashcards";
 import { patchFlashcard, updateFlashcardTags } from "../../utils/flashcards";
@@ -11,8 +12,8 @@ const INTERVAL_DAYS = [1, 3, 7, 14, 30, 90, 180, 365];
 function parseTags(input: string): string[] {
   return input
     .split(`,`)
-    .map((t) => t.trim())
-    .filter((t) => t.length > 0);
+    .map((tag) => tag.trim())
+    .filter((tag) => tag.length > 0);
 }
 
 interface Props {
@@ -22,6 +23,7 @@ interface Props {
 }
 
 export function EditCardModal({ card, onSave, onClose }: Props) {
+  const { t } = useTranslation();
   const [source, setSource] = useState(card.source);
   const [translation, setTranslation] = useState(card.translation);
   const [status, setStatus] = useState<FlashcardStatus>(card.status);
@@ -57,10 +59,12 @@ export function EditCardModal({ card, onSave, onClose }: Props) {
       }}
     >
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 space-y-4 max-h-[90vh] overflow-y-auto">
-        <h2 className="text-base font-semibold text-gray-800">{`Edit card`}</h2>
+        <h2 className="text-base font-semibold text-gray-800">{t(`Edit card`)}</h2>
         <div className="space-y-3">
           <div>
-            <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">{`Source`}</label>
+            <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+              {t(`Source`)}
+            </label>
             <input
               autoFocus
               value={source}
@@ -69,7 +73,9 @@ export function EditCardModal({ card, onSave, onClose }: Props) {
             />
           </div>
           <div>
-            <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">{`Translation`}</label>
+            <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+              {t(`Translation`)}
+            </label>
             <input
               value={translation}
               onChange={(e) => setTranslation(e.target.value)}
@@ -78,7 +84,9 @@ export function EditCardModal({ card, onSave, onClose }: Props) {
           </div>
           <div className="flex gap-3">
             <div className="flex-1">
-              <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">{`Status`}</label>
+              <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                {t(`Status`)}
+              </label>
               <select
                 value={status}
                 onChange={(e) => setStatus(e.target.value as FlashcardStatus)}
@@ -86,13 +94,15 @@ export function EditCardModal({ card, onSave, onClose }: Props) {
               >
                 {ALL_STATUSES.map((s) => (
                   <option key={s} value={s}>
-                    {s}
+                    {t(s)}
                   </option>
                 ))}
               </select>
             </div>
             <div className="w-48">
-              <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">{`Current interval (days)`}</label>
+              <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                {t(`Current interval (days)`)}
+              </label>
               <select
                 value={intervalDays}
                 onChange={(e) => setIntervalDays(Number(e.target.value))}
@@ -107,11 +117,13 @@ export function EditCardModal({ card, onSave, onClose }: Props) {
             </div>
           </div>
           <div>
-            <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">{`Tags`}</label>
+            <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+              {t(`Tags`)}
+            </label>
             <input
               value={tags}
               onChange={(e) => setTags(e.target.value)}
-              placeholder={`tag1, tag2`}
+              placeholder={t(`tag1, tag2`)}
               onKeyDown={(e) => {
                 if (e.key === `Enter`) save();
                 if (e.key === `Escape`) onClose();
@@ -125,7 +137,7 @@ export function EditCardModal({ card, onSave, onClose }: Props) {
             onClick={() => setDetailsOpen((p) => !p)}
             className="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg border border-gray-200 bg-gray-50 hover:bg-gray-100 hover:border-gray-300 text-sm font-medium text-gray-700 cursor-pointer transition"
           >
-            <span>{`Card details`}</span>
+            <span>{t(`Card details`)}</span>
             {detailsOpen ? (
               <FaChevronDown className="text-gray-500 text-xs" />
             ) : (
@@ -134,7 +146,7 @@ export function EditCardModal({ card, onSave, onClose }: Props) {
           </button>
           {detailsOpen && (
             <div className="mt-2">
-              <DetailsBlock card={card} />
+              <DetailsBlock card={card} t={t} />
             </div>
           )}
         </div>
@@ -143,13 +155,13 @@ export function EditCardModal({ card, onSave, onClose }: Props) {
             onClick={onClose}
             className="text-sm text-gray-500 px-4 py-2 rounded-lg border border-gray-200 hover:border-gray-300 cursor-pointer transition"
           >
-            {`Cancel`}
+            {t(`Cancel`)}
           </button>
           <button
             onClick={save}
             className="text-sm bg-green-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-700 cursor-pointer transition"
           >
-            {`Save`}
+            {t(`Save`)}
           </button>
         </div>
       </div>
@@ -157,44 +169,50 @@ export function EditCardModal({ card, onSave, onClose }: Props) {
   );
 }
 
-function DetailsBlock({ card }: { card: Flashcard }) {
+function DetailsBlock({ card, t }: { card: Flashcard; t: ReturnType<typeof useTranslation>["t"] }) {
   const reviews = card.reviewHistory ?? [];
   const correct = reviews.filter((r) => r.outcome === `correct`).length;
   const incorrect = reviews.length - correct;
   const accuracy = reviews.length > 0 ? `${Math.round((correct / reviews.length) * 100)}%` : `—`;
   const lastReview = reviews.length > 0 ? reviews[reviews.length - 1] : null;
   const inRelearning = card.relearningStartedAt !== null;
+  let contextsValue: string;
+  if (card.contexts.length === 0) {
+    contextsValue = t(`none`);
+  } else if (card.dateContextGenerated) {
+    contextsValue = `${card.contexts.length} · ${relativeTime(card.dateContextGenerated)}`;
+  } else {
+    contextsValue = `${card.contexts.length}`;
+  }
 
   return (
     <div className="rounded-lg bg-gray-50 border border-gray-100 p-3 text-xs text-gray-600 grid grid-cols-2 gap-x-4 gap-y-1.5">
-      <Row label="Language" value={card.language} />
-      <Row label="Added" value={relativeTime(card.addedAt)} />
-      <Row label="Last reviewed" value={relativeTime(card.lastReviewed)} />
-      <Row label="Reviews" value={`${reviews.length} (${correct} ✓ / ${incorrect} ✗)`} />
-      <Row label="Accuracy" value={accuracy} />
+      <Row label={t(`Language`)} value={card.language} />
+      <Row label={t(`Added`)} value={relativeTime(card.addedAt)} />
+      <Row label={t(`Last reviewed`)} value={relativeTime(card.lastReviewed)} />
       <Row
-        label="Contexts"
-        value={
-          card.contexts.length === 0
-            ? `none`
-            : `${card.contexts.length}${
-                card.dateContextGenerated ? ` · ${relativeTime(card.dateContextGenerated)}` : ``
-              }`
-        }
+        label={t(`Reviews`)}
+        value={t(`{{count}} ({{correct}} ✓ / {{incorrect}} ✗)`, {
+          count: reviews.length,
+          correct,
+          incorrect,
+        })}
       />
+      <Row label={t(`Accuracy`)} value={accuracy} />
+      <Row label={t(`Contexts`)} value={contextsValue} />
       {card.learningCorrectCount !== null && (
-        <Row label="Learning streak" value={String(card.learningCorrectCount)} />
+        <Row label={t(`Learning streak`)} value={String(card.learningCorrectCount)} />
       )}
       {inRelearning && (
-        <Row label="Relearning since" value={relativeTime(card.relearningStartedAt)} />
+        <Row label={t(`Relearning since`)} value={relativeTime(card.relearningStartedAt)} />
       )}
       {lastReview && (
         <Row
-          label="Last answer"
-          value={`${lastReview.outcome} · ${relativeTime(lastReview.timestamp)}`}
+          label={t(`Last answer`)}
+          value={`${t(lastReview.outcome)} · ${relativeTime(lastReview.timestamp)}`}
         />
       )}
-      <Row label="ID" value={<span className="font-mono text-[10px]">{card.id}</span>} />
+      <Row label={t(`ID`)} value={<span className="font-mono text-[10px]">{card.id}</span>} />
     </div>
   );
 }

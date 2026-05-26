@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { LANGUAGES } from "../../utils/language";
 import { flagFor } from "../../data/languageFlags";
 
@@ -8,6 +9,7 @@ interface Props {
 }
 
 export function LanguageGrid({ selected, onSelect }: Props) {
+  const { t } = useTranslation();
   const [customInput, setCustomInput] = useState(``);
 
   function submitCustom() {
@@ -46,7 +48,7 @@ export function LanguageGrid({ selected, onSelect }: Props) {
           onKeyDown={(e) => {
             if (e.key === `Enter`) submitCustom();
           }}
-          placeholder="Other (type a language)"
+          placeholder={t(`Other (type a language)`)}
           className="flex-1 border border-gray-200 rounded-xl px-3 py-2 text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-500"
         />
         <button
@@ -54,12 +56,13 @@ export function LanguageGrid({ selected, onSelect }: Props) {
           disabled={!customInput.trim()}
           className="bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-xl font-medium hover:border-gray-300 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition"
         >
-          {`Add`}
+          {t(`Add`)}
         </button>
       </div>
       {selected && (
         <p className="text-sm text-gray-500 text-center">
-          {`Selected: `}
+          {t(`Selected:`)}
+          {` `}
           <span className="font-semibold text-gray-700">
             {flagFor(selected)} {selected}
           </span>

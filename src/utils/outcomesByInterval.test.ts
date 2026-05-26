@@ -1,8 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
   aggregateOutcomesByDay,
+  aggregateOutcomesByEase,
   aggregateOutcomesByHour,
-  aggregateOutcomesByInterval,
+  aggregateOutcomesByIntervalBucket,
   formatIntervalLabel,
 } from "./outcomesByInterval";
 
@@ -14,47 +15,67 @@ function card(history: { outcome: "correct" | "incorrect"; currentInterval: numb
   };
 }
 
-describe("aggregateOutcomesByInterval", () => {
-  it("returns an empty array when no cards have history", () => {
-    expect(aggregateOutcomesByInterval([])).toEqual([]);
-    expect(aggregateOutcomesByInterval([{}])).toEqual([]);
-  });
-
-  it("counts correct and incorrect per interval across cards", () => {
-    const out = aggregateOutcomesByInterval([
-      card([
-        { outcome: `correct`, currentInterval: DAY },
-        { outcome: `incorrect`, currentInterval: 7 * DAY },
-      ]),
-      card([
-        { outcome: `correct`, currentInterval: DAY },
-        { outcome: `correct`, currentInterval: 7 * DAY },
-      ]),
-    ]);
-    expect(out).toEqual([
-      { intervalMs: DAY, correct: 2, incorrect: 0 },
-      { intervalMs: 7 * DAY, correct: 1, incorrect: 1 },
+describe("aggregateOutcomesByIntervalBucket", () => {
+  it("returns 8 zero-buckets when no cards have history", () => {
+    const out = aggregateOutcomesByIntervalBucket([]);
+    expect(out.length).toBe(8);
+    expect(out.every((b) => b.correct === 0 && b.incorrect === 0)).toBe(true);
+    expect(out.map((b) => b.bucketLabel)).toEqual([
+      `<1d`,
+      `1–3d`,
+      `3–7d`,
+      `7–14d`,
+      `14–30d`,
+      `30–90d`,
+      `90d–1y`,
+      `1y+`,
     ]);
   });
 
-  it("sorts the result by interval ascending", () => {
-    const out = aggregateOutcomesByInterval([
+  it("places reviews into Anki-style interval bands by currentInterval", () => {
+    const out = aggregateOutcomesByIntervalBucket([
       card([
-        { outcome: `correct`, currentInterval: 30 * DAY },
-        { outcome: `correct`, currentInterval: 3 * DAY },
-        { outcome: `correct`, currentInterval: 7 * DAY },
+        { outcome: `correct`, currentInterval: 0 }, // <1d
+        { outcome: `incorrect`, currentInterval: DAY }, // 1–3d
+        { outcome: `correct`, currentInterval: 5 * DAY }, // 3–7d
+        { outcome: `correct`, currentInterval: 365 * DAY }, // 1y+
       ]),
     ]);
-    expect(out.map((o) => o.intervalMs)).toEqual([3 * DAY, 7 * DAY, 30 * DAY]);
+    expect(out[0]).toMatchObject({ bucketLabel: `<1d`, correct: 1, incorrect: 0 });
+    expect(out[1]).toMatchObject({ bucketLabel: `1–3d`, correct: 0, incorrect: 1 });
+    expect(out[2]).toMatchObject({ bucketLabel: `3–7d`, correct: 1, incorrect: 0 });
+    expect(out[7]).toMatchObject({ bucketLabel: `1y+`, correct: 1, incorrect: 0 });
+  });
+});
+
+describe("aggregateOutcomesByEase", () => {
+  it("returns 8 zero-buckets when no cards have history", () => {
+    const out = aggregateOutcomesByEase([]);
+    expect(out.length).toBe(8);
+    expect(out.every((b) => b.correct === 0 && b.incorrect === 0)).toBe(true);
   });
 
-  it("ignores cards with no history", () => {
-    const out = aggregateOutcomesByInterval([
-      {},
-      { reviewHistory: [] },
-      card([{ outcome: `correct`, currentInterval: DAY }]),
+  it("attributes a card's review history to the bucket matching its current ease", () => {
+    // A card with all-correct history stays at ease 2.5 → bucket "2.4–2.7" (index 4).
+    const allCorrect = card([
+      { outcome: `correct`, currentInterval: DAY },
+      { outcome: `correct`, currentInterval: DAY },
     ]);
-    expect(out).toEqual([{ intervalMs: DAY, correct: 1, incorrect: 0 }]);
+    const out = aggregateOutcomesByEase([allCorrect]);
+    expect(out[4]).toMatchObject({ bucketLabel: `2.4–2.7`, correct: 2, incorrect: 0 });
+  });
+
+  it("pushes a card with many wrong answers into a low-ease bucket", () => {
+    // Many wrong answers — ease quickly hits the 1.3 floor → bucket "<1.5".
+    const mostlyWrong = card([
+      { outcome: `incorrect`, currentInterval: DAY },
+      { outcome: `incorrect`, currentInterval: DAY },
+      { outcome: `incorrect`, currentInterval: DAY },
+      { outcome: `incorrect`, currentInterval: DAY },
+    ]);
+    const out = aggregateOutcomesByEase([mostlyWrong]);
+    expect(out[0].bucketLabel).toBe(`<1.5`);
+    expect(out[0].correct + out[0].incorrect).toBe(4);
   });
 });
 

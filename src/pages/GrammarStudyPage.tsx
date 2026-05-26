@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useLocation, useParams } from "react-router-dom";
+import { useLiveQuery } from "dexie-react-hooks";
 import { useTranslation } from "react-i18next";
+import { loadSrsSettings } from "../utils/srsSettings";
 import { StudyEmptyState } from "../components/StudyEmptyState";
 import { BackHeader } from "../components/BackHeader";
 import type { GrammarCard } from "../utils/grammarCards";
@@ -31,6 +33,7 @@ export function GrammarStudyPage() {
   const mode = modeParam === `review` ? `review` : `learn`;
 
   const sessionData = location.state as GrammarSessionData | null;
+  const srsSettings = useLiveQuery(() => loadSrsSettings(), []);
 
   const [remaining, setRemaining] = useState<GrammarCard[]>(() => sessionData?.cards ?? []);
   const [current, setCurrent] = useState<GrammarCard | null>(() => sessionData?.current ?? null);
@@ -67,7 +70,8 @@ export function GrammarStudyPage() {
     // Grammar uses N=1 — a single right answer in learn mode graduates the card.
     const derivedStatus = computeSrsStatus(current);
     const mode: "learn" | "review" = derivedStatus === `learning` ? `learn` : `review`;
-    const { patch } = computeGrammarAnswerPatch(current, mode, right, now, 1);
+    const useEase = srsSettings?.useEaseFromHistory ?? true;
+    const { patch } = computeGrammarAnswerPatch(current, mode, right, now, 1, useEase);
     void patchGrammarCard(current.id, patch);
 
     // Reflect the patch in our in-memory session state so subsequent answers on the same

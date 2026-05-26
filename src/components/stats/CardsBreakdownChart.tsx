@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import type { TFunction } from "i18next";
 import type { SrsCardWithStatus } from "./SrsStatsView";
 import { formatIntervalLabel } from "../../utils/outcomesByInterval";
+import { computeEase } from "../../utils/srs";
 import {
   CHART_HEIGHT,
   CHART_WIDTH,
@@ -16,7 +17,7 @@ import {
   renderTooltip,
 } from "./chartCommon";
 
-type CardsMode = "status" | "interval" | "ease";
+type CardsMode = "status" | "interval" | "accuracy" | "ease";
 
 const STATUSES = [`new`, `learning`, `relearning`, `due`, `scheduled`, `dropped`] as const;
 
@@ -78,32 +79,52 @@ function buildBuckets(cards: SrsCardWithStatus[], mode: CardsMode, t: TFunction)
       excludedLabel: t(`with no interval yet`),
     };
   }
-  // ease: bucket cards by accuracy on reviewHistory (correct / total). Each entry in
-  // reviewHistory is the answer given when the card came due, so this is "how often the
-  // user got it right when it came due." Cards with no review history don't get a bar.
-  const easeBuckets: CardsBucket[] = [
-    { label: `0-25%`, color: `#ef4444`, count: 0, tooltipLabel: t(`0-25% correct`) },
-    { label: `26-50%`, color: `#f97316`, count: 0, tooltipLabel: t(`26-50% correct`) },
-    { label: `51-75%`, color: `#f59e0b`, count: 0, tooltipLabel: t(`51-75% correct`) },
-    { label: `76-99%`, color: `#84cc16`, count: 0, tooltipLabel: t(`76-99% correct`) },
-    { label: `100%`, color: `#16a34a`, count: 0, tooltipLabel: t(`100% correct`) },
-  ];
-  let untested = 0;
-  for (const c of cards) {
-    const history = c.reviewHistory ?? [];
-    if (history.length === 0) {
-      untested++;
-      continue;
+  if (mode === `accuracy`) {
+    // Bucket cards by accuracy on reviewHistory (correct / total). "How often the user
+    // got it right when the card came due." Cards with no review history are excluded.
+    const accuracyBuckets: CardsBucket[] = [
+      { label: `0-25%`, color: `#ef4444`, count: 0, tooltipLabel: t(`0-25% correct`) },
+      { label: `26-50%`, color: `#f97316`, count: 0, tooltipLabel: t(`26-50% correct`) },
+      { label: `51-75%`, color: `#f59e0b`, count: 0, tooltipLabel: t(`51-75% correct`) },
+      { label: `76-99%`, color: `#84cc16`, count: 0, tooltipLabel: t(`76-99% correct`) },
+      { label: `100%`, color: `#16a34a`, count: 0, tooltipLabel: t(`100% correct`) },
+    ];
+    let untested = 0;
+    for (const c of cards) {
+      const history = c.reviewHistory ?? [];
+      if (history.length === 0) {
+        untested++;
+        continue;
+      }
+      const correct = history.filter((e) => e.outcome === `correct`).length;
+      const ratio = correct / history.length;
+      if (ratio === 1) accuracyBuckets[4].count++;
+      else if (ratio >= 0.76) accuracyBuckets[3].count++;
+      else if (ratio >= 0.51) accuracyBuckets[2].count++;
+      else if (ratio >= 0.26) accuracyBuckets[1].count++;
+      else accuracyBuckets[0].count++;
     }
-    const correct = history.filter((e) => e.outcome === `correct`).length;
-    const ratio = correct / history.length;
-    if (ratio === 1) easeBuckets[4].count++;
-    else if (ratio >= 0.76) easeBuckets[3].count++;
-    else if (ratio >= 0.51) easeBuckets[2].count++;
-    else if (ratio >= 0.26) easeBuckets[1].count++;
+    return { buckets: accuracyBuckets, excludedCount: untested, excludedLabel: t(`untested`) };
+  }
+  // ease: bucket cards by the SM-2 ease multiplier computed from reviewHistory.
+  // Displayed as a percentage of the previous interval (e.g. ease 2.5 → 250%).
+  // Since correct answers don't push ease up in our model, ease lives in [130%, 250%].
+  const easeBuckets: CardsBucket[] = [
+    { label: `130-160%`, color: `#ef4444`, count: 0, tooltipLabel: t(`130-160% ease`) },
+    { label: `160-190%`, color: `#f97316`, count: 0, tooltipLabel: t(`160-190% ease`) },
+    { label: `190-220%`, color: `#f59e0b`, count: 0, tooltipLabel: t(`190-220% ease`) },
+    { label: `220-249%`, color: `#84cc16`, count: 0, tooltipLabel: t(`220-249% ease`) },
+    { label: `250%`, color: `#16a34a`, count: 0, tooltipLabel: t(`250% ease (default)`) },
+  ];
+  for (const c of cards) {
+    const ease = computeEase(c.reviewHistory ?? []);
+    if (ease >= 2.5) easeBuckets[4].count++;
+    else if (ease >= 2.2) easeBuckets[3].count++;
+    else if (ease >= 1.9) easeBuckets[2].count++;
+    else if (ease >= 1.6) easeBuckets[1].count++;
     else easeBuckets[0].count++;
   }
-  return { buckets: easeBuckets, excludedCount: untested, excludedLabel: t(`untested`) };
+  return { buckets: easeBuckets };
 }
 
 interface Props {
@@ -141,6 +162,7 @@ export function CardsBreakdownChart({ cards, emptyMessage }: Props) {
           options={[
             [`status`, t(`Status`)],
             [`interval`, t(`Interval`)],
+            [`accuracy`, t(`Accuracy`)],
             [`ease`, t(`Ease`)],
           ]}
           onChange={(next) => {

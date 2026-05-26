@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { pickNextGrammarCard } from "./grammarSession";
 import type { GrammarCard } from "./grammarCards";
-import { computeSrsAnswerPatch, INITIAL_INTERVAL, INTERVALS } from "./srs";
+import { computeSrsAnswerPatch, INITIAL_INTERVAL, INTERVAL_MULTIPLIER } from "./srs";
 
 const DAY = 24 * 60 * 60 * 1000;
 
@@ -28,11 +28,11 @@ function makeCard(id: string, overrides: Partial<GrammarCard> = {}): GrammarCard
 describe("grammar answer patch (via shared SRS state machine, N=1 for learn)", () => {
   it("right on a due card → scheduled, interval advanced", () => {
     const card = makeCard(`a`);
-    const { patch, graduate } = computeSrsAnswerPatch(card, `review`, true, 1000, 1);
+    const { patch, graduate } = computeSrsAnswerPatch(card, `review`, true, 1000, 1, true);
     expect(graduate).toBe(true);
     expect(patch.status).toBe(`scheduled`);
     expect(patch.lastReviewed).toBe(1000);
-    expect(patch.currentInterval).toBe(INTERVALS[1]);
+    expect(patch.currentInterval).toBe(Math.round(INITIAL_INTERVAL * INTERVAL_MULTIPLIER));
   });
 
   it("right on an initial-learning card → graduates after 1 correct (N=1)", () => {
@@ -42,7 +42,7 @@ describe("grammar answer patch (via shared SRS state machine, N=1 for learn)", (
       currentInterval: 0,
       learningCorrectCount: null,
     });
-    const { patch, graduate } = computeSrsAnswerPatch(card, `learn`, true, 1000, 1);
+    const { patch, graduate } = computeSrsAnswerPatch(card, `learn`, true, 1000, 1, true);
     expect(graduate).toBe(true);
     expect(patch.status).toBe(`scheduled`);
     expect(patch.currentInterval).toBe(INITIAL_INTERVAL);
@@ -50,7 +50,7 @@ describe("grammar answer patch (via shared SRS state machine, N=1 for learn)", (
 
   it("wrong on a due card → stays scheduled, currentInterval=0, relearning flag set", () => {
     const card = makeCard(`a`, { lastReviewed: Date.now() - 10 * DAY, currentInterval: 7 * DAY });
-    const { patch, graduate } = computeSrsAnswerPatch(card, `review`, false, 1000, 1);
+    const { patch, graduate } = computeSrsAnswerPatch(card, `review`, false, 1000, 1, true);
     expect(graduate).toBe(false);
     expect(`status` in patch).toBe(false); // stays scheduled
     expect(patch.currentInterval).toBe(0);
@@ -64,7 +64,7 @@ describe("grammar answer patch (via shared SRS state machine, N=1 for learn)", (
       currentInterval: 0,
       relearningStartedAt: 500,
     });
-    const { patch, graduate } = computeSrsAnswerPatch(card, `review`, true, 1000, 1);
+    const { patch, graduate } = computeSrsAnswerPatch(card, `review`, true, 1000, 1, true);
     expect(graduate).toBe(true);
     expect(patch.status).toBe(`scheduled`);
     expect(patch.currentInterval).toBe(INITIAL_INTERVAL);

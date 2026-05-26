@@ -2,13 +2,14 @@ import type { Flashcard } from "./flashcards";
 import { loadFlashcards, computeStatus, pickNextContext } from "./flashcards";
 import type { VocabSettings, VocabOrder } from "./vocabSettings";
 import { getLearnedTodayCount, recordLearnedToday } from "./vocabSettings";
+import { loadSrsSettings } from "./srsSettings";
 import { generateContextsFor, addMissingAudioFor } from "./contextOrchestrator";
 import { loadAudio } from "./db";
 import { computeSrsAnswerPatch } from "./srs";
 
 // Re-exports — the canonical definitions live in srs.ts. Kept here so existing imports
 // continue to work without a sweep of every caller.
-export { INTERVALS, INITIAL_INTERVAL, nextInterval, easyInterval } from "./srs";
+export { INITIAL_INTERVAL, INTERVAL_MULTIPLIER, incrementedInterval } from "./srs";
 
 export const DAY = 24 * 60 * 60 * 1000;
 
@@ -73,8 +74,16 @@ export function computeAnswerPatch(
   mode: "learn" | "review",
   right: boolean,
   now: number,
+  useEase: boolean,
 ): { patch: Partial<Flashcard>; graduate: boolean } {
-  const { patch, graduate } = computeSrsAnswerPatch(card, mode, right, now, LEARN_STEPS_REQUIRED);
+  const { patch, graduate } = computeSrsAnswerPatch(
+    card,
+    mode,
+    right,
+    now,
+    LEARN_STEPS_REQUIRED,
+    useEase,
+  );
   if (graduate) {
     return {
       graduate: true,
@@ -171,11 +180,8 @@ export async function prepareLearnSession(
 
   const finalCards = needAudio.length > 0 ? await reloadCards(language, cards) : cards;
 
-  const tierFn = buildTierFn(
-    `learn`,
-    settings.showUpcomingBeforeLearning,
-    settings.showDueBeforeRelearning,
-  );
+  const srs = await loadSrsSettings();
+  const tierFn = buildTierFn(`learn`, srs.showUpcomingBeforeLearning, srs.showDueBeforeRelearning);
   const current = pickNextCard(finalCards, tierFn);
   if (!current) return null;
   const contextIndex = current.contexts.length > 0 ? await pickNextContext(current) : 0;
@@ -204,11 +210,8 @@ export async function prepareReviewSession(
 
   const finalCards = needAudio.length > 0 ? await reloadCards(language, cards) : cards;
 
-  const tierFn = buildTierFn(
-    `review`,
-    settings.showUpcomingBeforeLearning,
-    settings.showDueBeforeRelearning,
-  );
+  const srs = await loadSrsSettings();
+  const tierFn = buildTierFn(`review`, srs.showUpcomingBeforeLearning, srs.showDueBeforeRelearning);
   const current = pickNextCard(finalCards, tierFn);
   if (!current) return null;
   const contextIndex = current.contexts.length > 0 ? await pickNextContext(current) : 0;

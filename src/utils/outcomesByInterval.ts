@@ -1,7 +1,15 @@
 import type { ReviewEntry } from "./flashcards";
+import { computeEase } from "./srs";
 
-export interface IntervalOutcomes {
-  intervalMs: number;
+export interface IntervalBucketOutcomes {
+  bucketIndex: number;
+  bucketLabel: string;
+  correct: number;
+  incorrect: number;
+}
+
+export interface EaseOutcomes {
+  bucketLabel: string;
   correct: number;
   incorrect: number;
 }
@@ -76,29 +84,103 @@ export function aggregateOutcomesByHour(
   return buckets;
 }
 
-// Aggregates every review entry across all cards into per-interval correct/incorrect
-// counts. Result is sorted by interval ascending so the chart x-axis reads left-to-right
-// short → long.
-export function aggregateOutcomesByInterval(
+const DAY = 24 * 60 * 60 * 1000;
+
+// Anki-style interval bands: [<1d, 1–3d, 3–7d, 7–14d, 14–30d, 30–90d, 90d–1y, 1y+].
+// Each entry is the inclusive lower bound (in ms); a review with currentInterval ∈ [b, next)
+// falls into that bucket. The final bucket has no upper bound.
+const INTERVAL_BUCKET_BOUNDS_MS: number[] = [
+  0,
+  DAY,
+  3 * DAY,
+  7 * DAY,
+  14 * DAY,
+  30 * DAY,
+  90 * DAY,
+  365 * DAY,
+];
+const INTERVAL_BUCKET_LABELS: string[] = [
+  `<1d`,
+  `1–3d`,
+  `3–7d`,
+  `7–14d`,
+  `14–30d`,
+  `30–90d`,
+  `90d–1y`,
+  `1y+`,
+];
+
+function bucketIndexFor(intervalMs: number): number {
+  for (let i = INTERVAL_BUCKET_BOUNDS_MS.length - 1; i >= 0; i--) {
+    if (intervalMs >= INTERVAL_BUCKET_BOUNDS_MS[i]) return i;
+  }
+  return 0;
+}
+
+// Aggregates every review entry across all cards into Anki-style interval bands.
+// Returns one entry per band, in band order (shortest → longest).
+export function aggregateOutcomesByIntervalBucket(
   cards: { reviewHistory?: ReviewEntry[] }[],
-): IntervalOutcomes[] {
-  const buckets = new Map<number, { correct: number; incorrect: number }>();
+): IntervalBucketOutcomes[] {
+  const buckets: IntervalBucketOutcomes[] = INTERVAL_BUCKET_LABELS.map((bucketLabel, i) => ({
+    bucketIndex: i,
+    bucketLabel,
+    correct: 0,
+    incorrect: 0,
+  }));
   for (const card of cards) {
     const history = card.reviewHistory;
     if (!history) continue;
     for (const entry of history) {
-      const slot = buckets.get(entry.currentInterval) ?? { correct: 0, incorrect: 0 };
-      if (entry.outcome === `correct`) slot.correct++;
-      else slot.incorrect++;
-      buckets.set(entry.currentInterval, slot);
+      const i = bucketIndexFor(entry.currentInterval);
+      if (entry.outcome === `correct`) buckets[i].correct++;
+      else buckets[i].incorrect++;
     }
   }
-  return Array.from(buckets.entries())
-    .map(([intervalMs, counts]) => ({ intervalMs, ...counts }))
-    .sort((a, b) => a.intervalMs - b.intervalMs);
+  return buckets;
 }
 
-const DAY = 24 * 60 * 60 * 1000;
+// Ease bins (8 buckets). Each card's full review history is attributed to the
+// bucket matching that card's CURRENT ease.
+const EASE_BUCKET_BOUNDS: number[] = [-Infinity, 1.5, 1.8, 2.1, 2.4, 2.7, 3.0, 3.3];
+const EASE_BUCKET_LABELS: string[] = [
+  `<1.5`,
+  `1.5–1.8`,
+  `1.8–2.1`,
+  `2.1–2.4`,
+  `2.4–2.7`,
+  `2.7–3.0`,
+  `3.0–3.3`,
+  `3.3+`,
+];
+
+function easeBucketIndexFor(ease: number): number {
+  for (let i = EASE_BUCKET_BOUNDS.length - 1; i >= 0; i--) {
+    if (ease >= EASE_BUCKET_BOUNDS[i]) return i;
+  }
+  return 0;
+}
+
+export function aggregateOutcomesByEase(
+  cards: { reviewHistory?: ReviewEntry[] }[],
+): EaseOutcomes[] {
+  const buckets: EaseOutcomes[] = EASE_BUCKET_LABELS.map((bucketLabel) => ({
+    bucketLabel,
+    correct: 0,
+    incorrect: 0,
+  }));
+  for (const card of cards) {
+    const history = card.reviewHistory;
+    if (!history || history.length === 0) continue;
+    const ease = computeEase(history);
+    const i = easeBucketIndexFor(ease);
+    for (const entry of history) {
+      if (entry.outcome === `correct`) buckets[i].correct++;
+      else buckets[i].incorrect++;
+    }
+  }
+  return buckets;
+}
 
 // Compact label for an interval in milliseconds. Uses days for short, weeks/months/years
 // for longer intervals to keep x-axis labels readable.

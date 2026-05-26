@@ -10,23 +10,19 @@ export interface VocabSettings {
   generateAudio: boolean;
   autoplayAudio: boolean;
   textDisplay: TextDisplay;
-  showUpcomingBeforeLearning: boolean;
-  showDueBeforeRelearning: boolean;
   includeTranslationInContexts: boolean;
 }
 
 const SETTINGS_KEY = `vocab_settings`;
 const LEARN_SESSION_KEY = `vocab_learn_session`;
 
-const DEFAULTS: VocabSettings = {
+export const VOCAB_SETTINGS_DEFAULTS: VocabSettings = {
   newWordsPerDay: 5,
   contextsPerCard: 3,
   order: `random`,
   generateAudio: true,
   autoplayAudio: true,
   textDisplay: `cloze`,
-  showUpcomingBeforeLearning: false,
-  showDueBeforeRelearning: true,
   includeTranslationInContexts: false,
 };
 
@@ -56,17 +52,17 @@ function todayString(): string {
 export async function loadVocabSettings(): Promise<VocabSettings> {
   const row = await db().kv.get(SETTINGS_KEY);
   const stored = row?.value as Partial<VocabSettings> | undefined;
-  if (!stored) return { ...DEFAULTS };
+  if (!stored) return { ...VOCAB_SETTINGS_DEFAULTS };
   return {
-    ...DEFAULTS,
+    ...VOCAB_SETTINGS_DEFAULTS,
     ...stored,
     newWordsPerDay: clamp(
-      stored.newWordsPerDay ?? DEFAULTS.newWordsPerDay,
+      stored.newWordsPerDay ?? VOCAB_SETTINGS_DEFAULTS.newWordsPerDay,
       NEW_WORDS_PER_DAY_MIN,
       NEW_WORDS_PER_DAY_MAX,
     ),
     contextsPerCard: clamp(
-      stored.contextsPerCard ?? DEFAULTS.contextsPerCard,
+      stored.contextsPerCard ?? VOCAB_SETTINGS_DEFAULTS.contextsPerCard,
       CONTEXTS_PER_CARD_MIN,
       CONTEXTS_PER_CARD_MAX,
     ),

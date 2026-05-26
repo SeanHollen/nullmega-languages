@@ -43,20 +43,41 @@ export function computeSrsStatus(card: SrsCard): SrsStatus {
 }
 
 const DAY = 24 * 60 * 60 * 1000;
-export const INTERVALS = [1, 3, 7, 14, 30, 90, 180, 365].map((d) => d * DAY);
-export const INITIAL_INTERVAL = INTERVALS[0];
+export const INITIAL_INTERVAL = DAY;
+export const INTERVAL_MULTIPLIER = 2.5;
+export const DEFAULT_EASE = 2.5;
+export const MIN_EASE = 1.3;
+// Ease describes the card's intrinsic difficulty (derived from history). Easy/hard are
+// session-time multipliers applied ON TOP of ease — they bump or shrink the next
+// interval without changing ease itself.
+export const EASY_BONUS = 2.0;
+export const HARD_FACTOR = 0.5;
 
-export function nextInterval(currentInterval: number): number {
-  const idx = INTERVALS.findIndex((i) => i > currentInterval);
-  return idx >= 0 ? INTERVALS[idx] : INTERVALS[INTERVALS.length - 1];
+// SM-2 style: each review nudges ease by a quality-derived delta. We collapse Anki's
+// 0..5 quality scale to two outcomes: correct=q4 (delta 0), incorrect=q1 (delta -0.54).
+export function computeEase(reviewHistory: ReviewEntry[] = []): number {
+  let ease = DEFAULT_EASE;
+  for (const entry of reviewHistory) {
+    const q = entry.outcome === `correct` ? 4 : 1;
+    ease = Math.max(MIN_EASE, ease + 0.1 - (5 - q) * (0.08 + (5 - q) * 0.02));
+  }
+  return ease;
 }
 
-export function easyInterval(currentInterval: number): number {
-  let interval = currentInterval;
-  for (let i = 0; i < 3; i++) {
-    interval = nextInterval(interval);
-  }
-  return interval;
+// "easy" jumps three multiplier steps ahead in one go; "hard" only steps a little.
+// In normal (right-answer) mode, the multiplier is either the card's per-card ease
+// (computed from its review history) or the fixed INTERVAL_MULTIPLIER, depending on
+// the user's `useEase` setting.
+export function incrementedInterval(
+  card: { currentInterval: number; reviewHistory?: ReviewEntry[] },
+  options: { mode?: "easy" | "hard"; useEase?: boolean } = {},
+): number {
+  const { mode, useEase = true } = options;
+  const base = useEase ? computeEase(card.reviewHistory) : INTERVAL_MULTIPLIER;
+  let multiplier = base;
+  if (mode === `easy`) multiplier = base * EASY_BONUS;
+  else if (mode === `hard`) multiplier = base * HARD_FACTOR;
+  return Math.round(card.currentInterval * multiplier);
 }
 
 export interface SrsAnswerResult {
@@ -73,6 +94,7 @@ export function computeSrsAnswerPatch(
   right: boolean,
   now: number,
   learnStepsRequired: number,
+  useEase: boolean,
 ): SrsAnswerResult {
   if (mode === `learn`) {
     if (right) {
@@ -119,7 +141,9 @@ export function computeSrsAnswerPatch(
       patch: {
         status: `scheduled`,
         lastReviewed: now,
-        currentInterval: wasRelearning ? INITIAL_INTERVAL : nextInterval(card.currentInterval),
+        currentInterval: wasRelearning
+          ? INITIAL_INTERVAL
+          : incrementedInterval({ ...card, reviewHistory }, { useEase }),
         relearningStartedAt: null,
         reviewHistory,
       },

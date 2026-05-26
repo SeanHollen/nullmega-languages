@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useLiveQuery } from "dexie-react-hooks";
 import { DAY } from "../../utils/studySession";
 import type { SrsCardWithStatus } from "./SrsStatsView";
 import { forecastDueDays } from "../../utils/srsForecast";
+import { loadSrsSettings } from "../../utils/srsSettings";
 import {
   CHART_HEIGHT,
   CHART_WIDTH,
@@ -28,13 +30,15 @@ export function ForecastChart({ cards }: Props) {
   const { t } = useTranslation();
   const [now] = useState(() => Date.now());
   const [hovered, setHovered] = useState<number | null>(null);
+  const srsSettings = useLiveQuery(() => loadSrsSettings(), []);
+  const useEase = srsSettings?.useEaseFromHistory ?? true;
 
   const today = dayStart(now);
   const horizonMs = today + HORIZON_DAYS * DAY;
 
   const dayCounts = new Map<number, number>();
   for (const card of cards) {
-    for (const d of forecastDueDays(card, today, horizonMs)) {
+    for (const d of forecastDueDays(card, today, horizonMs, useEase)) {
       dayCounts.set(d, (dayCounts.get(d) ?? 0) + 1);
     }
   }

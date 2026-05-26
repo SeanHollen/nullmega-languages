@@ -17,8 +17,6 @@ describe("loadVocabSettings", () => {
       generateAudio: true,
       autoplayAudio: true,
       textDisplay: `cloze`,
-      showUpcomingBeforeLearning: false,
-      showDueBeforeRelearning: true,
       includeTranslationInContexts: false,
     });
   });
@@ -31,8 +29,6 @@ describe("loadVocabSettings", () => {
       generateAudio: false,
       autoplayAudio: false,
       textDisplay: `cloze`,
-      showUpcomingBeforeLearning: false,
-      showDueBeforeRelearning: false,
       includeTranslationInContexts: true,
     });
     const s = await loadVocabSettings();
@@ -43,8 +39,6 @@ describe("loadVocabSettings", () => {
       generateAudio: false,
       autoplayAudio: false,
       textDisplay: `cloze`,
-      showUpcomingBeforeLearning: false,
-      showDueBeforeRelearning: false,
       includeTranslationInContexts: true,
     });
   });
@@ -57,8 +51,6 @@ describe("loadVocabSettings", () => {
       generateAudio: true,
       autoplayAudio: true,
       textDisplay: `show`,
-      showUpcomingBeforeLearning: true,
-      showDueBeforeRelearning: true,
       includeTranslationInContexts: false,
     });
     const s = await loadVocabSettings();

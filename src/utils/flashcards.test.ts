@@ -37,8 +37,6 @@ const settings: VocabSettings = {
   generateAudio: true,
   autoplayAudio: false,
   textDisplay: `show`,
-  showUpcomingBeforeLearning: true,
-  showDueBeforeRelearning: true,
   includeTranslationInContexts: false,
 };
 

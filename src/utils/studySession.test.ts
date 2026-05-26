@@ -63,8 +63,6 @@ const settings: VocabSettings = {
   generateAudio: true,
   autoplayAudio: false,
   textDisplay: `show`,
-  showUpcomingBeforeLearning: true,
-  showDueBeforeRelearning: true,
   includeTranslationInContexts: false,
 };
 
@@ -152,7 +150,7 @@ describe("computeAnswerPatch", () => {
 
   it("clears contexts when a learn-mode card graduates (count reaches threshold)", () => {
     const card = cardWithContexts({ status: "learning", learningCorrectCount: 1 });
-    const { patch, graduate } = computeAnswerPatch(card, "learn", true, 1000);
+    const { patch, graduate } = computeAnswerPatch(card, "learn", true, 1000, true);
     expect(graduate).toBe(true);
     expect(patch.status).toBe("scheduled");
     expect(patch.contexts).toEqual([]);
@@ -161,7 +159,7 @@ describe("computeAnswerPatch", () => {
 
   it("keeps contexts when a learn-mode card does not yet graduate", () => {
     const card = cardWithContexts({ status: "learning", learningCorrectCount: 0 });
-    const { patch, graduate } = computeAnswerPatch(card, "learn", true, 1000);
+    const { patch, graduate } = computeAnswerPatch(card, "learn", true, 1000, true);
     expect(graduate).toBe(false);
     expect(`contexts` in patch).toBe(false);
     expect(`dateContextGenerated` in patch).toBe(false);
@@ -169,27 +167,27 @@ describe("computeAnswerPatch", () => {
 
   it("flips learningCorrectCount from null to 1 on a learn-mode right answer (first time shown)", () => {
     const card = cardWithContexts({ status: "learning", learningCorrectCount: null });
-    const { patch, graduate } = computeAnswerPatch(card, "learn", true, 1000);
+    const { patch, graduate } = computeAnswerPatch(card, "learn", true, 1000, true);
     expect(graduate).toBe(false);
     expect(patch.learningCorrectCount).toBe(1);
   });
 
   it("flips learningCorrectCount from null to 0 on a learn-mode wrong answer (first time shown)", () => {
     const card = cardWithContexts({ status: "learning", learningCorrectCount: null });
-    const { patch } = computeAnswerPatch(card, "learn", false, 1000);
+    const { patch } = computeAnswerPatch(card, "learn", false, 1000, true);
     expect(patch.learningCorrectCount).toBe(0);
   });
 
   it("clears contexts when a review-mode card is answered right", () => {
     const card = cardWithContexts({ status: "scheduled", currentInterval: DAY });
-    const { patch } = computeAnswerPatch(card, "review", true, 1000);
+    const { patch } = computeAnswerPatch(card, "review", true, 1000, true);
     expect(patch.contexts).toEqual([]);
     expect(patch.dateContextGenerated).toBeNull();
   });
 
   it("does not clear contexts when a review-mode card is answered wrong (relearning)", () => {
     const card = cardWithContexts({ status: "scheduled", currentInterval: DAY });
-    const { patch } = computeAnswerPatch(card, "review", false, 1000);
+    const { patch } = computeAnswerPatch(card, "review", false, 1000, true);
     // Wrong-on-review keeps status="scheduled" but marks the card immediately due and
     // sets the relearning flag. status doesn't appear in the patch (no change).
     expect(`status` in patch).toBe(false);
@@ -207,10 +205,10 @@ describe("computeAnswerPatch", () => {
       lastReviewed: 500,
       reviewHistory: existing,
     });
-    const { patch: rightPatch } = computeAnswerPatch(card, "review", true, 1000);
+    const { patch: rightPatch } = computeAnswerPatch(card, "review", true, 1000, true);
     expect(rightPatch.reviewHistory).toEqual(existing);
 
-    const { patch: wrongPatch } = computeAnswerPatch(card, "review", false, 1000);
+    const { patch: wrongPatch } = computeAnswerPatch(card, "review", false, 1000, true);
     expect(wrongPatch.reviewHistory).toEqual(existing);
   });
 
@@ -221,27 +219,27 @@ describe("computeAnswerPatch", () => {
       relearningStartedAt: 500,
       lastReviewed: 500,
     });
-    const { patch, graduate } = computeAnswerPatch(card, "review", true, 1000);
+    const { patch, graduate } = computeAnswerPatch(card, "review", true, 1000, true);
     expect(graduate).toBe(true);
     expect(patch.status).toBe("scheduled");
     expect(patch.currentInterval).toBe(INITIAL_INTERVAL);
     expect(patch.relearningStartedAt).toBeNull();
   });
 
-  it("advances via nextInterval when right answer is for a card NOT in relearning", () => {
+  it("advances by INTERVAL_MULTIPLIER (2.5x) when right answer is for a card NOT in relearning", () => {
     const card = cardWithContexts({
       status: "scheduled",
       currentInterval: 3 * DAY,
       relearningStartedAt: null,
     });
-    const { patch } = computeAnswerPatch(card, "review", true, 1000);
-    expect(patch.currentInterval).toBe(7 * DAY);
+    const { patch } = computeAnswerPatch(card, "review", true, 1000, true);
+    expect(patch.currentInterval).toBe(Math.round(3 * DAY * 2.5));
     expect(patch.relearningStartedAt).toBeNull();
   });
 
   it("appends a 'correct' entry to reviewHistory when a review is answered right", () => {
     const card = cardWithContexts({ status: "scheduled", currentInterval: 3 * DAY });
-    const { patch } = computeAnswerPatch(card, "review", true, 1000);
+    const { patch } = computeAnswerPatch(card, "review", true, 1000, true);
     expect(patch.reviewHistory).toEqual([
       { outcome: "correct", timestamp: 1000, currentInterval: 3 * DAY },
     ]);
@@ -249,7 +247,7 @@ describe("computeAnswerPatch", () => {
 
   it("appends an 'incorrect' entry to reviewHistory when a review is answered wrong", () => {
     const card = cardWithContexts({ status: "scheduled", currentInterval: 7 * DAY });
-    const { patch } = computeAnswerPatch(card, "review", false, 1000);
+    const { patch } = computeAnswerPatch(card, "review", false, 1000, true);
     expect(patch.reviewHistory).toEqual([
       { outcome: "incorrect", timestamp: 1000, currentInterval: 7 * DAY },
     ]);
@@ -262,7 +260,7 @@ describe("computeAnswerPatch", () => {
       currentInterval: 3 * DAY,
       reviewHistory: [prior],
     });
-    const { patch } = computeAnswerPatch(card, "review", true, 1000);
+    const { patch } = computeAnswerPatch(card, "review", true, 1000, true);
     expect(patch.reviewHistory).toEqual([
       prior,
       { outcome: "correct", timestamp: 1000, currentInterval: 3 * DAY },
@@ -271,8 +269,8 @@ describe("computeAnswerPatch", () => {
 
   it("does NOT touch reviewHistory when a learn-mode answer is given (relearning practice)", () => {
     const card = cardWithContexts({ status: "learning", learningCorrectCount: 0 });
-    const right = computeAnswerPatch(card, "learn", true, 1000);
-    const wrong = computeAnswerPatch(card, "learn", false, 1000);
+    const right = computeAnswerPatch(card, "learn", true, 1000, true);
+    const wrong = computeAnswerPatch(card, "learn", false, 1000, true);
     expect(`reviewHistory` in right.patch).toBe(false);
     expect(`reviewHistory` in wrong.patch).toBe(false);
   });

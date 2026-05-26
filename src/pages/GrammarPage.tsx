@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLiveQuery } from "dexie-react-hooks";
 import { useTranslation } from "react-i18next";
+import { FaChevronDown, FaChevronRight } from "react-icons/fa";
 import { useLanguage } from "../contexts/LanguageContext";
 import { BackHeader } from "../components/BackHeader";
 import { useLoading } from "../contexts/LoadingContext";
@@ -9,6 +10,7 @@ import type { GrammarCard } from "../utils/grammarCards";
 import { loadGrammarCards, computeGrammarStatus } from "../utils/grammarCards";
 import type { GrammarSettings } from "../utils/grammarSettings";
 import {
+  GRAMMAR_SETTINGS_DEFAULTS,
   loadGrammarSettings,
   saveGrammarSettings,
   getGeneratedTodayCount,
@@ -19,6 +21,8 @@ import {
   GRAMMAR_LEVEL_STEP,
 } from "../utils/grammarSettings";
 import { prepareGrammarLearnSession, prepareGrammarReviewSession } from "../utils/grammarSession";
+import { loadSrsSettings, saveSrsSettings, SRS_SETTINGS_DEFAULTS } from "../utils/srsSettings";
+import { ConfirmModal } from "../components/ConfirmModal";
 import { ActiveCardsList } from "../components/grammar/ActiveCardsList";
 import { GrammarCardTable } from "../components/grammar/GrammarCardTable";
 import { Button } from "../components/Button";
@@ -47,13 +51,22 @@ export function GrammarPage() {
       [language],
     ) ?? [];
   const settings = useLiveQuery(() => loadGrammarSettings(), []);
+  const srsSettings = useLiveQuery(() => loadSrsSettings(), []);
   const generatedToday = useLiveQuery(() => getGeneratedTodayCount(), []) ?? 0;
   const [learnError, setLearnError] = useState<string | null>(null);
   const [reviewError, setReviewError] = useState<string | null>(null);
+  const [confirmingReset, setConfirmingReset] = useState(false);
+  const [advancedOpen, setAdvancedOpen] = useState(false);
 
   function updateSettings(patch: Partial<GrammarSettings>) {
     if (!settings) return;
     void saveGrammarSettings({ ...settings, ...patch });
+  }
+
+  function restoreDefaults() {
+    void saveGrammarSettings({ ...GRAMMAR_SETTINGS_DEFAULTS });
+    void saveSrsSettings({ ...SRS_SETTINGS_DEFAULTS });
+    setConfirmingReset(false);
   }
 
   async function handleLearn() {
@@ -166,7 +179,7 @@ export function GrammarPage() {
                 className="w-16 border border-gray-200 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-green-500"
               />
             </div>
-            <div className="px-6 py-3 flex flex-col items-center gap-1 text-sm">
+            <div className="px-6 py-3 flex items-center justify-center gap-3 text-sm">
               <span className="text-gray-600">{t(`Level`)}</span>
               <input
                 type="range"
@@ -178,7 +191,7 @@ export function GrammarPage() {
                 disabled={!settings}
                 className="w-48 accent-green-500 cursor-pointer"
               />
-              <span className="text-xs text-gray-400">
+              <span className="text-xs text-gray-400 whitespace-nowrap">
                 {settings
                   ? t(`{{level}} — {{label}}`, {
                       level: settings.level,
@@ -187,8 +200,97 @@ export function GrammarPage() {
                   : `—`}
               </span>
             </div>
+            <Button
+              onClick={() => setAdvancedOpen((p) => !p)}
+              className="w-full px-6 py-3 flex items-center justify-center gap-2 text-sm text-gray-500 hover:text-gray-700 transition cursor-pointer"
+            >
+              {advancedOpen ? (
+                <FaChevronDown className="text-xs" />
+              ) : (
+                <FaChevronRight className="text-xs" />
+              )}
+              <span>{t(`Advanced`)}</span>
+            </Button>
+            {advancedOpen && (
+              <div className="px-6 pb-4 flex justify-center text-sm">
+                <div className="flex flex-col gap-3 items-start">
+                  <label className="flex items-center gap-2 cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      checked={srsSettings?.useEaseFromHistory ?? true}
+                      onChange={(e) => {
+                        if (!srsSettings) return;
+                        void saveSrsSettings({
+                          ...srsSettings,
+                          useEaseFromHistory: e.target.checked,
+                        });
+                      }}
+                      disabled={!srsSettings}
+                      className="accent-green-600 cursor-pointer"
+                    />
+                    <span className="text-gray-600">{t(`Show harder cards more often`)}</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      checked={srsSettings?.showUpcomingBeforeLearning ?? false}
+                      onChange={(e) => {
+                        if (!srsSettings) return;
+                        void saveSrsSettings({
+                          ...srsSettings,
+                          showUpcomingBeforeLearning: e.target.checked,
+                        });
+                      }}
+                      disabled={!srsSettings}
+                      className="accent-green-600 cursor-pointer"
+                    />
+                    <span className="text-gray-600">
+                      {t(`Show upcoming cards before learning cards`)}
+                    </span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      checked={srsSettings?.showDueBeforeRelearning ?? true}
+                      onChange={(e) => {
+                        if (!srsSettings) return;
+                        void saveSrsSettings({
+                          ...srsSettings,
+                          showDueBeforeRelearning: e.target.checked,
+                        });
+                      }}
+                      disabled={!srsSettings}
+                      className="accent-green-600 cursor-pointer"
+                    />
+                    <span className="text-gray-600">
+                      {t(`Show due cards before relearning cards`)}
+                    </span>
+                  </label>
+                </div>
+              </div>
+            )}
+            {advancedOpen && (
+              <div className="px-6 pb-4 text-center">
+                <Button
+                  onClick={() => setConfirmingReset(true)}
+                  className="text-sm text-gray-500 hover:text-red-600 underline underline-offset-2 transition cursor-pointer"
+                >
+                  {t(`Restore defaults`)}
+                </Button>
+              </div>
+            )}
           </div>
         </div>
+
+        <ConfirmModal
+          open={confirmingReset}
+          title={t(`Restore default settings?`)}
+          body={t(`This will reset all grammar and SRS settings to their defaults.`)}
+          confirmLabel={t(`Restore`)}
+          destructive
+          onCancel={() => setConfirmingReset(false)}
+          onConfirm={restoreDefaults}
+        />
 
         <GrammarCardTable cards={cards} language={language} />
       </div>

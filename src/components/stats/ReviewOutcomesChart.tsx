@@ -4,9 +4,9 @@ import type { TFunction } from "i18next";
 import type { SrsCardWithStatus } from "./SrsStatsView";
 import {
   aggregateOutcomesByDay,
+  aggregateOutcomesByEase,
   aggregateOutcomesByHour,
-  aggregateOutcomesByInterval,
-  formatIntervalLabel,
+  aggregateOutcomesByIntervalBucket,
 } from "../../utils/outcomesByInterval";
 import {
   CHART_HEIGHT,
@@ -23,7 +23,7 @@ import {
   shortDate,
 } from "./chartCommon";
 
-type OutcomeMode = "interval" | "day" | "hour";
+type OutcomeMode = "interval" | "ease" | "day" | "hour";
 type OutcomeScale = "totals" | "percent";
 
 interface OutcomeBucket {
@@ -39,15 +39,20 @@ function buildBuckets(
   t: TFunction,
 ): OutcomeBucket[] {
   if (mode === `interval`) {
-    return aggregateOutcomesByInterval(cards).map((b) => {
-      const lbl = formatIntervalLabel(b.intervalMs);
-      return {
-        label: lbl,
-        tooltipLabel: t(`{{interval}} interval`, { interval: lbl }),
-        correct: b.correct,
-        incorrect: b.incorrect,
-      };
-    });
+    return aggregateOutcomesByIntervalBucket(cards).map((b) => ({
+      label: b.bucketLabel,
+      tooltipLabel: t(`{{interval}} interval`, { interval: b.bucketLabel }),
+      correct: b.correct,
+      incorrect: b.incorrect,
+    }));
+  }
+  if (mode === `ease`) {
+    return aggregateOutcomesByEase(cards).map((b) => ({
+      label: b.bucketLabel,
+      tooltipLabel: t(`ease {{ease}}`, { ease: b.bucketLabel }),
+      correct: b.correct,
+      incorrect: b.incorrect,
+    }));
   }
   if (mode === `day`) {
     return aggregateOutcomesByDay(cards).map((b, i, arr) => {
@@ -98,7 +103,7 @@ export function ReviewOutcomesChart({ cards }: Props) {
 
   const buckets = buildBuckets(cards, mode, t);
   const totalOutcomes = buckets.reduce((s, b) => s + b.correct + b.incorrect, 0);
-  if (totalOutcomes === 0 && mode === `interval`) return null;
+  if (totalOutcomes === 0 && (mode === `interval` || mode === `ease`)) return null;
 
   // In percent mode, each bucket's bars are a share of that bucket's total. Zero-review
   // buckets render as zero-height bars without NaN.
@@ -141,6 +146,7 @@ export function ReviewOutcomesChart({ cards }: Props) {
           value={mode}
           options={[
             [`interval`, t(`Per interval`)],
+            [`ease`, t(`Per ease`)],
             [`day`, t(`Per day`)],
             [`hour`, t(`Per time of day`)],
           ]}

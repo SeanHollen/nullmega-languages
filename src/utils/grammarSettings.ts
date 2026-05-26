@@ -8,7 +8,7 @@ export interface GrammarSettings {
 const SETTINGS_KEY = `grammar_settings`;
 const LEARN_SESSION_KEY = `grammar_learn_session`;
 
-const DEFAULTS: GrammarSettings = {
+export const GRAMMAR_SETTINGS_DEFAULTS: GrammarSettings = {
   newCardsPerDay: 0,
   level: 20,
 };
@@ -40,16 +40,20 @@ function todayString(): string {
 export async function loadGrammarSettings(): Promise<GrammarSettings> {
   const row = await db().kv.get(SETTINGS_KEY);
   const stored = row?.value as Partial<GrammarSettings> | undefined;
-  if (!stored) return { ...DEFAULTS };
+  if (!stored) return { ...GRAMMAR_SETTINGS_DEFAULTS };
   return {
-    ...DEFAULTS,
+    ...GRAMMAR_SETTINGS_DEFAULTS,
     ...stored,
     newCardsPerDay: clamp(
-      stored.newCardsPerDay ?? DEFAULTS.newCardsPerDay,
+      stored.newCardsPerDay ?? GRAMMAR_SETTINGS_DEFAULTS.newCardsPerDay,
       NEW_CARDS_PER_DAY_MIN,
       NEW_CARDS_PER_DAY_MAX,
     ),
-    level: clamp(stored.level ?? DEFAULTS.level, GRAMMAR_LEVEL_MIN, GRAMMAR_LEVEL_MAX),
+    level: clamp(
+      stored.level ?? GRAMMAR_SETTINGS_DEFAULTS.level,
+      GRAMMAR_LEVEL_MIN,
+      GRAMMAR_LEVEL_MAX,
+    ),
   };
 }
 

@@ -1,13 +1,18 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useLiveQuery } from "dexie-react-hooks";
 import { FaChevronDown, FaChevronRight } from "react-icons/fa";
 import type { VocabSettings } from "../../utils/vocabSettings";
+import { VOCAB_SETTINGS_DEFAULTS } from "../../utils/vocabSettings";
+import { SRS_SETTINGS_DEFAULTS } from "../../utils/srsSettings";
+import { ConfirmModal } from "../ConfirmModal";
 import {
   NEW_WORDS_PER_DAY_MIN,
   NEW_WORDS_PER_DAY_MAX,
   CONTEXTS_PER_CARD_MIN,
   CONTEXTS_PER_CARD_MAX,
 } from "../../utils/vocabSettings";
+import { loadSrsSettings, saveSrsSettings } from "../../utils/srsSettings";
 import { Button } from "../Button";
 
 interface Props {
@@ -18,6 +23,14 @@ interface Props {
 export function VocabSettingsPanel({ settings, onUpdate }: Props) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
+  const [confirmingReset, setConfirmingReset] = useState(false);
+  const srsSettings = useLiveQuery(() => loadSrsSettings(), []);
+
+  function restoreDefaults() {
+    onUpdate(VOCAB_SETTINGS_DEFAULTS);
+    void saveSrsSettings({ ...SRS_SETTINGS_DEFAULTS });
+    setConfirmingReset(false);
+  }
 
   return (
     <div className="mb-6">
@@ -113,8 +126,15 @@ export function VocabSettingsPanel({ settings, onUpdate }: Props) {
               <label className="flex items-center gap-2 cursor-pointer select-none">
                 <input
                   type="checkbox"
-                  checked={settings.showUpcomingBeforeLearning}
-                  onChange={(e) => onUpdate({ showUpcomingBeforeLearning: e.target.checked })}
+                  checked={srsSettings?.showUpcomingBeforeLearning ?? false}
+                  onChange={(e) => {
+                    if (!srsSettings) return;
+                    void saveSrsSettings({
+                      ...srsSettings,
+                      showUpcomingBeforeLearning: e.target.checked,
+                    });
+                  }}
+                  disabled={!srsSettings}
                   className="accent-green-600 cursor-pointer"
                 />
                 <span className="text-gray-600">{t(`Show upcoming before learning`)}</span>
@@ -122,8 +142,15 @@ export function VocabSettingsPanel({ settings, onUpdate }: Props) {
               <label className="flex items-center gap-2 cursor-pointer select-none">
                 <input
                   type="checkbox"
-                  checked={settings.showDueBeforeRelearning}
-                  onChange={(e) => onUpdate({ showDueBeforeRelearning: e.target.checked })}
+                  checked={srsSettings?.showDueBeforeRelearning ?? true}
+                  onChange={(e) => {
+                    if (!srsSettings) return;
+                    void saveSrsSettings({
+                      ...srsSettings,
+                      showDueBeforeRelearning: e.target.checked,
+                    });
+                  }}
+                  disabled={!srsSettings}
                   className="accent-green-600 cursor-pointer"
                 />
                 <span className="text-gray-600">{t(`Show due before relearning`)}</span>
@@ -139,10 +166,45 @@ export function VocabSettingsPanel({ settings, onUpdate }: Props) {
                   {t(`Include translation in context generation`)}
                 </span>
               </label>
+              <label className="flex items-center gap-2 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={srsSettings?.useEaseFromHistory ?? true}
+                  onChange={(e) => {
+                    if (!srsSettings) return;
+                    void saveSrsSettings({
+                      ...srsSettings,
+                      useEaseFromHistory: e.target.checked,
+                    });
+                  }}
+                  disabled={!srsSettings}
+                  className="accent-green-600 cursor-pointer"
+                />
+                <span className="text-gray-600">{t(`Show harder cards more often`)}</span>
+              </label>
             </div>
           </div>
         )}
+        {open && (
+          <div className="px-6 pb-4 text-center">
+            <Button
+              onClick={() => setConfirmingReset(true)}
+              className="text-sm text-gray-500 hover:text-red-600 underline underline-offset-2 transition cursor-pointer"
+            >
+              {t(`Restore defaults`)}
+            </Button>
+          </div>
+        )}
       </div>
+      <ConfirmModal
+        open={confirmingReset}
+        title={t(`Restore default settings?`)}
+        body={t(`This will reset all vocab and SRS settings to their defaults.`)}
+        confirmLabel={t(`Restore`)}
+        destructive
+        onCancel={() => setConfirmingReset(false)}
+        onConfirm={restoreDefaults}
+      />
     </div>
   );
 }

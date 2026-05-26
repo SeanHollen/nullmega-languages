@@ -8,12 +8,13 @@ import { StudyEmptyState } from "../components/StudyEmptyState";
 import type { Flashcard } from "../utils/flashcards";
 import { patchFlashcard, computeStatus, pickNextContext } from "../utils/flashcards";
 import { loadVocabSettings } from "../utils/vocabSettings";
+import { loadSrsSettings } from "../utils/srsSettings";
 import { loadAudio, deleteAudio } from "../utils/db";
 import { AudioPlayer } from "../components/listening/AudioPlayer";
 import { BoldWord } from "../components/BoldWord";
 import type { StudySessionData } from "../utils/studySession";
 import {
-  easyInterval,
+  incrementedInterval,
   pickNextCard,
   buildTierFn,
   computeAnswerPatch,
@@ -69,6 +70,7 @@ export function StudyPage() {
   const mode: StudyMode = modeParam === "review" ? "review" : "learn";
 
   const settings = useLiveQuery(() => loadVocabSettings(), []);
+  const srsSettings = useLiveQuery(() => loadSrsSettings(), []);
   const sessionData = location.state as StudySessionData | null;
 
   const [remaining, setRemaining] = useState<Flashcard[]>(() => sessionData?.cards ?? []);
@@ -84,8 +86,8 @@ export function StudyPage() {
 
   const tierFn = buildTierFn(
     mode,
-    settings?.showUpcomingBeforeLearning ?? true,
-    settings?.showDueBeforeRelearning ?? true,
+    srsSettings?.showUpcomingBeforeLearning ?? false,
+    srsSettings?.showDueBeforeRelearning ?? true,
   );
 
   function showCard(card: Flashcard) {
@@ -127,7 +129,8 @@ export function StudyPage() {
 
   function handleAnswer(right: boolean) {
     if (!current) return;
-    const { patch, graduate } = computeAnswerPatch(current, mode, right, Date.now());
+    const useEase = srsSettings?.useEaseFromHistory ?? true;
+    const { patch, graduate } = computeAnswerPatch(current, mode, right, Date.now(), useEase);
     void patchFlashcard(current.id, patch);
 
     if (graduate) {
@@ -184,14 +187,17 @@ export function StudyPage() {
     return () => document.removeEventListener(`keydown`, onKey);
   });
 
-  function handleEasy() {
+  function handleShowEarlier() {
     if (!current) return;
     const now = Date.now();
     if (mode === "learn") {
       void patchFlashcard(current.id, {
         status: "scheduled",
         lastReviewed: now,
-        currentInterval: easyInterval(current.currentInterval),
+        currentInterval: incrementedInterval(current, {
+          mode: "hard",
+          useEase: srsSettings?.useEaseFromHistory ?? true,
+        }),
         learningCorrectCount: 0,
         relearningStartedAt: null,
         contexts: [],
@@ -201,7 +207,43 @@ export function StudyPage() {
       void patchFlashcard(current.id, {
         status: "scheduled",
         lastReviewed: now,
-        currentInterval: easyInterval(current.currentInterval),
+        currentInterval: incrementedInterval(current, {
+          mode: "hard",
+          useEase: srsSettings?.useEaseFromHistory ?? true,
+        }),
+        relearningStartedAt: null,
+        contexts: [],
+        dateContextGenerated: null,
+      });
+    }
+    setMenuOpen(false);
+    advanceCard();
+  }
+
+  function handleEasy() {
+    if (!current) return;
+    const now = Date.now();
+    if (mode === "learn") {
+      void patchFlashcard(current.id, {
+        status: "scheduled",
+        lastReviewed: now,
+        currentInterval: incrementedInterval(current, {
+          mode: "easy",
+          useEase: srsSettings?.useEaseFromHistory ?? true,
+        }),
+        learningCorrectCount: 0,
+        relearningStartedAt: null,
+        contexts: [],
+        dateContextGenerated: null,
+      });
+    } else {
+      void patchFlashcard(current.id, {
+        status: "scheduled",
+        lastReviewed: now,
+        currentInterval: incrementedInterval(current, {
+          mode: "easy",
+          useEase: srsSettings?.useEaseFromHistory ?? true,
+        }),
         relearningStartedAt: null,
         contexts: [],
         dateContextGenerated: null,
@@ -336,10 +378,16 @@ export function StudyPage() {
                     {menuOpen && (
                       <div className="absolute right-0 bottom-full mb-2 bg-white rounded-xl shadow-lg border border-gray-100 py-1 z-20 min-w-[180px]">
                         <Button
+                          onClick={handleShowEarlier}
+                          className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-800 cursor-pointer"
+                        >
+                          {t(`Show earlier`)}
+                        </Button>
+                        <Button
                           onClick={handleEasy}
                           className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-800 cursor-pointer"
                         >
-                          {t(`Easy`)}
+                          {t(`Show later`)}
                         </Button>
                         <Button
                           onClick={handleSuspend}

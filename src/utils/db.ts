@@ -259,6 +259,44 @@ class LanguageLabDB extends Dexie {
           await tx.table(`kv`).put({ ...row, value: { ...rest, textDisplay } });
         }
       });
+    // v16: `showUpcomingBeforeLearning` and `showDueBeforeRelearning` move from
+    // `vocab_settings` to `srs_settings` (they apply to grammar as well as vocab).
+    // Copy any existing values across, then strip them from the vocab entry.
+    this.version(16)
+      .stores({
+        audio: ``,
+        streaks: `&date`,
+        streaksLang: `&[language+date], date, language`,
+        goals: `&language`,
+        kv: `&key`,
+        abilities: `&id, [language+mode]`,
+        customLanguages: `&name`,
+        flashcards: `&id, language, [language+source]`,
+        grammarCards: `&id, language, [language+title]`,
+        assessments: `&id, [mode+language], completedAt, createdAt`,
+      })
+      .upgrade(async (tx) => {
+        const vocabRow = (await tx.table(`kv`).get(`vocab_settings`)) as
+          | { key: string; value: Record<string, unknown> }
+          | undefined;
+        if (!vocabRow?.value || typeof vocabRow.value !== `object`) return;
+        const { showUpcomingBeforeLearning, showDueBeforeRelearning, ...rest } = vocabRow.value;
+        const hasUpcoming = typeof showUpcomingBeforeLearning === `boolean`;
+        const hasDue = typeof showDueBeforeRelearning === `boolean`;
+        if (hasUpcoming || hasDue) {
+          const srsRow = (await tx.table(`kv`).get(`srs_settings`)) as
+            | { key: string; value: Record<string, unknown> }
+            | undefined;
+          const existing = srsRow?.value && typeof srsRow.value === `object` ? srsRow.value : {};
+          const nextValue: Record<string, unknown> = { ...existing };
+          if (hasUpcoming) nextValue.showUpcomingBeforeLearning = showUpcomingBeforeLearning;
+          if (hasDue) nextValue.showDueBeforeRelearning = showDueBeforeRelearning;
+          await tx.table(`kv`).put({ key: `srs_settings`, value: nextValue });
+        }
+        if (hasUpcoming || hasDue) {
+          await tx.table(`kv`).put({ ...vocabRow, value: rest });
+        }
+      });
   }
 }
 

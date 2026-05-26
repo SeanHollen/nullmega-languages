@@ -11,6 +11,9 @@ interface Props {
   label?: string;
   autoplay?: boolean;
   small?: boolean;
+  // Parent fills this with a callback that restarts and plays the audio. Used for
+  // keyboard shortcuts (e.g. "r" to replay).
+  replayRef?: React.RefObject<(() => void) | null>;
 }
 
 function formatTime(seconds: number): string {
@@ -20,7 +23,7 @@ function formatTime(seconds: number): string {
   return `${m}:${s.toString().padStart(2, `0`)}`;
 }
 
-export function AudioPlayer({ src, label, autoplay = false, small = false }: Props) {
+export function AudioPlayer({ src, label, autoplay = false, small = false, replayRef }: Props) {
   const { t } = useTranslation();
   const [trackedSrc, setTrackedSrc] = useState(src);
   const [playing, setPlaying] = useState(false);
@@ -73,6 +76,12 @@ export function AudioPlayer({ src, label, autoplay = false, small = false }: Pro
       setPlaying(false);
     });
     audioRef.current = audio;
+    if (replayRef) {
+      replayRef.current = () => {
+        audio.currentTime = 0;
+        void audio.play();
+      };
+    }
     if (autoplay) {
       void (async () => {
         try {
@@ -86,8 +95,9 @@ export function AudioPlayer({ src, label, autoplay = false, small = false }: Pro
       flushSeconds();
       audio.pause();
       audioRef.current = null;
+      if (replayRef) replayRef.current = null;
     };
-  }, [src, autoplay]);
+  }, [src, autoplay, replayRef]);
 
   function toggle() {
     const audio = audioRef.current;

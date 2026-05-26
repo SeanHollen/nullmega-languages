@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams, useLocation } from "react-router-dom";
 import { useLiveQuery } from "dexie-react-hooks";
 import { useTranslation } from "react-i18next";
@@ -80,6 +80,7 @@ export function StudyPage() {
   const [audioUrl, setAudioUrl] = useState<string | null>(() => sessionData?.audioUrl ?? null);
 
   const cancelAudio = useRef<() => void>(() => {});
+  const replayAudio = useRef<(() => void) | null>(null);
 
   const tierFn = buildTierFn(
     mode,
@@ -147,6 +148,41 @@ export function StudyPage() {
     setCurrent(nextCard);
     if (nextCard) showCard(nextCard);
   }
+
+  // Anki-style keyboard shortcuts: Space to show the answer, then 1=Wrong, 3=Right.
+  // useEffect is necessary here — there's no JSX equivalent for a document-level
+  // keydown listener. Deps include the gating state so the closure sees current values.
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (!current) return;
+      const target = e.target as HTMLElement | null;
+      if (target && (target.tagName === `INPUT` || target.tagName === `TEXTAREA`)) return;
+      if (e.repeat || e.metaKey || e.ctrlKey || e.altKey) return;
+      if (e.key === `r` || e.key === `R`) {
+        if (replayAudio.current) {
+          e.preventDefault();
+          replayAudio.current();
+        }
+        return;
+      }
+      if (!revealed) {
+        if (e.key === ` `) {
+          e.preventDefault();
+          setRevealed(true);
+        }
+        return;
+      }
+      if (e.key === `1`) {
+        e.preventDefault();
+        handleAnswer(false);
+      } else if (e.key === `3`) {
+        e.preventDefault();
+        handleAnswer(true);
+      }
+    }
+    document.addEventListener(`keydown`, onKey);
+    return () => document.removeEventListener(`keydown`, onKey);
+  });
 
   function handleEasy() {
     if (!current) return;
@@ -251,7 +287,11 @@ export function StudyPage() {
             />
             {audioUrl && (
               <div className="flex justify-center">
-                <AudioPlayer src={audioUrl} autoplay={settings.autoplayAudio} />
+                <AudioPlayer
+                  src={audioUrl}
+                  autoplay={settings.autoplayAudio}
+                  replayRef={replayAudio}
+                />
               </div>
             )}
             {revealed && (

@@ -167,34 +167,66 @@ export function ReviewOutcomesChart({ cards }: Props) {
         {buckets.map((b, i) => {
           const v = values[i];
           const cx = groupX(i);
-          const correctX = cx - barW - 1;
-          const incorrectX = cx + 1;
           const baseY = toY(0);
           const isHoveredCorrect = hovered?.bucket === i && hovered.side === `correct`;
           const isHoveredIncorrect = hovered?.bucket === i && hovered.side === `incorrect`;
+          const stacked = scale === `percent`;
+          // Stacked mode: one centered bar with correct on bottom + incorrect stacked above.
+          // Totals mode: two bars side-by-side around the bucket center.
+          const stackedW = Math.min(48, Math.max(2, groupSlot * 0.6));
+          const stackedX = cx - stackedW / 2;
+          const correctTopY = toY(v.correctVal);
+          const incorrectTopY = toY(v.correctVal + v.incorrectVal);
           return (
             <g key={i}>
-              {v.correctVal > 0 && (
-                <rect
-                  x={correctX}
-                  y={toY(v.correctVal)}
-                  width={barW}
-                  height={Math.max(0, baseY - toY(v.correctVal))}
-                  fill="#16a34a"
-                  opacity={isHoveredCorrect ? 0.8 : 1}
-                  rx="2"
-                />
-              )}
-              {v.incorrectVal > 0 && (
-                <rect
-                  x={incorrectX}
-                  y={toY(v.incorrectVal)}
-                  width={barW}
-                  height={Math.max(0, baseY - toY(v.incorrectVal))}
-                  fill="#ef4444"
-                  opacity={isHoveredIncorrect ? 0.8 : 1}
-                  rx="2"
-                />
+              {stacked ? (
+                <>
+                  {v.correctVal > 0 && (
+                    <rect
+                      x={stackedX}
+                      y={correctTopY}
+                      width={stackedW}
+                      height={Math.max(0, baseY - correctTopY)}
+                      fill="#16a34a"
+                      opacity={isHoveredCorrect ? 0.8 : 1}
+                    />
+                  )}
+                  {v.incorrectVal > 0 && (
+                    <rect
+                      x={stackedX}
+                      y={incorrectTopY}
+                      width={stackedW}
+                      height={Math.max(0, correctTopY - incorrectTopY)}
+                      fill="#ef4444"
+                      opacity={isHoveredIncorrect ? 0.8 : 1}
+                    />
+                  )}
+                </>
+              ) : (
+                <>
+                  {v.correctVal > 0 && (
+                    <rect
+                      x={cx - barW - 1}
+                      y={correctTopY}
+                      width={barW}
+                      height={Math.max(0, baseY - correctTopY)}
+                      fill="#16a34a"
+                      opacity={isHoveredCorrect ? 0.8 : 1}
+                      rx="2"
+                    />
+                  )}
+                  {v.incorrectVal > 0 && (
+                    <rect
+                      x={cx + 1}
+                      y={toY(v.incorrectVal)}
+                      width={barW}
+                      height={Math.max(0, baseY - toY(v.incorrectVal))}
+                      fill="#ef4444"
+                      opacity={isHoveredIncorrect ? 0.8 : 1}
+                      rx="2"
+                    />
+                  )}
+                </>
               )}
               {mode === `hour` && (
                 <line
@@ -216,26 +248,53 @@ export function ReviewOutcomesChart({ cards }: Props) {
                   {b.label}
                 </text>
               )}
-              <rect
-                x={cx - groupSlot / 2}
-                y={PAD_T}
-                width={groupSlot / 2}
-                height={INNER_H}
-                fill="transparent"
-                style={{ cursor: `pointer` }}
-                onMouseEnter={() => setHovered({ bucket: i, side: `correct` })}
-                onMouseLeave={() => setHovered(null)}
-              />
-              <rect
-                x={cx}
-                y={PAD_T}
-                width={groupSlot / 2}
-                height={INNER_H}
-                fill="transparent"
-                style={{ cursor: `pointer` }}
-                onMouseEnter={() => setHovered({ bucket: i, side: `incorrect` })}
-                onMouseLeave={() => setHovered(null)}
-              />
+              {stacked ? (
+                <>
+                  <rect
+                    x={stackedX}
+                    y={correctTopY}
+                    width={stackedW}
+                    height={Math.max(0, baseY - correctTopY)}
+                    fill="transparent"
+                    style={{ cursor: `pointer` }}
+                    onMouseEnter={() => setHovered({ bucket: i, side: `correct` })}
+                    onMouseLeave={() => setHovered(null)}
+                  />
+                  <rect
+                    x={stackedX}
+                    y={incorrectTopY}
+                    width={stackedW}
+                    height={Math.max(0, correctTopY - incorrectTopY)}
+                    fill="transparent"
+                    style={{ cursor: `pointer` }}
+                    onMouseEnter={() => setHovered({ bucket: i, side: `incorrect` })}
+                    onMouseLeave={() => setHovered(null)}
+                  />
+                </>
+              ) : (
+                <>
+                  <rect
+                    x={cx - groupSlot / 2}
+                    y={PAD_T}
+                    width={groupSlot / 2}
+                    height={INNER_H}
+                    fill="transparent"
+                    style={{ cursor: `pointer` }}
+                    onMouseEnter={() => setHovered({ bucket: i, side: `correct` })}
+                    onMouseLeave={() => setHovered(null)}
+                  />
+                  <rect
+                    x={cx}
+                    y={PAD_T}
+                    width={groupSlot / 2}
+                    height={INNER_H}
+                    fill="transparent"
+                    style={{ cursor: `pointer` }}
+                    onMouseEnter={() => setHovered({ bucket: i, side: `incorrect` })}
+                    onMouseLeave={() => setHovered(null)}
+                  />
+                </>
+              )}
             </g>
           );
         })}
@@ -245,8 +304,18 @@ export function ReviewOutcomesChart({ cards }: Props) {
             const v = values[hovered.bucket];
             const value = hovered.side === `correct` ? v.correctVal : v.incorrectVal;
             const cx = groupX(hovered.bucket);
-            const tx = hovered.side === `correct` ? cx - barW / 2 - 1 : cx + barW / 2 + 1;
-            return renderTooltip(tx, toY(value), [
+            const stacked = scale === `percent`;
+            let tx: number;
+            let ty: number;
+            if (stacked) {
+              tx = cx;
+              ty =
+                hovered.side === `correct` ? toY(v.correctVal) : toY(v.correctVal + v.incorrectVal);
+            } else {
+              tx = hovered.side === `correct` ? cx - barW / 2 - 1 : cx + barW / 2 + 1;
+              ty = toY(value);
+            }
+            return renderTooltip(tx, ty, [
               b.tooltipLabel,
               hovered.side === `correct`
                 ? t(`{{value}} correct`, { value: formatValue(value) })

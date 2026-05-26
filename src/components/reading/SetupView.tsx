@@ -2,6 +2,7 @@ import { FaExclamationTriangle } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import type { ReadingLength } from "../../utils/prompts";
 import type { WritingMode } from "../../hooks/useGenerateWriting";
+import { Button } from "../Button";
 
 interface Props {
   language: string;
@@ -101,7 +102,7 @@ export function SetupView({
         {length !== undefined && onLengthChange && (
           <div className="inline-flex rounded-xl border border-gray-200 overflow-hidden divide-x divide-gray-200">
             {LENGTH_OPTIONS.map((opt) => (
-              <button
+              <Button
                 key={opt}
                 onClick={() => onLengthChange(opt)}
                 className={`px-3 py-1 text-sm transition cursor-pointer ${
@@ -111,7 +112,7 @@ export function SetupView({
                 }`}
               >
                 {t(LENGTH_LABELS[opt])}
-              </button>
+              </Button>
             ))}
           </div>
         )}
@@ -121,7 +122,7 @@ export function SetupView({
         <div>
           <div className="inline-flex rounded-xl border border-gray-200 overflow-hidden divide-x divide-gray-200">
             {WRITING_MODES.map((mode) => (
-              <button
+              <Button
                 key={mode}
                 onClick={() => onWritingModeChange(mode)}
                 className={`px-3 py-1 text-sm transition cursor-pointer ${
@@ -131,7 +132,7 @@ export function SetupView({
                 }`}
               >
                 {t(WRITING_MODE_LABELS[mode])}
-              </button>
+              </Button>
             ))}
           </div>
           {writingMode && (
@@ -156,7 +157,7 @@ export function SetupView({
       )}
 
       <div className={`relative group ${disabledReason ? `cursor-not-allowed` : ``}`}>
-        <button
+        <Button
           onClick={onGenerate}
           disabled={!!disabledReason}
           className="w-full bg-green-600 text-white py-3 rounded-xl font-semibold hover:bg-green-700 disabled:opacity-40 disabled:cursor-not-allowed transition cursor-pointer"
@@ -164,7 +165,7 @@ export function SetupView({
           {rated
             ? resolvedGenerateLabel
             : t(`{{label}} (Unrated)`, { label: resolvedGenerateLabel })}
-        </button>
+        </Button>
         {disabledReason && (
           <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-gray-800 text-white text-xs rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition pointer-events-none">
             {disabledReason}

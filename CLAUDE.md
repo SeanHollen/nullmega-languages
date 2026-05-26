@@ -34,6 +34,20 @@ Validate at the boundary where the data actually comes from outside our control:
 
 Optional parameters are `gender?: NarratorGender`, not `gender: NarratorGender | null`. Use `null` only when an existing API forces it.
 
+## Use <Button> instead of <button> for actions
+
+`onClick` waits for both mousedown AND mouseup before firing — a perceivable ~100ms lag on every press. Use the `<Button>` component in `src/components/Button.tsx` instead of native `<button>`. It fires on mousedown for instant feedback and still activates on Enter/Space for keyboard users.
+
+```tsx
+import { Button } from "../components/Button";
+
+<Button onClick={handleSubmit} className="bg-green-600 ...">Submit</Button>
+```
+
+The `onClick` prop on `<Button>` is typed `() => void` (no event arg) — it's wired to `onMouseDown` and `onKeyDown` internally. Pass the same className and other props you'd pass to a native button.
+
+When to keep native `<button>`: form submit buttons that must be triggered by Enter inside an input (`type="submit"` inside `<form>`), and the rare case where you need the click event object. When to keep `<a>` with `onClick`: browser-navigated links.
+
 ## Never use window.confirm or window.alert
 
 Native browser dialogs are not allowed. They can't be styled, they break the app's visual language, and they're not testable or i18n-friendly. Build an in-app modal instead — the `ConfirmModal` component in `src/components/ConfirmModal.tsx` is the established pattern for confirmations. Same rule applies to `window.prompt`.

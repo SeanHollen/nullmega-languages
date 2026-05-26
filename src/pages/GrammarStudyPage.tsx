@@ -11,6 +11,7 @@ import {
   computeGrammarAnswerPatch,
   pickNextGrammarCard,
 } from "../utils/grammarSession";
+import { Button } from "../components/Button";
 
 type Phase = "answering" | "results";
 
@@ -119,7 +120,7 @@ export function GrammarStudyPage() {
                   {q.type === `multiple-choice` && q.choices ? (
                     <div className="flex flex-col gap-2">
                       {q.choices.map((choice) => (
-                        <button
+                        <Button
                           key={choice}
                           onClick={() => setAnswer(i, choice)}
                           className={`text-left px-4 py-3 rounded-xl border-2 transition cursor-pointer ${
@@ -129,7 +130,7 @@ export function GrammarStudyPage() {
                           }`}
                         >
                           {choice}
-                        </button>
+                        </Button>
                       ))}
                     </div>
                   ) : (
@@ -147,14 +148,14 @@ export function GrammarStudyPage() {
               ))}
             </div>
 
-            <button
+            <Button
               onClick={submitAnswers}
               disabled={!allAnswered}
               title={!allAnswered ? t(`Not all questions answered`) : undefined}
               className="w-full bg-green-600 text-white py-3 rounded-xl font-semibold hover:bg-green-700 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition"
             >
               {t(`Check answers →`)}
-            </button>
+            </Button>
           </div>
         )}
         {current !== null && phase === `results` && (
@@ -190,12 +191,12 @@ export function GrammarStudyPage() {
               ))}
             </div>
 
-            <button
+            <Button
               onClick={() => handleCardAnswer(questionResults.every(Boolean))}
               className="w-full bg-green-600 text-white py-3 rounded-xl font-semibold hover:bg-green-700 transition cursor-pointer"
             >
               {t(`Continue →`)}
-            </button>
+            </Button>
           </div>
         )}
       </div>

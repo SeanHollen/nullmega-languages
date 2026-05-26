@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { FaMicrophone, FaStop } from "react-icons/fa";
 import type { WritingExercise } from "../../hooks/useGenerateWriting";
 import { useSpeechToText } from "../../hooks/useSpeechToText";
+import { Button } from "../Button";
 
 function wordCount(text: string): number {
   return text.trim() === "" ? 0 : text.trim().split(/\s+/).length;
@@ -130,7 +131,7 @@ export function WritingPassageView({
             <div className="flex items-center justify-between gap-2 flex-wrap">
               <div className="flex items-center gap-2 flex-wrap">
                 {stt.isSupported && (
-                  <button
+                  <Button
                     onClick={() => toggleRecording(i)}
                     className={`cursor-pointer flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg border transition font-medium ${
                       stt.activeKey === String(i)
@@ -145,7 +146,7 @@ export function WritingPassageView({
                       <FaMicrophone className="shrink-0" />
                     )}
                     {stt.activeKey === String(i) ? t(`Listening…`) : t(`Dictate`)}
-                  </button>
+                  </Button>
                 )}
                 {sttErrorByIndex[i] && (
                   <span className="text-xs text-red-500 font-medium">{sttErrorByIndex[i]}</span>
@@ -166,13 +167,13 @@ export function WritingPassageView({
       })}
 
       <div className={`relative group ${!canSubmit ? `cursor-not-allowed` : ``}`}>
-        <button
+        <Button
           onClick={onSubmit}
           disabled={!canSubmit}
           className="w-full bg-green-600 text-white py-3 rounded-xl font-semibold hover:bg-green-700 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition"
         >
           {t(`Submit Answers`)}
-        </button>
+        </Button>
         {!canSubmit && (
           <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-gray-800 text-white text-xs rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition pointer-events-none">
             {essayCount < (essayQ?.minWords ?? 0)

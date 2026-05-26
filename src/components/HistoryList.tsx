@@ -15,6 +15,7 @@ import {
 import { deltaColor } from "../utils/colors";
 import { loadAudio } from "../utils/db";
 import { useLoading } from "../contexts/LoadingContext";
+import { Button } from "./Button";
 
 interface Props {
   mode: Mode;
@@ -172,9 +173,9 @@ export function HistoryList({ mode, language, limit = 10, writingMode }: Props) 
 
           if (inProgress) {
             return (
-              <button key={r.id} onClick={() => void handleResume(r)} className={className}>
+              <Button key={r.id} onClick={() => void handleResume(r)} className={className}>
                 {inner}
-              </button>
+              </Button>
             );
           }
           return (

@@ -5,6 +5,7 @@ import type { RatingResult } from "../../hooks/useAbility";
 import { AssessmentFeedback } from "../AssessmentFeedback";
 import { ClickableText } from "../ClickableText";
 import { ResultsScoreCard } from "../ResultsScoreCard";
+import { Button } from "../Button";
 
 function scoreColor(score: number): string {
   if (score >= 5) return `text-green-600`;
@@ -168,18 +169,18 @@ export function WritingResultsView({
       )}
 
       <div className="flex gap-3">
-        <button
+        <Button
           onClick={onGoAgain}
           className="flex-1 bg-green-600 text-white py-3 rounded-xl font-semibold hover:bg-green-700 transition cursor-pointer"
         >
           {t(`Go Again`)}
-        </button>
-        <button
+        </Button>
+        <Button
           onClick={onHome}
           className="flex-1 bg-white border border-gray-200 text-gray-600 py-3 rounded-xl font-semibold hover:bg-gray-50 hover:border-gray-300 transition cursor-pointer"
         >
           {t(`Home`)}
-        </button>
+        </Button>
       </div>
     </div>
   );

@@ -5,6 +5,7 @@ import type { Exercise } from "../../types";
 import { QuestionCard } from "./QuestionCard";
 import { WordDefinitionPanel } from "./WordDefinitionPanel";
 import { loadDictionaryEnabled, saveDictionaryEnabled } from "../../utils/dictionarySettings";
+import { Button } from "../Button";
 
 interface Props {
   exercise: Exercise;
@@ -112,14 +113,14 @@ export function PassageView({
         />
       ))}
 
-      <button
+      <Button
         onClick={onSubmit}
         disabled={!allAnswered}
         title={!allAnswered ? t(`Not all questions answered`) : undefined}
         className="w-full bg-green-600 text-white py-3 rounded-xl font-semibold hover:bg-green-700 disabled:opacity-40 transition cursor-pointer"
       >
         {t(`Submit Answers`)}
-      </button>
+      </Button>
 
       {dictionaryEnabled && (
         <WordDefinitionPanel

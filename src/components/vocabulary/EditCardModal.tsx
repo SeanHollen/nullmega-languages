@@ -4,6 +4,7 @@ import { FaChevronDown, FaChevronRight } from "react-icons/fa";
 import type { Flashcard, FlashcardStatus } from "../../utils/flashcards";
 import { patchFlashcard, updateFlashcardTags } from "../../utils/flashcards";
 import { relativeTime } from "../../utils/relativeTime";
+import { Button } from "../Button";
 
 const DAY = 24 * 60 * 60 * 1000;
 const ALL_STATUSES: FlashcardStatus[] = ["new", "learning", "scheduled", "dropped"];
@@ -133,7 +134,7 @@ export function EditCardModal({ card, onSave, onClose }: Props) {
           </div>
         </div>
         <div>
-          <button
+          <Button
             onClick={() => setDetailsOpen((p) => !p)}
             className="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg border border-gray-200 bg-gray-50 hover:bg-gray-100 hover:border-gray-300 text-sm font-medium text-gray-700 cursor-pointer transition"
           >
@@ -143,7 +144,7 @@ export function EditCardModal({ card, onSave, onClose }: Props) {
             ) : (
               <FaChevronRight className="text-gray-500 text-xs" />
             )}
-          </button>
+          </Button>
           {detailsOpen && (
             <div className="mt-2">
               <DetailsBlock card={card} t={t} />
@@ -151,18 +152,18 @@ export function EditCardModal({ card, onSave, onClose }: Props) {
           )}
         </div>
         <div className="flex justify-end gap-2 pt-1">
-          <button
+          <Button
             onClick={onClose}
             className="text-sm text-gray-500 px-4 py-2 rounded-lg border border-gray-200 hover:border-gray-300 cursor-pointer transition"
           >
             {t(`Cancel`)}
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={save}
             className="text-sm bg-green-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-700 cursor-pointer transition"
           >
             {t(`Save`)}
-          </button>
+          </Button>
         </div>
       </div>
     </div>

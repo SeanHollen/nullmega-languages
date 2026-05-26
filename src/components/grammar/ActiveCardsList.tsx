@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import type { GrammarCard } from "../../utils/grammarCards";
 import { computeGrammarStatus } from "../../utils/grammarCards";
+import { Button } from "../Button";
 
 const STATUS_COLORS = {
   learning: `bg-yellow-100 text-yellow-700`,
@@ -26,7 +27,7 @@ export function ActiveCardsList({ cards, onPlay }: Props) {
           if (status === `due`) statusColor = STATUS_COLORS.due;
           if (status === `relearning`) statusColor = STATUS_COLORS.relearning;
           return (
-            <button
+            <Button
               key={card.id}
               onClick={() => onPlay(card)}
               className="flex items-center gap-2 bg-white rounded-xl border border-gray-100 shadow-sm px-3 py-2 hover:border-green-200 hover:shadow-md transition cursor-pointer text-left"
@@ -47,7 +48,7 @@ export function ActiveCardsList({ cards, onPlay }: Props) {
               >
                 {t(status)}
               </span>
-            </button>
+            </Button>
           );
         })}
       </div>

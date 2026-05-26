@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import type { Question } from "../../types";
+import { Button } from "../Button";
 
 interface Props {
   question: Question;
@@ -20,7 +21,7 @@ export function QuestionCard({ question, index, selected, onSelect, headerSlot }
       </div>
       <div className="space-y-2">
         {question.options.map((opt, oi) => (
-          <button
+          <Button
             key={oi}
             onClick={() => onSelect(selected === oi ? -1 : oi)}
             className={`w-full text-left px-4 py-3 rounded-xl border transition-all duration-100 text-sm cursor-pointer ${
@@ -30,7 +31,7 @@ export function QuestionCard({ question, index, selected, onSelect, headerSlot }
             }`}
           >
             {opt}
-          </button>
+          </Button>
         ))}
       </div>
     </div>

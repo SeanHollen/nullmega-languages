@@ -1,6 +1,7 @@
 // Shared chart primitives for the stats charts. Each chart in this folder
 // renders into a 600x280 viewBox with a consistent inner padding, so the y/x
 // axis math, tooltip box, and toggle/chart-card chrome can all live here.
+import { Button } from "../Button";
 
 export const CHART_WIDTH = 600;
 export const CHART_HEIGHT = 280;
@@ -105,7 +106,7 @@ export function ChartToggle<T extends string>({
   return (
     <div className="flex items-center gap-2">
       {options.map(([mode, label]) => (
-        <button
+        <Button
           key={mode}
           onClick={() => onChange(mode)}
           className={`text-xs px-3 py-1 rounded-md transition cursor-pointer ${
@@ -115,7 +116,7 @@ export function ChartToggle<T extends string>({
           }`}
         >
           {label}
-        </button>
+        </Button>
       ))}
     </div>
   );

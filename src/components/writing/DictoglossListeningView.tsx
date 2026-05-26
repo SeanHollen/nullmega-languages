@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import type { WritingExercise } from "../../hooks/useGenerateWriting";
 import { AudioPlayer } from "../listening/AudioPlayer";
+import { Button } from "../Button";
 
 interface Props {
   exercise: WritingExercise;
@@ -39,12 +40,12 @@ export function DictoglossListeningView({
           <AudioPlayer src={audioUrl} label={t(`Listen to the passage`)} />
         </div>
       </div>
-      <button
+      <Button
         onClick={onContinue}
         className="w-full bg-green-600 text-white py-3 rounded-xl font-semibold hover:bg-green-700 transition cursor-pointer"
       >
         {t(`Continue to summary`)}
-      </button>
+      </Button>
     </div>
   );
 }

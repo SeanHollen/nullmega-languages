@@ -11,6 +11,7 @@ import { loadVocabSettings, saveVocabSettings, getLearnedTodayCount } from "../u
 import { prepareLearnSession, prepareReviewSession } from "../utils/studySession";
 import { VocabSettingsPanel } from "../components/vocabulary/VocabSettingsPanel";
 import { FlashcardTable } from "../components/vocabulary/FlashcardTable";
+import { Button } from "../components/Button";
 
 export function VocabularyPage() {
   const navigate = useNavigate();
@@ -78,8 +79,8 @@ export function VocabularyPage() {
 
         <div className="flex flex-col min-[420px]:flex-row justify-center gap-4 mb-8">
           <div className="flex flex-col items-center gap-1">
-            <button
-              onClick={handleStartLearn}
+            <Button
+              onClick={() => void handleStartLearn()}
               disabled={!settings || (availableNewCount === 0 && learningCount === 0)}
               className="bg-white border-2 border-green-400 text-green-700 px-8 py-4 rounded-2xl font-bold text-base hover:bg-green-50 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition text-center min-w-48"
             >
@@ -90,12 +91,12 @@ export function VocabularyPage() {
                   learning: learningCount,
                 })}
               </div>
-            </button>
+            </Button>
             {learnError && <p className="text-xs text-red-500">{learnError}</p>}
           </div>
           <div className="flex flex-col items-center gap-1">
-            <button
-              onClick={handleStartReview}
+            <Button
+              onClick={() => void handleStartReview()}
               disabled={!settings || (dueCount === 0 && relearningCount === 0)}
               className="bg-white border-2 border-green-400 text-green-700 px-8 py-4 rounded-2xl font-bold text-base hover:bg-green-50 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition text-center min-w-48"
             >
@@ -106,7 +107,7 @@ export function VocabularyPage() {
                   relearning: relearningCount,
                 })}
               </div>
-            </button>
+            </Button>
             {reviewError && <p className="text-xs text-red-500">{reviewError}</p>}
           </div>
         </div>

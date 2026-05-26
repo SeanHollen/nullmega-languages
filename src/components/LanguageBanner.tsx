@@ -7,6 +7,7 @@ import { LANGUAGES, getCustomLanguages, addCustomLanguage } from "../utils/langu
 import { useLanguage } from "../contexts/LanguageContext";
 import { LanguageSelect } from "./LanguageSelect";
 import logo from "../assets/logo.png";
+import { Button } from "./Button";
 
 const OTHER = `__other__`;
 
@@ -75,19 +76,19 @@ export function LanguageBanner() {
               placeholder={t(`Enter a language…`)}
               className="flex-1 border border-green-700 rounded-lg px-3 py-1.5 text-sm bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-300"
             />
-            <button
+            <Button
               onClick={handleAddCustom}
               disabled={!customInput.trim()}
               className="px-3 py-1.5 bg-white text-green-700 rounded-lg text-sm font-semibold hover:bg-green-50 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition"
             >
               {t(`Add`)}
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={handleCancelCustom}
               className="px-3 py-1.5 border border-green-300 text-white rounded-lg text-sm font-medium hover:bg-white/10 cursor-pointer transition"
             >
               {t(`Cancel`)}
-            </button>
+            </Button>
           </div>
         ) : (
           <div className="flex items-center gap-2 min-w-0">
@@ -102,14 +103,14 @@ export function LanguageBanner() {
           </div>
         )}
 
-        <button
+        <Button
           onClick={() => void navigate(`/settings`)}
           className="flex items-center gap-2 px-2 sm:px-3 py-1.5 rounded-lg text-white hover:bg-white/10 transition cursor-pointer text-sm font-medium whitespace-nowrap shrink-0"
           title={t(`Configure AI provider keys`)}
         >
           <FaCog />
           <span className="hidden sm:inline">{t(`AI provider`)}</span>
-        </button>
+        </Button>
       </div>
     </header>
   );

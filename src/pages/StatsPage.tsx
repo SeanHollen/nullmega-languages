@@ -8,6 +8,7 @@ import type { Mode } from "../hooks/useAbility";
 import { useLanguage } from "../contexts/LanguageContext";
 import { getHistory, pointsForRecord } from "../utils/history";
 import { deltaColor } from "../utils/colors";
+import { Button } from "../components/Button";
 
 const MODE_LABELS: Record<Mode, string> = {
   reading: `Reading`,
@@ -101,13 +102,13 @@ export function StatsPage() {
     return (
       <div className="min-h-screen bg-green-100 py-10 px-4">
         <div className="max-w-3xl mx-auto">
-          <button
-            onClick={() => navigate(`/`)}
+          <Button
+            onClick={() => void navigate(`/`)}
             className="text-gray-400 hover:text-gray-600 transition cursor-pointer mb-6 flex items-center gap-2"
           >
             <FaArrowLeft />
             <span>{t(`Home`)}</span>
-          </button>
+          </Button>
           <p className="text-gray-500">{t(`Unknown mode.`)}</p>
         </div>
       </div>

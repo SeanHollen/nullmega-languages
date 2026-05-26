@@ -7,6 +7,7 @@ import {
   type WiktionaryResult,
 } from "../../utils/wiktionary";
 import { wiktionaryCode } from "../../data/wiktionaryCodes";
+import { Button } from "../Button";
 
 interface Props {
   word: string | null;
@@ -78,13 +79,13 @@ export function WordDefinitionPanel({ word, language, onClose }: Props) {
           <p className="text-xs text-gray-400 uppercase tracking-wide">{language}</p>
           <p className="text-xl font-semibold text-gray-800 break-words">{viewingWord}</p>
         </div>
-        <button
+        <Button
           onClick={onClose}
           className="text-gray-400 hover:text-gray-600 transition cursor-pointer p-1"
           aria-label={t(`Close`)}
         >
           <FaTimes />
-        </button>
+        </Button>
       </div>
 
       <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
@@ -95,12 +96,12 @@ export function WordDefinitionPanel({ word, language, onClose }: Props) {
         )}
 
         {supported && !showingFor && !loading && (
-          <button
+          <Button
             onClick={() => lookup(viewingWord)}
             className="w-full bg-green-600 text-white py-2.5 rounded-xl font-semibold hover:bg-green-700 transition cursor-pointer"
           >
             {t(`View translation`)}
-          </button>
+          </Button>
         )}
 
         {loading && <p className="text-sm text-gray-500">{t(`Looking up…`)}</p>}

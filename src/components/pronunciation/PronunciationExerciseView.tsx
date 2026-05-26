@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { PronunciationPhrase } from "../../hooks/useGeneratePronunciation";
 import { PhraseCard } from "./PhraseCard";
+import { Button } from "../Button";
 
 interface Props {
   phrases: PronunciationPhrase[];
@@ -78,13 +79,13 @@ export function PronunciationExerciseView({
       ))}
 
       <div className={`relative group ${!allRated ? `cursor-not-allowed` : ``}`}>
-        <button
+        <Button
           onClick={onSubmit}
           disabled={!allRated}
           className="w-full bg-green-600 text-white py-3 rounded-xl font-semibold hover:bg-green-700 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition"
         >
           {t(`Submit`)}
-        </button>
+        </Button>
         {!allRated && (
           <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-gray-800 text-white text-xs rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition pointer-events-none">
             {t(`Rate yourself on each phrase before submitting`)}

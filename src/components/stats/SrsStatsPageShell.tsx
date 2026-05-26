@@ -6,6 +6,7 @@ import { BackHeader } from "../BackHeader";
 import { SrsStatsView } from "./SrsStatsView";
 import type { SrsCard } from "../../utils/srs";
 import { computeSrsStatus } from "../../utils/srs";
+import { Button } from "../Button";
 
 interface Props {
   title: string;
@@ -79,13 +80,13 @@ export function SrsStatsPageShell({ title, backTo, loadCards, emptyMessage }: Pr
                 className="inline-flex items-center gap-1 bg-green-100 text-green-700 rounded-md px-2 py-0.5 text-xs font-medium"
               >
                 {tag}
-                <button
+                <Button
                   onClick={() => removeTag(tag)}
                   className="text-green-600 hover:text-green-800 cursor-pointer"
                   aria-label={t(`Remove {{tag}}`, { tag })}
                 >
                   {`×`}
-                </button>
+                </Button>
               </span>
             ))}
             <input
@@ -106,7 +107,7 @@ export function SrsStatsPageShell({ title, backTo, loadCards, emptyMessage }: Pr
             ))}
           </datalist>
           {tags.length > 0 && (
-            <button
+            <Button
               onClick={() => {
                 setTags([]);
                 setDraft(``);
@@ -114,7 +115,7 @@ export function SrsStatsPageShell({ title, backTo, loadCards, emptyMessage }: Pr
               className="text-xs text-gray-500 hover:text-gray-700 cursor-pointer"
             >
               {t(`Clear`)}
-            </button>
+            </Button>
           )}
         </div>
         <SrsStatsView cards={cards} emptyMessage={emptyMessage(language)} />

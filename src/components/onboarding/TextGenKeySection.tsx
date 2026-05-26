@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Button } from "../Button";
 
 interface Props {
   value: string;
@@ -50,7 +51,7 @@ export function TextGenKeySection({ value, onChange }: Props) {
               <span className="text-xs text-gray-500">{t(`Show key`)}</span>
             </label>
             {value && (
-              <button
+              <Button
                 type="button"
                 onClick={() => {
                   onChange(``);
@@ -59,7 +60,7 @@ export function TextGenKeySection({ value, onChange }: Props) {
                 className="text-xs text-gray-500 hover:text-gray-700 cursor-pointer"
               >
                 {t(`Clear`)}
-              </button>
+              </Button>
             )}
           </div>
           {touched && value && !value.startsWith(`sk-`) && (

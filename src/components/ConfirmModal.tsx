@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { Button } from "./Button";
 
 interface Props {
   open: boolean;
@@ -38,18 +39,18 @@ export function ConfirmModal({
         <p className="text-lg font-semibold text-gray-800">{title}</p>
         {body && <p className="text-sm text-gray-600">{body}</p>}
         <div className="flex justify-end gap-2 pt-2">
-          <button
+          <Button
             onClick={onCancel}
             className="px-4 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition cursor-pointer"
           >
             {cancelLabel ?? t(`Cancel`)}
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={onConfirm}
             className={`px-4 py-2 rounded-lg text-sm font-semibold text-white transition cursor-pointer ${confirmClass}`}
           >
             {confirmLabel ?? t(`Confirm`)}
-          </button>
+          </Button>
         </div>
       </div>
     </div>

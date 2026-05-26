@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { FaMicrophone, FaStop, FaQuestion } from "react-icons/fa";
 import { AudioPlayer } from "../listening/AudioPlayer";
 import { useSpeechToText } from "../../hooks/useSpeechToText";
+import { Button } from "../Button";
 
 interface Props {
   index: number;
@@ -113,18 +114,18 @@ export function PhraseCard({
         <span className="text-xs text-gray-400 font-medium">
           {t(`Phrase {{n}}`, { n: index + 1 })}
         </span>
-        <button
+        <Button
           onClick={() => setTextRevealed((p) => !p)}
           className="cursor-pointer text-xs px-3 py-1.5 rounded-lg border border-gray-200 text-gray-500 hover:border-gray-300 hover:text-gray-700 transition"
         >
           {textRevealed ? t(`Hide phrase`) : t(`Show phrase`)}
-        </button>
-        <button
+        </Button>
+        <Button
           onClick={() => setTranslationRevealed((p) => !p)}
           className="cursor-pointer text-xs px-3 py-1.5 rounded-lg border border-gray-200 text-gray-500 hover:border-gray-300 hover:text-gray-700 transition"
         >
           {translationRevealed ? t(`Hide translation`) : t(`Show translation`)}
-        </button>
+        </Button>
       </div>
 
       {(textRevealed || translationRevealed) && (
@@ -145,35 +146,35 @@ export function PhraseCard({
               <AudioPlayer src={userRecordingUrl} label={t(`Your recording`)} small />
             )}
             {isRecording ? (
-              <button
+              <Button
                 onClick={stopRecording}
                 className="cursor-pointer flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg bg-red-50 border border-red-200 text-red-600 hover:bg-red-100 transition font-medium"
               >
                 <FaStop className="shrink-0" />
                 {t(`Stop`)}
-              </button>
+              </Button>
             ) : (
-              <button
-                onClick={startRecording}
+              <Button
+                onClick={() => void startRecording()}
                 className="cursor-pointer flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg border border-gray-200 text-gray-500 hover:border-gray-300 hover:text-gray-700 transition"
               >
                 <FaMicrophone className="shrink-0" />
                 {userRecordingUrl ? t(`Re-record`) : t(`Record`)}
-              </button>
+              </Button>
             )}
             {userRecordingUrl && !isRecording && stt.isSupported && (
-              <button
+              <Button
                 onClick={() => setCheckRevealed(true)}
                 className="cursor-pointer flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg border border-gray-200 text-gray-500 hover:border-gray-300 hover:text-gray-700 transition"
               >
                 <FaQuestion className="shrink-0" />
                 {t(`Check`)}
-              </button>
+              </Button>
             )}
           </div>
 
           <div className="flex items-center gap-2 shrink-0">
-            <button
+            <Button
               onClick={() => onRate("good")}
               className={`cursor-pointer text-xs px-3 py-1.5 rounded-lg border transition font-medium ${
                 rating === "good"
@@ -182,8 +183,8 @@ export function PhraseCard({
               }`}
             >
               {t(`Easy`)}
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={() => onRate("medium")}
               className={`cursor-pointer text-xs px-3 py-1.5 rounded-lg border transition font-medium ${
                 rating === "medium"
@@ -192,8 +193,8 @@ export function PhraseCard({
               }`}
             >
               {t(`Medium`)}
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={() => onRate("bad")}
               className={`cursor-pointer text-xs px-3 py-1.5 rounded-lg border transition font-medium ${
                 rating === "bad"
@@ -202,7 +203,7 @@ export function PhraseCard({
               }`}
             >
               {t(`Hard`)}
-            </button>
+            </Button>
           </div>
         </div>
 

@@ -15,6 +15,7 @@ import { relativeTime } from "../../utils/relativeTime";
 import { SortableHeader, type SortDir } from "../SortableHeader";
 import { EditCardModal } from "./EditCardModal";
 import { ConfirmModal } from "../ConfirmModal";
+import { Button } from "../Button";
 
 const STATUS_STYLES: Record<FlashcardStatusDerived, string> = {
   new: `bg-gray-100 text-gray-600`,
@@ -245,7 +246,7 @@ export function FlashcardTable({ cards, language }: Props) {
         />
       )}
       <div className="flex flex-wrap items-center gap-2 mb-4">
-        <button
+        <Button
           onClick={() => {
             setAddingCard((p) => !p);
             setActionMessage(null);
@@ -254,22 +255,22 @@ export function FlashcardTable({ cards, language }: Props) {
         >
           <FaPlus className="text-xs" />
           {addingCard ? t(`Cancel`) : t(`Card`)}
-        </button>
-        <button
+        </Button>
+        <Button
           onClick={() => fileInputRef.current?.click()}
           title={t(`Import cards from JSON`)}
           className="bg-white border border-gray-200 text-gray-500 p-2 rounded-lg hover:border-gray-300 hover:bg-gray-50 hover:text-gray-700 transition cursor-pointer"
         >
           <FaFileImport />
-        </button>
-        <button
+        </Button>
+        <Button
           onClick={handleExport}
           disabled={cards.length === 0}
           title={t(`Export cards to JSON`)}
           className="bg-white border border-gray-200 text-gray-500 p-2 rounded-lg hover:border-gray-300 hover:bg-gray-50 hover:text-gray-700 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition"
         >
           <FaFileExport />
-        </button>
+        </Button>
         <input
           ref={fileInputRef}
           type="file"
@@ -319,7 +320,7 @@ export function FlashcardTable({ cards, language }: Props) {
             className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
           />
           <div className="flex justify-end gap-2">
-            <button
+            <Button
               onClick={() => {
                 setAddingCard(false);
                 setNewSource(``);
@@ -329,14 +330,14 @@ export function FlashcardTable({ cards, language }: Props) {
               className="text-sm text-gray-500 px-3 py-1.5 rounded-lg border border-gray-200 hover:border-gray-300 cursor-pointer transition"
             >
               {t(`Cancel`)}
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={handleAddCard}
               disabled={!newSource.trim() || !newTranslation.trim()}
               className="text-sm bg-green-600 text-white px-4 py-1.5 rounded-lg font-semibold hover:bg-green-700 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition"
             >
               {t(`Add card`)}
-            </button>
+            </Button>
           </div>
         </div>
       )}
@@ -364,26 +365,26 @@ export function FlashcardTable({ cards, language }: Props) {
             <span>{showingLabel}</span>
             {pageCount > 1 && (
               <div className="flex items-center gap-2">
-                <button
+                <Button
                   onClick={() => setPage((p) => Math.max(0, p - 1))}
                   disabled={clampedPage === 0}
                   className="px-2 py-1 rounded border border-gray-200 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 cursor-pointer"
                 >
                   {t(`Prev`)}
-                </button>
+                </Button>
                 <span>
                   {t(`Page {{page}} of {{pages}}`, {
                     page: clampedPage + 1,
                     pages: pageCount,
                   })}
                 </span>
-                <button
+                <Button
                   onClick={() => setPage((p) => Math.min(pageCount - 1, p + 1))}
                   disabled={clampedPage >= pageCount - 1}
                   className="px-2 py-1 rounded border border-gray-200 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 cursor-pointer"
                 >
                   {t(`Next`)}
-                </button>
+                </Button>
               </div>
             )}
           </div>
@@ -449,20 +450,20 @@ export function FlashcardTable({ cards, language }: Props) {
                         </td>
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-2">
-                            <button
+                            <Button
                               onClick={() => setEditingCard(c)}
                               className="text-gray-300 hover:text-blue-400 transition cursor-pointer"
                               title={t(`Edit card`)}
                             >
                               <FaPen className="text-xs" />
-                            </button>
-                            <button
+                            </Button>
+                            <Button
                               onClick={() => setPendingDelete(c)}
                               className="text-gray-300 hover:text-red-400 transition cursor-pointer"
                               title={t(`Delete card`)}
                             >
                               ✕
-                            </button>
+                            </Button>
                           </div>
                         </td>
                       </tr>

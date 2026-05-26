@@ -3,6 +3,7 @@ import type { Exercise } from "../../types";
 import type { ExerciseAudio } from "../../hooks/useTTS";
 import { AudioPlayer } from "./AudioPlayer";
 import { QuestionCard } from "../reading/QuestionCard";
+import { Button } from "../Button";
 
 interface Props {
   exercise: Exercise;
@@ -71,14 +72,14 @@ export function ListeningPassageView({
         />
       ))}
 
-      <button
+      <Button
         onClick={onSubmit}
         disabled={!allAnswered}
         title={!allAnswered ? t(`Not all questions answered`) : undefined}
         className="w-full bg-green-600 text-white py-3 rounded-xl font-semibold hover:bg-green-700 disabled:opacity-40 transition cursor-pointer"
       >
         {t(`Submit Answers`)}
-      </button>
+      </Button>
     </div>
   );
 }

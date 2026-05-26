@@ -19,6 +19,7 @@ import {
   computeAnswerPatch,
   computeRemoveContextPatch,
 } from "../utils/studySession";
+import { Button } from "../components/Button";
 
 type StudyMode = "learn" | "review";
 
@@ -32,12 +33,12 @@ interface CardSourceProps {
 function CardSource({ source, mode, revealedFull, onRevealText }: CardSourceProps) {
   const { t } = useTranslation();
   const revealButton = (
-    <button
+    <Button
       onClick={onRevealText}
       className="text-sm text-gray-400 hover:text-gray-600 underline underline-offset-2 transition cursor-pointer"
     >
       {t(`Show text`)}
-    </button>
+    </Button>
   );
   if (mode === `show` || revealedFull) {
     return (
@@ -262,56 +263,56 @@ export function StudyPage() {
             )}
             <div className="pt-2">
               {!revealed ? (
-                <button
+                <Button
                   onClick={() => setRevealed(true)}
                   className="w-full bg-green-600 text-white py-3 rounded-xl font-semibold hover:bg-green-700 transition cursor-pointer"
                 >
                   {t(`Show answer`)}
-                </button>
+                </Button>
               ) : (
                 <div className="flex gap-3">
-                  <button
+                  <Button
                     onClick={() => handleAnswer(false)}
                     className="flex-1 border-2 border-red-200 bg-red-50 text-gray-700 py-3 rounded-xl font-semibold hover:bg-red-100 transition cursor-pointer"
                   >
                     {t(`Wrong`)}
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     onClick={() => handleAnswer(true)}
                     className="flex-1 border-2 border-blue-200 bg-blue-50 text-gray-700 py-3 rounded-xl font-semibold hover:bg-blue-100 transition cursor-pointer"
                   >
                     {t(`Right`)}
-                  </button>
+                  </Button>
                   <div className="relative">
                     {menuOpen && (
                       <div className="fixed inset-0 z-10" onClick={() => setMenuOpen(false)} />
                     )}
-                    <button
+                    <Button
                       onClick={() => setMenuOpen((p) => !p)}
                       className="h-full px-3 border-2 border-gray-400 bg-white text-gray-500 rounded-xl hover:bg-gray-100 transition cursor-pointer"
                     >
                       <FaEllipsisV />
-                    </button>
+                    </Button>
                     {menuOpen && (
                       <div className="absolute right-0 bottom-full mb-2 bg-white rounded-xl shadow-lg border border-gray-100 py-1 z-20 min-w-[180px]">
-                        <button
+                        <Button
                           onClick={handleEasy}
                           className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-800 cursor-pointer"
                         >
                           {t(`Easy`)}
-                        </button>
-                        <button
+                        </Button>
+                        <Button
                           onClick={handleSuspend}
                           className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-700 cursor-pointer"
                         >
                           {t(`Suspend`)}
-                        </button>
-                        <button
+                        </Button>
+                        <Button
                           onClick={handleRemoveContext}
                           className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-700 cursor-pointer"
                         >
                           {t(`Remove this context`)}
-                        </button>
+                        </Button>
                       </div>
                     )}
                   </div>

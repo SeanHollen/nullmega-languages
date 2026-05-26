@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 import type { BackendMode } from "../../utils/onboarding";
+import { Button } from "../Button";
 
 interface Props {
   selected: BackendMode | null;
@@ -10,7 +11,7 @@ export function BackendChoice({ selected, onSelect }: Props) {
   const { t } = useTranslation();
   return (
     <div className="space-y-3">
-      <button
+      <Button
         onClick={() => onSelect(`standard`)}
         className={`w-full text-left p-5 rounded-2xl border-2 transition cursor-pointer ${
           selected === `standard`
@@ -29,8 +30,8 @@ export function BackendChoice({ selected, onSelect }: Props) {
           <em>{t(`The Language Lab`)}</em>
           {t(` services, standard backend, faster loading times.`)}
         </p>
-      </button>
-      <button
+      </Button>
+      <Button
         onClick={() => onSelect(`byok`)}
         className={`w-full text-left p-5 rounded-2xl border-2 transition cursor-pointer ${
           selected === `byok`
@@ -44,7 +45,7 @@ export function BackendChoice({ selected, onSelect }: Props) {
             `Only select this if you know what you're doing. Allows more open-source customization.`,
           )}
         </p>
-      </button>
+      </Button>
     </div>
   );
 }

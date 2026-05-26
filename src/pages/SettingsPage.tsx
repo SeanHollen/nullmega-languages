@@ -6,6 +6,7 @@ import { BackHeader } from "../components/BackHeader";
 import type { Provider } from "../utils/settings";
 import { loadSettings, saveSettings } from "../utils/settings";
 import { TextGenKeySection } from "../components/onboarding/TextGenKeySection";
+import { Button } from "../components/Button";
 
 export function SettingsPage() {
   const navigate = useNavigate();
@@ -106,7 +107,7 @@ export function SettingsPage() {
                         <span className="text-xs text-gray-500">{t(`Show key`)}</span>
                       </label>
                       {ttsKey && (
-                        <button
+                        <Button
                           type="button"
                           onClick={() => {
                             setTtsKey(``);
@@ -115,7 +116,7 @@ export function SettingsPage() {
                           className="text-xs text-gray-500 hover:text-gray-700 cursor-pointer"
                         >
                           {t(`Clear`)}
-                        </button>
+                        </Button>
                       )}
                     </div>
                     {ttsKeyTouched && ttsKey && !ttsKey.startsWith(`sk-`) && (
@@ -128,12 +129,12 @@ export function SettingsPage() {
               )}
             </section>
 
-            <button
+            <Button
               onClick={handleSave}
               className="w-full bg-green-600 text-white rounded-xl py-3 font-semibold hover:bg-green-700 transition cursor-pointer"
             >
               {t(`Save`)}
-            </button>
+            </Button>
           </div>
         )}
       </div>

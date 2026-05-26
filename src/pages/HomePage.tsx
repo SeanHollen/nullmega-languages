@@ -21,6 +21,7 @@ import { loadGrammarCards, computeGrammarStatus, type GrammarCard } from "../uti
 import { loadGrammarSettings, getGeneratedTodayCount } from "../utils/grammarSettings";
 import { useLiveQuery } from "dexie-react-hooks";
 import { loadStreaks, recordToday, computeCurrentStreak } from "../utils/streaks";
+import { Button } from "../components/Button";
 
 interface ModeConfig {
   label: string;
@@ -180,18 +181,18 @@ export function HomePage() {
                   : t(`Current streak: {{count}} days`, { count: currentStreak })}
               </span>
             )}
-            <button
-              onClick={() => navigate(`/goals`)}
+            <Button
+              onClick={() => void navigate(`/goals`)}
               className="text-sm text-green-600 hover:text-green-700 font-medium cursor-pointer"
             >
               {t(`Set daily goals →`)}
-            </button>
-            <button
-              onClick={() => navigate(`/streaks`)}
+            </Button>
+            <Button
+              onClick={() => void navigate(`/streaks`)}
               className="text-sm text-green-600 hover:text-green-700 font-medium cursor-pointer"
             >
               {t(`View streaks →`)}
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -220,9 +221,9 @@ export function HomePage() {
             const showGrammarStudyBadge =
               grammarStudyCountValue !== null && grammarCount !== null && grammarCount > 0;
             return (
-              <button
+              <Button
                 key={label}
-                onClick={() => navigate(href)}
+                onClick={() => void navigate(href)}
                 className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col items-center gap-1 hover:shadow-md hover:border-green-200 transition group cursor-pointer text-center"
               >
                 <Icon className="text-3xl text-gray-500 group-hover:text-green-500 transition" />
@@ -292,7 +293,7 @@ export function HomePage() {
                       : t(`{{completed}} completed today`, { completed: completedToday })}
                   </span>
                 )}
-              </button>
+              </Button>
             );
           })}
         </div>

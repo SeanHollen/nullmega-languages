@@ -3,6 +3,7 @@ import { useLiveQuery } from "dexie-react-hooks";
 import { useTranslation } from "react-i18next";
 import { translateOne } from "../hooks/useTranslate";
 import { loadFlashcards, addFlashcard, removeFlashcard } from "../utils/flashcards";
+import { Button } from "./Button";
 
 interface Props {
   text: string;
@@ -179,7 +180,7 @@ export function ClickableText({ text, language }: Props) {
         >
           <span className="text-center">{popup.translation ?? t(`Translating…`)}</span>
           {language && popup.translation && (
-            <button
+            <Button
               onClick={alreadySaved ? handleRemoveFlashcard : handleAddFlashcard}
               className={
                 alreadySaved
@@ -195,7 +196,7 @@ export function ClickableText({ text, language }: Props) {
               ) : (
                 t(`+ flashcard`)
               )}
-            </button>
+            </Button>
           )}
         </span>
       )}

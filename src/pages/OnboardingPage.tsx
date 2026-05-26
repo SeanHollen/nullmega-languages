@@ -18,6 +18,7 @@ import { ComplexitySlider } from "../components/onboarding/ComplexitySlider";
 import { BackendChoice } from "../components/onboarding/BackendChoice";
 import { TextGenKeySection } from "../components/onboarding/TextGenKeySection";
 import { LoginPanel } from "../components/onboarding/LoginPanel";
+import { Button } from "../components/Button";
 
 type Stage = "language" | "complexity" | "backend" | "auth";
 
@@ -137,7 +138,7 @@ export function OnboardingPage() {
 
           <div className="flex justify-between gap-3 pt-2 border-t border-gray-100">
             {stage !== `language` ? (
-              <button
+              <Button
                 onClick={() => {
                   if (stage === `complexity`) setStage(`language`);
                   else if (stage === `backend`) setStage(`complexity`);
@@ -146,27 +147,27 @@ export function OnboardingPage() {
                 className="text-sm text-gray-500 px-4 py-2 rounded-xl border border-gray-200 hover:border-gray-300 cursor-pointer transition"
               >
                 {t(`Back`)}
-              </button>
+              </Button>
             ) : (
               <span />
             )}
             {stage === `auth` && backendMode === `byok` && (
-              <button
+              <Button
                 onClick={() => void finishByok()}
                 disabled={!byokKey?.startsWith(`sk-`)}
                 className="text-sm bg-green-600 text-white px-6 py-2 rounded-xl font-semibold hover:bg-green-700 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition"
               >
                 {t(`Finish`)}
-              </button>
+              </Button>
             )}
             {stage !== `auth` && (
-              <button
+              <Button
                 onClick={() => void commitStageAndAdvance()}
                 disabled={!canAdvance}
                 className="text-sm bg-green-600 text-white px-6 py-2 rounded-xl font-semibold hover:bg-green-700 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition"
               >
                 {t(`Next`)}
-              </button>
+              </Button>
             )}
           </div>
         </div>

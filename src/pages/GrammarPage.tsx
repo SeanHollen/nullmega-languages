@@ -21,6 +21,7 @@ import {
 import { prepareGrammarLearnSession, prepareGrammarReviewSession } from "../utils/grammarSession";
 import { ActiveCardsList } from "../components/grammar/ActiveCardsList";
 import { GrammarCardTable } from "../components/grammar/GrammarCardTable";
+import { Button } from "../components/Button";
 
 const LEVEL_LABELS: Record<number, string> = {
   10: `Absolute Beginner`,
@@ -106,8 +107,8 @@ export function GrammarPage() {
         <div className="flex flex-col items-center gap-3 mb-8">
           <div className="flex flex-col min-[420px]:flex-row justify-center gap-4">
             <div className="flex flex-col items-center gap-1">
-              <button
-                onClick={handleLearn}
+              <Button
+                onClick={() => void handleLearn()}
                 disabled={learnDisabled}
                 className="bg-white border-2 border-green-400 text-green-700 px-8 py-4 rounded-2xl font-bold text-base hover:bg-green-50 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition text-center min-w-48"
               >
@@ -118,13 +119,13 @@ export function GrammarPage() {
                     learning: learningCount,
                   })}
                 </div>
-              </button>
+              </Button>
               {learnError && <p className="text-xs text-red-500">{learnError}</p>}
             </div>
 
             <div className="flex flex-col items-center gap-1">
-              <button
-                onClick={handleReview}
+              <Button
+                onClick={() => void handleReview()}
                 disabled={dueCount === 0 && relearningCount === 0}
                 className="bg-white border-2 border-green-400 text-green-700 px-8 py-4 rounded-2xl font-bold text-base hover:bg-green-50 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition text-center min-w-48"
               >
@@ -135,7 +136,7 @@ export function GrammarPage() {
                     relearning: relearningCount,
                   })}
                 </div>
-              </button>
+              </Button>
               {reviewError && <p className="text-xs text-red-500">{reviewError}</p>}
             </div>
           </div>

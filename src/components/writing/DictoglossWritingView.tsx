@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 import type { WritingExercise } from "../../hooks/useGenerateWriting";
+import { Button } from "../Button";
 
 interface Props {
   exercise: WritingExercise;
@@ -55,14 +56,14 @@ export function DictoglossWritingView({
           {count === 1 ? t(`{{count}} word`, { count }) : t(`{{count}} words`, { count })}
         </p>
       </div>
-      <button
+      <Button
         onClick={onSubmit}
         disabled={!canSubmit}
         title={!canSubmit ? t(`Summary not written`) : undefined}
         className="w-full bg-green-600 text-white py-3 rounded-xl font-semibold hover:bg-green-700 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition"
       >
         {t(`Submit summary`)}
-      </button>
+      </Button>
     </div>
   );
 }

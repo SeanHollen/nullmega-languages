@@ -4,6 +4,7 @@ import { FaThumbsUp, FaThumbsDown } from "react-icons/fa";
 import { updateFeedback } from "../utils/history";
 import { submitFeedback } from "../utils/api";
 import { getUserId } from "../utils/user";
+import { Button } from "./Button";
 
 interface Props {
   assessmentId: string;
@@ -41,7 +42,7 @@ export function AssessmentFeedback({ assessmentId }: Props) {
         {unvoted ? t(`Was this assessment helpful?`) : t(`Thanks for the feedback!`)}
       </p>
       <div className="flex items-center gap-2">
-        <button
+        <Button
           onClick={() => vote(true)}
           disabled={voted !== null}
           className={`p-2 rounded-lg transition cursor-pointer ${voteButtonClass(
@@ -53,8 +54,8 @@ export function AssessmentFeedback({ assessmentId }: Props) {
           title={t(`Helpful`)}
         >
           <FaThumbsUp />
-        </button>
-        <button
+        </Button>
+        <Button
           onClick={() => vote(false)}
           disabled={voted !== null}
           className={`p-2 rounded-lg transition cursor-pointer ${voteButtonClass(
@@ -66,7 +67,7 @@ export function AssessmentFeedback({ assessmentId }: Props) {
           title={t(`Not helpful`)}
         >
           <FaThumbsDown />
-        </button>
+        </Button>
       </div>
     </div>
   );

@@ -10,23 +10,21 @@ export type { ReadingLength };
 
 function pastTitlesBlock(label: string, titles: string[]): string {
   if (titles.length === 0) return ``;
-  return `\n\n${label} (do not repeat any of these or cover closely related ground — choose something fresh):
+  return `\n\n${label} — AVOID these topics. They are NOT a style template; pick a different format if these are mostly one kind.
 ${titles.map((t) => `- ${t}`).join(`\n`)}`;
 }
 
 const NARRATIVE_BLOCK = `
 
-NARRATIVE QUALITY:
-Where the form supports it, give the passage genuine interest. Aim for at least one of:
-- A clear narrative arc (setup → complication → resolution or twist)
-- Disagreement, conflict, or contrasting perspectives between people
-- An unexpected detail, observation, or insight that earns its place
-- A protagonist with a recognisable motivation, not a generic actor
-- Concrete specifics (names, places, gestures) over abstract description
-Avoid:
-- Bland filler — passages should be the kind of thing a reader would actually want to keep reading.
-- Cliches, like "When I was a child, I did X, now that I'm an adult, I do Y." or "It was a great and fun experience!".
-- Re-using themes from prior stories you've generated.
+FORMAT VARIETY (important):
+Vary the format aggressively. Do NOT default to first-person personal narrative. Pick from a wide range, e.g.: two-person dialogue, magazine excerpt, news brief, instructional howto, recipe with commentary, journal entry, advice column, sci-fi vignette, fantasy fragment, historical letter, technical writeup, product review, museum placard, podcast transcript snippet, lyric or poem fragment, overheard conversation, customer-service exchange, scientific abstract. Don't get overly experimental for the sake of it, but when looking at previuos summaries, try to include (level-appropriate) formats which are underrepresented.
+
+QUALITY: give the reader a reason to keep reading. Aim for at least one of:
+- A narrative arc (setup → complication → resolution or twist)
+- A controversy, conflict, or contrasting perspectives
+- A callback, parallel, or unexpected turn that pays something off
+- A concrete insight or specific detail that earns its place
+Avoid: bland filler, "When I was X, now I Y" arcs, "It was a great experience!" framing.
 `;
 
 // ---------- Reading / Listening exercise ----------

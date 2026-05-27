@@ -28,24 +28,25 @@ interface Cell {
   key: string;
   record: StreakRecord | undefined;
   isFuture: boolean;
+  isToday: boolean;
 }
 
 function cellColor(cell: Cell): string {
   if (cell.isFuture) return `bg-transparent`;
-  if (!cell.record) return `bg-gray-200`;
-  if (cell.record.complete && cell.record.hadObligations) return `bg-green-500`;
-  if (cell.record.complete) return `bg-green-200`;
-  return `bg-gray-300`;
+  if (cell.record?.complete && cell.record.hadObligations) return `bg-green-600`;
+  if (cell.isToday) return `bg-indigo-500`;
+  if (!cell.record) return `bg-gray-100`;
+  return `bg-slate-300`;
 }
 
 function cellTitle(cell: Cell, t: TFunction): string {
   const d = cell.date.toLocaleDateString();
   if (cell.isFuture) return d;
-  if (!cell.record) return t(`{{date}} — not visited`, { date: d });
-  if (cell.record.complete && cell.record.hadObligations)
+  if (cell.record?.complete && cell.record.hadObligations)
     return t(`{{date}} — all goals met`, { date: d });
-  if (cell.record.complete) return t(`{{date}} — no goals set`, { date: d });
-  return t(`{{date}} — incomplete`, { date: d });
+  if (cell.isToday) return t(`{{date}} — in progress`, { date: d });
+  if (!cell.record) return t(`{{date}} — not visited`, { date: d });
+  return t(`{{date}} — visited`, { date: d });
 }
 
 export function StreaksPage() {
@@ -78,6 +79,7 @@ export function StreaksPage() {
         key,
         record: byDate.get(key),
         isFuture: date.getTime() > today.getTime(),
+        isToday: date.getTime() === today.getTime(),
       });
     }
     weeks.push(col);
@@ -168,19 +170,19 @@ export function StreaksPage() {
 
           <div className="flex items-center gap-4 text-xs text-gray-500 flex-wrap">
             <span className="flex items-center gap-1.5">
-              <span className="w-3 h-3 rounded-sm bg-green-500" />
+              <span className="w-3 h-3 rounded-sm bg-green-600" />
               {t(`All goals met`)}
             </span>
             <span className="flex items-center gap-1.5">
-              <span className="w-3 h-3 rounded-sm bg-green-200" />
-              {t(`Visited (no goals)`)}
+              <span className="w-3 h-3 rounded-sm bg-indigo-500" />
+              {t(`In progress`)}
             </span>
             <span className="flex items-center gap-1.5">
-              <span className="w-3 h-3 rounded-sm bg-gray-300" />
-              {t(`Visited, incomplete`)}
+              <span className="w-3 h-3 rounded-sm bg-slate-300" />
+              {t(`Visited`)}
             </span>
             <span className="flex items-center gap-1.5">
-              <span className="w-3 h-3 rounded-sm bg-gray-200" />
+              <span className="w-3 h-3 rounded-sm bg-gray-100" />
               {t(`Not visited`)}
             </span>
           </div>

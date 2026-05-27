@@ -129,7 +129,8 @@ export function HomePage() {
   const learnedToday = useLiveQuery(() => getLearnedTodayCount(), []) ?? 0;
   const vocabCards = useLiveQuery(() => loadFlashcards(language), [language]) ?? [];
   const grammarSettings = useLiveQuery(() => loadGrammarSettings(), []);
-  const grammarGeneratedToday = useLiveQuery(() => getGeneratedTodayCount(), []) ?? 0;
+  const grammarGeneratedToday =
+    useLiveQuery(() => getGeneratedTodayCount(language), [language]) ?? 0;
   const grammarCards = useLiveQuery(() => loadGrammarCards(language), [language]) ?? [];
   const allModes = Object.keys(DEFAULT_LANGUAGE_COMPLEXITY) as Mode[];
   const completedTodayByMode = useLiveQuery(async () => {

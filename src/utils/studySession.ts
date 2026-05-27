@@ -1,7 +1,7 @@
 import type { Flashcard } from "./flashcards";
 import { loadFlashcards, computeStatus, pickNextContext } from "./flashcards";
 import type { VocabSettings, VocabOrder } from "./vocabSettings";
-import { getLearnedTodayCount, recordLearnedToday } from "./vocabSettings";
+import { getLearnedTodayCount } from "./vocabSettings";
 import { loadSrsSettings } from "./srsSettings";
 import { generateContextsFor, addMissingAudioFor } from "./contextOrchestrator";
 import { loadAudio } from "./db";
@@ -165,11 +165,8 @@ export async function prepareLearnSession(
   const picked = pickInitial(all, "learn", settings.order, availableNew);
   if (picked.length === 0) return null;
 
-  const newCount = picked.filter((c) => c.status === "new").length;
   const needContexts = picked.filter((c) => c.contexts.length === 0);
   await Promise.all(needContexts.map((c) => generateContextsFor(c, settings)));
-
-  if (newCount > 0) await recordLearnedToday(newCount);
 
   const cards = await reloadCards(language, picked);
 

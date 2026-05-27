@@ -52,7 +52,7 @@ export function GrammarPage() {
     ) ?? [];
   const settings = useLiveQuery(() => loadGrammarSettings(), []);
   const srsSettings = useLiveQuery(() => loadSrsSettings(), []);
-  const generatedToday = useLiveQuery(() => getGeneratedTodayCount(), []) ?? 0;
+  const generatedToday = useLiveQuery(() => getGeneratedTodayCount(language), [language]) ?? 0;
   const [learnError, setLearnError] = useState<string | null>(null);
   const [reviewError, setReviewError] = useState<string | null>(null);
   const [confirmingReset, setConfirmingReset] = useState(false);

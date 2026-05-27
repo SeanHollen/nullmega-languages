@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { callContexts } from "../utils/api";
 import { buildContextsPrompt } from "../utils/prompts";
+import { loadNativeLanguage } from "../utils/nativeLanguageSettings";
 
 const GeneratedContextSchema = z.object({
   source: z.string(),
@@ -28,7 +29,15 @@ export async function generateContexts({
   language,
   count,
 }: Params): Promise<GeneratedContext[]> {
-  const prompt = buildContextsPrompt({ language, word, translation, includeTranslation, count });
+  const nativeLanguage = await loadNativeLanguage();
+  const prompt = buildContextsPrompt({
+    language,
+    word,
+    translation,
+    includeTranslation,
+    count,
+    nativeLanguage,
+  });
 
   const data = await callContexts({
     model: "o4-mini",

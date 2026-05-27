@@ -4,24 +4,26 @@ import { callChat } from "../utils/api";
 import { getUserId } from "../utils/user";
 import { getPastSummariesByComplexity } from "../utils/history";
 import { buildPronunciationExercisePrompt } from "../utils/prompts";
-
-const PronunciationPhraseSchema = z.object({
-  phrase: z.string(),
-  translation: z.string(),
-});
+import { translateBatch } from "./useTranslate";
 
 const PronunciationExerciseLlmResponseSchema = z.object({
   title: z.string(),
-  phrases: z.array(PronunciationPhraseSchema),
+  phrases: z.array(z.string()),
 });
 
-export type PronunciationPhrase = z.infer<typeof PronunciationPhraseSchema>;
 export type PronunciationExerciseLlmResponse = z.infer<
   typeof PronunciationExerciseLlmResponseSchema
 >;
 
-export interface PronunciationExercise extends PronunciationExerciseLlmResponse {
+export interface PronunciationPhrase {
+  phrase: string;
+  translation: string;
+}
+
+export interface PronunciationExercise {
   id?: string;
+  title: string;
+  phrases: PronunciationPhrase[];
   languageComplexity: number;
 }
 
@@ -35,7 +37,11 @@ async function fetchPronunciationExercise(
     languageComplexity,
     500,
   );
-  const prompt = buildPronunciationExercisePrompt({ language, languageComplexity, pastTitles });
+  const prompt = buildPronunciationExercisePrompt({
+    language,
+    languageComplexity,
+    pastTitles,
+  });
 
   const data = await callChat({
     model: "o4-mini",
@@ -51,7 +57,12 @@ async function fetchPronunciationExercise(
   const parsed = PronunciationExerciseLlmResponseSchema.parse(
     JSON.parse(data.choices[0].message.content),
   );
-  return { ...parsed, languageComplexity };
+  const translations = await translateBatch(parsed.phrases);
+  const phrases: PronunciationPhrase[] = parsed.phrases.map((phrase, i) => ({
+    phrase,
+    translation: translations[i] ?? ``,
+  }));
+  return { title: parsed.title, phrases, languageComplexity };
 }
 
 export function useGeneratePronunciation() {

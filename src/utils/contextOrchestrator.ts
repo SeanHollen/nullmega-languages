@@ -1,6 +1,7 @@
 import type { Flashcard, FlashcardContext } from "./flashcards";
 import { updateFlashcardContexts, patchFlashcard } from "./flashcards";
 import type { VocabSettings } from "./vocabSettings";
+import { recordLearnedToday } from "./vocabSettings";
 import { generateContexts } from "../hooks/useGenerateContexts";
 import { pickVoice, tts } from "./tts";
 import { saveAudio, deleteAudioByPrefix } from "./db";
@@ -60,5 +61,10 @@ export async function generateContextsFor(card: Flashcard, settings: VocabSettin
     : fresh;
 
   await updateFlashcardContexts(card.id, contexts, Date.now());
-  if (card.status === "new") await patchFlashcard(card.id, { status: "learning" });
+  if (card.status === "new") await promoteToLearning(card.id);
+}
+
+async function promoteToLearning(cardId: string): Promise<void> {
+  await patchFlashcard(cardId, { status: "learning" });
+  await recordLearnedToday(1);
 }

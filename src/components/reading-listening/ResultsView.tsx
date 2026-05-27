@@ -7,6 +7,7 @@ import { AudioPlayer } from "../listening/AudioPlayer";
 import { ClickableText } from "../ClickableText";
 import { ResultsScoreCard } from "../ResultsScoreCard";
 import { Button } from "../Button";
+import { TermList } from "../TermList";
 
 export interface ResultsAudio {
   passageUrl: string | null;
@@ -78,20 +79,14 @@ export function ResultsView({
             {exercise.translation}
           </p>
         </div>
-        {exercise.difficultWords.length > 0 && (
-          <div className="border-t border-green-100 pt-4">
-            <p className="text-xs text-gray-400 uppercase tracking-wide mb-2">{t(`Vocabulary`)}</p>
-            <div className="flex flex-wrap gap-x-4 gap-y-1">
-              {exercise.difficultWords.map((w, i) => (
-                <span key={i} className="text-sm text-gray-500">
-                  <span className="text-gray-700">{w.source}</span>
-                  {` — `}
-                  {w.translation}
-                </span>
-              ))}
-            </div>
-          </div>
-        )}
+        <TermList
+          title={t(`Vocabulary`)}
+          items={exercise.difficultWords.map((w) => ({ left: w.source, right: w.translation }))}
+        />
+        <TermList
+          title={t(`Proper nouns`)}
+          items={exercise.properNouns.map((p) => ({ left: p.name, right: p.description }))}
+        />
         {exercise.insight && (
           <div className="border-t border-green-100 pt-4">
             <p className="text-xs text-gray-400 uppercase tracking-wide mb-2">

@@ -4,6 +4,7 @@ import { FaMicrophone, FaStop } from "react-icons/fa";
 import type { WritingExercise } from "../../hooks/useGenerateWriting";
 import { useSpeechToText } from "../../hooks/useSpeechToText";
 import { Button } from "../Button";
+import { TermList } from "../TermList";
 
 function wordCount(text: string): number {
   return text.trim() === "" ? 0 : text.trim().split(/\s+/).length;
@@ -82,20 +83,12 @@ export function WritingPassageView({
           })}
         </p>
         <p className="text-gray-800 leading-relaxed whitespace-pre-wrap">{exercise.passage}</p>
-        {exercise.difficultWords.length > 0 && (
-          <div className="mt-5 pt-4 border-t border-green-100">
-            <p className="text-xs text-gray-300 uppercase tracking-wide mb-2">{t(`Vocabulary`)}</p>
-            <div className="flex flex-wrap gap-x-4 gap-y-1">
-              {exercise.difficultWords.map((w, i) => (
-                <span key={i} className="text-sm text-gray-400">
-                  <span className="text-gray-600">{w.source}</span>
-                  {` — `}
-                  {w.translation}
-                </span>
-              ))}
-            </div>
-          </div>
-        )}
+        <TermList
+          title={t(`Vocabulary`)}
+          items={exercise.difficultWords.map((w) => ({ left: w.source, right: w.translation }))}
+          variant="passage"
+          className="mt-5"
+        />
       </div>
 
       {exercise.questions.map((q, i) => {

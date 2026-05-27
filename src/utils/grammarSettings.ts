@@ -6,7 +6,6 @@ export interface GrammarSettings {
 }
 
 const SETTINGS_KEY = `grammar_settings`;
-const LEARN_SESSION_KEY = `grammar_learn_session`;
 
 export const GRAMMAR_SETTINGS_DEFAULTS: GrammarSettings = {
   newCardsPerDay: 0,
@@ -23,18 +22,10 @@ function clamp(n: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, Math.round(n)));
 }
 
-interface GenerateSession {
-  date: string;
-  count: number;
-}
-
-function todayString(): string {
-  // Local date (matches streaks.ts and history.ts). UTC would roll over hours earlier or
-  // later than the user's actual midnight, so the counters and the streak record would
-  // disagree about which day "today" is — already-finished work could appear unfinished.
+function startOfTodayLocal(): number {
   const d = new Date();
-  const pad = (n: number) => (n < 10 ? `0${n}` : String(n));
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  d.setHours(0, 0, 0, 0);
+  return d.getTime();
 }
 
 export async function loadGrammarSettings(): Promise<GrammarSettings> {
@@ -61,35 +52,11 @@ export async function saveGrammarSettings(settings: GrammarSettings): Promise<vo
   await db().kv.put({ key: SETTINGS_KEY, value: settings });
 }
 
-async function loadSession(): Promise<GenerateSession | null> {
-  const row = await db().kv.get(LEARN_SESSION_KEY);
-  if (!row) return null;
-  const s = row.value as Partial<GenerateSession> | null;
-  if (!s || typeof s.date !== `string` || typeof s.count !== `number`) return null;
-  return { date: s.date, count: s.count };
-}
-
-export async function getGeneratedTodayCount(): Promise<number> {
-  const session = await loadSession();
-  if (!session) return 0;
-  return session.date === todayString() ? session.count : 0;
-}
-
-export async function recordGeneratedToday(count: number): Promise<void> {
-  const current = await getGeneratedTodayCount();
-  await db().kv.put({
-    key: LEARN_SESSION_KEY,
-    value: { date: todayString(), count: current + count },
-  });
-}
-
-export async function shiftGrammarSessionDate(days: number): Promise<void> {
-  const session = await loadSession();
-  if (!session) return;
-  const d = new Date(session.date);
-  d.setDate(d.getDate() - days);
-  await db().kv.put({
-    key: LEARN_SESSION_KEY,
-    value: { date: d.toISOString().slice(0, 10), count: session.count },
-  });
+export async function getGeneratedTodayCount(language: string): Promise<number> {
+  const cutoff = startOfTodayLocal();
+  return await db()
+    .grammarCards.where(`language`)
+    .equals(language)
+    .filter((c) => c.addedAt >= cutoff)
+    .count();
 }

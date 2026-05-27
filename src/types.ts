@@ -9,8 +9,8 @@ export const QuestionSchema = z.object({
 export const ExerciseLlmResponseSchema = z.object({
   title: z.string(),
   passage: z.string(),
-  translation: z.string(),
-  difficultWords: z.array(z.object({ source: z.string(), translation: z.string() })),
+  difficultWords: z.array(z.string()),
+  properNouns: z.array(z.object({ name: z.string(), description: z.string() })),
   insight: z.string(),
   questions: z.array(QuestionSchema),
   summary: z.string(),
@@ -23,8 +23,16 @@ export type ReadingLength = "short" | "medium" | "long";
 
 export type NarratorGender = "male" | "female";
 
-export interface Exercise extends ExerciseLlmResponse {
+export interface Exercise {
   id?: string;
+  title: string;
+  passage: string;
+  translation: string;
+  difficultWords: { source: string; translation: string }[];
+  properNouns: { name: string; description: string }[];
+  insight: string;
+  questions: Question[];
+  summary: string;
   languageComplexity: number;
   length: ReadingLength;
   narratorGender: NarratorGender;

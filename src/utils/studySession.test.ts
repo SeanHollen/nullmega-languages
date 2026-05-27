@@ -7,6 +7,7 @@ import {
   computeRemoveContextPatch,
 } from "./studySession";
 import type { VocabSettings } from "./vocabSettings";
+import { getLearnedTodayCount } from "./vocabSettings";
 import { callTTS } from "./api";
 import type { Flashcard } from "./flashcards";
 import {
@@ -399,5 +400,36 @@ describe("prepareReviewSession", () => {
     await prepareReviewSession("Spanish", { ...settings, generateAudio: false });
 
     expect(callTTS).not.toHaveBeenCalled();
+  });
+});
+
+describe("learnedToday counter stays in sync with per-card promotions", () => {
+  it("scenario: user clicks Learn, generation completes for some cards, user navigates away before the batch counter update — counter must still reflect the cards that were promoted", async () => {
+    // Reproduces the user-observed bug: click "Learn new cards", something breaks, click
+    // again, and the second batch promotes a FULL fresh daily quota's worth of cards
+    // because the counter never recorded the first batch's promotions.
+    //
+    // Today the counter increments live in prepareLearnSession AFTER Promise.all resolves
+    // — meanwhile generateContextsFor patches each card's status to "learning" as it
+    // completes. If anything cuts the function short before the bulk counter increment
+    // (browser refresh, navigation, error), promoted cards exist in the DB but the
+    // counter never moved. Next page load: UI thinks zero cards have been learned today
+    // and offers the full quota again.
+    //
+    // This test simulates the cut-short scenario by calling generateContextsFor directly
+    // (the work the user already paid for) without ever reaching the trailing
+    // recordLearnedToday(...) call.
+    const c1 = (await addFlashcard("Spanish", "uno", "one"))!;
+    const c2 = (await addFlashcard("Spanish", "dos", "two"))!;
+
+    await generateContextsFor(c1, settings);
+    await generateContextsFor(c2, settings);
+
+    const cards = await loadFlashcards("Spanish");
+    const promoted = cards.filter((c) => c.status === "learning").length;
+    expect(promoted).toBe(2);
+
+    const counter = await getLearnedTodayCount();
+    expect(counter).toBe(2);
   });
 });

@@ -8,6 +8,18 @@ If the user says "stop doing X", "X is becoming a problem", "I told you already"
 
 Never hand-roll validators — no `typeof x === "string"` chains, `Array.isArray` ladders, or `if (!raw || typeof raw !== "object") return null` parsing. Use a zod schema with `.safeParse()` or `.parse()` and let TypeScript infer the type from the schema. This applies to: imported JSON files, LLM/HTTP API responses, file uploads, and any other data crossing a system boundary. Dexie is NOT a boundary (we own that storage and have migrations); zod isn't needed there.
 
+## Don't comment TypeScript interface fields
+
+When adding a new field to a TS interface or zod schema, don't write a paragraph above it explaining what it's for. The field name plus its type should communicate intent. Only comment when the role is genuinely ambiguous from the name (e.g. an opaque numeric flag, a field with a non-obvious lifecycle, an invariant that crosses files). Default to no comment.
+
+## Comments are a code smell
+
+If you reach for a comment to explain WHY code exists, ask whether the design is wrong. Two adjacent statements that need a paragraph to justify their adjacency probably belong in a single named function. A long "this happens here because…" comment usually means the structure failed to communicate intent. Fix the structure first. Only keep a comment when the WHY genuinely can't be encoded in names or structure (e.g. a workaround for an external bug, a non-local invariant). Never write history-explainer comments ("this used to be here, it's now elsewhere").
+
+## One-off scripts live in `scripts/`
+
+Browser-console scripts to repair stale state, recalibrate data, or perform a manual migration go in the `scripts/` directory at the repo root (see `scripts/recalibrate-flashcards.js`, `scripts/clean-level-descriptions.cjs`). Pattern: a self-contained IIFE that opens the IndexedDB directly, no app imports. Header comment with USAGE block explaining how to run it. Never paste these into chat — write the file.
+
 ## Keep LLM prompt additions terse
 
 When editing `src/utils/prompts.ts`, one short line per rule or field. Aim for ≤15 words per rule. If a field is genuinely self-explanatory or optional, don't add an instruction for it at all.
@@ -20,9 +32,15 @@ The active backend is **Convex** at `../language-learning-backend-convex/`. The 
 
 `useEffect` is forbidden unless there is absolutely no other option. If something happens because a user clicked something, it must be triggered by that click handler — not by a reactive effect watching state. Before reaching for `useEffect`, ask: what user action caused this? Put the logic there instead.
 
-## Reproduce bugs with a test before fixing
+## Reproduce bugs with a test BEFORE fixing — strict ordering
 
-If the user points out a bad behavior or bug, it is unacceptable to fix it without first writing a test that reproduces it. The test must fail against the current code, then pass after the fix. This applies to every reported bug, no matter how obvious the fix seems.
+When the user reports a bug:
+1. Write the test first.
+2. Run it. Confirm it FAILS against current code. Show the failure in your response.
+3. Only then change the source.
+4. Re-run. Confirm it now passes.
+
+Writing the test after the fix is unacceptable — it doesn't prove the bug existed and doesn't prove the fix addresses it. A passing-on-first-run test is meaningless. This applies to every reported bug, no matter how obvious the cause seems.
 
 ## Plans
 

@@ -4,6 +4,7 @@ import { callChat } from "../utils/api";
 import { getUserId } from "../utils/user";
 import { getPastSummariesByComplexity } from "../utils/history";
 import { buildWritingExercisePrompt, essayWordCounts } from "../utils/prompts";
+import { translateBatch, translateOne } from "./useTranslate";
 
 const WritingQuestionSchema = z.object({
   question: z.string(),
@@ -15,8 +16,7 @@ const WritingQuestionSchema = z.object({
 const WritingExerciseLlmResponseSchema = z.object({
   title: z.string(),
   passage: z.string(),
-  translation: z.string(),
-  difficultWords: z.array(z.object({ source: z.string(), translation: z.string() })),
+  difficultWords: z.array(z.string()),
   insight: z.string().optional(),
   questions: z.array(WritingQuestionSchema),
   summary: z.string(),
@@ -27,12 +27,18 @@ export type WritingExerciseLlmResponse = z.infer<typeof WritingExerciseLlmRespon
 
 export type WritingMode = "short-answer" | "dictogloss" | "vocab-paragraph";
 
-export interface WritingExercise extends WritingExerciseLlmResponse {
+export interface WritingExercise {
   id?: string;
+  title: string;
+  passage: string;
+  translation: string;
+  difficultWords: { source: string; translation: string }[];
+  insight?: string;
+  questions: WritingQuestion[];
+  summary: string;
   languageComplexity: number;
   mode: WritingMode;
-  // Only populated for `vocab-paragraph`: the user's own vocab words the paragraph must
-  // incorporate. The grader checks the student's paragraph against this list.
+  // Only set when mode === "vocab-paragraph".
   requiredWords?: { source: string; translation: string }[];
 }
 
@@ -48,7 +54,12 @@ async function fetchWritingExercise(
     languageComplexity,
     100,
   );
-  const prompt = buildWritingExercisePrompt({ language, languageComplexity, mode, pastSummaries });
+  const prompt = buildWritingExercisePrompt({
+    language,
+    languageComplexity,
+    mode,
+    pastSummaries,
+  });
 
   const data = await callChat({
     model: "o4-mini",
@@ -64,9 +75,19 @@ async function fetchWritingExercise(
   const parsed = WritingExerciseLlmResponseSchema.parse(
     JSON.parse(data.choices[0].message.content),
   );
+  const [translation, wordTranslations] = await Promise.all([
+    translateOne(parsed.passage),
+    translateBatch(parsed.difficultWords),
+  ]);
+  const difficultWords = parsed.difficultWords.map((source, i) => ({
+    source,
+    translation: wordTranslations[i] ?? ``,
+  }));
 
   return {
     ...parsed,
+    translation,
+    difficultWords,
     languageComplexity,
     mode,
     questions: parsed.questions.map((q) =>

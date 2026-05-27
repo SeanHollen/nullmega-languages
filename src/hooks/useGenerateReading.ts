@@ -4,6 +4,7 @@ import { callChat } from "../utils/api";
 import { getUserId } from "../utils/user";
 import { getPastSummariesByComplexity } from "../utils/history";
 import { buildReadingExercisePrompt, type ReadingLength } from "../utils/prompts";
+import { translateBatch, translateOne } from "./useTranslate";
 
 async function fetchExercise(
   language: string,
@@ -28,7 +29,23 @@ async function fetchExercise(
     metadata: { mode, language, difficulty: languageComplexity, userId: await getUserId() },
   });
   const parsed = ExerciseLlmResponseSchema.parse(JSON.parse(data.choices[0].message.content));
-  return { ...parsed, languageComplexity, length, narratorGender };
+  const [translation, wordTranslations] = await Promise.all([
+    translateOne(parsed.passage),
+    translateBatch(parsed.difficultWords),
+  ]);
+  const difficultWords = parsed.difficultWords.map((source, i) => ({
+    source,
+    translation: wordTranslations[i] ?? ``,
+  }));
+  return {
+    ...parsed,
+    translation,
+    difficultWords,
+    properNouns: parsed.properNouns,
+    languageComplexity,
+    length,
+    narratorGender,
+  };
 }
 
 export function useGenerateReading() {

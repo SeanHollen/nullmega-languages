@@ -3,9 +3,9 @@ import {
   loadGrammarSettings,
   saveGrammarSettings,
   getGeneratedTodayCount,
-  recordGeneratedToday,
-  shiftGrammarSessionDate,
 } from "./grammarSettings";
+import { addGrammarCards } from "./grammarCards";
+import { db } from "./db";
 
 describe("loadGrammarSettings", () => {
   it("returns DEFAULTS when nothing is saved", async () => {
@@ -23,20 +23,45 @@ describe("loadGrammarSettings", () => {
   });
 });
 
-describe("generated-today counter", () => {
-  it("returns 0 when nothing was recorded", async () => {
-    expect(await getGeneratedTodayCount()).toBe(0);
+const rawCard = (title: string) => ({
+  title,
+  prompt: `prompt`,
+  tags: [],
+  questions: [{ type: `multiple-choice` as const, prompt: `q`, choices: [`a`, `b`], answer: `a` }],
+});
+
+describe("getGeneratedTodayCount (derived from grammar cards' addedAt)", () => {
+  it("returns 0 when nothing was generated", async () => {
+    expect(await getGeneratedTodayCount(`Spanish`)).toBe(0);
   });
 
-  it("accumulates the count across multiple records on the same day", async () => {
-    await recordGeneratedToday(1);
-    await recordGeneratedToday(2);
-    expect(await getGeneratedTodayCount()).toBe(3);
+  it("counts cards added in this language today", async () => {
+    await addGrammarCards(`Spanish`, [rawCard(`a`), rawCard(`b`), rawCard(`c`)], 20);
+    expect(await getGeneratedTodayCount(`Spanish`)).toBe(3);
   });
 
-  it("returns 0 once today's session is shifted into the past", async () => {
-    await recordGeneratedToday(5);
-    await shiftGrammarSessionDate(1);
-    expect(await getGeneratedTodayCount()).toBe(0);
+  it("is per-language — counter in one language is unaffected by cards in another", async () => {
+    await addGrammarCards(`Spanish`, [rawCard(`a`)], 20);
+    await addGrammarCards(`French`, [rawCard(`b`), rawCard(`c`)], 20);
+    expect(await getGeneratedTodayCount(`Spanish`)).toBe(1);
+    expect(await getGeneratedTodayCount(`French`)).toBe(2);
+    expect(await getGeneratedTodayCount(`German`)).toBe(0);
+  });
+
+  it("excludes cards with addedAt before today's local midnight", async () => {
+    await addGrammarCards(`Spanish`, [rawCard(`fresh`)], 20);
+    // Backdate one card to "yesterday" via direct DB write.
+    const all = await db().grammarCards.where(`language`).equals(`Spanish`).toArray();
+    const yesterday = Date.now() - 25 * 60 * 60 * 1000;
+    await db().grammarCards.put({ ...all[0], addedAt: yesterday });
+    expect(await getGeneratedTodayCount(`Spanish`)).toBe(0);
+  });
+
+  it("rolls back when cards generated today are deleted", async () => {
+    await addGrammarCards(`Spanish`, [rawCard(`a`), rawCard(`b`)], 20);
+    expect(await getGeneratedTodayCount(`Spanish`)).toBe(2);
+    const all = await db().grammarCards.where(`language`).equals(`Spanish`).toArray();
+    await db().grammarCards.delete(all[0].id);
+    expect(await getGeneratedTodayCount(`Spanish`)).toBe(1);
   });
 });

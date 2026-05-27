@@ -1,7 +1,7 @@
 import type { GrammarCard } from "./grammarCards";
 import { loadGrammarCards, addGrammarCards } from "./grammarCards";
 import type { GrammarSettings } from "./grammarSettings";
-import { getGeneratedTodayCount, recordGeneratedToday } from "./grammarSettings";
+import { getGeneratedTodayCount } from "./grammarSettings";
 import { generateGrammarCards } from "./generateGrammarCards";
 import { pickRandom } from "./studySession";
 import { computeSrsStatus } from "./srs";
@@ -17,7 +17,10 @@ export async function prepareGrammarLearnSession(
   language: string,
   settings: GrammarSettings,
 ): Promise<GrammarSessionData | null> {
-  const toGenerate = Math.max(0, settings.newCardsPerDay - (await getGeneratedTodayCount()));
+  const toGenerate = Math.max(
+    0,
+    settings.newCardsPerDay - (await getGeneratedTodayCount(language)),
+  );
 
   if (toGenerate > 0) {
     const existing = await loadGrammarCards(language);
@@ -29,7 +32,6 @@ export async function prepareGrammarLearnSession(
     });
     if (rawCards.length > 0) {
       await addGrammarCards(language, rawCards, settings.level);
-      await recordGeneratedToday(rawCards.length);
     }
   }
 

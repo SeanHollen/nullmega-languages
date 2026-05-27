@@ -9,16 +9,16 @@ const TranslateResponseSchema = z
   .transform((arr) => arr[0])
   .pipe(z.array(z.tuple([z.string()]).rest(z.unknown())));
 
-export async function translateOne(text: string): Promise<string> {
+export async function translateOne(text: string, targetCode = `en`): Promise<string> {
   const url =
     `https://translate.googleapis.com/translate_a/single` +
-    `?client=gtx&sl=auto&tl=en&dt=t&q=${encodeURIComponent(text)}`;
+    `?client=gtx&sl=auto&tl=${encodeURIComponent(targetCode)}&dt=t&q=${encodeURIComponent(text)}`;
   const res = await fetch(url);
   if (!res.ok) throw new Error(`translate ${res.status}`);
   const chunks = TranslateResponseSchema.parse(await res.json());
   return chunks.map((chunk) => chunk[0]).join("");
 }
 
-export async function translateBatch(texts: string[]): Promise<string[]> {
-  return Promise.all(texts.map(translateOne));
+export async function translateBatch(texts: string[], targetCode = `en`): Promise<string[]> {
+  return Promise.all(texts.map((t) => translateOne(t, targetCode)));
 }

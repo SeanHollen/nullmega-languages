@@ -89,9 +89,9 @@ Return ONLY valid JSON with this exact shape (write the fields in this order —
 {
   "title": "3-6 word title in ${language} describing the topic of the passage",
   "passage": "${readingPassageLengthGuide(languageComplexity, length)} passage entirely in ${language}",
-  "translation": "full English translation of the passage",
-  "difficultWords": [{ "source": "word in ${language}", "translation": "English equivalent" }],
-  "insight": "1-2 sentences in English noting something genuinely interesting about the passage — an unusual grammatical construction, a subtle idiomatic choice, a register shift, or a structural feature worth a learner's attention. Scale depth to the difficulty level.",
+  "difficultWords": ["word in ${language}", "..."],
+  "properNouns": [{ "name": "proper noun as it appears in the passage", "description": "1-5 word gloss in ${language} (NOT a translation)" }],
+  "insight": "1-2 sentences in ${language} noting something genuinely interesting about the passage — an unusual grammatical construction, a subtle idiomatic choice, a register shift, or a structural feature worth a learner's attention. Scale depth to the difficulty level.",
   "questions": [
     {
       "question": "question in ${language}",
@@ -106,11 +106,16 @@ Return ONLY valid JSON with this exact shape (write the fields in this order —
 - Generate 3 to 6 questions, scaled to passage length — shorter passages get 3, longer ones up to 6. All text in ${language}.
 - "correct" is the 0-based index of the correct answer
 
-DIFFICULT WORDS — what to include and what to exclude:
-- Include: words that are important for understanding the rest of the passage. If the reader doesn't really need to know the word, don't include it.
-- Include: words an English speaker is unlikely to recognise or correctly guess — non-cognates, false friends, idiomatic expressions, words with unexpected meanings in context
-- Exclude: cognates and near-cognates — words whose meaning is obvious or easily inferred from their resemblance to English (e.g. "biodiversité", "naturellement", "décision", "organisation"). If an English speaker could look at the word and correctly guess its meaning, do not mark it as difficult.
-- Scale the list to the difficulty level: at low levels, even a few genuinely opaque words count; at high levels, include subtler vocabulary like register-specific or idiomatic terms
+DIFFICULT WORDS — what to include:
+- Words important for understanding the rest of the passage. If the reader doesn't need to know the word, don't include it.
+- Words with idiomatic, register-specific, or unexpected meanings in context.
+- Scale to the difficulty level: at low levels even a few opaque words count; at high levels include subtler vocabulary.
+- Include about 2-4 words, sometimes 1-5
+
+PROPER NOUNS:
+- List every proper noun in the passage (people, places, organizations, fictional entities).
+- "description" is a 1–5 word gloss IN ${language}, not a translation. e.g. for "Sétif" → "ville d'Algérie".
+- Empty array if none.
 
 THE COMMAND-F TEST:
 A learner must NOT be able to answer any question by Ctrl-F searching the passage for a keyword from the question or the correct option. For every question you write, mentally do this:
@@ -198,9 +203,8 @@ Return ONLY valid JSON with this exact shape (write the fields in this order —
 {
   "title": "3-6 word title in ${language} describing the topic of the passage",
   "passage": "${passageGuide} passage entirely in ${language}",
-  "translation": "full English translation of the passage",
-  "difficultWords": [{ "source": "word in ${language}", "translation": "English equivalent" }],
-  "insight": "1-2 sentences in English noting something interesting about the language used in the passage",
+  "difficultWords": ["word in ${language}", "..."],
+  "insight": "1-2 sentences in ${language} noting something interesting about the language used in the passage",
   "questions": [
     { "type": "short", "question": "short-answer question in ${language} — answer should fit in one brief phrase or sentence" },
     { "type": "short", "question": "another short-answer question in ${language} — answer should fit in one brief phrase or sentence" },
@@ -211,7 +215,7 @@ Return ONLY valid JSON with this exact shape (write the fields in this order —
 
 SHORT-ANSWER QUESTIONS: test specific comprehension; require understanding, not just copying words.
 ESSAY QUESTION: at low levels use simple prompts (describe your own experience with the topic); at high levels use analytical or argumentative prompts.
-DIFFICULT WORDS: exclude cognates an English speaker could recognise. Include genuine non-cognates, false friends, idiomatic expressions.`;
+DIFFICULT WORDS: include words with idiomatic, register-specific, or unexpected meanings in context.`;
 }
 
 // ---------- Writing grader ----------
@@ -270,9 +274,12 @@ export function buildVocabParagraphGraderPrompt(args: {
   languageComplexity: number;
   requiredWords: { source: string; translation: string }[];
   paragraph: string;
+  nativeLanguage: string;
 }): string {
-  const { language, languageComplexity, requiredWords, paragraph } = args;
-  const wordList = requiredWords.map((w) => `- ${w.source} (English: ${w.translation})`).join(`\n`);
+  const { language, languageComplexity, requiredWords, paragraph, nativeLanguage } = args;
+  const wordList = requiredWords
+    .map((w) => `- ${w.source} (${nativeLanguage}: ${w.translation})`)
+    .join(`\n`);
 
   return `You are grading a ${language} paragraph written by a student at difficulty ${languageComplexity}/100.
 
@@ -341,17 +348,14 @@ THEME: All ${count} phrases must belong to a single coherent topic or theme summ
 Return ONLY valid JSON with this exact shape:
 {
   "title": "3-6 word title in ${language} describing the theme tying the phrases together",
-  "phrases": [
-    { "phrase": "...", "translation": "..." }
-  ]
+  "phrases": ["phrase in ${language}", "..."]
 }
 
 - Generate exactly ${count} phrases, all within the chosen theme
 - Phrases should be ${pronunciationPhraseLengthGuide(languageComplexity)}
 - Within the theme, vary the type: statements, questions, exclamations
 - Phrases should be practical and natural-sounding in ${language}
-- At low difficulty: prioritise common sounds and basic patterns; at high difficulty: include challenging phoneme combinations, intonation shifts, and less common vocabulary
-- "translation" is the complete English translation of each phrase${avoidanceBlock}`;
+- At low difficulty: prioritise common sounds and basic patterns; at high difficulty: include challenging phoneme combinations, intonation shifts, and less common vocabulary${avoidanceBlock}`;
 }
 
 // ---------- Flashcard contexts ----------
@@ -362,9 +366,10 @@ export function buildContextsPrompt(args: {
   translation: string;
   includeTranslation: boolean;
   count: number;
+  nativeLanguage: string;
 }): string {
-  const { language, word, translation, includeTranslation, count } = args;
-  const meaningClause = includeTranslation ? ` (English meaning: "${translation}")` : ``;
+  const { language, word, translation, includeTranslation, count, nativeLanguage } = args;
+  const meaningClause = includeTranslation ? ` (${nativeLanguage} meaning: "${translation}")` : ``;
   return `Generate ${count} short example contexts for the ${language} word/phrase "${word}"${meaningClause}.
 
 Each context is a short sentence or fragment in ${language} (5-15 words) that uses a form of "${word}".
@@ -372,7 +377,7 @@ Each context is a short sentence or fragment in ${language} (5-15 words) that us
 Requirements:
 - The ${language} context must use "${word}" (you may vary tense, gender, plurality, conjugation; for multi-word phrases keep the phrase together).
 - In the ${language} context, wrap the exact form of "${word}" that appears with double asterisks: **like this**. Wrap only the word/phrase itself, not surrounding punctuation.
-- In the English translation, wrap the English equivalent of "${word}" (whatever inflected form fits naturally) with double asterisks too.
+- In the ${nativeLanguage} translation, wrap the ${nativeLanguage} equivalent of "${word}" (whatever inflected form fits naturally) with double asterisks too.
 - "${word}" should be the most complex/difficult element of the context. Surround it with simpler, common vocabulary. These are "n+1 cards".
 - The context should make sense and stay true to the word's meaning, but should NOT give away the translation directly (no glosses, no synonyms in parentheses).
 - Each context should use the word differently — vary the tense, register, situation, or sentence structure. Aim for genuine variety.
@@ -380,7 +385,7 @@ Requirements:
 Return ONLY valid JSON of this exact shape:
 {
   "contexts": [
-    { "source": "<${language} context containing **${word}** (or an inflected form)>", "translation": "<English translation containing **the English equivalent**>" }
+    { "source": "<${language} context containing **${word}** (or an inflected form)>", "translation": "<${nativeLanguage} translation containing **the ${nativeLanguage} equivalent**>" }
   ]
 }`;
 }

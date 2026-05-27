@@ -1,25 +1,29 @@
 import { useMutation } from "@tanstack/react-query";
+import { z } from "zod";
 import { callChat } from "../utils/api";
 import { getUserId } from "../utils/user";
 import { getPastSummariesByComplexity } from "../utils/history";
 import { buildWritingExercisePrompt, essayWordCounts } from "../utils/prompts";
 
-export interface WritingQuestion {
-  question: string;
-  type: "short" | "essay";
-  minWords?: number;
-  maxWords?: number;
-}
+const WritingQuestionSchema = z.object({
+  question: z.string(),
+  type: z.enum([`short`, `essay`]),
+  minWords: z.number().optional(),
+  maxWords: z.number().optional(),
+});
 
-export interface WritingExerciseLlmResponse {
-  title: string;
-  passage: string;
-  translation: string;
-  difficultWords: { source: string; translation: string }[];
-  insight?: string;
-  questions: WritingQuestion[];
-  summary: string;
-}
+const WritingExerciseLlmResponseSchema = z.object({
+  title: z.string(),
+  passage: z.string(),
+  translation: z.string(),
+  difficultWords: z.array(z.object({ source: z.string(), translation: z.string() })),
+  insight: z.string().optional(),
+  questions: z.array(WritingQuestionSchema),
+  summary: z.string(),
+});
+
+export type WritingQuestion = z.infer<typeof WritingQuestionSchema>;
+export type WritingExerciseLlmResponse = z.infer<typeof WritingExerciseLlmResponseSchema>;
 
 export type WritingMode = "short-answer" | "dictogloss" | "vocab-paragraph";
 
@@ -57,7 +61,9 @@ async function fetchWritingExercise(
       userId: await getUserId(),
     },
   });
-  const parsed = JSON.parse(data.choices[0].message.content) as WritingExerciseLlmResponse;
+  const parsed = WritingExerciseLlmResponseSchema.parse(
+    JSON.parse(data.choices[0].message.content),
+  );
 
   return {
     ...parsed,

@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { callChat } from "../utils/api";
 import { buildVocabParagraphGraderPrompt } from "../utils/prompts";
-import type { WritingGrade, WritingGrades } from "./useGradeWriting";
+import { WritingGradesSchema, type WritingGrade, type WritingGrades } from "./useGradeWriting";
 
 export type { WritingGrade, WritingGrades };
 
@@ -17,7 +17,7 @@ async function gradeVocabParagraph(args: {
     messages: [{ role: "user", content: prompt }],
     response_format: { type: "json_object" },
   });
-  return JSON.parse(data.choices[0].message.content) as WritingGrades;
+  return WritingGradesSchema.parse(JSON.parse(data.choices[0].message.content));
 }
 
 export function useGradeVocabParagraph() {

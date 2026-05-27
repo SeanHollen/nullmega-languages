@@ -1,4 +1,15 @@
+import { z } from "zod";
 import { loadSettings } from "./settings";
+
+const ChatResponseSchema = z.object({
+  choices: z.array(z.object({ message: z.object({ content: z.string() }) })),
+});
+
+const TTSUrlResponseSchema = z.object({ url: z.string() });
+
+const AuthLoginResponseSchema = z.object({ token: z.string(), userId: z.string() });
+
+const OnboardingExamplesResponseSchema = z.object({ examples: z.record(z.string(), z.unknown()) });
 
 const DEFAULT_BACKEND = (import.meta.env.VITE_BACKEND_URL as string) ?? "";
 
@@ -26,9 +37,7 @@ export interface ChatBody {
   metadata?: ChatMetadata;
 }
 
-export interface ChatResponse {
-  choices: { message: { content: string } }[];
-}
+export type ChatResponse = z.infer<typeof ChatResponseSchema>;
 
 export interface TTSBody {
   model: string;
@@ -56,7 +65,7 @@ export async function callChat(body: ChatBody): Promise<ChatResponse> {
 
   const res = await fetch(url, { method: "POST", headers, body: JSON.stringify(outgoingBody) });
   if (!res.ok) throw new Error(`API error: ${res.status}`);
-  return res.json() as Promise<ChatResponse>;
+  return ChatResponseSchema.parse(await res.json());
 }
 
 export async function callContexts(body: ChatBody): Promise<ChatResponse> {
@@ -78,7 +87,7 @@ export async function callContexts(body: ChatBody): Promise<ChatResponse> {
 
   const res = await fetch(url, { method: "POST", headers, body: JSON.stringify(outgoingBody) });
   if (!res.ok) throw new Error(`API error: ${res.status}`);
-  return res.json() as Promise<ChatResponse>;
+  return ChatResponseSchema.parse(await res.json());
 }
 
 export async function callGrammar(body: ChatBody): Promise<ChatResponse> {
@@ -100,7 +109,7 @@ export async function callGrammar(body: ChatBody): Promise<ChatResponse> {
 
   const res = await fetch(url, { method: "POST", headers, body: JSON.stringify(outgoingBody) });
   if (!res.ok) throw new Error(`API error: ${res.status}`);
-  return res.json() as Promise<ChatResponse>;
+  return ChatResponseSchema.parse(await res.json());
 }
 
 export async function callTTS(body: TTSBody): Promise<Blob> {
@@ -123,7 +132,7 @@ export async function callTTS(body: TTSBody): Promise<Blob> {
     body: JSON.stringify(body),
   });
   if (!res.ok) throw new Error(`TTS error: ${res.status}`);
-  const { url } = (await res.json()) as { url: string };
+  const { url } = TTSUrlResponseSchema.parse(await res.json());
   const audioRes = await fetch(url);
   if (!audioRes.ok) throw new Error(`TTS audio fetch error: ${audioRes.status}`);
   return audioRes.blob();
@@ -140,7 +149,7 @@ export async function callAuthLogin(): Promise<{ token: string; userId: string }
     body: JSON.stringify({ provider: "placeholder" }),
   });
   if (!res.ok) throw new Error(`Login failed: ${res.status}`);
-  return res.json() as Promise<{ token: string; userId: string }>;
+  return AuthLoginResponseSchema.parse(await res.json());
 }
 
 // Onboarding always uses the backend — the user hasn't set up BYOK or authenticated yet,
@@ -155,7 +164,7 @@ export async function callOnboardingComplexityExamples(
     body: JSON.stringify({ language }),
   });
   if (!res.ok) throw new Error(`Examples request failed: ${res.status}`);
-  const { examples } = (await res.json()) as { examples: Record<string, unknown> };
+  const { examples } = OnboardingExamplesResponseSchema.parse(await res.json());
   return examples;
 }
 

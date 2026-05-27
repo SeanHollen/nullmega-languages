@@ -1,5 +1,12 @@
+import { z } from "zod";
 import { db } from "./db";
 import type { SrsCard, SrsStatus, SrsStoredStatus } from "./srs";
+
+const ImportableCardSchema = z.object({
+  source: z.string(),
+  translation: z.string(),
+  tags: z.array(z.string()).optional(),
+});
 
 // Re-export for backwards compatibility with existing imports.
 export type { ReviewEntry } from "./srs";
@@ -116,29 +123,24 @@ export async function importFlashcards(
   } catch {
     throw new Error(`Invalid JSON`);
   }
-  if (!Array.isArray(parsed)) throw new Error(`Expected a JSON array of cards`);
+  const arr = z.array(z.unknown()).safeParse(parsed);
+  if (!arr.success) throw new Error(`Expected a JSON array of cards`);
 
   let added = 0;
   let skipped = 0;
-  for (const item of parsed) {
-    if (!item || typeof item !== `object`) {
+  for (const item of arr.data) {
+    const parsedItem = ImportableCardSchema.safeParse(item);
+    if (!parsedItem.success) {
       skipped++;
       continue;
     }
-    const r = item as Record<string, unknown>;
-    if (typeof r.source !== `string` || typeof r.translation !== `string`) {
-      skipped++;
-      continue;
-    }
+    const r = parsedItem.data;
     const card = await addFlashcard(language, r.source, r.translation);
     if (!card) {
       skipped++;
       continue;
     }
-    if (Array.isArray(r.tags)) {
-      const tags = (r.tags as unknown[]).filter((t): t is string => typeof t === `string`);
-      if (tags.length > 0) await updateFlashcardTags(card.id, tags);
-    }
+    if (r.tags && r.tags.length > 0) await updateFlashcardTags(card.id, r.tags);
     added++;
   }
   return { added, skipped };

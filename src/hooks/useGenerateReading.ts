@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import type { Exercise, ExerciseLlmResponse, NarratorGender } from "../types";
+import { ExerciseLlmResponseSchema, type Exercise, type NarratorGender } from "../types";
 import { callChat } from "../utils/api";
 import { getUserId } from "../utils/user";
 import { getPastSummariesByComplexity } from "../utils/history";
@@ -27,7 +27,7 @@ async function fetchExercise(
     response_format: { type: "json_object" },
     metadata: { mode, language, difficulty: languageComplexity, userId: await getUserId() },
   });
-  const parsed = JSON.parse(data.choices[0].message.content) as ExerciseLlmResponse;
+  const parsed = ExerciseLlmResponseSchema.parse(JSON.parse(data.choices[0].message.content));
   return { ...parsed, languageComplexity, length, narratorGender };
 }
 

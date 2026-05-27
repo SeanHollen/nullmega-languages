@@ -1,10 +1,17 @@
+import { z } from "zod";
 import { callContexts } from "../utils/api";
 import { buildContextsPrompt } from "../utils/prompts";
 
-export interface GeneratedContext {
-  source: string;
-  translation: string;
-}
+const GeneratedContextSchema = z.object({
+  source: z.string(),
+  translation: z.string(),
+});
+
+const ContextsResponseSchema = z.object({
+  contexts: z.array(GeneratedContextSchema).optional(),
+});
+
+export type GeneratedContext = z.infer<typeof GeneratedContextSchema>;
 
 interface Params {
   word: string;
@@ -30,6 +37,6 @@ export async function generateContexts({
   });
 
   const content = data.choices[0]?.message?.content ?? "";
-  const parsed = JSON.parse(content) as { contexts?: GeneratedContext[] };
+  const parsed = ContextsResponseSchema.parse(JSON.parse(content));
   return (parsed.contexts ?? []).slice(0, count);
 }

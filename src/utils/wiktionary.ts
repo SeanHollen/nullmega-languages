@@ -1,5 +1,10 @@
+import { z } from "zod";
 import { db } from "./db";
 import { wiktionaryCode } from "../data/wiktionaryCodes";
+
+const WiktionaryParseResponseSchema = z.object({
+  parse: z.object({ text: z.string() }).optional(),
+});
 
 interface CachedEntry {
   html: string | null;
@@ -37,9 +42,9 @@ async function fetchParseHtml(code: string, word: string): Promise<string | null
   )}&prop=text&format=json&formatversion=2&origin=*`;
   const res = await fetch(url);
   if (!res.ok) return null;
-  const data = (await res.json()) as { parse?: { text?: string }; error?: unknown };
-  if (!data.parse?.text) return null;
-  return data.parse.text;
+  const result = WiktionaryParseResponseSchema.safeParse(await res.json());
+  if (!result.success || !result.data.parse?.text) return null;
+  return result.data.parse.text;
 }
 
 function stripChrome(html: string, code: string): string {

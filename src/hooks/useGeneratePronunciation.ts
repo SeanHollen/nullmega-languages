@@ -1,18 +1,24 @@
 import { useMutation } from "@tanstack/react-query";
+import { z } from "zod";
 import { callChat } from "../utils/api";
 import { getUserId } from "../utils/user";
 import { getPastSummariesByComplexity } from "../utils/history";
 import { buildPronunciationExercisePrompt } from "../utils/prompts";
 
-export interface PronunciationPhrase {
-  phrase: string;
-  translation: string;
-}
+const PronunciationPhraseSchema = z.object({
+  phrase: z.string(),
+  translation: z.string(),
+});
 
-export interface PronunciationExerciseLlmResponse {
-  title: string;
-  phrases: PronunciationPhrase[];
-}
+const PronunciationExerciseLlmResponseSchema = z.object({
+  title: z.string(),
+  phrases: z.array(PronunciationPhraseSchema),
+});
+
+export type PronunciationPhrase = z.infer<typeof PronunciationPhraseSchema>;
+export type PronunciationExerciseLlmResponse = z.infer<
+  typeof PronunciationExerciseLlmResponseSchema
+>;
 
 export interface PronunciationExercise extends PronunciationExerciseLlmResponse {
   id?: string;
@@ -42,7 +48,9 @@ async function fetchPronunciationExercise(
       userId: await getUserId(),
     },
   });
-  const parsed = JSON.parse(data.choices[0].message.content) as PronunciationExerciseLlmResponse;
+  const parsed = PronunciationExerciseLlmResponseSchema.parse(
+    JSON.parse(data.choices[0].message.content),
+  );
   return { ...parsed, languageComplexity };
 }
 

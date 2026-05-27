@@ -1,3 +1,4 @@
+import { z } from "zod";
 import { db } from "./db";
 import type { SrsCard } from "./srs";
 
@@ -7,13 +8,23 @@ export type {
   SrsStatus as GrammarCardStatusDerived,
 } from "./srs";
 
-export interface QuizQuestion {
-  type: "multiple-choice" | "write-in";
-  prompt: string;
-  choices?: string[];
-  answer: string | string[];
-  shuffle?: boolean;
-}
+const QuizQuestionSchema = z.object({
+  type: z.enum([`multiple-choice`, `write-in`]),
+  prompt: z.string(),
+  choices: z.array(z.string()).optional(),
+  answer: z.union([z.string(), z.array(z.string()).min(1)]),
+  shuffle: z.boolean().optional(),
+});
+
+export type QuizQuestion = z.infer<typeof QuizQuestionSchema>;
+
+const ImportableGrammarCardSchema = z.object({
+  title: z.string(),
+  prompt: z.string(),
+  tags: z.array(z.string()).optional(),
+  questions: z.array(z.unknown()).optional(),
+  level: z.number().optional(),
+});
 
 export function acceptedAnswers(q: QuizQuestion): string[] {
   return Array.isArray(q.answer) ? q.answer : [q.answer];
@@ -45,25 +56,8 @@ export interface GrammarCard extends SrsCard {
 }
 
 function normalizeQuestion(raw: unknown): QuizQuestion | null {
-  if (!raw || typeof raw !== `object`) return null;
-  const r = raw as Record<string, unknown>;
-  if (r.type !== `multiple-choice` && r.type !== `write-in`) return null;
-  if (typeof r.prompt !== `string`) return null;
-  let answer: string | string[];
-  if (typeof r.answer === `string`) {
-    answer = r.answer;
-  } else if (Array.isArray(r.answer) && r.answer.every((a) => typeof a === `string`)) {
-    answer = r.answer as string[];
-    if (answer.length === 0) return null;
-  } else {
-    return null;
-  }
-  const q: QuizQuestion = { type: r.type, prompt: r.prompt, answer };
-  if (r.type === `multiple-choice` && Array.isArray(r.choices)) {
-    q.choices = (r.choices as unknown[]).filter((c): c is string => typeof c === `string`);
-  }
-  if (typeof r.shuffle === `boolean`) q.shuffle = r.shuffle;
-  return q;
+  const result = QuizQuestionSchema.safeParse(raw);
+  return result.success ? result.data : null;
 }
 
 export async function loadGrammarCards(language: string): Promise<GrammarCard[]> {
@@ -149,7 +143,8 @@ export async function importGrammarCards(
   } catch {
     throw new Error(`Invalid JSON`);
   }
-  if (!Array.isArray(parsed)) throw new Error(`Expected a JSON array of cards`);
+  const arr = z.array(z.unknown()).safeParse(parsed);
+  if (!arr.success) throw new Error(`Expected a JSON array of cards`);
 
   const existing = await loadGrammarCards(language);
   const existingTitles = new Set(existing.map((c) => c.title.toLowerCase()));
@@ -157,40 +152,33 @@ export async function importGrammarCards(
   let added = 0;
   let skipped = 0;
   const toInsert: GrammarCard[] = [];
-  for (const item of parsed) {
-    if (!item || typeof item !== `object`) {
+  for (const item of arr.data) {
+    const parsedItem = ImportableGrammarCardSchema.safeParse(item);
+    if (!parsedItem.success) {
       skipped++;
       continue;
     }
-    const r = item as Record<string, unknown>;
-    if (typeof r.title !== `string` || typeof r.prompt !== `string`) {
-      skipped++;
-      continue;
-    }
+    const r = parsedItem.data;
     if (existingTitles.has(r.title.toLowerCase())) {
       skipped++;
       continue;
     }
-    const questions = Array.isArray(r.questions)
-      ? r.questions.map(normalizeQuestion).filter((q): q is QuizQuestion => q !== null)
-      : [];
+    const questions = (r.questions ?? [])
+      .map(normalizeQuestion)
+      .filter((q): q is QuizQuestion => q !== null);
     if (questions.length === 0) {
       skipped++;
       continue;
     }
-    const tags = Array.isArray(r.tags)
-      ? (r.tags as unknown[]).filter((t): t is string => typeof t === `string`)
-      : [];
-    const level = typeof r.level === `number` ? r.level : 1;
     const card: GrammarCard = {
       id: `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`,
       language,
       title: r.title,
       prompt: r.prompt,
       questions,
-      level,
+      level: r.level ?? 1,
       addedAt: Date.now(),
-      tags,
+      tags: r.tags ?? [],
       lastReviewed: null,
       currentInterval: 0,
       status: `learning`,

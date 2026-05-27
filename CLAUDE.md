@@ -1,5 +1,17 @@
 # Claude instructions
 
+## When the user pushes back, update THIS FILE
+
+If the user says "stop doing X", "X is becoming a problem", "I told you already", or otherwise corrects a behavior — add a rule to this CLAUDE.md immediately. Don't only save to `~/.claude/projects/.../memory/` — memory is per-user across projects, but CLAUDE.md is what gets loaded into every conversation in THIS repo. Project-specific corrections belong here. Add the rule, then continue the task. Skipping this step means the same mistake recurs next session.
+
+## Use zod for all external-boundary validation
+
+Never hand-roll validators — no `typeof x === "string"` chains, `Array.isArray` ladders, or `if (!raw || typeof raw !== "object") return null` parsing. Use a zod schema with `.safeParse()` or `.parse()` and let TypeScript infer the type from the schema. This applies to: imported JSON files, LLM/HTTP API responses, file uploads, and any other data crossing a system boundary. Dexie is NOT a boundary (we own that storage and have migrations); zod isn't needed there.
+
+## Keep LLM prompt additions terse
+
+When editing `src/utils/prompts.ts`, one short line per rule or field. Aim for ≤15 words per rule. If a field is genuinely self-explanatory or optional, don't add an instruction for it at all.
+
 ## Backend location
 
 The active backend is **Convex** at `../language-learning-backend-convex/`. The Express backend at `../language-learning-backend/` is deprecated — do not edit it. Frontend talks to Convex via `VITE_BACKEND_URL` (typically `http://127.0.0.1:3211` for local dev). HTTP routes live in `convex/http.ts`; backing actions live alongside (`convex/generate.ts`, `convex/onboarding.ts`, etc.). Start with `npx convex dev` from the convex backend repo.

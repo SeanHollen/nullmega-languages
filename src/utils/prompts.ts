@@ -435,7 +435,7 @@ Card structure:
 - prompt: 5-40 words describing what the quiz tests
 - tags: an array of 1-4 short lowercase tags describing what the card is about. Use established tags when applicable (e.g. "tense", "conjugation", "word-order", "register", "idiom", "preposition", "subjunctive", "passive"). Add a language-specific tag if relevant (e.g. "keigo" for Japanese honorifics). Don't pluralize. Don't include the language name itself as a tag.
 - questions: 1-8 questions, each either:
-  - multiple-choice: {"type":"multiple-choice","prompt":"...","choices":["a","b","c","d"],"answer":"exact text of correct choice"}
+  - multiple-choice: {"type":"multiple-choice","prompt":"...","choices":["a","b","c","d"],"answer":"exact text of correct choice","shuffle":true}
   - write-in: {"type":"write-in","prompt":"Fill in: Je ___ (aller) au marché hier.","answer":["suis allé"]}
 
 Rules:

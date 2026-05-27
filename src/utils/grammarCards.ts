@@ -12,10 +12,29 @@ export interface QuizQuestion {
   prompt: string;
   choices?: string[];
   answer: string | string[];
+  shuffle?: boolean;
 }
 
 export function acceptedAnswers(q: QuizQuestion): string[] {
   return Array.isArray(q.answer) ? q.answer : [q.answer];
+}
+
+export function shuffledChoices(
+  q: QuizQuestion,
+  seed: number,
+  shuffle = q.shuffle ?? true,
+): string[] {
+  const choices = q.choices ?? [];
+  if (!shuffle || choices.length <= 1) return choices;
+  let s = seed | 0 || 1;
+  function next(): number {
+    s = (s * 1664525 + 1013904223) | 0;
+    return s;
+  }
+  return choices
+    .map((c) => ({ c, k: next() }))
+    .sort((a, b) => a.k - b.k)
+    .map((x) => x.c);
 }
 
 export interface GrammarCard extends SrsCard {
@@ -43,6 +62,7 @@ function normalizeQuestion(raw: unknown): QuizQuestion | null {
   if (r.type === `multiple-choice` && Array.isArray(r.choices)) {
     q.choices = (r.choices as unknown[]).filter((c): c is string => typeof c === `string`);
   }
+  if (typeof r.shuffle === `boolean`) q.shuffle = r.shuffle;
   return q;
 }
 

@@ -6,7 +6,7 @@ import { loadSrsSettings } from "../utils/srsSettings";
 import { StudyEmptyState } from "../components/StudyEmptyState";
 import { BackHeader } from "../components/BackHeader";
 import type { GrammarCard } from "../utils/grammarCards";
-import { acceptedAnswers, patchGrammarCard } from "../utils/grammarCards";
+import { acceptedAnswers, patchGrammarCard, shuffledChoices } from "../utils/grammarCards";
 import { computeSrsStatus } from "../utils/srs";
 import {
   type GrammarSessionData,
@@ -42,6 +42,7 @@ export function GrammarStudyPage() {
     Array(sessionData?.current?.questions.length ?? 0).fill(``),
   );
   const [questionResults, setQuestionResults] = useState<boolean[]>([]);
+  const [shuffleSeed, setShuffleSeed] = useState<number>(() => Date.now());
 
   const title = mode === `learn` ? t(`Learn Grammar`) : t(`Review Grammar`);
 
@@ -89,6 +90,7 @@ export function GrammarStudyPage() {
     setAnswers(Array(nextCard?.questions.length ?? 0).fill(``));
     setPhase(`answering`);
     setQuestionResults([]);
+    setShuffleSeed(Date.now());
   }
 
   return (
@@ -123,7 +125,7 @@ export function GrammarStudyPage() {
                   <p className="text-base text-gray-700 leading-relaxed">{q.prompt}</p>
                   {q.type === `multiple-choice` && q.choices ? (
                     <div className="flex flex-col gap-2">
-                      {q.choices.map((choice) => (
+                      {shuffledChoices(q, shuffleSeed).map((choice) => (
                         <Button
                           key={choice}
                           onClick={() => setAnswer(i, choice)}

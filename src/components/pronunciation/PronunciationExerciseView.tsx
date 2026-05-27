@@ -1,7 +1,11 @@
-import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useLiveQuery } from "dexie-react-hooks";
 import type { PronunciationPhrase } from "../../hooks/useGeneratePronunciation";
 import type { PronunciationMode } from "../../pages/PronunciationPage";
+import {
+  loadPronunciationSettings,
+  savePronunciationSettings,
+} from "../../utils/pronunciationSettings";
 import { PhraseCard } from "./PhraseCard";
 import { Button } from "../Button";
 
@@ -30,8 +34,9 @@ export function PronunciationExerciseView({
 }: Props) {
   const { t } = useTranslation();
   const allRated = ratings.every((r) => r !== null);
-  const [showPhrasesByDefault, setShowPhrasesByDefault] = useState(true);
-  const [showTranslationsByDefault, setShowTranslationsByDefault] = useState(true);
+  const settings = useLiveQuery(() => loadPronunciationSettings(), []);
+  const showPhrasesByDefault = settings?.showPhrasesByDefault ?? true;
+  const showTranslationsByDefault = settings?.showTranslationsByDefault ?? true;
 
   return (
     <div className="space-y-6">
@@ -48,13 +53,25 @@ export function PronunciationExerciseView({
         </p>
         <div className="flex flex-wrap gap-2 mt-3">
           <Button
-            onClick={() => setShowPhrasesByDefault((p) => !p)}
+            onClick={() => {
+              if (!settings) return;
+              void savePronunciationSettings({
+                ...settings,
+                showPhrasesByDefault: !showPhrasesByDefault,
+              });
+            }}
             className="cursor-pointer text-xs px-3 py-1.5 rounded-lg border border-gray-200 text-gray-600 hover:border-gray-300 hover:text-gray-800 transition"
           >
             {showPhrasesByDefault ? t(`Hide all phrases`) : t(`Show all phrases`)}
           </Button>
           <Button
-            onClick={() => setShowTranslationsByDefault((p) => !p)}
+            onClick={() => {
+              if (!settings) return;
+              void savePronunciationSettings({
+                ...settings,
+                showTranslationsByDefault: !showTranslationsByDefault,
+              });
+            }}
             className="cursor-pointer text-xs px-3 py-1.5 rounded-lg border border-gray-200 text-gray-600 hover:border-gray-300 hover:text-gray-800 transition"
           >
             {showTranslationsByDefault ? t(`Hide all translations`) : t(`Show all translations`)}

@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { loadSrsSettings } from "../utils/srsSettings";
 import { StudyEmptyState } from "../components/StudyEmptyState";
 import { BackHeader } from "../components/BackHeader";
+import { BoldWord } from "../components/BoldWord";
 import type { GrammarCard } from "../utils/grammarCards";
 import { acceptedAnswers, patchGrammarCard, shuffledChoices } from "../utils/grammarCards";
 import { computeSrsStatus } from "../utils/srs";
@@ -123,6 +124,11 @@ export function GrammarStudyPage() {
                   className={`space-y-2${i > 0 ? ` pt-6 border-t border-gray-100` : ``}`}
                 >
                   <p className="text-base text-gray-700 leading-relaxed">{q.prompt}</p>
+                  {q.example && (
+                    <p className="text-sm text-gray-500 italic">
+                      {t(`Example`)}: <BoldWord text={q.example} />
+                    </p>
+                  )}
                   {q.type === `multiple-choice` && q.choices ? (
                     <div className="flex flex-col gap-2">
                       {shuffledChoices(q, shuffleSeed).map((choice) => (

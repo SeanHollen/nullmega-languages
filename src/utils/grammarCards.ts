@@ -14,6 +14,7 @@ const QuizQuestionSchema = z.object({
   choices: z.array(z.string()).optional(),
   answer: z.union([z.string(), z.array(z.string()).min(1)]),
   shuffle: z.boolean().optional(),
+  example: z.string().optional(),
 });
 
 export type QuizQuestion = z.infer<typeof QuizQuestionSchema>;

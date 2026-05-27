@@ -163,6 +163,7 @@
   "Enter a language…": "Enter a language…",
   "Enter your OpenAI API key to call the model directly (BYOK). Leave blank to route through the backend.": "Enter your OpenAI API key to call the model directly (BYOK). Leave blank to route through the backend.",
   "Essay needs at least {{min}} words": "Essay needs at least {{min}} words",
+  "Example": "Example",
   "Export cards to JSON": "Export cards to JSON",
   "Exported {{count}} card_one": "Exported {{count}} card",
   "Exported {{count}} card_other": "Exported {{count}} card",

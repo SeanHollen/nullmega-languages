@@ -439,14 +439,16 @@ Card structure:
 - tags: an array of 1-4 short lowercase tags describing what the card is about. Use established tags when applicable (e.g. "tense", "conjugation", "word-order", "register", "idiom", "preposition", "subjunctive", "passive"). Add a language-specific tag if relevant (e.g. "keigo" for Japanese honorifics). Don't pluralize. Don't include the language name itself as a tag.
 - questions: 1-8 questions, each either:
   - multiple-choice: {"type":"multiple-choice","prompt":"...","choices":["a","b","c","d"],"answer":"exact text of correct choice","shuffle":true}
-  - write-in: {"type":"write-in","prompt":"Fill in: Je ___ (aller) au marché hier.","answer":["suis allé"]}
+  - write-in: {"type":"write-in","prompt":"Fill in: Je ___ (aller) au marché hier.","answer":["suis allé"],"example":"Hier, elle **est allée** au cinéma."}
 
 Rules:
 - Use real ${language} examples in questions
 - Write-in answers should be 1-4 words
 - For write-in, "answer" must be an ARRAY of all acceptable answers. The FIRST element must be the canonical / recommended form (this is what gets shown to the user when they get it wrong). Subsequent elements are alternates that should still be marked correct: with/without a clitic that sits adjacent to the blank in the prompt (e.g. ["aimes-tu","aimes"]), spelling variants, alternate verb forms when both are valid in context, etc. If the answer is genuinely unambiguous, the array has a single element.
 - Multiple-choice "answer" is a single string (the exact text of the correct choice). Distractors should be plausible but clearly wrong.
-- For tense/conjugation cards, strongly prefer write-in questions — use multiple-choice only when the answer would be genuinely ambiguous as a free-form fill-in
+- Prefer write-in for conjugation / inflection / vocabulary questions where the lemma or stem is given in the prompt and showing the options would spoil the answer.
+- Prefer multiple-choice for structural / abstract questions where many forms could plausibly fit (subjunctive selection, particle choice, register pickers, agreement). If no obvious cue tells the learner which form is wanted, use multiple-choice.
+- Optional "example" (write-in only): one short sentence in ${language} demonstrating the same construction, with the part corresponding to the answer wrapped in **double asterisks**. Use when the prompt alone is ambiguous about what form to produce.
 - Do NOT mix question types for the sake of variety; choose the type that best fits each question${avoidNote}
 
 Return ONLY valid JSON:

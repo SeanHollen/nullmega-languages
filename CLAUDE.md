@@ -32,15 +32,26 @@ The active backend is **Convex** at `../language-learning-backend-convex/`. The 
 
 `useEffect` is forbidden unless there is absolutely no other option. If something happens because a user clicked something, it must be triggered by that click handler — not by a reactive effect watching state. Before reaching for `useEffect`, ask: what user action caused this? Put the logic there instead.
 
-## Reproduce bugs with a test BEFORE fixing — strict ordering
+## Tests must be written BEFORE the change they're for
 
-When the user reports a bug:
+This rule applies to any task that calls for tests — bug fixes, refactors, behavior changes the user asks to be tested.
+
+The forbidden action: writing tests AFTER the source change they're meant to verify. Tests written after implementation are biased by it — the writer subconsciously matches the test to what was built, not to what should be built. A passing-on-first-run test is meaningless.
+
+Order:
 1. Write the test first.
-2. Run it. Confirm it FAILS against current code. Show the failure in your response.
+2. Run it. Confirm it FAILS against the current code. Paste the failure in your response.
 3. Only then change the source.
 4. Re-run. Confirm it now passes.
 
-Writing the test after the fix is unacceptable — it doesn't prove the bug existed and doesn't prove the fix addresses it. A passing-on-first-run test is meaningless. This applies to every reported bug, no matter how obvious the cause seems.
+Escape hatch if this rule is somehow violated (e.g. you wrote source first by accident):
+- Clone the repo to a separate working directory WITHOUT applying the source change.
+- Spawn a subagent with NO knowledge of the change. Brief it only on what behavior should be tested.
+- Have the subagent write tests against the unmodified copy.
+- Run those tests; they must fail.
+- Bring the tests back into the main repo and verify they now pass with the change.
+
+Do NOT just write the tests yourself after the fact and demonstrate they fail by temporarily reverting source. That doesn't remove the bias.
 
 ## Plans
 

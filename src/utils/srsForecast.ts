@@ -19,22 +19,28 @@ function dayStart(ts: number): number {
 // and apply it each iteration.
 //   useEase=true  → per-card ease (from history)
 //   useEase=false → fixed INTERVAL_MULTIPLIER, matching the scheduling behavior in that mode
-export function forecastDueDays(
+// Returns each future due time within [fromMs, horizonMs]. With `dayAligned: true`, each
+// time is floored to the local day-start (current behavior for day-grain charts). With
+// `dayAligned: false`, the raw lastReviewed + interval timestamps are preserved (used for
+// the hour-grain 48h view).
+export function forecastDueTimes(
   card: SrsCard,
-  today: number,
+  fromMs: number,
   horizonMs: number,
   useEase: boolean,
+  dayAligned: boolean,
 ): number[] {
   if (card.status === "dropped" || card.status === "new") return [];
   if (card.lastReviewed === null) return [];
   const multiplier = useEase ? computeEase(card.reviewHistory) : INTERVAL_MULTIPLIER;
+  const align = (ts: number): number => (dayAligned ? dayStart(ts) : ts);
   let interval = card.currentInterval > 0 ? card.currentInterval : INITIAL_INTERVAL;
-  let nextDue = Math.max(today, dayStart(card.lastReviewed + card.currentInterval));
-  const days: number[] = [];
+  let nextDue = Math.max(fromMs, align(card.lastReviewed + card.currentInterval));
+  const times: number[] = [];
   while (nextDue <= horizonMs) {
-    days.push(nextDue);
+    times.push(nextDue);
     interval = Math.round(interval * multiplier);
-    nextDue = dayStart(nextDue + interval);
+    nextDue = align(nextDue + interval);
   }
-  return days;
+  return times;
 }

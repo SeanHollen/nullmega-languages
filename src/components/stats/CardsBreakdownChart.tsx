@@ -57,19 +57,25 @@ function buildBuckets(cards: SrsCardWithStatus[], mode: CardsMode, t: TFunction)
     };
   }
   if (mode === `interval`) {
-    const byInterval = new Map<number, number>();
+    const byLabel = new Map<string, { sortKey: number; count: number }>();
     let noInterval = 0;
     for (const c of cards) {
       if (c.currentInterval === 0) {
         noInterval++;
         continue;
       }
-      byInterval.set(c.currentInterval, (byInterval.get(c.currentInterval) ?? 0) + 1);
+      const label = formatIntervalLabel(c.currentInterval);
+      const entry = byLabel.get(label);
+      if (entry) {
+        entry.count++;
+      } else {
+        byLabel.set(label, { sortKey: c.currentInterval, count: 1 });
+      }
     }
-    const buckets: CardsBucket[] = [...byInterval.entries()]
-      .sort((a, b) => a[0] - b[0])
-      .map(([ms, count]) => ({
-        label: formatIntervalLabel(ms),
+    const buckets: CardsBucket[] = [...byLabel.entries()]
+      .sort((a, b) => a[1].sortKey - b[1].sortKey)
+      .map(([label, { count }]) => ({
+        label,
         count,
         color: `#0ea5e9`,
       }));

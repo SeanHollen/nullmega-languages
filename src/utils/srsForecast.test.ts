@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { forecastDueDays, type SrsCard } from "./srsForecast";
+import { forecastDueTimes, type SrsCard } from "./srsForecast";
+
+function forecastDueDays(c: SrsCard, today: number, horizon: number, useEase: boolean): number[] {
+  return forecastDueTimes(c, today, horizon, useEase, true);
+}
 import { computeEase, INTERVAL_MULTIPLIER } from "./srs";
 import type { ReviewEntry } from "./srs";
 
@@ -125,5 +129,43 @@ describe(`forecastDueDays`, () => {
     const today = dayStart(0);
     const c = card({ lastReviewed: today, currentInterval: 100 * DAY });
     expect(forecastDueDays(c, today, today + 30 * DAY, true)).toEqual([]);
+  });
+});
+
+describe(`forecastDueTimes — dayAligned: false (hour-precision)`, () => {
+  it(`preserves the actual due time without flooring to day-start`, () => {
+    // lastReviewed at 3pm; interval = 1 day → next due is tomorrow at 3pm, not midnight.
+    const today = dayStart(0);
+    const threePm = today + 15 * 60 * 60 * 1000;
+    const c = card({ lastReviewed: threePm, currentInterval: DAY, reviewHistory: [] });
+    const fromMs = today;
+    const times = forecastDueTimes(c, fromMs, today + 5 * DAY, false, false);
+    // First due time: 3pm tomorrow = today + 1d + 15h. Day-aligned would have given `today + 1d`.
+    expect(times[0]).toBe(threePm + DAY);
+    expect(new Date(times[0]).getHours()).toBe(15);
+  });
+
+  it(`day-aligned and not-aligned forecasts diverge when lastReviewed is mid-day`, () => {
+    const today = dayStart(0);
+    const threePm = today + 15 * 60 * 60 * 1000;
+    const c = card({ lastReviewed: threePm, currentInterval: DAY, reviewHistory: [] });
+    const aligned = forecastDueTimes(c, today, today + 5 * DAY, false, true);
+    const raw = forecastDueTimes(c, today, today + 5 * DAY, false, false);
+    // Day-aligned floors to midnight; raw preserves 3pm.
+    expect(aligned[0]).toBe(today + DAY);
+    expect(raw[0]).toBe(threePm + DAY);
+  });
+
+  it(`returns an empty array for dropped, new, or never-reviewed cards (same as day-aligned)`, () => {
+    const today = dayStart(0);
+    expect(
+      forecastDueTimes(card({ status: `dropped` }), today, today + 30 * DAY, true, false),
+    ).toEqual([]);
+    expect(forecastDueTimes(card({ status: `new` }), today, today + 30 * DAY, true, false)).toEqual(
+      [],
+    );
+    expect(
+      forecastDueTimes(card({ lastReviewed: null }), today, today + 30 * DAY, true, false),
+    ).toEqual([]);
   });
 });

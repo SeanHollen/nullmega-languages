@@ -20,7 +20,7 @@ export default defineConfig(
         { selector: "TryStatement[finalizer]", message: "Avoid try/finally. Put cleanup after the try/catch block — it runs in both paths anyway." },
         { selector: "TSTypeReference > Identifier[name='Omit']", message: "Don't use Omit<>. Define an explicit base type that other types extend." },
         { selector: "TSExpressionWithTypeArguments > Identifier[name='Omit']", message: "Don't use Omit<> in extends. Define an explicit base type that other types extend." },
-        { selector: "JSXExpressionContainer > CallExpression[callee.type='ArrowFunctionExpression']", message: "Don't inline an IIFE in JSX. Extract the logic into a named component or compute the value above the return statement." },
+        { selector: "JSXExpressionContainer CallExpression[callee.type='ArrowFunctionExpression']", message: "Don't inline an IIFE in JSX. Extract the logic into a named component or compute the value above the return statement." },
         { selector: "CallExpression[callee.object.name='window'][callee.property.name=/^(confirm|alert|prompt)$/]", message: "Don't use window.confirm/alert/prompt. Use the in-app ConfirmModal (src/components/ConfirmModal.tsx) or build a styled in-app dialog." },
         { selector: "CallExpression[callee.name=/^(confirm|alert|prompt)$/]", message: "Don't use the bare confirm/alert/prompt globals. Use the in-app ConfirmModal (src/components/ConfirmModal.tsx) or build a styled in-app dialog." },
       ],

@@ -61,20 +61,31 @@ export function CardsAddedChart({ cards, emptyMessage }: Props) {
 
   const totalCards = cards.length;
 
+  let cumulativeLinePath = ``;
+  let cumulativeAreaPath = ``;
+  if (mode === `cumulative` && series.length > 0) {
+    const parts: string[] = [];
+    series.forEach((d, i) => {
+      parts.push(`${i === 0 ? `M` : `L`}${barX(i)},${toY(d.cumulative)}`);
+    });
+    cumulativeLinePath = parts.join(` `);
+    const baseY = toY(0);
+    cumulativeAreaPath = `${cumulativeLinePath} L${barX(series.length - 1)},${baseY} L${barX(0)},${baseY} Z`;
+  }
+
+  let tooltipNode: React.ReactNode = null;
+  if (hovered !== null && series[hovered]) {
+    const d = series[hovered];
+    const value = mode === `perDay` ? d.count : d.cumulative;
+    const valueLine =
+      mode === `perDay`
+        ? t(`{{count}} added`, { count: d.count })
+        : t(`{{count}} total`, { count: d.cumulative });
+    tooltipNode = renderTooltip(barX(hovered), toY(value), [shortDate(d.t), valueLine]);
+  }
+
   return (
-    <ChartCard
-      title={t(`Cards added over time`)}
-      right={
-        <ChartToggle
-          value={mode}
-          options={[
-            [`perDay`, t(`Per day`)],
-            [`cumulative`, t(`Cumulative`)],
-          ]}
-          onChange={setMode}
-        />
-      }
-    >
+    <ChartCard title={t(`Cards added over time`)}>
       {totalCards === 0 ? (
         <p className="text-sm text-gray-400 italic py-8 text-center">{emptyMessage}</p>
       ) : (
@@ -117,84 +128,78 @@ export function CardsAddedChart({ cards, emptyMessage }: Props) {
             );
           })}
 
-          {mode === `perDay`
-            ? series.map((d, i) => {
-                const innerBarW = Math.max(2, barSlot * 0.7);
-                const bx = barX(i) - innerBarW / 2;
-                const by = toY(d.count);
-                const bh = Math.max(0, toY(0) - by);
-                return (
-                  <g key={d.t}>
-                    {d.count > 0 && (
-                      <rect
-                        x={bx}
-                        y={by}
-                        width={innerBarW}
-                        height={bh}
-                        fill="#0ea5e9"
-                        opacity={hovered === i ? 0.8 : 1}
-                        rx="2"
-                      />
-                    )}
+          {mode === `perDay` ? (
+            series.map((d, i) => {
+              const innerBarW = Math.max(2, barSlot * 0.7);
+              const bx = barX(i) - innerBarW / 2;
+              const by = toY(d.count);
+              const bh = Math.max(0, toY(0) - by);
+              return (
+                <g key={d.t}>
+                  {d.count > 0 && (
                     <rect
-                      x={barX(i) - barSlot / 2}
-                      y={PAD_T}
-                      width={barSlot}
-                      height={INNER_H}
-                      fill="transparent"
-                      style={{ cursor: `pointer` }}
-                      onMouseEnter={() => setHovered(i)}
-                      onMouseLeave={() => setHovered(null)}
+                      x={bx}
+                      y={by}
+                      width={innerBarW}
+                      height={bh}
+                      fill="#0ea5e9"
+                      opacity={hovered === i ? 0.8 : 1}
+                      rx="2"
                     />
-                  </g>
-                );
-              })
-            : (() => {
-                // Step-area path for cumulative.
-                const path: string[] = [];
-                series.forEach((d, i) => {
-                  path.push(`${i === 0 ? `M` : `L`}${barX(i)},${toY(d.cumulative)}`);
-                });
-                const baseY = toY(0);
-                const lastX = barX(series.length - 1);
-                const firstX = barX(0);
-                const areaPath = `${path.join(` `)} L${lastX},${baseY} L${firstX},${baseY} Z`;
-                return (
-                  <g>
-                    <path d={areaPath} fill="#0ea5e9" opacity={0.2} />
-                    <path d={path.join(` `)} stroke="#0ea5e9" strokeWidth="2" fill="none" />
-                    {series.map((d, i) => (
-                      <g key={d.t}>
-                        {hovered === i && (
-                          <circle cx={barX(i)} cy={toY(d.cumulative)} r="3" fill="#0ea5e9" />
-                        )}
-                        <rect
-                          x={barX(i) - barSlot / 2}
-                          y={PAD_T}
-                          width={barSlot}
-                          height={INNER_H}
-                          fill="transparent"
-                          style={{ cursor: `pointer` }}
-                          onMouseEnter={() => setHovered(i)}
-                          onMouseLeave={() => setHovered(null)}
-                        />
-                      </g>
-                    ))}
-                  </g>
-                );
-              })()}
-
-          {hovered !== null &&
-            (() => {
-              const d = series[hovered];
-              const value = mode === `perDay` ? d.count : d.cumulative;
-              const valueLine =
-                mode === `perDay`
-                  ? t(`{{count}} added`, { count: d.count })
-                  : t(`{{count}} total`, { count: d.cumulative });
-              return renderTooltip(barX(hovered), toY(value), [shortDate(d.t), valueLine]);
-            })()}
+                  )}
+                  <rect
+                    x={barX(i) - barSlot / 2}
+                    y={PAD_T}
+                    width={barSlot}
+                    height={INNER_H}
+                    fill="transparent"
+                    style={{ cursor: `pointer` }}
+                    onMouseEnter={() => setHovered(i)}
+                    onMouseLeave={() => setHovered(null)}
+                  />
+                </g>
+              );
+            })
+          ) : (
+            <g>
+              <path d={cumulativeAreaPath} fill="#0ea5e9" opacity={0.2} />
+              <path d={cumulativeLinePath} stroke="#0ea5e9" strokeWidth="2" fill="none" />
+              {series.map((d, i) => (
+                <g key={d.t}>
+                  {hovered === i && (
+                    <circle cx={barX(i)} cy={toY(d.cumulative)} r="3" fill="#0ea5e9" />
+                  )}
+                  <rect
+                    x={barX(i) - barSlot / 2}
+                    y={PAD_T}
+                    width={barSlot}
+                    height={INNER_H}
+                    fill="transparent"
+                    style={{ cursor: `pointer` }}
+                    onMouseEnter={() => setHovered(i)}
+                    onMouseLeave={() => setHovered(null)}
+                  />
+                </g>
+              ))}
+            </g>
+          )}
+          {tooltipNode}
         </svg>
+      )}
+      {totalCards > 0 && (
+        <div className="flex items-center justify-end gap-4 flex-wrap">
+          <ChartToggle
+            value={mode}
+            options={[
+              [`perDay`, t(`Per day`)],
+              [`cumulative`, t(`Cumulative`)],
+            ]}
+            onChange={(next) => {
+              setMode(next);
+              setHovered(null);
+            }}
+          />
+        </div>
       )}
     </ChartCard>
   );

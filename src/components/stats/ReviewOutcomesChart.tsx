@@ -138,6 +138,30 @@ export function ReviewOutcomesChart({ cards }: Props) {
     return scale === `percent` ? `${tick}%` : `${tick}`;
   }
 
+  let tooltipNode: React.ReactNode = null;
+  if (hovered !== null && buckets[hovered.bucket]) {
+    const b = buckets[hovered.bucket];
+    const v = values[hovered.bucket];
+    const value = hovered.side === `correct` ? v.correctVal : v.incorrectVal;
+    const cx = groupX(hovered.bucket);
+    const stacked = scale === `percent`;
+    let tx: number;
+    let ty: number;
+    if (stacked) {
+      tx = cx;
+      ty = hovered.side === `correct` ? toY(v.correctVal) : toY(v.correctVal + v.incorrectVal);
+    } else {
+      tx = hovered.side === `correct` ? cx - barW / 2 - 1 : cx + barW / 2 + 1;
+      ty = toY(value);
+    }
+    tooltipNode = renderTooltip(tx, ty, [
+      b.tooltipLabel,
+      hovered.side === `correct`
+        ? t(`{{value}} correct`, { value: formatValue(value) })
+        : t(`{{value}} incorrect`, { value: formatValue(value) }),
+    ]);
+  }
+
   return (
     <ChartCard
       title={t(`Review outcomes`)}
@@ -304,30 +328,7 @@ export function ReviewOutcomesChart({ cards }: Props) {
             </g>
           );
         })}
-        {hovered !== null &&
-          (() => {
-            const b = buckets[hovered.bucket];
-            const v = values[hovered.bucket];
-            const value = hovered.side === `correct` ? v.correctVal : v.incorrectVal;
-            const cx = groupX(hovered.bucket);
-            const stacked = scale === `percent`;
-            let tx: number;
-            let ty: number;
-            if (stacked) {
-              tx = cx;
-              ty =
-                hovered.side === `correct` ? toY(v.correctVal) : toY(v.correctVal + v.incorrectVal);
-            } else {
-              tx = hovered.side === `correct` ? cx - barW / 2 - 1 : cx + barW / 2 + 1;
-              ty = toY(value);
-            }
-            return renderTooltip(tx, ty, [
-              b.tooltipLabel,
-              hovered.side === `correct`
-                ? t(`{{value}} correct`, { value: formatValue(value) })
-                : t(`{{value}} incorrect`, { value: formatValue(value) }),
-            ]);
-          })()}
+        {tooltipNode}
       </svg>
 
       <div className="flex items-center justify-between gap-4 flex-wrap">

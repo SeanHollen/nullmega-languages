@@ -59,6 +59,7 @@ function ReadingHistory({
     <ResultsView
       exercise={body.exercise}
       language={language}
+      mode="reading"
       selected={body.selected}
       ratingResult={rebuildRatingResult(record)}
       assessmentId={record.id}
@@ -90,6 +91,7 @@ function ListeningHistory({
     <ResultsView
       exercise={body.exercise}
       language={language}
+      mode="listening"
       selected={body.selected}
       ratingResult={rebuildRatingResult(record)}
       assessmentId={record.id}

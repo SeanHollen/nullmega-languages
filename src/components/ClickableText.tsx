@@ -3,11 +3,13 @@ import { useLiveQuery } from "dexie-react-hooks";
 import { useTranslation } from "react-i18next";
 import { translateOne } from "../hooks/useTranslate";
 import { loadFlashcards, addFlashcard, removeFlashcard } from "../utils/flashcards";
+import type { Mode } from "../hooks/useAbility";
 import { Button } from "./Button";
 
 interface Props {
   text: string;
   language?: string;
+  source?: Mode;
 }
 
 interface Popup {
@@ -74,7 +76,7 @@ function buildFlashcardMask(text: string, sources: string[]): boolean[] {
   return mask;
 }
 
-export function ClickableText({ text, language }: Props) {
+export function ClickableText({ text, language, source }: Props) {
   const { t } = useTranslation();
   const [popup, setPopup] = useState<Popup | null>(null);
   const savedSources =
@@ -135,7 +137,7 @@ export function ClickableText({ text, language }: Props) {
 
   function handleAddFlashcard() {
     if (!language || !popup || !popup.translation) return;
-    void addFlashcard(language, popup.text, popup.translation);
+    void addFlashcard(language, popup.text, popup.translation, source ? [source] : []);
     setPopup(null);
   }
 

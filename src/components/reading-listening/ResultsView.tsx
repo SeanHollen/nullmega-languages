@@ -32,6 +32,7 @@ export interface Translations {
 interface Props {
   exercise: Exercise;
   language: string;
+  mode: "reading" | "listening";
   selected: (number | null)[];
   ratingResult: RatingResult | null;
   assessmentId: string | null;
@@ -44,6 +45,7 @@ interface Props {
 export function ResultsView({
   exercise,
   language,
+  mode,
   selected,
   ratingResult,
   assessmentId,
@@ -69,7 +71,7 @@ export function ResultsView({
         <p className="text-xs text-gray-400 uppercase tracking-wide">{t(`Passage`)}</p>
         {audio?.passageUrl && <AudioPlayer src={audio.passageUrl} label={t(`Play passage`)} />}
         <p className="text-gray-800 leading-relaxed">
-          <ClickableText text={exercise.passage} language={language} />
+          <ClickableText source={mode} text={exercise.passage} language={language} />
         </p>
         <div className="border-t border-green-100 pt-4">
           <p className="text-xs text-gray-400 uppercase tracking-wide mb-2">
@@ -117,7 +119,7 @@ export function ResultsView({
                 <div className="flex-1">
                   <p className="font-medium text-gray-800">
                     {`${qi + 1}. `}
-                    <ClickableText text={q.question} language={language} />
+                    <ClickableText source={mode} text={q.question} language={language} />
                   </p>
                   {tq && <p className="text-xs text-gray-400 mt-0.5">{tq}</p>}
                   {qAudio && (
@@ -134,7 +136,7 @@ export function ResultsView({
                     className={`text-sm px-3 py-2 rounded-lg ${optionClass(oi, q.correct, selected[qi])}`}
                   >
                     <p>
-                      <ClickableText text={opt} language={language} />
+                      <ClickableText source={mode} text={opt} language={language} />
                     </p>
                     {topts?.[oi] && <p className="text-xs opacity-60 mt-0.5">{topts[oi]}</p>}
                   </div>

@@ -88,7 +88,7 @@ export function PronunciationResultsView({
                 <span className="ml-auto">{icon}</span>
               </div>
               <p className="font-medium text-gray-800">
-                <ClickableText text={p.phrase} language={language} />
+                <ClickableText source="pronunciation" text={p.phrase} language={language} />
               </p>
               <p className="text-sm text-gray-400 italic mt-0.5">{p.translation}</p>
             </div>

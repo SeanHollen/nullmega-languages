@@ -67,7 +67,7 @@ export function WritingResultsView({
         <div className="bg-white rounded-2xl border border-green-100 shadow-sm p-8 space-y-4">
           <p className="text-xs text-gray-400 uppercase tracking-wide">{t(`Passage`)}</p>
           <p className="text-gray-800 leading-relaxed whitespace-pre-wrap">
-            <ClickableText text={exercise.passage} language={language} />
+            <ClickableText source="writing" text={exercise.passage} language={language} />
           </p>
           {exercise.translation && (
             <div className="border-t border-green-100 pt-4">
@@ -108,7 +108,7 @@ export function WritingResultsView({
           </div>
           <div className="bg-gray-50 rounded-xl px-4 py-3">
             <p className="text-sm text-gray-700 whitespace-pre-wrap">
-              <ClickableText text={answers[0] ?? ``} language={language} />
+              <ClickableText source="writing" text={answers[0] ?? ``} language={language} />
             </p>
           </div>
           {grades[0]?.notes && <p className="text-sm text-gray-500 italic">{grades[0].notes}</p>}
@@ -125,7 +125,7 @@ export function WritingResultsView({
                 <div className="flex items-start justify-between gap-4">
                   <p className="font-medium text-gray-800">
                     {`${i + 1}. `}
-                    <ClickableText text={q.question} language={language} />
+                    <ClickableText source="writing" text={q.question} language={language} />
                   </p>
                   {grade && (
                     <span className={`text-lg font-bold shrink-0 ${scoreColor(grade.score)}`}>
@@ -135,7 +135,7 @@ export function WritingResultsView({
                 </div>
                 <div className="bg-gray-50 rounded-xl px-4 py-3">
                   <p className="text-sm text-gray-700">
-                    <ClickableText text={answers[i] ?? ``} language={language} />
+                    <ClickableText source="writing" text={answers[i] ?? ``} language={language} />
                   </p>
                 </div>
                 {grade?.notes && <p className="text-sm text-gray-500 italic">{grade.notes}</p>}

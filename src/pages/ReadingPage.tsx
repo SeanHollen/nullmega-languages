@@ -208,6 +208,7 @@ export function ReadingPage() {
           <ResultsView
             exercise={exercise}
             language={language}
+            mode="reading"
             selected={selected}
             ratingResult={ratingResult}
             assessmentId={assessmentId}

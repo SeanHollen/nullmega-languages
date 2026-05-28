@@ -258,6 +258,7 @@ export function ListeningPage() {
           <ResultsView
             exercise={exercise}
             language={language}
+            mode="listening"
             selected={selected}
             ratingResult={ratingResult}
             assessmentId={assessmentId}

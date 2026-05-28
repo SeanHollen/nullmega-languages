@@ -39,6 +39,7 @@ export async function addFlashcard(
   language: string,
   source: string,
   translation: string,
+  tags: string[] = [],
 ): Promise<Flashcard | null> {
   const lower = source.toLowerCase();
   const existing = await db()
@@ -55,7 +56,7 @@ export async function addFlashcard(
     addedAt: Date.now(),
     lastReviewed: null,
     currentInterval: 0,
-    tags: [],
+    tags,
     status: `new`,
     contexts: [],
     dateContextGenerated: null,
@@ -135,12 +136,11 @@ export async function importFlashcards(
       continue;
     }
     const r = parsedItem.data;
-    const card = await addFlashcard(language, r.source, r.translation);
+    const card = await addFlashcard(language, r.source, r.translation, r.tags ?? []);
     if (!card) {
       skipped++;
       continue;
     }
-    if (r.tags && r.tags.length > 0) await updateFlashcardTags(card.id, r.tags);
     added++;
   }
   return { added, skipped };

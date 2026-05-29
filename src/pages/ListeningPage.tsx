@@ -121,10 +121,14 @@ export function ListeningPage() {
             setSelected(initialSelected);
             task.update(t(`Generating audio…`));
             try {
-              const exerciseAudio = await generateExerciseAudio(data, {
-                passage: audioKeyPassage,
-                questions: audioKeyQuestions,
-              });
+              const exerciseAudio = await generateExerciseAudio(
+                data,
+                {
+                  passage: audioKeyPassage,
+                  questions: audioKeyQuestions,
+                },
+                language,
+              );
               setAudio(exerciseAudio);
               await updateAssessment(id, {
                 body: {

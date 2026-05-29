@@ -1,5 +1,6 @@
 import type { NarratorGender } from "../types";
 import { callTTS } from "./api";
+import { loadSettings } from "./settings";
 
 const MALE_VOICES = ["echo", "fable", "onyx"] as const;
 const FEMALE_VOICES = ["nova", "shimmer"] as const;
@@ -23,7 +24,22 @@ function stripBold(text: string): string {
   return text.split("**").join("");
 }
 
-export async function tts(text: string, voice: string, kind: TtsKind): Promise<Blob> {
+export async function tts(
+  text: string,
+  voice: string,
+  kind: TtsKind,
+  language: string,
+): Promise<Blob> {
+  const { ttsModel } = await loadSettings();
+  const input = stripBold(text);
+  if (ttsModel === `gpt-4o-mini-tts`) {
+    return callTTS({
+      model: `gpt-4o-mini-tts`,
+      voice,
+      input,
+      instructions: `language: ${language}`,
+    });
+  }
   const model = kind === `passage` ? `tts-1-hd` : `tts-1`;
-  return callTTS({ model, voice, input: stripBold(text) });
+  return callTTS({ model, voice, input });
 }

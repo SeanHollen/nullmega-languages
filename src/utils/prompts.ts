@@ -25,6 +25,7 @@ QUALITY: give the reader a reason to keep reading. Aim for at least one of:
 - A callback, parallel, or unexpected turn that pays something off
 - A concrete insight or specific detail that earns its place
 FLOW: each sentence must follow from the previous one — causation, consequence, contrast, or argument. No arbitrary lists, no recitations of unrelated facts strung together to hit a word count or showcase vocabulary.
+ENDINGS: alternate between satisfying/positive resolutions and ambiguous, bittersweet, or open endings. Don't default to either — check previous summaries and pick the underrepresented mode. Avoid cliché tidy lessons.
 Avoid: bland filler, "When I was X, now I Y" arcs, "It was a great experience!" framing.
 `;
 

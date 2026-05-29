@@ -43,6 +43,7 @@ export interface TTSBody {
   model: string;
   voice: string;
   input: string;
+  instructions?: string;
 }
 
 export async function callChat(body: ChatBody): Promise<ChatResponse> {

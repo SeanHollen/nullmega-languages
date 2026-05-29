@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { loadSettings, saveSettings } from "./settings";
+import { DEFAULT_TTS_MODEL, loadSettings, saveSettings } from "./settings";
 
 beforeEach(() => {
   vi.stubEnv(`VITE_OPENAI_API_KEY`, ``);
@@ -8,7 +8,12 @@ beforeEach(() => {
 describe("loadSettings", () => {
   it("returns null providers and empty backendUrl when nothing saved and no env key", async () => {
     const s = await loadSettings();
-    expect(s).toEqual({ textGen: null, tts: null, backendUrl: `` });
+    expect(s).toEqual({
+      textGen: null,
+      tts: null,
+      ttsModel: DEFAULT_TTS_MODEL,
+      backendUrl: ``,
+    });
   });
 
   it("falls back to VITE_OPENAI_API_KEY for both providers when nothing else is saved", async () => {
@@ -22,6 +27,7 @@ describe("loadSettings", () => {
     await saveSettings({
       textGen: { provider: `openai`, key: `sk-text` },
       tts: { provider: `openai`, key: `sk-tts` },
+      ttsModel: `tts-1`,
       backendUrl: `http://example.com`,
     });
     const s = await loadSettings();
@@ -35,13 +41,19 @@ describe("loadSettings", () => {
     await saveSettings({
       textGen: { provider: `openai`, key: `sk-explicit` },
       tts: null,
+      ttsModel: DEFAULT_TTS_MODEL,
       backendUrl: ``,
     });
     let s = await loadSettings();
     expect(s.textGen?.key).toBe(`sk-explicit`);
     expect(s.tts?.key).toBe(`sk-env`);
 
-    await saveSettings({ textGen: null, tts: null, backendUrl: `` });
+    await saveSettings({
+      textGen: null,
+      tts: null,
+      ttsModel: DEFAULT_TTS_MODEL,
+      backendUrl: ``,
+    });
     s = await loadSettings();
     expect(s.textGen?.key).toBe(`sk-env`);
     expect(s.tts?.key).toBe(`sk-env`);

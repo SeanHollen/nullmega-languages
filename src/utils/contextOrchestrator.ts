@@ -17,12 +17,13 @@ async function populateAudio(
   cardId: string,
   contexts: FlashcardContext[],
   voice: string,
+  language: string,
 ): Promise<FlashcardContext[]> {
   return await Promise.all(
     contexts.map(async (ctx, i) => {
       if (ctx.audioKey) return ctx;
       try {
-        const blob = await tts(ctx.source, voice, `phrase`);
+        const blob = await tts(ctx.source, voice, `phrase`, language);
         const key = audioKey(cardId, i);
         await saveAudio(key, blob);
         return { ...ctx, audioKey: key };
@@ -36,7 +37,7 @@ async function populateAudio(
 export async function addMissingAudioFor(card: Flashcard, settings: VocabSettings): Promise<void> {
   if (!settings.generateAudio) return;
   if (!card.contexts.some((ctx) => !ctx.audioKey)) return;
-  const updated = await populateAudio(card.id, card.contexts, pickVoice());
+  const updated = await populateAudio(card.id, card.contexts, pickVoice(), card.language);
   await updateFlashcardContexts(card.id, updated, card.dateContextGenerated);
 }
 
@@ -57,7 +58,7 @@ export async function generateContextsFor(card: Flashcard, settings: VocabSettin
     audioKey: null,
   }));
   const contexts = settings.generateAudio
-    ? await populateAudio(card.id, fresh, pickVoice())
+    ? await populateAudio(card.id, fresh, pickVoice(), card.language)
     : fresh;
 
   await updateFlashcardContexts(card.id, contexts, Date.now());

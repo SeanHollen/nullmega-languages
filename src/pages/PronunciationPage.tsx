@@ -116,6 +116,7 @@ export function PronunciationPage() {
                 data.phrases.map((p) => p.phrase),
                 audioKeys,
                 `phrase`,
+                language,
               );
               setAudioUrls(urls);
               await updateAssessment(id, {

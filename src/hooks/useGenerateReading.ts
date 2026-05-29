@@ -4,6 +4,7 @@ import { callChat } from "../utils/api";
 import { getUserId } from "../utils/user";
 import { getPastSummariesByComplexity } from "../utils/history";
 import { buildReadingExercisePrompt, type ReadingLength } from "../utils/prompts";
+import { shuffleQuestionOptions } from "../utils/seededRandom";
 import { translateBatch, translateOne } from "./useTranslate";
 
 async function fetchExercise(
@@ -39,6 +40,7 @@ async function fetchExercise(
   }));
   return {
     ...parsed,
+    questions: parsed.questions.map(shuffleQuestionOptions),
     translation,
     difficultWords,
     properNouns: parsed.properNouns,

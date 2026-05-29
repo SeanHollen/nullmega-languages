@@ -7,15 +7,20 @@ export interface ProviderConfig {
   key: string;
 }
 
+export type TtsModel = "tts-1" | "gpt-4o-mini-tts";
+export const DEFAULT_TTS_MODEL: TtsModel = `gpt-4o-mini-tts`;
+
 export interface AppSettings {
   textGen: ProviderConfig | null;
   tts: ProviderConfig | null;
+  ttsModel: TtsModel;
   backendUrl: string;
 }
 
 const KEYS = {
   textGen: `settings_textGen`,
   tts: `settings_tts`,
+  ttsModel: `settings_ttsModel`,
   backendUrl: `settings_backendUrl`,
   authToken: `authToken`,
   authUserId: `authUserId`,
@@ -38,14 +43,16 @@ async function putValue(key: string, value: unknown): Promise<void> {
 export async function loadSettings(): Promise<AppSettings> {
   const envKey = (import.meta.env.VITE_OPENAI_API_KEY as string | undefined) ?? ``;
   const envFallback: ProviderConfig | null = envKey ? { provider: `openai`, key: envKey } : null;
-  const [textGen, tts, backendUrl] = await Promise.all([
+  const [textGen, tts, ttsModel, backendUrl] = await Promise.all([
     getValue<ProviderConfig>(KEYS.textGen),
     getValue<ProviderConfig>(KEYS.tts),
+    getValue<TtsModel>(KEYS.ttsModel),
     getValue<string>(KEYS.backendUrl),
   ]);
   return {
     textGen: textGen ?? envFallback,
     tts: tts ?? envFallback,
+    ttsModel: ttsModel ?? DEFAULT_TTS_MODEL,
     backendUrl: backendUrl ?? ``,
   };
 }
@@ -55,6 +62,7 @@ export async function saveSettings(s: AppSettings): Promise<void> {
   else await db().kv.delete(KEYS.textGen);
   if (s.tts) await putValue(KEYS.tts, s.tts);
   else await db().kv.delete(KEYS.tts);
+  await putValue(KEYS.ttsModel, s.ttsModel);
   if (s.backendUrl) await putValue(KEYS.backendUrl, s.backendUrl);
   else await db().kv.delete(KEYS.backendUrl);
 }

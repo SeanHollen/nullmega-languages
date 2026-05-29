@@ -3,8 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { useLiveQuery } from "dexie-react-hooks";
 import { useTranslation } from "react-i18next";
 import { BackHeader } from "../components/BackHeader";
-import type { Provider } from "../utils/settings";
-import { loadSettings, saveSettings } from "../utils/settings";
+import type { Provider, TtsModel } from "../utils/settings";
+import { DEFAULT_TTS_MODEL, loadSettings, saveSettings } from "../utils/settings";
 import { TextGenKeySection } from "../components/onboarding/TextGenKeySection";
 import { Button } from "../components/Button";
 
@@ -16,6 +16,7 @@ export function SettingsPage() {
   const [textGenKey, setTextGenKey] = useState<string | null>(null);
   const [sameTTS, setSameTTS] = useState<boolean | null>(null);
   const [ttsKey, setTtsKey] = useState<string | null>(null);
+  const [ttsModel, setTtsModel] = useState<TtsModel>(DEFAULT_TTS_MODEL);
   const [showTtsKey, setShowTtsKey] = useState(false);
   const [ttsKeyTouched, setTtsKeyTouched] = useState(false);
 
@@ -26,6 +27,7 @@ export function SettingsPage() {
     setTextGenKey(initial.textGen?.key ?? ``);
     setSameTTS(!initial.tts || initial.tts.key === initial.textGen?.key);
     setTtsKey(initial.tts && initial.tts.key !== initial.textGen?.key ? initial.tts.key : ``);
+    setTtsModel(initial.ttsModel);
   }
 
   function handleSave() {
@@ -39,7 +41,7 @@ export function SettingsPage() {
       tts = { provider, key: ttsKey };
     }
     void (async () => {
-      await saveSettings({ textGen, tts, backendUrl: initial.backendUrl });
+      await saveSettings({ textGen, tts, ttsModel, backendUrl: initial.backendUrl });
       void navigate(`/`);
     })();
   }
@@ -60,6 +62,22 @@ export function SettingsPage() {
               <p className="text-sm text-gray-400 mb-4">
                 {t(`Configure a separate key for TTS, or reuse the text generation key.`)}
               </p>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-600 mb-1">{t(`Model`)}</label>
+                <select
+                  value={ttsModel}
+                  onChange={(e) => setTtsModel(e.target.value as TtsModel)}
+                  className="w-full border border-gray-200 rounded-xl px-3 py-2 text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-green-500 cursor-pointer"
+                >
+                  <option value="gpt-4o-mini-tts">{t(`gpt-4o-mini-tts (language-aware)`)}</option>
+                  <option value="tts-1">{t(`tts-1 / tts-1-hd (classic)`)}</option>
+                </select>
+                <p className="text-xs text-gray-400 mt-1">
+                  {t(
+                    `gpt-4o-mini-tts is told the target language explicitly, so short phrases stop sounding English. Classic infers from the text.`,
+                  )}
+                </p>
+              </div>
               <label className="flex items-center gap-2 mb-4 cursor-pointer select-none">
                 <input
                   type="checkbox"

@@ -15,11 +15,12 @@ export interface ExerciseAudioKeys {
 export async function generateExerciseAudio(
   exercise: Exercise,
   keys: ExerciseAudioKeys,
+  language: string,
 ): Promise<ExerciseAudio> {
   const voice = pickVoice(exercise.narratorGender);
   const blobs = await Promise.all([
-    tts(exercise.passage, voice, `passage`),
-    ...exercise.questions.map((q) => tts(q.question, voice, `passage`)),
+    tts(exercise.passage, voice, `passage`, language),
+    ...exercise.questions.map((q) => tts(q.question, voice, `passage`, language)),
   ]);
   await saveAudio(keys.passage, blobs[0]);
   await Promise.all(exercise.questions.map((_, i) => saveAudio(keys.questions[i], blobs[i + 1])));
@@ -33,9 +34,10 @@ export async function generatePhrasesAudio(
   phrases: string[],
   keys: string[],
   kind: TtsKind,
+  language: string,
 ): Promise<string[]> {
   const voice = pickVoice();
-  const blobs = await Promise.all(phrases.map((p) => tts(p, voice, kind)));
+  const blobs = await Promise.all(phrases.map((p) => tts(p, voice, kind, language)));
   await Promise.all(blobs.map((b, i) => saveAudio(keys[i], b)));
   return blobs.map((b) => URL.createObjectURL(b));
 }

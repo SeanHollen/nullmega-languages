@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { db } from "./db";
+import { mulberry32, seededShuffle } from "./seededRandom";
 import type { SrsCard } from "./srs";
 
 // Re-export for backwards compatibility with existing imports.
@@ -31,6 +32,8 @@ export function acceptedAnswers(q: QuizQuestion): string[] {
   return Array.isArray(q.answer) ? q.answer : [q.answer];
 }
 
+// Grammar study uses a per-session numeric seed (Date.now at mount) so each visit
+// re-shuffles, and answers are matched by text — no `correct` index to remap.
 export function shuffledChoices(
   q: QuizQuestion,
   seed: number,
@@ -38,15 +41,7 @@ export function shuffledChoices(
 ): string[] {
   const choices = q.choices ?? [];
   if (!shuffle || choices.length <= 1) return choices;
-  let s = seed | 0 || 1;
-  function next(): number {
-    s = (s * 1664525 + 1013904223) | 0;
-    return s;
-  }
-  return choices
-    .map((c) => ({ c, k: next() }))
-    .sort((a, b) => a.k - b.k)
-    .map((x) => x.c);
+  return seededShuffle(choices, mulberry32(seed));
 }
 
 export interface GrammarCard extends SrsCard {

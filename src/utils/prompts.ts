@@ -443,13 +443,15 @@ Card structure:
   - write-in: {"type":"write-in","prompt":"Fill in: Je ___ (aller) au marché hier.","answer":["suis allé"],"example":"Hier, elle **est allée** au cinéma."}
 
 Rules:
+- Monolingual: card prompt and every question prompt/answer must be written entirely in ${language}. Do not use English (or any other non-target language) anywhere in the card content.
+- If the question relies on a grammar term (e.g. "imparfait du subjonctif"), an "example" field is REQUIRED so a native speaker who doesn't know the term can still answer.
 - Use real ${language} examples in questions
 - Write-in answers should be 1-4 words
 - For write-in, "answer" must be an ARRAY of all acceptable answers. The FIRST element must be the canonical / recommended form (this is what gets shown to the user when they get it wrong). Subsequent elements are alternates that should still be marked correct: with/without a clitic that sits adjacent to the blank in the prompt (e.g. ["aimes-tu","aimes"]), spelling variants, alternate verb forms when both are valid in context, etc. If the answer is genuinely unambiguous, the array has a single element.
 - Multiple-choice "answer" is a single string (the exact text of the correct choice). Distractors should be plausible but clearly wrong.
 - Prefer write-in for conjugation / inflection / vocabulary questions where the lemma or stem is given in the prompt and showing the options would spoil the answer.
 - Prefer multiple-choice for structural / abstract questions where many forms could plausibly fit (subjunctive selection, particle choice, register pickers, agreement). If no obvious cue tells the learner which form is wanted, use multiple-choice.
-- Optional "example" (write-in only): one short sentence in ${language} demonstrating the same construction, with the part corresponding to the answer wrapped in **double asterisks**. Use when the prompt alone is ambiguous about what form to produce.
+- "example" (write-in only): one short sentence in ${language} demonstrating the same construction, with the part corresponding to the answer wrapped in **double asterisks**. Required whenever the prompt uses a grammatical term — a native speaker who doesn't know the term must still be able to answer from the example. Optional only when the prompt is fully self-evident.
 - Do NOT mix question types for the sake of variety; choose the type that best fits each question${avoidNote}
 
 Return ONLY valid JSON:

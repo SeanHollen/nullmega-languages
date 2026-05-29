@@ -113,21 +113,20 @@ function buildBuckets(cards: SrsCardWithStatus[], mode: CardsMode, t: TFunction)
     return { buckets: accuracyBuckets, excludedCount: untested, excludedLabel: t(`untested`) };
   }
   // ease: bucket cards by the SM-2 ease multiplier computed from reviewHistory.
-  // Displayed as a percentage of the previous interval (e.g. ease 2.5 → 250%).
-  // Since correct answers don't push ease up in our model, ease lives in [130%, 250%].
+  // With correct=q4 and incorrect=q1, the only reachable ease values are 1.30 (floor,
+  // 3+ lapses), 1.42 (2 lapses), 1.96 (1 lapse), and 2.50 (0 lapses) — so the buckets
+  // are sized to land each on its own bar.
   const easeBuckets: CardsBucket[] = [
-    { label: `130-160%`, color: `#ef4444`, count: 0, tooltipLabel: t(`130-160% ease`) },
-    { label: `160-190%`, color: `#f97316`, count: 0, tooltipLabel: t(`160-190% ease`) },
-    { label: `190-220%`, color: `#f59e0b`, count: 0, tooltipLabel: t(`190-220% ease`) },
-    { label: `220-249%`, color: `#84cc16`, count: 0, tooltipLabel: t(`220-249% ease`) },
+    { label: `130%`, color: `#ef4444`, count: 0, tooltipLabel: t(`130% ease (floor)`) },
+    { label: `~140%`, color: `#f97316`, count: 0, tooltipLabel: t(`~140% ease`) },
+    { label: `~200%`, color: `#f59e0b`, count: 0, tooltipLabel: t(`~200% ease`) },
     { label: `250%`, color: `#16a34a`, count: 0, tooltipLabel: t(`250% ease (default)`) },
   ];
   for (const c of cards) {
     const ease = computeEase(c.reviewHistory ?? []);
-    if (ease >= 2.5) easeBuckets[4].count++;
-    else if (ease >= 2.2) easeBuckets[3].count++;
-    else if (ease >= 1.9) easeBuckets[2].count++;
-    else if (ease >= 1.6) easeBuckets[1].count++;
+    if (ease >= 2.2) easeBuckets[3].count++;
+    else if (ease >= 1.7) easeBuckets[2].count++;
+    else if (ease >= 1.35) easeBuckets[1].count++;
     else easeBuckets[0].count++;
   }
   return { buckets: easeBuckets };

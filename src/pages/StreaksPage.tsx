@@ -5,6 +5,7 @@ import { BackHeader } from "../components/BackHeader";
 import { loadStreaks, computeCurrentStreak, dateStr, type StreakRecord } from "../utils/streaks";
 import { loadListeningSeconds, formatListeningDuration } from "../utils/listeningStats";
 import { useLanguage } from "../contexts/LanguageContext";
+import { useDayKey } from "../hooks/useDayKey";
 
 const WEEKS = 26;
 const DAY_LABELS = [`Sun`, `Mon`, `Tue`, `Wed`, `Thu`, `Fri`, `Sat`];
@@ -52,13 +53,13 @@ function cellTitle(cell: Cell, t: TFunction): string {
 export function StreaksPage() {
   const { language } = useLanguage();
   const { t } = useTranslation();
-  const records = useLiveQuery(() => loadStreaks(language), [language]) ?? [];
+  const dayKey = useDayKey();
+  const records = useLiveQuery(() => loadStreaks(language), [language, dayKey]) ?? [];
   const byDate = new Map(records.map((r) => [r.date, r]));
   const currentStreak = computeCurrentStreak(records);
   const listeningSeconds = useLiveQuery(() => loadListeningSeconds(), []) ?? 0;
 
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  const today = new Date(dayKey);
 
   // The rightmost column holds today's week. Start from the Sunday WEEKS-1 weeks before
   // the Sunday of this week.

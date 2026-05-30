@@ -12,6 +12,7 @@ import { prepareLearnSession, prepareReviewSession } from "../utils/studySession
 import { VocabSettingsPanel } from "../components/vocabulary/VocabSettingsPanel";
 import { FlashcardTable } from "../components/vocabulary/FlashcardTable";
 import { Button } from "../components/Button";
+import { useDayKey } from "../hooks/useDayKey";
 
 export function VocabularyPage() {
   const navigate = useNavigate();
@@ -23,8 +24,9 @@ export function VocabularyPage() {
       async () => (await loadFlashcards(language)).sort((a, b) => b.addedAt - a.addedAt),
       [language],
     ) ?? [];
+  const dayKey = useDayKey();
   const settings = useLiveQuery(() => loadVocabSettings(), []);
-  const learnedToday = useLiveQuery(() => getLearnedTodayCount(), []) ?? 0;
+  const learnedToday = useLiveQuery(() => getLearnedTodayCount(), [dayKey]) ?? 0;
   const [learnError, setLearnError] = useState<string | null>(null);
   const [reviewError, setReviewError] = useState<string | null>(null);
 

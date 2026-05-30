@@ -22,6 +22,7 @@ import { loadGrammarSettings, getGeneratedTodayCount } from "../utils/grammarSet
 import { useLiveQuery } from "dexie-react-hooks";
 import { loadStreaks, recordToday, computeCurrentStreak } from "../utils/streaks";
 import { Button } from "../components/Button";
+import { useDayKey } from "../hooks/useDayKey";
 
 interface ModeConfig {
   label: string;
@@ -124,13 +125,14 @@ export function HomePage() {
   const navigate = useNavigate();
   const { language } = useLanguage();
   const { t } = useTranslation();
+  const dayKey = useDayKey();
   const goals = useLiveQuery(() => loadGoals(language), [language]);
   const vocabSettings = useLiveQuery(() => loadVocabSettings(), []);
-  const learnedToday = useLiveQuery(() => getLearnedTodayCount(), []) ?? 0;
+  const learnedToday = useLiveQuery(() => getLearnedTodayCount(), [dayKey]) ?? 0;
   const vocabCards = useLiveQuery(() => loadFlashcards(language), [language]) ?? [];
   const grammarSettings = useLiveQuery(() => loadGrammarSettings(), []);
   const grammarGeneratedToday =
-    useLiveQuery(() => getGeneratedTodayCount(language), [language]) ?? 0;
+    useLiveQuery(() => getGeneratedTodayCount(language), [language, dayKey]) ?? 0;
   const grammarCards = useLiveQuery(() => loadGrammarCards(language), [language]) ?? [];
   const allModes = Object.keys(DEFAULT_LANGUAGE_COMPLEXITY) as Mode[];
   const completedTodayByMode = useLiveQuery(async () => {
@@ -138,7 +140,7 @@ export function HomePage() {
       allModes.map(async (m) => [m, await getCompletedToday(m, language)] as const),
     );
     return Object.fromEntries(entries) as Record<Mode, number>;
-  }, [language]) ?? { reading: 0, listening: 0, writing: 0, pronunciation: 0 };
+  }, [language, dayKey]) ?? { reading: 0, listening: 0, writing: 0, pronunciation: 0 };
   const ratingsByMode = useLiveQuery(async () => {
     const entries = await Promise.all(
       allModes.map(async (m) => [m, await loadAbility(language, m)] as const),

@@ -1,5 +1,26 @@
+// Two paths for every LLM operation:
+//   - BYOK: frontend builds the prompt (from src/utils/prompts.ts) and hits OpenAI directly.
+//   - Standard: frontend sends a small parameterised body to the backend, which picks the
+//     model and prompt server-side, and uses its own past-generation history to compute
+//     avoidance. The standard prompt may drift from the BYOK prompt over time.
+
 import { z } from "zod";
 import { loadSettings } from "./settings";
+import { getUserId } from "./user";
+import { getPastSummariesByComplexity } from "./history";
+import { pickClosest } from "./proximity";
+import {
+  buildReadingExercisePrompt,
+  buildWritingExercisePrompt,
+  buildPronunciationExercisePrompt,
+  buildWritingGraderPrompt,
+  buildVocabParagraphGraderPrompt,
+  buildContextsPrompt,
+  buildGrammarCardsPrompt,
+  GRAMMAR_CARDS_SYSTEM_MESSAGE,
+  type ReadingLength,
+} from "./prompts";
+import type { NarratorGender } from "../types";
 
 const ChatResponseSchema = z.object({
   choices: z.array(z.object({ message: z.object({ content: z.string() }) })),
@@ -23,18 +44,10 @@ export interface ChatMessage {
   content: string;
 }
 
-export interface ChatMetadata {
-  mode: string;
-  language: string;
-  difficulty: number;
-  userId: string;
-}
-
-export interface ChatBody {
+interface OpenAIChatBody {
   model: string;
   messages: ChatMessage[];
   response_format?: { type: string };
-  metadata?: ChatMetadata;
 }
 
 export type ChatResponse = z.infer<typeof ChatResponseSchema>;
@@ -46,72 +59,208 @@ export interface TTSBody {
   instructions?: string;
 }
 
-export async function callChat(body: ChatBody): Promise<ChatResponse> {
+const BYOK_MODEL = "o4-mini";
+
+async function isBYOK(): Promise<boolean> {
+  return (await loadSettings()).textGen !== null;
+}
+
+async function postBYOK(body: OpenAIChatBody): Promise<ChatResponse> {
   const { textGen } = await loadSettings();
-
-  let url: string;
-  let outgoingBody: object;
-  const headers: Record<string, string> = { "Content-Type": "application/json" };
-
-  if (textGen) {
-    url = "https://api.openai.com/v1/chat/completions";
-    headers["Authorization"] = `Bearer ${textGen.key}`;
-    // OpenAI rejects unknown fields — strip metadata for direct calls
-    const { metadata: _metadata, ...rest } = body;
-    outgoingBody = rest;
-  } else {
-    url = `${await resolvedBackendUrl()}/api/generate`;
-    outgoingBody = body;
-  }
-
-  const res = await fetch(url, { method: "POST", headers, body: JSON.stringify(outgoingBody) });
+  if (!textGen) throw new Error("BYOK called with no key");
+  const res = await fetch("https://api.openai.com/v1/chat/completions", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${textGen.key}` },
+    body: JSON.stringify(body),
+  });
   if (!res.ok) throw new Error(`API error: ${res.status}`);
   return ChatResponseSchema.parse(await res.json());
 }
 
-export async function callContexts(body: ChatBody): Promise<ChatResponse> {
-  const { textGen } = await loadSettings();
-
-  let url: string;
-  let outgoingBody: object;
-  const headers: Record<string, string> = { "Content-Type": "application/json" };
-
-  if (textGen) {
-    url = "https://api.openai.com/v1/chat/completions";
-    headers["Authorization"] = `Bearer ${textGen.key}`;
-    const { metadata: _metadata, ...rest } = body;
-    outgoingBody = rest;
-  } else {
-    url = `${await resolvedBackendUrl()}/api/contexts`;
-    outgoingBody = body;
-  }
-
-  const res = await fetch(url, { method: "POST", headers, body: JSON.stringify(outgoingBody) });
+async function postBackend(path: string, body: object): Promise<ChatResponse> {
+  const res = await fetch(`${await resolvedBackendUrl()}${path}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
   if (!res.ok) throw new Error(`API error: ${res.status}`);
   return ChatResponseSchema.parse(await res.json());
 }
 
-export async function callGrammar(body: ChatBody): Promise<ChatResponse> {
-  const { textGen } = await loadSettings();
+// ---------- Reading / listening ----------
 
-  let url: string;
-  let outgoingBody: object;
-  const headers: Record<string, string> = { "Content-Type": "application/json" };
-
-  if (textGen) {
-    url = "https://api.openai.com/v1/chat/completions";
-    headers["Authorization"] = `Bearer ${textGen.key}`;
-    const { metadata: _metadata, ...rest } = body;
-    outgoingBody = rest;
-  } else {
-    url = `${await resolvedBackendUrl()}/api/grammar`;
-    outgoingBody = body;
+export async function callReadingExercise(params: {
+  language: string;
+  languageComplexity: number;
+  length: ReadingLength;
+  mode: "reading" | "listening";
+  narratorGender: NarratorGender;
+}): Promise<ChatResponse> {
+  if (await isBYOK()) {
+    const pastSummaries = await getPastSummariesByComplexity(
+      params.mode,
+      params.language,
+      params.languageComplexity,
+      100,
+    );
+    return postBYOK({
+      model: BYOK_MODEL,
+      messages: [
+        { role: "user", content: buildReadingExercisePrompt({ ...params, pastSummaries }) },
+      ],
+      response_format: { type: "json_object" },
+    });
   }
-
-  const res = await fetch(url, { method: "POST", headers, body: JSON.stringify(outgoingBody) });
-  if (!res.ok) throw new Error(`API error: ${res.status}`);
-  return ChatResponseSchema.parse(await res.json());
+  return postBackend("/api/exercise/reading", { ...params, userId: await getUserId() });
 }
+
+// ---------- Writing exercise ----------
+
+export async function callWritingExercise(params: {
+  language: string;
+  languageComplexity: number;
+  mode: "short-answer" | "dictogloss";
+}): Promise<ChatResponse> {
+  if (await isBYOK()) {
+    const pastSummaries = await getPastSummariesByComplexity(
+      "writing",
+      params.language,
+      params.languageComplexity,
+      100,
+    );
+    return postBYOK({
+      model: BYOK_MODEL,
+      messages: [
+        { role: "user", content: buildWritingExercisePrompt({ ...params, pastSummaries }) },
+      ],
+      response_format: { type: "json_object" },
+    });
+  }
+  return postBackend("/api/exercise/writing", { ...params, userId: await getUserId() });
+}
+
+// ---------- Pronunciation ----------
+
+export async function callPronunciationExercise(params: {
+  language: string;
+  languageComplexity: number;
+}): Promise<ChatResponse> {
+  if (await isBYOK()) {
+    const pastTitles = await getPastSummariesByComplexity(
+      "pronunciation",
+      params.language,
+      params.languageComplexity,
+      500,
+    );
+    return postBYOK({
+      model: BYOK_MODEL,
+      messages: [
+        { role: "user", content: buildPronunciationExercisePrompt({ ...params, pastTitles }) },
+      ],
+      response_format: { type: "json_object" },
+    });
+  }
+  return postBackend("/api/exercise/pronunciation", { ...params, userId: await getUserId() });
+}
+
+// ---------- Writing grader ----------
+
+export async function callWritingGrader(params: {
+  language: string;
+  languageComplexity: number;
+  passage: string;
+  questions: {
+    type: "short" | "essay";
+    question: string;
+    answer: string;
+    minWords?: number;
+    maxWords?: number;
+  }[];
+}): Promise<ChatResponse> {
+  if (await isBYOK()) {
+    return postBYOK({
+      model: BYOK_MODEL,
+      messages: [{ role: "user", content: buildWritingGraderPrompt(params) }],
+      response_format: { type: "json_object" },
+    });
+  }
+  return postBackend("/api/grade/writing", params);
+}
+
+// ---------- Vocab-paragraph grader ----------
+
+export async function callVocabParagraphGrader(params: {
+  language: string;
+  languageComplexity: number;
+  requiredWords: { source: string; translation: string }[];
+  paragraph: string;
+  nativeLanguage: string;
+}): Promise<ChatResponse> {
+  if (await isBYOK()) {
+    return postBYOK({
+      model: BYOK_MODEL,
+      messages: [{ role: "user", content: buildVocabParagraphGraderPrompt(params) }],
+      response_format: { type: "json_object" },
+    });
+  }
+  return postBackend("/api/grade/vocab-paragraph", params);
+}
+
+// ---------- Flashcard contexts ----------
+
+export async function callContextsGenerate(params: {
+  language: string;
+  word: string;
+  translation: string;
+  includeTranslation: boolean;
+  count: number;
+  nativeLanguage: string;
+}): Promise<ChatResponse> {
+  if (await isBYOK()) {
+    return postBYOK({
+      model: BYOK_MODEL,
+      messages: [{ role: "user", content: buildContextsPrompt(params) }],
+      response_format: { type: "json_object" },
+    });
+  }
+  return postBackend("/api/contexts", params);
+}
+
+// ---------- Grammar quiz cards ----------
+
+export async function callGrammarCardsGenerate(params: {
+  language: string;
+  level: number;
+  count: number;
+  // Used for BYOK avoidance only. Backend computes its own avoidance from its DB.
+  existingCards: { title: string; level: number }[];
+}): Promise<ChatResponse> {
+  if (await isBYOK()) {
+    const pastTitles = pickClosest(params.existingCards, (c) => c.level, params.level, 500).map(
+      (c) => c.title,
+    );
+    return postBYOK({
+      model: BYOK_MODEL,
+      messages: [
+        { role: "system", content: GRAMMAR_CARDS_SYSTEM_MESSAGE },
+        {
+          role: "user",
+          content: buildGrammarCardsPrompt({
+            language: params.language,
+            level: params.level,
+            count: params.count,
+            pastTitles,
+          }),
+        },
+      ],
+      response_format: { type: "json_object" },
+    });
+  }
+  const { existingCards: _ignored, ...backendBody } = params;
+  return postBackend("/api/grammar", backendBody);
+}
+
+// ---------- TTS (unchanged shape — already operation-specific) ----------
 
 export async function callTTS(body: TTSBody): Promise<Blob> {
   const { tts } = await loadSettings();
@@ -126,7 +275,6 @@ export async function callTTS(body: TTSBody): Promise<Blob> {
     return res.blob();
   }
 
-  // Convex backend returns { url } pointing at a stored MP3 in Convex file storage.
   const res = await fetch(`${await resolvedBackendUrl()}/api/speak`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -139,9 +287,7 @@ export async function callTTS(body: TTSBody): Promise<Blob> {
   return audioRes.blob();
 }
 
-async function isBYOK(): Promise<boolean> {
-  return (await loadSettings()).textGen !== null;
-}
+// ---------- Auth + onboarding ----------
 
 export async function callAuthLogin(): Promise<{ token: string; userId: string }> {
   const res = await fetch(`${await resolvedBackendUrl()}/api/auth/login`, {
@@ -153,9 +299,6 @@ export async function callAuthLogin(): Promise<{ token: string; userId: string }
   return AuthLoginResponseSchema.parse(await res.json());
 }
 
-// Onboarding always uses the backend — the user hasn't set up BYOK or authenticated yet,
-// so we cannot route through callChat (which falls through to OpenAI directly when a key
-// is present in env or storage).
 export async function callOnboardingComplexityExamples(
   language: string,
 ): Promise<Record<string, unknown>> {
@@ -168,6 +311,8 @@ export async function callOnboardingComplexityExamples(
   const { examples } = OnboardingExamplesResponseSchema.parse(await res.json());
   return examples;
 }
+
+// ---------- History / feedback uploads (fire-and-forget) ----------
 
 async function postJsonFireAndForget(path: string, payload: object): Promise<void> {
   const url = `${await resolvedBackendUrl()}${path}`;

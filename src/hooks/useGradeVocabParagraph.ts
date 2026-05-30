@@ -1,6 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import { callChat } from "../utils/api";
-import { buildVocabParagraphGraderPrompt } from "../utils/prompts";
+import { callVocabParagraphGrader } from "../utils/api";
 import { loadNativeLanguage } from "../utils/nativeLanguageSettings";
 import { WritingGradesSchema, type WritingGrade, type WritingGrades } from "./useGradeWriting";
 
@@ -13,12 +12,7 @@ async function gradeVocabParagraph(args: {
   paragraph: string;
 }): Promise<WritingGrades> {
   const nativeLanguage = await loadNativeLanguage();
-  const prompt = buildVocabParagraphGraderPrompt({ ...args, nativeLanguage });
-  const data = await callChat({
-    model: "o4-mini",
-    messages: [{ role: "user", content: prompt }],
-    response_format: { type: "json_object" },
-  });
+  const data = await callVocabParagraphGrader({ ...args, nativeLanguage });
   return WritingGradesSchema.parse(JSON.parse(data.choices[0].message.content));
 }
 

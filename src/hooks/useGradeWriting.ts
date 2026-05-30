@@ -1,8 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { z } from "zod";
 import type { WritingExercise } from "./useGenerateWriting";
-import { callChat } from "../utils/api";
-import { buildWritingGraderPrompt } from "../utils/prompts";
+import { callWritingGrader } from "../utils/api";
 
 const WritingGradeSchema = z.object({
   score: z.number(),
@@ -22,7 +21,7 @@ async function gradeAnswers(
   language: string,
   languageComplexity: number,
 ): Promise<WritingGrades> {
-  const prompt = buildWritingGraderPrompt({
+  const data = await callWritingGrader({
     language,
     languageComplexity,
     passage: exercise.passage,
@@ -33,12 +32,6 @@ async function gradeAnswers(
       minWords: q.minWords,
       maxWords: q.maxWords,
     })),
-  });
-
-  const data = await callChat({
-    model: "o4-mini",
-    messages: [{ role: "user", content: prompt }],
-    response_format: { type: "json_object" },
   });
   return WritingGradesSchema.parse(JSON.parse(data.choices[0].message.content));
 }

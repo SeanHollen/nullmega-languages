@@ -1,9 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { z } from "zod";
-import { callChat } from "../utils/api";
-import { getUserId } from "../utils/user";
-import { getPastSummariesByComplexity } from "../utils/history";
-import { buildPronunciationExercisePrompt } from "../utils/prompts";
+import { callPronunciationExercise } from "../utils/api";
 import { translateBatch } from "./useTranslate";
 
 const PronunciationExerciseLlmResponseSchema = z.object({
@@ -31,29 +28,7 @@ async function fetchPronunciationExercise(
   language: string,
   languageComplexity: number,
 ): Promise<PronunciationExercise> {
-  const pastTitles = await getPastSummariesByComplexity(
-    "pronunciation",
-    language,
-    languageComplexity,
-    500,
-  );
-  const prompt = buildPronunciationExercisePrompt({
-    language,
-    languageComplexity,
-    pastTitles,
-  });
-
-  const data = await callChat({
-    model: "o4-mini",
-    messages: [{ role: "user", content: prompt }],
-    response_format: { type: "json_object" },
-    metadata: {
-      mode: "pronunciation",
-      language,
-      difficulty: languageComplexity,
-      userId: await getUserId(),
-    },
-  });
+  const data = await callPronunciationExercise({ language, languageComplexity });
   const parsed = PronunciationExerciseLlmResponseSchema.parse(
     JSON.parse(data.choices[0].message.content),
   );

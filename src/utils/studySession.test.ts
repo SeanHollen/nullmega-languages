@@ -40,7 +40,7 @@ function makeCard(id: string, relearningStartedAt: number | null): Flashcard {
 
 vi.mock("./api", () => ({
   callTTS: vi.fn(async () => new Blob(["audio"], { type: "audio/mpeg" })),
-  callContexts: vi.fn(async () => ({
+  callContextsGenerate: vi.fn(async () => ({
     choices: [
       {
         message: {

@@ -9,12 +9,12 @@ import {
 } from "./flashcards";
 import { DAY, INITIAL_INTERVAL } from "./studySession";
 import { generateContextsFor, addMissingAudioFor } from "./contextOrchestrator";
-import { callTTS, callContexts } from "./api";
+import { callTTS, callContextsGenerate } from "./api";
 import type { VocabSettings } from "./vocabSettings";
 
 vi.mock("./api", () => ({
   callTTS: vi.fn(async () => new Blob(["audio"], { type: "audio/mpeg" })),
-  callContexts: vi.fn(async () => ({
+  callContextsGenerate: vi.fn(async () => ({
     choices: [
       {
         message: {
@@ -152,7 +152,7 @@ describe("generateContextsFor", () => {
 
   it("strips ** markers from text before sending to TTS", async () => {
     vi.mocked(callTTS).mockClear();
-    vi.mocked(callContexts).mockResolvedValueOnce({
+    vi.mocked(callContextsGenerate).mockResolvedValueOnce({
       choices: [
         {
           message: {

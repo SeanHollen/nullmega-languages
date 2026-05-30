@@ -1,9 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { ExerciseLlmResponseSchema, type Exercise, type NarratorGender } from "../types";
-import { callChat } from "../utils/api";
-import { getUserId } from "../utils/user";
-import { getPastSummariesByComplexity } from "../utils/history";
-import { buildReadingExercisePrompt, type ReadingLength } from "../utils/prompts";
+import { callReadingExercise } from "../utils/api";
+import type { ReadingLength } from "../utils/prompts";
 import { shuffleQuestionOptions } from "../utils/seededRandom";
 import { translateBatch, translateOne } from "./useTranslate";
 
@@ -14,20 +12,12 @@ async function fetchExercise(
   mode: "reading" | "listening",
 ): Promise<Exercise> {
   const narratorGender: NarratorGender = Math.random() < 0.5 ? `male` : `female`;
-  const pastSummaries = await getPastSummariesByComplexity(mode, language, languageComplexity, 100);
-  const prompt = buildReadingExercisePrompt({
+  const data = await callReadingExercise({
     language,
     languageComplexity,
     length,
-    pastSummaries,
+    mode,
     narratorGender,
-  });
-
-  const data = await callChat({
-    model: "o4-mini",
-    messages: [{ role: "user", content: prompt }],
-    response_format: { type: "json_object" },
-    metadata: { mode, language, difficulty: languageComplexity, userId: await getUserId() },
   });
   const parsed = ExerciseLlmResponseSchema.parse(JSON.parse(data.choices[0].message.content));
   const [translation, wordTranslations] = await Promise.all([

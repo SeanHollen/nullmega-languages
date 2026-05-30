@@ -1,7 +1,5 @@
 import { z } from "zod";
-import { callGrammar } from "./api";
-import { pickClosest } from "./proximity";
-import { buildGrammarCardsPrompt, GRAMMAR_CARDS_SYSTEM_MESSAGE } from "./prompts";
+import { callGrammarCardsGenerate } from "./api";
 
 const RawGrammarCardSchema = z.object({
   title: z.string(),
@@ -30,20 +28,8 @@ export async function generateGrammarCards(params: {
   count: number;
   existingCards: { title: string; level: number }[];
 }): Promise<RawGrammarCard[]> {
-  const { language, level, count, existingCards } = params;
-  const pastTitles = pickClosest(existingCards, (c) => c.level, level, 500).map((c) => c.title);
-  const prompt = buildGrammarCardsPrompt({ language, level, count, pastTitles });
-
-  const data = await callGrammar({
-    model: `o4-mini`,
-    messages: [
-      { role: `system`, content: GRAMMAR_CARDS_SYSTEM_MESSAGE },
-      { role: `user`, content: prompt },
-    ],
-    response_format: { type: `json_object` },
-  });
-
+  const data = await callGrammarCardsGenerate(params);
   const content = data.choices[0]?.message?.content ?? ``;
   const parsed = GrammarCardsResponseSchema.parse(JSON.parse(content));
-  return (parsed.cards ?? []).slice(0, count);
+  return (parsed.cards ?? []).slice(0, params.count);
 }

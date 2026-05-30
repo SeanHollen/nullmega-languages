@@ -1,9 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { z } from "zod";
-import { callChat } from "../utils/api";
-import { getUserId } from "../utils/user";
-import { getPastSummariesByComplexity } from "../utils/history";
-import { buildWritingExercisePrompt, essayWordCounts } from "../utils/prompts";
+import { callWritingExercise } from "../utils/api";
+import { essayWordCounts } from "../utils/prompts";
 import { translateBatch, translateOne } from "./useTranslate";
 
 const WritingQuestionSchema = z.object({
@@ -48,30 +46,7 @@ async function fetchWritingExercise(
   mode: "short-answer" | "dictogloss",
 ): Promise<WritingExercise> {
   const { min, max } = essayWordCounts(languageComplexity);
-  const pastSummaries = await getPastSummariesByComplexity(
-    "writing",
-    language,
-    languageComplexity,
-    100,
-  );
-  const prompt = buildWritingExercisePrompt({
-    language,
-    languageComplexity,
-    mode,
-    pastSummaries,
-  });
-
-  const data = await callChat({
-    model: "o4-mini",
-    messages: [{ role: "user", content: prompt }],
-    response_format: { type: "json_object" },
-    metadata: {
-      mode: "writing",
-      language,
-      difficulty: languageComplexity,
-      userId: await getUserId(),
-    },
-  });
+  const data = await callWritingExercise({ language, languageComplexity, mode });
   const parsed = WritingExerciseLlmResponseSchema.parse(
     JSON.parse(data.choices[0].message.content),
   );

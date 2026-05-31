@@ -27,7 +27,7 @@ export function BackendChoice({ selected, onSelect }: Props) {
         </div>
         <p className="text-sm text-gray-500">
           {t(`Use `)}
-          <em>{t(`The Language Lab`)}</em>
+          <em>{t(`Nullmega Languages`)}</em>
           {t(` services, standard backend, faster loading times.`)}
         </p>
       </Button>

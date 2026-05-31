@@ -102,6 +102,10 @@ export function StudyPage() {
       });
       return;
     }
+    // Sync-set the index to the cursor the card already carries so the new card never
+    // renders with the previous card's stale index. The async pickNextContext below
+    // will land on the same value (and advance the persisted cursor).
+    setContextIndex((card.contextCursor ?? 0) % card.contexts.length);
     let cancelled = false;
     cancelAudio.current = () => {
       cancelled = true;

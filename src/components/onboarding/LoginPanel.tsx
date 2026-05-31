@@ -33,7 +33,7 @@ export function LoginPanel({ onSuccess }: Props) {
     <div className="space-y-4 text-center">
       <p className="text-sm text-gray-500">
         {t(`Sign in to sync your progress and use the `)}
-        <em>{t(`The Language Lab`)}</em>
+        <em>{t(`Nullmega Languages`)}</em>
         {t(` backend.`)}
       </p>
       <Button
@@ -46,7 +46,7 @@ export function LoginPanel({ onSuccess }: Props) {
         ) : (
           <>
             {t(`Login with `)}
-            <em>{t(`The Language Lab`)}</em>
+            <em>{t(`Nullmega Languages`)}</em>
           </>
         )}
       </Button>

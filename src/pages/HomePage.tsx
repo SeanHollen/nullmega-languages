@@ -174,7 +174,7 @@ export function HomePage() {
     <div className="min-h-screen bg-green-100 flex flex-col items-center px-4 pt-12">
       <div className="w-full max-w-lg">
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">{t(`The Language Lab`)}</h1>
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">{t(`Nullmega Languages`)}</h1>
           <p className="text-gray-500">{t(`Any language, any level`)}</p>
           <div className="flex items-center justify-center flex-wrap gap-x-4 gap-y-1 mt-3">
             {currentStreak > 0 && (

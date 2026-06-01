@@ -87,14 +87,14 @@ export function computeAnswerPatch(
   if (graduate) {
     return {
       graduate: true,
-      patch: { ...patch, contexts: [], dateContextGenerated: null },
+      patch: { ...patch, contextsRefreshedAt: null },
     };
   }
   return { patch, graduate };
 }
 
 // Pure computation: returns the patch for removing a single context from a card.
-// When the removed context is the last one, also clears dateContextGenerated so the
+// When the removed context is the last one, also clears contextsRefreshedAt so the
 // card will regenerate fresh contexts the next time it is studied.
 export function computeRemoveContextPatch(
   card: Flashcard,
@@ -104,7 +104,7 @@ export function computeRemoveContextPatch(
   const newContexts = card.contexts.filter((_, i) => i !== contextIndex);
   if (newContexts.length === 0) {
     return {
-      patch: { contexts: [], dateContextGenerated: null },
+      patch: { contexts: [], contextsRefreshedAt: null },
       removedAudioKey: removed?.audioKey ?? null,
     };
   }
@@ -165,7 +165,7 @@ export async function prepareLearnSession(
   const picked = pickInitial(all, "learn", settings.order, availableNew);
   if (picked.length === 0) return null;
 
-  const needContexts = picked.filter((c) => c.contexts.length === 0);
+  const needContexts = picked.filter((c) => c.contextsRefreshedAt === null);
   await Promise.all(needContexts.map((c) => generateContextsFor(c, settings)));
 
   const cards = await reloadCards(language, picked);
@@ -195,7 +195,7 @@ export async function prepareReviewSession(
   const picked = pickInitial(all, "review", settings.order, 0);
   if (picked.length === 0) return null;
 
-  const needContexts = picked.filter((c) => c.contexts.length === 0);
+  const needContexts = picked.filter((c) => c.contextsRefreshedAt === null);
   await Promise.all(needContexts.map((c) => generateContextsFor(c, settings)));
 
   const cards = await reloadCards(language, picked);

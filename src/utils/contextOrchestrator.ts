@@ -41,7 +41,7 @@ export async function addMissingAudioFor(card: Flashcard, settings: VocabSetting
   if (!settings.generateAudio) return;
   if (!card.contexts.some((ctx) => !ctx.audioKey)) return;
   const updated = await populateAudio(card.id, card.contexts, pickVoice(), card.language);
-  await updateFlashcardContexts(card.id, updated, card.dateContextGenerated);
+  await updateFlashcardContexts(card.id, updated, card.contextsRefreshedAt);
 }
 
 export async function generateContextsFor(card: Flashcard, settings: VocabSettings): Promise<void> {

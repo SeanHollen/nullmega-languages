@@ -8,12 +8,13 @@ import {
 } from "./studySession";
 import type { VocabSettings } from "./vocabSettings";
 import { getLearnedTodayCount } from "./vocabSettings";
-import { callTTS } from "./api";
+import { callTTS, callContextsGenerate } from "./api";
 import type { Flashcard } from "./flashcards";
 import {
   addFlashcard,
   loadFlashcards,
   patchFlashcard,
+  pickNextContext,
   updateFlashcardContexts,
 } from "./flashcards";
 import { DAY, INITIAL_INTERVAL } from "./studySession";
@@ -31,7 +32,7 @@ function makeCard(id: string, relearningStartedAt: number | null): Flashcard {
     tags: [],
     status: "learning",
     contexts: [],
-    dateContextGenerated: null,
+    contextsRefreshedAt: null,
     learningCorrectCount: null,
     relearningStartedAt,
     reviewHistory: [],
@@ -144,26 +145,17 @@ describe("computeAnswerPatch", () => {
     return {
       ...makeCard("c1", null),
       contexts: [{ source: "src", translation: "tr", audioKey: null }],
-      dateContextGenerated: 100,
+      contextsRefreshedAt: 100,
       ...overrides,
     };
   }
-
-  it("clears contexts when a learn-mode card graduates (count reaches threshold)", () => {
-    const card = cardWithContexts({ status: "learning", learningCorrectCount: 1 });
-    const { patch, graduate } = computeAnswerPatch(card, "learn", true, 1000, true);
-    expect(graduate).toBe(true);
-    expect(patch.status).toBe("scheduled");
-    expect(patch.contexts).toEqual([]);
-    expect(patch.dateContextGenerated).toBeNull();
-  });
 
   it("keeps contexts when a learn-mode card does not yet graduate", () => {
     const card = cardWithContexts({ status: "learning", learningCorrectCount: 0 });
     const { patch, graduate } = computeAnswerPatch(card, "learn", true, 1000, true);
     expect(graduate).toBe(false);
     expect(`contexts` in patch).toBe(false);
-    expect(`dateContextGenerated` in patch).toBe(false);
+    expect(`contextsRefreshedAt` in patch).toBe(false);
   });
 
   it("flips learningCorrectCount from null to 1 on a learn-mode right answer (first time shown)", () => {
@@ -177,13 +169,6 @@ describe("computeAnswerPatch", () => {
     const card = cardWithContexts({ status: "learning", learningCorrectCount: null });
     const { patch } = computeAnswerPatch(card, "learn", false, 1000, true);
     expect(patch.learningCorrectCount).toBe(0);
-  });
-
-  it("clears contexts when a review-mode card is answered right", () => {
-    const card = cardWithContexts({ status: "scheduled", currentInterval: DAY });
-    const { patch } = computeAnswerPatch(card, "review", true, 1000, true);
-    expect(patch.contexts).toEqual([]);
-    expect(patch.dateContextGenerated).toBeNull();
   });
 
   it("does not clear contexts when a review-mode card is answered wrong (relearning)", () => {
@@ -238,6 +223,20 @@ describe("computeAnswerPatch", () => {
     expect(patch.relearningStartedAt).toBeNull();
   });
 
+  it("sets lastReviewed=now on a right-in-review answer so the card derives back to scheduled", () => {
+    // This is the active half of the due → scheduled transition: pushing lastReviewed
+    // forward so that lastReviewed + currentInterval > now, which flips computeSrsStatus
+    // from "due" back to "scheduled". The interval half is covered by the test above.
+    const card = cardWithContexts({
+      status: "scheduled",
+      currentInterval: 3 * DAY,
+      relearningStartedAt: null,
+      lastReviewed: 500,
+    });
+    const { patch } = computeAnswerPatch(card, "review", true, 1000, true);
+    expect(patch.lastReviewed).toBe(1000);
+  });
+
   it("appends a 'correct' entry to reviewHistory when a review is answered right", () => {
     const card = cardWithContexts({ status: "scheduled", currentInterval: 3 * DAY });
     const { patch } = computeAnswerPatch(card, "review", true, 1000, true);
@@ -286,7 +285,7 @@ describe("computeRemoveContextPatch", () => {
         translation: "tr",
         audioKey: c.audioKey,
       })),
-      dateContextGenerated: 100,
+      contextsRefreshedAt: 100,
     };
   }
 
@@ -301,14 +300,14 @@ describe("computeRemoveContextPatch", () => {
       { source: "a", translation: "tr", audioKey: null },
       { source: "c", translation: "tr", audioKey: null },
     ]);
-    expect(`dateContextGenerated` in patch).toBe(false);
+    expect(`contextsRefreshedAt` in patch).toBe(false);
   });
 
-  it("clears dateContextGenerated when the removed context was the last one", () => {
+  it("clears contextsRefreshedAt when the removed context was the last one", () => {
     const card = cardWith([{ source: "only", audioKey: null }]);
     const { patch } = computeRemoveContextPatch(card, 0);
     expect(patch.contexts).toEqual([]);
-    expect(patch.dateContextGenerated).toBeNull();
+    expect(patch.contextsRefreshedAt).toBeNull();
   });
 
   it("surfaces the removed context's audioKey so the caller can clean up the blob", () => {
@@ -431,5 +430,86 @@ describe("learnedToday counter stays in sync with per-card promotions", () => {
 
     const counter = await getLearnedTodayCount();
     expect(counter).toBe(2);
+  });
+});
+
+describe("graduation preserves contexts so unseen ones can be reused", () => {
+  // Bug 1: the old code wiped `contexts: []` on graduation. That defeated the whole
+  // seen/unseen savings — by the time regen ran, there was nothing left to keep.
+  it("a card with unseen contexts retains all of them after graduation", async () => {
+    vi.mocked(callContextsGenerate).mockReset();
+    vi.mocked(callContextsGenerate).mockResolvedValueOnce({
+      choices: [
+        {
+          message: {
+            content: JSON.stringify({
+              contexts: [
+                { source: `ctx-a`, translation: `A` },
+                { source: `ctx-b`, translation: `B` },
+                { source: `ctx-c`, translation: `C` },
+              ],
+            }),
+          },
+        },
+      ],
+    });
+
+    const card = (await addFlashcard(`Spanish`, `lluvia`, `rain`))!;
+    await generateContextsFor(card, settings);
+
+    let stored = (await loadFlashcards(`Spanish`)).find((c) => c.id === card.id)!;
+    await pickNextContext(stored); // user sees 1 context
+    stored = (await loadFlashcards(`Spanish`)).find((c) => c.id === card.id)!;
+
+    // Two correct answers in learn mode graduate the card.
+    let result = computeAnswerPatch(stored, `learn`, true, Date.now(), true);
+    await patchFlashcard(stored.id, result.patch);
+    stored = (await loadFlashcards(`Spanish`)).find((c) => c.id === card.id)!;
+    result = computeAnswerPatch(stored, `learn`, true, Date.now(), true);
+    expect(result.graduate).toBe(true);
+    await patchFlashcard(stored.id, result.patch);
+
+    const finalCard = (await loadFlashcards(`Spanish`)).find((c) => c.id === card.id)!;
+    expect(finalCard.contexts.length).toBe(3);
+    expect(finalCard.contexts.filter((c) => c.seen).length).toBe(1);
+    expect(finalCard.contextsRefreshedAt).toBeNull(); // still flagged for top-up
+  });
+});
+
+describe("session-prep triggers regeneration via the contextsRefreshedAt flag", () => {
+  // Bug 2: once we stopped wiping contexts on graduation (bug 1 fix), the old filter
+  // `contexts.length === 0` no longer picked up the card — graduated cards now hold
+  // unseen contexts, so the array isn't empty. The filter must key on the regen flag.
+  it("prepares regeneration for a card whose contextsRefreshedAt is null even when contexts are non-empty", async () => {
+    vi.mocked(callContextsGenerate).mockReset();
+    vi.mocked(callContextsGenerate).mockResolvedValueOnce({
+      choices: [
+        {
+          message: {
+            content: JSON.stringify({
+              contexts: [{ source: `ctx-fresh`, translation: `Fresh` }],
+            }),
+          },
+        },
+      ],
+    });
+
+    const card = (await addFlashcard(`Spanish`, `nube`, `cloud`))!;
+    await updateFlashcardContexts(
+      card.id,
+      [
+        { source: `kept-a`, translation: `KA`, audioKey: null },
+        { source: `kept-b`, translation: `KB`, audioKey: null },
+      ],
+      null, // contextsRefreshedAt null = needs regen, even though contexts exist
+    );
+    await makeCardDue(card.id);
+
+    await prepareReviewSession(`Spanish`, { ...settings, generateAudio: false });
+
+    expect(vi.mocked(callContextsGenerate).mock.calls.length).toBe(1);
+    const finalCard = (await loadFlashcards(`Spanish`)).find((c) => c.id === card.id)!;
+    expect(finalCard.contexts.length).toBe(3);
+    expect(finalCard.contextsRefreshedAt).not.toBeNull();
   });
 });

@@ -24,7 +24,7 @@ export interface Flashcard extends SrsCard {
   source: string;
   translation: string;
   contexts: FlashcardContext[];
-  dateContextGenerated: number | null;
+  contextsRefreshedAt: number | null;
   contextCursor?: number;
 }
 
@@ -60,7 +60,7 @@ export async function addFlashcard(
     tags,
     status: `new`,
     contexts: [],
-    dateContextGenerated: null,
+    contextsRefreshedAt: null,
     learningCorrectCount: null,
     relearningStartedAt: null,
     reviewHistory: [],
@@ -91,11 +91,11 @@ export async function updateFlashcardTags(id: string, tags: string[]): Promise<b
 export async function updateFlashcardContexts(
   id: string,
   contexts: FlashcardContext[],
-  dateContextGenerated: number | null,
+  contextsRefreshedAt: number | null,
 ): Promise<boolean> {
   const card = await loadCard(id);
   if (!card) return false;
-  await db().flashcards.put({ ...card, contexts, dateContextGenerated });
+  await db().flashcards.put({ ...card, contexts, contextsRefreshedAt });
   return true;
 }
 

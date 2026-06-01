@@ -32,6 +32,14 @@ The active backend is **Convex** at `../language-learning-backend-convex/`. The 
 
 `useEffect` is forbidden unless there is absolutely no other option. If something happens because a user clicked something, it must be triggered by that click handler — not by a reactive effect watching state. Before reaching for `useEffect`, ask: what user action caused this? Put the logic there instead.
 
+## Don't ask permission for in-scope local changes
+
+When the next step is an obvious continuation of what the user just discussed — adding a test we just identified as missing, fixing a bug we just diagnosed, applying a refactor we just agreed on — just do it. Don't end a turn with "Want me to…?" or "Should I proceed?". The user can `git restore` anything they don't like; asking wastes their time. This applies to local edits to source/tests/config in this repo. It does NOT override the standing rules against destructive git ops, force-pushes, sending messages, etc. — those still need explicit approval.
+
+## Delete invalidated tests — don't rename them
+
+When a behavior the test was guarding goes away (e.g. "contexts get wiped on graduation" → "contexts are preserved on graduation"), DELETE the test. Don't rename it and flip the assertion. A renamed/flipped test masquerades as coverage but is really just a tautology written against the new code, identical in value to writing it from scratch alongside the change. If the new behavior still needs coverage, that belongs in the new feature's own test (integration-level — see [[feedback_integration_tests_for_regression]]), not as an inverted re-skin of the old one.
+
 ## Tests must be written BEFORE the change they're for
 
 This rule applies to any task that calls for tests — bug fixes, refactors, behavior changes the user asks to be tested.

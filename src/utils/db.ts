@@ -314,6 +314,36 @@ class LanguageLabDB extends Dexie {
       assessments: `&id, [mode+language], completedAt, createdAt`,
       apiUsage: `&id, timestamp, category`,
     });
+    // v18: flashcards.dateContextGenerated → contextsRefreshedAt (pure rename; same
+    // null-vs-timestamp semantics).
+    this.version(18)
+      .stores({
+        audio: ``,
+        streaks: `&date`,
+        streaksLang: `&[language+date], date, language`,
+        goals: `&language`,
+        kv: `&key`,
+        abilities: `&id, [language+mode]`,
+        customLanguages: `&name`,
+        flashcards: `&id, language, [language+source]`,
+        grammarCards: `&id, language, [language+title]`,
+        assessments: `&id, [mode+language], completedAt, createdAt`,
+        apiUsage: `&id, timestamp, category`,
+      })
+      .upgrade(async (tx) => {
+        const cards = (await tx.table(`flashcards`).toArray()) as (Record<string, unknown> & {
+          id: string;
+          dateContextGenerated?: number | null;
+        })[];
+        for (const c of cards) {
+          if (`dateContextGenerated` in c) {
+            const { dateContextGenerated, ...rest } = c;
+            await tx
+              .table(`flashcards`)
+              .put({ ...rest, contextsRefreshedAt: dateContextGenerated ?? null });
+          }
+        }
+      });
   }
 }
 

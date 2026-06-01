@@ -17,7 +17,7 @@ function makeCard(id: string, dueInDays: number, status: Flashcard["status"]): F
     tags: [],
     status,
     contexts: [],
-    dateContextGenerated: null,
+    contextsRefreshedAt: null,
     learningCorrectCount: null,
     relearningStartedAt: null,
     reviewHistory: [],

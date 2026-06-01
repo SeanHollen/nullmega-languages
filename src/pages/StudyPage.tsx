@@ -204,8 +204,7 @@ export function StudyPage() {
         }),
         learningCorrectCount: 0,
         relearningStartedAt: null,
-        contexts: [],
-        dateContextGenerated: null,
+        contextsRefreshedAt: null,
       });
     } else {
       void patchFlashcard(current.id, {
@@ -216,8 +215,7 @@ export function StudyPage() {
           useEase: srsSettings?.useEaseFromHistory ?? true,
         }),
         relearningStartedAt: null,
-        contexts: [],
-        dateContextGenerated: null,
+        contextsRefreshedAt: null,
       });
     }
     setMenuOpen(false);
@@ -237,8 +235,7 @@ export function StudyPage() {
         }),
         learningCorrectCount: 0,
         relearningStartedAt: null,
-        contexts: [],
-        dateContextGenerated: null,
+        contextsRefreshedAt: null,
       });
     } else {
       void patchFlashcard(current.id, {
@@ -249,8 +246,7 @@ export function StudyPage() {
           useEase: srsSettings?.useEaseFromHistory ?? true,
         }),
         relearningStartedAt: null,
-        contexts: [],
-        dateContextGenerated: null,
+        contextsRefreshedAt: null,
       });
     }
     setMenuOpen(false);

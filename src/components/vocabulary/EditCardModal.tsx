@@ -180,8 +180,8 @@ function DetailsBlock({ card, t }: { card: Flashcard; t: ReturnType<typeof useTr
   let contextsValue: string;
   if (card.contexts.length === 0) {
     contextsValue = t(`none`);
-  } else if (card.dateContextGenerated) {
-    contextsValue = `${card.contexts.length} · ${relativeTime(card.dateContextGenerated)}`;
+  } else if (card.contextsRefreshedAt) {
+    contextsValue = `${card.contexts.length} · ${relativeTime(card.contextsRefreshedAt)}`;
   } else {
     contextsValue = `${card.contexts.length}`;
   }

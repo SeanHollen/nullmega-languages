@@ -131,7 +131,7 @@ describe("generateContextsFor", () => {
 
     const [updated] = await loadFlashcards("Spanish");
     expect(updated.contexts.length).toBeGreaterThan(0);
-    expect(updated.dateContextGenerated).not.toBeNull();
+    expect(updated.contextsRefreshedAt).not.toBeNull();
   });
 
   it("skips TTS and leaves audioKey null when generateAudio is false", async () => {
@@ -297,7 +297,7 @@ describe("pickNextContext", () => {
 });
 
 describe("updateFlashcardContexts", () => {
-  it("replaces contexts and updates dateContextGenerated", async () => {
+  it("replaces contexts and updates contextsRefreshedAt", async () => {
     const card = (await addFlashcard("Spanish", "hola", "hello"))!;
     const now = Date.now();
     await updateFlashcardContexts(
@@ -309,6 +309,6 @@ describe("updateFlashcardContexts", () => {
     const [updated] = await loadFlashcards("Spanish");
     expect(updated.contexts).toHaveLength(1);
     expect(updated.contexts[0].source).toBe("Hola mundo");
-    expect(updated.dateContextGenerated).toBe(now);
+    expect(updated.contextsRefreshedAt).toBe(now);
   });
 });

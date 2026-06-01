@@ -177,6 +177,57 @@ describe("generateContextsFor", () => {
     const [updated] = await loadFlashcards("Spanish");
     expect(updated.contexts[0].source).toBe("El gato **se esconde** aquí");
   });
+
+  it("keeps unseen contexts and only generates the shortfall on regeneration", async () => {
+    const card = (await addFlashcard("Spanish", "lluvia", "rain"))!;
+    await updateFlashcardContexts(
+      card.id,
+      [
+        { source: "ctx-seen", translation: "ctx-seen-en", audioKey: "audio-seen", seen: true },
+        { source: "ctx-unseen", translation: "ctx-unseen-en", audioKey: "audio-unseen" },
+      ],
+      Date.now(),
+    );
+    vi.mocked(callContextsGenerate).mockClear();
+    vi.mocked(callContextsGenerate).mockResolvedValueOnce({
+      choices: [
+        {
+          message: {
+            content: JSON.stringify({
+              contexts: [{ source: "ctx-new", translation: "ctx-new-en" }],
+            }),
+          },
+        },
+      ],
+    });
+    const [stored] = await loadFlashcards("Spanish");
+    await generateContextsFor(stored, { ...settings, contextsPerCard: 2, generateAudio: false });
+
+    expect(callContextsGenerate).toHaveBeenCalledTimes(1);
+    const [updated] = await loadFlashcards("Spanish");
+    expect(updated.contexts.map((c) => c.source)).toEqual(["ctx-unseen", "ctx-new"]);
+    expect(updated.contexts[0].audioKey).toBe("audio-unseen"); // kept context retains its audio
+    expect(updated.contextCursor).toBe(0);
+  });
+
+  it("skips generation entirely when all contexts are still unseen", async () => {
+    const card = (await addFlashcard("Spanish", "nube", "cloud"))!;
+    await updateFlashcardContexts(
+      card.id,
+      [
+        { source: "ctx-a", translation: "a", audioKey: null },
+        { source: "ctx-b", translation: "b", audioKey: null },
+      ],
+      Date.now(),
+    );
+    vi.mocked(callContextsGenerate).mockClear();
+    const [stored] = await loadFlashcards("Spanish");
+    await generateContextsFor(stored, { ...settings, contextsPerCard: 2, generateAudio: false });
+
+    expect(callContextsGenerate).not.toHaveBeenCalled();
+    const [updated] = await loadFlashcards("Spanish");
+    expect(updated.contexts.map((c) => c.source)).toEqual(["ctx-a", "ctx-b"]);
+  });
 });
 
 describe("addMissingAudioFor", () => {

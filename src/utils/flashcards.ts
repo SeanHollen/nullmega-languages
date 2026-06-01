@@ -17,6 +17,7 @@ export interface FlashcardContext {
   source: string;
   translation: string;
   audioKey: string | null;
+  seen?: boolean;
 }
 
 export interface Flashcard extends SrsCard {
@@ -157,9 +158,11 @@ export async function pickNextContext(card: Flashcard): Promise<number> {
   const len = card.contexts.length;
   if (len === 0) return 0;
   const fresh = await loadCard(card.id);
-  const cursor = fresh?.contextCursor ?? card.contextCursor ?? 0;
+  const source = fresh ?? card;
+  const cursor = source.contextCursor ?? 0;
   const idx = cursor % len;
-  await patchFlashcard(card.id, { contextCursor: (idx + 1) % len });
+  const contexts = source.contexts.map((ctx, i) => (i === idx ? { ...ctx, seen: true } : ctx));
+  await patchFlashcard(card.id, { contextCursor: (idx + 1) % len, contexts });
   return idx;
 }
 

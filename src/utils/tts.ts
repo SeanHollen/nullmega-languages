@@ -40,7 +40,7 @@ export async function tts(
       model: `gpt-4o-mini-tts`,
       voice,
       input,
-      instructions: `language: ${language}. Read at a normal conversational pace`,
+      instructions: `language: ${language}. Read at a normal conversational pace, not slow or didactic.`,
     });
   }
   const model = kind === `passage` ? `tts-1-hd` : `tts-1`;

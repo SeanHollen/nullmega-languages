@@ -4,10 +4,13 @@ import type { VocabSettings } from "./vocabSettings";
 import { recordLearnedToday } from "./vocabSettings";
 import { generateContexts } from "../hooks/useGenerateContexts";
 import { pickVoice, tts } from "./tts";
-import { saveAudio, deleteAudioByPrefix } from "./db";
+import { saveAudio, deleteAudio } from "./db";
 
-function audioKey(cardId: string, contextIndex: number): string {
-  return `flashcard-${cardId}-ctx-${contextIndex}`;
+// Unique audio-key suffix per context so newly-generated audio never collides with
+// the audio of a kept (unseen) context that happens to occupy the same array index.
+function audioKey(cardId: string): string {
+  const rand = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+  return `flashcard-${cardId}-ctx-${rand}`;
 }
 
 // Ensure each context has an audioKey. Contexts whose audioKey is already set are left
@@ -20,11 +23,11 @@ async function populateAudio(
   language: string,
 ): Promise<FlashcardContext[]> {
   return await Promise.all(
-    contexts.map(async (ctx, i) => {
+    contexts.map(async (ctx) => {
       if (ctx.audioKey) return ctx;
       try {
         const blob = await tts(ctx.source, voice, `phrase`, language);
-        const key = audioKey(cardId, i);
+        const key = audioKey(cardId);
         await saveAudio(key, blob);
         return { ...ctx, audioKey: key };
       } catch {
@@ -42,26 +45,43 @@ export async function addMissingAudioFor(card: Flashcard, settings: VocabSetting
 }
 
 export async function generateContextsFor(card: Flashcard, settings: VocabSettings): Promise<void> {
-  await deleteAudioByPrefix(`flashcard-${card.id}-ctx-`);
+  // Keep contexts the user has never been shown — regenerating them would burn LLM
+  // and TTS spend on material they would have seen anyway. Only the seen ones (which
+  // the user is already familiar with) get evicted to make room for fresh material.
+  const kept = card.contexts.filter((ctx) => !ctx.seen);
+  const dropped = card.contexts.filter((ctx) => ctx.seen);
 
-  const generated = await generateContexts({
-    word: card.source,
-    translation: card.translation,
-    includeTranslation: settings.includeTranslationInContexts,
-    language: card.language,
-    count: settings.contextsPerCard,
-  });
+  for (const ctx of dropped) {
+    if (ctx.audioKey) await deleteAudio(ctx.audioKey);
+  }
 
-  const fresh: FlashcardContext[] = generated.map((g) => ({
-    source: g.source,
-    translation: g.translation,
-    audioKey: null,
-  }));
-  const contexts = settings.generateAudio
-    ? await populateAudio(card.id, fresh, pickVoice(), card.language)
-    : fresh;
+  const need = Math.max(0, settings.contextsPerCard - kept.length);
 
-  await updateFlashcardContexts(card.id, contexts, Date.now());
+  let combined: FlashcardContext[];
+  if (need === 0) {
+    combined = kept;
+  } else {
+    const generated = await generateContexts({
+      word: card.source,
+      translation: card.translation,
+      includeTranslation: settings.includeTranslationInContexts,
+      language: card.language,
+      count: need,
+    });
+    const fresh: FlashcardContext[] = generated.map((g) => ({
+      source: g.source,
+      translation: g.translation,
+      audioKey: null,
+    }));
+    combined = [...kept, ...fresh];
+  }
+
+  const finalContexts = settings.generateAudio
+    ? await populateAudio(card.id, combined, pickVoice(), card.language)
+    : combined;
+
+  await updateFlashcardContexts(card.id, finalContexts, Date.now());
+  await patchFlashcard(card.id, { contextCursor: 0 });
   if (card.status === "new") await promoteToLearning(card.id);
 }
 

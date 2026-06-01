@@ -55,6 +55,13 @@ export function SettingsPage() {
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-6">
             <TextGenKeySection value={textGenKey} onChange={setTextGenKey} />
 
+            <Button
+              onClick={() => void navigate(`/settings/usage`)}
+              className="text-sm text-green-700 hover:text-green-800 cursor-pointer"
+            >
+              {t(`View usage & cost stats →`)}
+            </Button>
+
             <hr className="border-gray-100" />
 
             <section>

@@ -21,9 +21,16 @@ import {
   type ReadingLength,
 } from "./prompts";
 import type { NarratorGender } from "../types";
+import { recordUsage, type UsageCategory } from "./apiUsage";
 
 const ChatResponseSchema = z.object({
   choices: z.array(z.object({ message: z.object({ content: z.string() }) })),
+  usage: z
+    .object({
+      prompt_tokens: z.number().optional(),
+      completion_tokens: z.number().optional(),
+    })
+    .optional(),
 });
 
 const TTSUrlResponseSchema = z.object({ url: z.string() });
@@ -65,7 +72,7 @@ async function isBYOK(): Promise<boolean> {
   return (await loadSettings()).textGen !== null;
 }
 
-async function postBYOK(body: OpenAIChatBody): Promise<ChatResponse> {
+async function postBYOK(body: OpenAIChatBody, category: UsageCategory): Promise<ChatResponse> {
   const { textGen } = await loadSettings();
   if (!textGen) throw new Error("BYOK called with no key");
   const res = await fetch("https://api.openai.com/v1/chat/completions", {
@@ -74,7 +81,17 @@ async function postBYOK(body: OpenAIChatBody): Promise<ChatResponse> {
     body: JSON.stringify(body),
   });
   if (!res.ok) throw new Error(`API error: ${res.status}`);
-  return ChatResponseSchema.parse(await res.json());
+  const parsed = ChatResponseSchema.parse(await res.json());
+  const usage = parsed.usage;
+  if (usage) {
+    void recordUsage({
+      category,
+      model: body.model,
+      promptTokens: usage.prompt_tokens ?? 0,
+      completionTokens: usage.completion_tokens ?? 0,
+    });
+  }
+  return parsed;
 }
 
 async function postBackend(path: string, body: object): Promise<ChatResponse> {
@@ -103,13 +120,16 @@ export async function callReadingExercise(params: {
       params.languageComplexity,
       100,
     );
-    return postBYOK({
-      model: BYOK_MODEL,
-      messages: [
-        { role: "user", content: buildReadingExercisePrompt({ ...params, pastSummaries }) },
-      ],
-      response_format: { type: "json_object" },
-    });
+    return postBYOK(
+      {
+        model: BYOK_MODEL,
+        messages: [
+          { role: "user", content: buildReadingExercisePrompt({ ...params, pastSummaries }) },
+        ],
+        response_format: { type: "json_object" },
+      },
+      params.mode,
+    );
   }
   return postBackend("/api/exercise/reading", { ...params, userId: await getUserId() });
 }
@@ -128,13 +148,16 @@ export async function callWritingExercise(params: {
       params.languageComplexity,
       100,
     );
-    return postBYOK({
-      model: BYOK_MODEL,
-      messages: [
-        { role: "user", content: buildWritingExercisePrompt({ ...params, pastSummaries }) },
-      ],
-      response_format: { type: "json_object" },
-    });
+    return postBYOK(
+      {
+        model: BYOK_MODEL,
+        messages: [
+          { role: "user", content: buildWritingExercisePrompt({ ...params, pastSummaries }) },
+        ],
+        response_format: { type: "json_object" },
+      },
+      `writing`,
+    );
   }
   return postBackend("/api/exercise/writing", { ...params, userId: await getUserId() });
 }
@@ -152,13 +175,16 @@ export async function callPronunciationExercise(params: {
       params.languageComplexity,
       500,
     );
-    return postBYOK({
-      model: BYOK_MODEL,
-      messages: [
-        { role: "user", content: buildPronunciationExercisePrompt({ ...params, pastTitles }) },
-      ],
-      response_format: { type: "json_object" },
-    });
+    return postBYOK(
+      {
+        model: BYOK_MODEL,
+        messages: [
+          { role: "user", content: buildPronunciationExercisePrompt({ ...params, pastTitles }) },
+        ],
+        response_format: { type: "json_object" },
+      },
+      `pronunciation`,
+    );
   }
   return postBackend("/api/exercise/pronunciation", { ...params, userId: await getUserId() });
 }
@@ -178,11 +204,14 @@ export async function callWritingGrader(params: {
   }[];
 }): Promise<ChatResponse> {
   if (await isBYOK()) {
-    return postBYOK({
-      model: BYOK_MODEL,
-      messages: [{ role: "user", content: buildWritingGraderPrompt(params) }],
-      response_format: { type: "json_object" },
-    });
+    return postBYOK(
+      {
+        model: BYOK_MODEL,
+        messages: [{ role: "user", content: buildWritingGraderPrompt(params) }],
+        response_format: { type: "json_object" },
+      },
+      `writing`,
+    );
   }
   return postBackend("/api/grade/writing", params);
 }
@@ -197,11 +226,14 @@ export async function callVocabParagraphGrader(params: {
   nativeLanguage: string;
 }): Promise<ChatResponse> {
   if (await isBYOK()) {
-    return postBYOK({
-      model: BYOK_MODEL,
-      messages: [{ role: "user", content: buildVocabParagraphGraderPrompt(params) }],
-      response_format: { type: "json_object" },
-    });
+    return postBYOK(
+      {
+        model: BYOK_MODEL,
+        messages: [{ role: "user", content: buildVocabParagraphGraderPrompt(params) }],
+        response_format: { type: "json_object" },
+      },
+      `writing`,
+    );
   }
   return postBackend("/api/grade/vocab-paragraph", params);
 }
@@ -217,11 +249,14 @@ export async function callContextsGenerate(params: {
   nativeLanguage: string;
 }): Promise<ChatResponse> {
   if (await isBYOK()) {
-    return postBYOK({
-      model: BYOK_MODEL,
-      messages: [{ role: "user", content: buildContextsPrompt(params) }],
-      response_format: { type: "json_object" },
-    });
+    return postBYOK(
+      {
+        model: BYOK_MODEL,
+        messages: [{ role: "user", content: buildContextsPrompt(params) }],
+        response_format: { type: "json_object" },
+      },
+      `vocabulary`,
+    );
   }
   return postBackend("/api/contexts", params);
 }
@@ -239,22 +274,25 @@ export async function callGrammarCardsGenerate(params: {
     const pastTitles = pickClosest(params.existingCards, (c) => c.level, params.level, 500).map(
       (c) => c.title,
     );
-    return postBYOK({
-      model: BYOK_MODEL,
-      messages: [
-        { role: "system", content: GRAMMAR_CARDS_SYSTEM_MESSAGE },
-        {
-          role: "user",
-          content: buildGrammarCardsPrompt({
-            language: params.language,
-            level: params.level,
-            count: params.count,
-            pastTitles,
-          }),
-        },
-      ],
-      response_format: { type: "json_object" },
-    });
+    return postBYOK(
+      {
+        model: BYOK_MODEL,
+        messages: [
+          { role: "system", content: GRAMMAR_CARDS_SYSTEM_MESSAGE },
+          {
+            role: "user",
+            content: buildGrammarCardsPrompt({
+              language: params.language,
+              level: params.level,
+              count: params.count,
+              pastTitles,
+            }),
+          },
+        ],
+        response_format: { type: "json_object" },
+      },
+      `grammar`,
+    );
   }
   const { existingCards: _ignored, ...backendBody } = params;
   return postBackend("/api/grammar", backendBody);

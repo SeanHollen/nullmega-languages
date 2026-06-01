@@ -4,6 +4,7 @@ import type { Goals } from "./goals";
 import type { Flashcard } from "./flashcards";
 import type { GrammarCard } from "./grammarCards";
 import type { AssessmentRecord } from "./history";
+import type { UsageRow } from "./apiUsage";
 
 export interface GoalsRow extends Goals {
   language: string;
@@ -34,6 +35,7 @@ class LanguageLabDB extends Dexie {
   flashcards!: Table<Flashcard, string>;
   grammarCards!: Table<GrammarCard, string>;
   assessments!: Table<AssessmentRecord, string>;
+  apiUsage!: Table<UsageRow, string>;
 
   constructor() {
     super(`language-lab`);
@@ -297,6 +299,21 @@ class LanguageLabDB extends Dexie {
           await tx.table(`kv`).put({ ...vocabRow, value: rest });
         }
       });
+    // v17: BYOK cost tracking — per-call token + cost rows, indexed by timestamp and
+    // by category for the stats chart.
+    this.version(17).stores({
+      audio: ``,
+      streaks: `&date`,
+      streaksLang: `&[language+date], date, language`,
+      goals: `&language`,
+      kv: `&key`,
+      abilities: `&id, [language+mode]`,
+      customLanguages: `&name`,
+      flashcards: `&id, language, [language+source]`,
+      grammarCards: `&id, language, [language+title]`,
+      assessments: `&id, [mode+language], completedAt, createdAt`,
+      apiUsage: `&id, timestamp, category`,
+    });
   }
 }
 

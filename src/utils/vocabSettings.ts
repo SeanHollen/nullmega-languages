@@ -11,6 +11,7 @@ export interface VocabSettings {
   autoplayAudio: boolean;
   textDisplay: TextDisplay;
   includeTranslationInContexts: boolean;
+  avoidAdjacentDuplicates: boolean;
 }
 
 const SETTINGS_KEY = `vocab_settings`;
@@ -24,6 +25,7 @@ export const VOCAB_SETTINGS_DEFAULTS: VocabSettings = {
   autoplayAudio: true,
   textDisplay: `cloze`,
   includeTranslationInContexts: false,
+  avoidAdjacentDuplicates: true,
 };
 
 export const NEW_WORDS_PER_DAY_MIN = 1;

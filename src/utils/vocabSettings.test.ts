@@ -18,6 +18,7 @@ describe("loadVocabSettings", () => {
       autoplayAudio: true,
       textDisplay: `cloze`,
       includeTranslationInContexts: false,
+      avoidAdjacentDuplicates: true,
     });
   });
 
@@ -30,6 +31,7 @@ describe("loadVocabSettings", () => {
       autoplayAudio: false,
       textDisplay: `cloze`,
       includeTranslationInContexts: true,
+      avoidAdjacentDuplicates: false,
     });
     const s = await loadVocabSettings();
     expect(s).toEqual({
@@ -40,6 +42,7 @@ describe("loadVocabSettings", () => {
       autoplayAudio: false,
       textDisplay: `cloze`,
       includeTranslationInContexts: true,
+      avoidAdjacentDuplicates: false,
     });
   });
 
@@ -52,6 +55,7 @@ describe("loadVocabSettings", () => {
       autoplayAudio: true,
       textDisplay: `show`,
       includeTranslationInContexts: false,
+      avoidAdjacentDuplicates: false,
     });
     const s = await loadVocabSettings();
     expect(s.newWordsPerDay).toBe(50);

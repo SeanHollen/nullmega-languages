@@ -142,7 +142,8 @@ export function StudyPage() {
     } else {
       const updatedRemaining = remaining.map((c) => (c.id === current.id ? { ...c, ...patch } : c));
       setRemaining(updatedRemaining);
-      const nextCard = pickNextCard(updatedRemaining, tierFn);
+      const excludeId = settings?.avoidAdjacentDuplicates ? current.id : undefined;
+      const nextCard = pickNextCard(updatedRemaining, tierFn, excludeId);
       setCurrent(nextCard);
       if (nextCard) showCard(nextCard);
     }
@@ -151,7 +152,8 @@ export function StudyPage() {
   function advanceCard() {
     const next = remaining.filter((c) => c.id !== current!.id);
     setRemaining(next);
-    const nextCard = pickNextCard(next, tierFn);
+    const excludeId = settings?.avoidAdjacentDuplicates ? current!.id : undefined;
+    const nextCard = pickNextCard(next, tierFn, excludeId);
     setCurrent(nextCard);
     if (nextCard) showCard(nextCard);
   }

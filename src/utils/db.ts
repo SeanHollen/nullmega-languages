@@ -344,6 +344,32 @@ class LanguageLabDB extends Dexie {
           }
         }
       });
+    // v19: grammar settings become per-language. The old global `grammar_settings` row
+    // (if any) is copied to `grammar_settings_<currentSelectedLanguage>` and removed.
+    this.version(19)
+      .stores({
+        audio: ``,
+        streaks: `&date`,
+        streaksLang: `&[language+date], date, language`,
+        goals: `&language`,
+        kv: `&key`,
+        abilities: `&id, [language+mode]`,
+        customLanguages: `&name`,
+        flashcards: `&id, language, [language+source]`,
+        grammarCards: `&id, language, [language+title]`,
+        assessments: `&id, [mode+language], completedAt, createdAt`,
+        apiUsage: `&id, timestamp, category`,
+      })
+      .upgrade(async (tx) => {
+        const oldRow = await tx.table(`kv`).get(`grammar_settings`);
+        if (!oldRow) return;
+        const langRow = (await tx.table(`kv`).get(`selectedLanguage`)) as
+          | { value?: unknown }
+          | undefined;
+        const lang = typeof langRow?.value === `string` ? langRow.value : `French`;
+        await tx.table(`kv`).put({ key: `grammar_settings_${lang}`, value: oldRow.value });
+        await tx.table(`kv`).delete(`grammar_settings`);
+      });
   }
 }
 

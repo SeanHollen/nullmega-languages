@@ -66,6 +66,7 @@ const settings: VocabSettings = {
   autoplayAudio: false,
   textDisplay: `show`,
   includeTranslationInContexts: false,
+  avoidAdjacentDuplicates: false,
 };
 
 async function makeCardDue(id: string): Promise<void> {
@@ -101,6 +102,20 @@ describe("pickNextCard", () => {
     const picked = pickNextCard(cards, reviewTier);
     expect(picked).not.toBeNull();
     expect(picked!.relearningStartedAt).not.toBeNull();
+  });
+
+  it("excludes the given card id from the candidate pool when another card is available", () => {
+    const cards = [makeCard("just-shown", null), makeCard("other", null)];
+    for (let i = 0; i < 50; i++) {
+      const picked = pickNextCard(cards, undefined, "just-shown");
+      expect(picked?.id).toBe("other");
+    }
+  });
+
+  it("returns the excluded card anyway when it's the only one left in the tier", () => {
+    const cards = [makeCard("just-shown", null)];
+    const picked = pickNextCard(cards, undefined, "just-shown");
+    expect(picked?.id).toBe("just-shown");
   });
 
   it("with no tier function, picks uniformly at random across all cards", () => {

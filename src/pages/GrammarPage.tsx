@@ -50,7 +50,7 @@ export function GrammarPage() {
       async () => (await loadGrammarCards(language)).sort((a, b) => b.addedAt - a.addedAt),
       [language],
     ) ?? [];
-  const settings = useLiveQuery(() => loadGrammarSettings(), []);
+  const settings = useLiveQuery(() => loadGrammarSettings(language), [language]);
   const srsSettings = useLiveQuery(() => loadSrsSettings(), []);
   const generatedToday = useLiveQuery(() => getGeneratedTodayCount(language), [language]) ?? 0;
   const [learnError, setLearnError] = useState<string | null>(null);
@@ -60,11 +60,11 @@ export function GrammarPage() {
 
   function updateSettings(patch: Partial<GrammarSettings>) {
     if (!settings) return;
-    void saveGrammarSettings({ ...settings, ...patch });
+    void saveGrammarSettings(language, { ...settings, ...patch });
   }
 
   function restoreDefaults() {
-    void saveGrammarSettings({ ...GRAMMAR_SETTINGS_DEFAULTS });
+    void saveGrammarSettings(language, { ...GRAMMAR_SETTINGS_DEFAULTS });
     void saveSrsSettings({ ...SRS_SETTINGS_DEFAULTS });
     setConfirmingReset(false);
   }
@@ -179,7 +179,7 @@ export function GrammarPage() {
                 className="w-16 border border-gray-200 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-green-500"
               />
             </div>
-            <div className="px-6 py-3 flex items-center justify-center gap-3 text-sm">
+            <div className="px-6 pt-3 flex items-center justify-center gap-3 text-sm">
               <span className="text-gray-600">{t(`Level`)}</span>
               <input
                 type="range"
@@ -191,14 +191,14 @@ export function GrammarPage() {
                 disabled={!settings}
                 className="w-48 accent-green-500 cursor-pointer"
               />
-              <span className="text-xs text-gray-400 whitespace-nowrap">
-                {settings
-                  ? t(`{{level}} — {{label}}`, {
-                      level: settings.level,
-                      label: t(LEVEL_LABELS[settings.level]),
-                    })
-                  : `—`}
-              </span>
+            </div>
+            <div className="px-6 pb-3 text-center text-xs text-gray-400">
+              {settings
+                ? t(`{{level}} — {{label}}`, {
+                    level: settings.level,
+                    label: t(LEVEL_LABELS[settings.level]),
+                  })
+                : `—`}
             </div>
             <Button
               onClick={() => setAdvancedOpen((p) => !p)}

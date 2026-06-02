@@ -34,16 +34,29 @@ export type TierFn = (card: Flashcard) => number;
 // Picks the next card from `cards`. If `tierFn` is provided, only cards in the lowest
 // (highest-priority) non-empty tier are eligible. If omitted, picks uniformly at random
 // from the entire list — used when the user has disabled tier-based ordering.
-export function pickNextCard(cards: Flashcard[], tierFn?: TierFn): Flashcard | null {
+// When `excludeId` is provided, the card with that id is dropped from the candidate
+// pool — except when it's the only card available, in which case it's returned anyway.
+export function pickNextCard(
+  cards: Flashcard[],
+  tierFn?: TierFn,
+  excludeId?: string,
+): Flashcard | null {
   if (cards.length === 0) return null;
-  if (!tierFn) return pickRandom(cards);
+  const tierPool = tierFn ? lowestTier(cards, tierFn) : cards;
+  if (excludeId !== undefined) {
+    const filtered = tierPool.filter((c) => c.id !== excludeId);
+    if (filtered.length > 0) return pickRandom(filtered);
+  }
+  return pickRandom(tierPool);
+}
+
+function lowestTier(cards: Flashcard[], tierFn: TierFn): Flashcard[] {
   let minTier = Number.POSITIVE_INFINITY;
   for (const c of cards) {
     const t = tierFn(c);
     if (t < minTier) minTier = t;
   }
-  const pool = cards.filter((c) => tierFn(c) === minTier);
-  return pickRandom(pool);
+  return cards.filter((c) => tierFn(c) === minTier);
 }
 
 // Builds the tier function for a study session based on the user's ordering preferences.

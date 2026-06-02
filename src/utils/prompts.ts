@@ -17,7 +17,8 @@ ${titles.map((t) => `- ${t}`).join(`\n`)}`;
 const NARRATIVE_BLOCK = `
 
 FORMAT VARIETY (important):
-Vary the format aggressively. Do NOT default to first-person personal narrative. Pick from a wide range, e.g.: two-person dialogue, magazine excerpt, news brief, instructional howto, recipe with commentary, journal entry, advice column, sci-fi vignette, fantasy fragment, historical letter, technical writeup, product review, museum placard, podcast transcript snippet, lyric or poem fragment, overheard conversation, customer-service exchange, scientific abstract. Don't get overly experimental for the sake of it, but when looking at previuos summaries, try to include (level-appropriate) formats which are underrepresented.
+Vary the format aggressively. Do NOT default to first-person personal narrative. Pick from a wide range, e.g.: two-person dialogue, magazine excerpt, news brief, instructional howto, recipe with commentary, journal entry, advice column, sci-fi vignette, fantasy fragment, historical letter, technical writeup, product review, museum placard, podcast transcript snippet, lyric or poem fragment, overheard conversation, customer-service exchange, scientific abstract, debate, persuasive essay, angry rant. 
+Don't get overly experimental for the sake of it, but when looking at previuos summaries, try to include (level-appropriate) formats which are underrepresented.
 
 QUALITY: give the reader a reason to keep reading. Aim for at least one of:
 - A narrative arc (setup → complication → resolution or twist)

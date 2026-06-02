@@ -38,6 +38,7 @@ const settings: VocabSettings = {
   autoplayAudio: false,
   textDisplay: `show`,
   includeTranslationInContexts: false,
+  avoidAdjacentDuplicates: false,
 };
 
 describe("addFlashcard", () => {

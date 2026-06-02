@@ -169,6 +169,15 @@ export function VocabSettingsPanel({ settings, onUpdate }: Props) {
               <label className="flex items-center gap-2 cursor-pointer select-none">
                 <input
                   type="checkbox"
+                  checked={settings.avoidAdjacentDuplicates}
+                  onChange={(e) => onUpdate({ avoidAdjacentDuplicates: e.target.checked })}
+                  className="accent-green-600 cursor-pointer"
+                />
+                <span className="text-gray-600">{t(`Avoid adjacent duplicates`)}</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer select-none">
+                <input
+                  type="checkbox"
                   checked={srsSettings?.useEaseFromHistory ?? true}
                   onChange={(e) => {
                     if (!srsSettings) return;

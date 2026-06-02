@@ -5,7 +5,9 @@ export interface GrammarSettings {
   level: number;
 }
 
-const SETTINGS_KEY = `grammar_settings`;
+function settingsKey(language: string): string {
+  return `grammar_settings_${language}`;
+}
 
 export const GRAMMAR_SETTINGS_DEFAULTS: GrammarSettings = {
   newCardsPerDay: 0,
@@ -28,8 +30,8 @@ function startOfTodayLocal(): number {
   return d.getTime();
 }
 
-export async function loadGrammarSettings(): Promise<GrammarSettings> {
-  const row = await db().kv.get(SETTINGS_KEY);
+export async function loadGrammarSettings(language: string): Promise<GrammarSettings> {
+  const row = await db().kv.get(settingsKey(language));
   const stored = row?.value as Partial<GrammarSettings> | undefined;
   if (!stored) return { ...GRAMMAR_SETTINGS_DEFAULTS };
   return {
@@ -48,8 +50,11 @@ export async function loadGrammarSettings(): Promise<GrammarSettings> {
   };
 }
 
-export async function saveGrammarSettings(settings: GrammarSettings): Promise<void> {
-  await db().kv.put({ key: SETTINGS_KEY, value: settings });
+export async function saveGrammarSettings(
+  language: string,
+  settings: GrammarSettings,
+): Promise<void> {
+  await db().kv.put({ key: settingsKey(language), value: settings });
 }
 
 export async function getGeneratedTodayCount(language: string): Promise<number> {

@@ -8,18 +8,27 @@ import { addGrammarCards } from "./grammarCards";
 import { db } from "./db";
 
 describe("loadGrammarSettings", () => {
-  it("returns DEFAULTS when nothing is saved", async () => {
-    expect(await loadGrammarSettings()).toEqual({ newCardsPerDay: 0, level: 20 });
+  it("returns DEFAULTS when nothing is saved for the given language", async () => {
+    expect(await loadGrammarSettings(`Spanish`)).toEqual({ newCardsPerDay: 0, level: 20 });
   });
 
-  it("round-trips saved values", async () => {
-    await saveGrammarSettings({ newCardsPerDay: 8, level: 70 });
-    expect(await loadGrammarSettings()).toEqual({ newCardsPerDay: 8, level: 70 });
+  it("round-trips saved values per language", async () => {
+    await saveGrammarSettings(`Spanish`, { newCardsPerDay: 8, level: 70 });
+    expect(await loadGrammarSettings(`Spanish`)).toEqual({ newCardsPerDay: 8, level: 70 });
+  });
+
+  it("isolates settings between languages", async () => {
+    await saveGrammarSettings(`Spanish`, { newCardsPerDay: 8, level: 70 });
+    await saveGrammarSettings(`French`, { newCardsPerDay: 2, level: 30 });
+    expect(await loadGrammarSettings(`Spanish`)).toEqual({ newCardsPerDay: 8, level: 70 });
+    expect(await loadGrammarSettings(`French`)).toEqual({ newCardsPerDay: 2, level: 30 });
+    // Untouched language still returns defaults.
+    expect(await loadGrammarSettings(`German`)).toEqual({ newCardsPerDay: 0, level: 20 });
   });
 
   it("clamps level to the 10-100 range", async () => {
-    await saveGrammarSettings({ newCardsPerDay: 3, level: 250 });
-    expect((await loadGrammarSettings()).level).toBe(100);
+    await saveGrammarSettings(`Spanish`, { newCardsPerDay: 3, level: 250 });
+    expect((await loadGrammarSettings(`Spanish`)).level).toBe(100);
   });
 });
 

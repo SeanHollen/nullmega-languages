@@ -130,7 +130,7 @@ export function HomePage() {
   const vocabSettings = useLiveQuery(() => loadVocabSettings(), []);
   const learnedToday = useLiveQuery(() => getLearnedTodayCount(), [dayKey]) ?? 0;
   const vocabCards = useLiveQuery(() => loadFlashcards(language), [language]) ?? [];
-  const grammarSettings = useLiveQuery(() => loadGrammarSettings(), []);
+  const grammarSettings = useLiveQuery(() => loadGrammarSettings(language), [language]);
   const grammarGeneratedToday =
     useLiveQuery(() => getGeneratedTodayCount(language), [language, dayKey]) ?? 0;
   const grammarCards = useLiveQuery(() => loadGrammarCards(language), [language]) ?? [];

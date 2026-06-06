@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useLiveQuery } from "dexie-react-hooks";
 import { useTranslation } from "react-i18next";
@@ -72,12 +73,13 @@ export interface ResumeState {
 
 export function HistoryList({ mode, language, limit = 10, writingMode }: Props) {
   const { t } = useTranslation();
-  const records =
+  const [visible, setVisible] = useState(limit);
+  const allFiltered =
     useLiveQuery(async () => {
       const all = await getHistory(mode, language);
-      const filtered = writingMode ? all.filter((r) => writingModeOf(r) === writingMode) : all;
-      return filtered.slice(0, limit);
-    }, [mode, language, limit, writingMode]) ?? [];
+      return writingMode ? all.filter((r) => writingModeOf(r) === writingMode) : all;
+    }, [mode, language, writingMode]) ?? [];
+  const records = allFiltered.slice(0, visible);
   const navigate = useNavigate();
   const { beginLoading } = useLoading();
   if (records.length === 0) return null;
@@ -185,6 +187,16 @@ export function HistoryList({ mode, language, limit = 10, writingMode }: Props) 
           );
         })}
       </div>
+      {allFiltered.length > visible && (
+        <div className="mt-3 text-center">
+          <Button
+            onClick={() => setVisible((v) => v + limit)}
+            className="text-xs text-gray-500 hover:text-gray-700 transition cursor-pointer"
+          >
+            {t(`Show more ({{count}} hidden)`, { count: allFiltered.length - visible })}
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

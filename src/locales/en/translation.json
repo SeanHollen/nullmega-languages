@@ -381,6 +381,8 @@
   "Show harder cards more often": "Show harder cards more often",
   "Show key": "Show key",
   "Show later": "Show later",
+  "Show more ({{count}} hidden)_one": "Show more ({{count}} hidden)",
+  "Show more ({{count}} hidden)_other": "Show more ({{count}} hidden)",
   "Show text": "Show text",
   "Show text by default": "Show text by default",
   "Show upcoming before learning": "Show upcoming before learning",

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation, useParams } from "react-router-dom";
 import { useLiveQuery } from "dexie-react-hooks";
 import { useTranslation } from "react-i18next";
@@ -49,6 +49,23 @@ export function GrammarStudyPage() {
 
   const allAnswered = current !== null && answers.every((a) => a.trim() !== ``);
 
+  // Hijack Enter while the results panel is showing so the user can advance without
+  // mousing to the Continue button. No JSX-level alternative for a document-wide
+  // keydown listener; deps include `phase` + the state the handler reads so the
+  // listener always sees current values.
+  useEffect(() => {
+    if (phase !== `results` || current === null) return;
+    function onKey(e: KeyboardEvent) {
+      if (e.key !== `Enter` || e.repeat || e.metaKey || e.ctrlKey || e.altKey) return;
+      const target = e.target as HTMLElement | null;
+      if (target && (target.tagName === `INPUT` || target.tagName === `TEXTAREA`)) return;
+      e.preventDefault();
+      handleCardAnswer(questionResults.every(Boolean));
+    }
+    document.addEventListener(`keydown`, onKey);
+    return () => document.removeEventListener(`keydown`, onKey);
+  });
+
   function setAnswer(index: number, value: string) {
     setAnswers((prev) => {
       const next = [...prev];
@@ -86,6 +103,20 @@ export function GrammarStudyPage() {
       right,
     );
 
+    setRemaining(nextRemaining);
+    setCurrent(nextCard);
+    setAnswers(Array(nextCard?.questions.length ?? 0).fill(``));
+    setPhase(`answering`);
+    setQuestionResults([]);
+    setShuffleSeed(Date.now());
+  }
+
+  function handleSuspend() {
+    if (!current) return;
+    void patchGrammarCard(current.id, { status: `dropped` });
+    // Suspending behaves like a right answer from the queue's POV — the card drops out
+    // and we move to the next one.
+    const { card: nextCard, nextRemaining } = pickNextGrammarCard(remaining, current, true);
     setRemaining(nextRemaining);
     setCurrent(nextCard);
     setAnswers(Array(nextCard?.questions.length ?? 0).fill(``));
@@ -172,8 +203,11 @@ export function GrammarStudyPage() {
         )}
         {current !== null && phase === `results` && (
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 space-y-6">
-            <div className="space-y-1">
+            <div className="flex items-baseline justify-between gap-3">
               <p className="text-lg font-bold text-gray-800">{current.title}</p>
+              <span className="text-xs text-gray-400 whitespace-nowrap">
+                {t(`Level {{level}}`, { level: current.level })}
+              </span>
             </div>
 
             <div className="text-center py-2">
@@ -208,6 +242,12 @@ export function GrammarStudyPage() {
               className="w-full bg-green-600 text-white py-3 rounded-xl font-semibold hover:bg-green-700 transition cursor-pointer"
             >
               {t(`Continue →`)}
+            </Button>
+            <Button
+              onClick={handleSuspend}
+              className="w-full text-sm text-gray-500 hover:text-red-600 underline underline-offset-2 transition cursor-pointer"
+            >
+              {t(`Suspend this card`)}
             </Button>
           </div>
         )}

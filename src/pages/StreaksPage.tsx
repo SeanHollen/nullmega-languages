@@ -6,6 +6,7 @@ import { loadStreaks, computeCurrentStreak, dateStr, type StreakRecord } from ".
 import { loadListeningSeconds, formatListeningDuration } from "../utils/listeningStats";
 import { useLanguage } from "../contexts/LanguageContext";
 import { useDayKey } from "../hooks/useDayKey";
+import { PointsPerDayByModeChart } from "../components/stats/PointsPerDayByModeChart";
 
 const WEEKS = 26;
 const DAY_LABELS = [`Sun`, `Mon`, `Tue`, `Wed`, `Thu`, `Fri`, `Sat`];
@@ -102,7 +103,7 @@ export function StreaksPage() {
 
   return (
     <div className="min-h-screen bg-green-100 py-10 px-4">
-      <div className="max-w-2xl mx-auto">
+      <div className="max-w-2xl mx-auto space-y-6">
         <BackHeader title={t(`Streaks`)} to="/" />
 
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-6">
@@ -188,6 +189,8 @@ export function StreaksPage() {
             </span>
           </div>
         </div>
+
+        <PointsPerDayByModeChart language={language} />
       </div>
     </div>
   );

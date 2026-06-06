@@ -113,4 +113,42 @@ describe("pointsForRecord", () => {
       }),
     ).toBe(0);
   });
+
+  function passingReading(length: "short" | "medium" | "long") {
+    return {
+      ...baseRec(),
+      id: `x`,
+      helpful: null,
+      createdAt: 0,
+      body: {
+        exercise: {
+          length,
+          // remaining Exercise fields are unread by pointsForRecord; cast through unknown.
+        } as unknown,
+        selected: [],
+      } as never,
+    };
+  }
+
+  it("halves points for short reading/listening passages", () => {
+    expect(pointsForRecord(passingReading(`short`))).toBe(25);
+  });
+  it("doubles points for long reading/listening passages", () => {
+    expect(pointsForRecord(passingReading(`long`))).toBe(100);
+  });
+  it("keeps base points for medium reading/listening passages", () => {
+    expect(pointsForRecord(passingReading(`medium`))).toBe(50);
+  });
+  it("ignores length for non-reading modes (writing has no length)", () => {
+    expect(
+      pointsForRecord({
+        ...baseRec(),
+        id: `x`,
+        helpful: null,
+        createdAt: 0,
+        mode: `writing`,
+        // even with a body that happens to contain length, writing mode shouldn't apply it
+      }),
+    ).toBe(50);
+  });
 });

@@ -156,10 +156,24 @@ export async function getPastSummariesByComplexity(
   );
 }
 
+// Reading/listening passages carry a `length` knob. We scale points to reward longer
+// passages and discount shorter ones. Writing/pronunciation have no length variant; they
+// always get the normal multiplier.
+function lengthMultiplier(record: AssessmentRecord): number {
+  if (record.mode !== `reading` && record.mode !== `listening`) return 1;
+  const body = record.body;
+  if (!body || !(`exercise` in body)) return 1;
+  const length = (body as { exercise: { length?: unknown } }).exercise.length;
+  if (length === `short`) return 0.5;
+  if (length === `long`) return 2;
+  return 1;
+}
+
 export function pointsForRecord(record: AssessmentRecord): number {
   if (record.scoreMax <= 0) return 0;
   const pct = record.scoreEarned / record.scoreMax;
-  if (pct >= 0.9) return record.difficulty;
-  if (pct >= 0.6) return record.difficulty / 2;
+  const mult = lengthMultiplier(record);
+  if (pct >= 0.9) return record.difficulty * mult;
+  if (pct >= 0.6) return (record.difficulty / 2) * mult;
   return 0;
 }

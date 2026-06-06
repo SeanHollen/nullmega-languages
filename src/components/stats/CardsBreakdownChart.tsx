@@ -122,14 +122,20 @@ function buildBuckets(cards: SrsCardWithStatus[], mode: CardsMode, t: TFunction)
     { label: `~200%`, color: `#f59e0b`, count: 0, tooltipLabel: t(`~200% ease`) },
     { label: `250%`, color: `#16a34a`, count: 0, tooltipLabel: t(`250% ease (default)`) },
   ];
+  let untested = 0;
   for (const c of cards) {
-    const ease = computeEase(c.reviewHistory ?? []);
+    const history = c.reviewHistory ?? [];
+    if (history.length === 0) {
+      untested++;
+      continue;
+    }
+    const ease = computeEase(history);
     if (ease >= 2.2) easeBuckets[3].count++;
     else if (ease >= 1.7) easeBuckets[2].count++;
     else if (ease >= 1.35) easeBuckets[1].count++;
     else easeBuckets[0].count++;
   }
-  return { buckets: easeBuckets };
+  return { buckets: easeBuckets, excludedCount: untested, excludedLabel: t(`untested`) };
 }
 
 interface Props {

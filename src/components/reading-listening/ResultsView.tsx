@@ -70,7 +70,7 @@ export function ResultsView({
       <div className="bg-white rounded-2xl border border-green-100 shadow-sm p-8 space-y-4">
         <p className="text-xs text-gray-400 uppercase tracking-wide">{t(`Passage`)}</p>
         {audio?.passageUrl && <AudioPlayer src={audio.passageUrl} label={t(`Play passage`)} />}
-        <p className="text-gray-800 leading-relaxed">
+        <p className="text-gray-800 leading-relaxed whitespace-pre-wrap">
           <ClickableText source={mode} text={exercise.passage} language={language} />
         </p>
         <div className="border-t border-green-100 pt-4">

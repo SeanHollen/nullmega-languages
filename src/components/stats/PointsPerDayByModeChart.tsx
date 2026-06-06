@@ -2,7 +2,9 @@ import { useState } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
 import { useTranslation } from "react-i18next";
 import { getHistory, pointsForRecord } from "../../utils/history";
+import { getDailyVocabPoints, getDailyGrammarPoints } from "../../utils/cardActivityPoints";
 import type { Mode } from "../../hooks/useAbility";
+import { Button } from "../Button";
 import {
   CHART_HEIGHT,
   CHART_WIDTH,
@@ -21,42 +23,72 @@ import {
 
 type Window = "7" | "30" | "90";
 
+type Category = Mode | "vocab" | "grammar";
+
 const DAY_MS = 24 * 60 * 60 * 1000;
 const MODES: Mode[] = [`reading`, `writing`, `listening`, `pronunciation`];
+const CATEGORIES: Category[] = [...MODES, `vocab`, `grammar`];
 
-const MODE_COLOR: Record<Mode, string> = {
+const CATEGORY_COLOR: Record<Category, string> = {
   reading: `#16a34a`,
   writing: `#0ea5e9`,
   listening: `#f59e0b`,
   pronunciation: `#a855f7`,
+  vocab: `#ec4899`,
+  grammar: `#14b8a6`,
 };
 
 interface DayBucket {
   t: number;
-  byMode: Record<Mode, number>;
+  byCategory: Record<Category, number>;
   total: number;
 }
 
 function buildBuckets(
   recordsByMode: Record<Mode, { completedAt: number; points: number }[]>,
+  vocabByDay: Map<number, number>,
+  grammarByDay: Map<number, number>,
   days: number,
+  excluded: Set<Category>,
 ): DayBucket[] {
   const today = dayStart(Date.now());
   const startDay = today - (days - 1) * DAY_MS;
   const buckets: DayBucket[] = [];
   for (let i = 0; i < days; i++) {
     const t = startDay + i * DAY_MS;
-    const byMode = Object.fromEntries(MODES.map((m) => [m, 0])) as Record<Mode, number>;
-    buckets.push({ t, byMode, total: 0 });
+    const byCategory = Object.fromEntries(CATEGORIES.map((c) => [c, 0])) as Record<
+      Category,
+      number
+    >;
+    buckets.push({ t, byCategory, total: 0 });
   }
   for (const mode of MODES) {
+    if (excluded.has(mode)) continue;
     for (const r of recordsByMode[mode]) {
       const day = dayStart(r.completedAt);
       if (day < startDay || day > today) continue;
       const idx = Math.round((day - startDay) / DAY_MS);
       if (!buckets[idx]) continue;
-      buckets[idx].byMode[mode] += r.points;
+      buckets[idx].byCategory[mode] += r.points;
       buckets[idx].total += r.points;
+    }
+  }
+  if (!excluded.has(`vocab`)) {
+    for (const [day, pts] of vocabByDay) {
+      if (day < startDay || day > today) continue;
+      const idx = Math.round((day - startDay) / DAY_MS);
+      if (!buckets[idx]) continue;
+      buckets[idx].byCategory.vocab += pts;
+      buckets[idx].total += pts;
+    }
+  }
+  if (!excluded.has(`grammar`)) {
+    for (const [day, pts] of grammarByDay) {
+      if (day < startDay || day > today) continue;
+      const idx = Math.round((day - startDay) / DAY_MS);
+      if (!buckets[idx]) continue;
+      buckets[idx].byCategory.grammar += pts;
+      buckets[idx].total += pts;
     }
   }
   return buckets;
@@ -69,7 +101,18 @@ interface Props {
 export function PointsPerDayByModeChart({ language }: Props) {
   const { t } = useTranslation();
   const [windowDays, setWindowDays] = useState<Window>(`30`);
-  const [hovered, setHovered] = useState<{ bucket: number; mode: Mode } | null>(null);
+  const [hovered, setHovered] = useState<{ bucket: number; category: Category } | null>(null);
+  const [excluded, setExcluded] = useState<Set<Category>>(() => new Set());
+
+  function toggleCategory(c: Category) {
+    setExcluded((prev) => {
+      const next = new Set(prev);
+      if (next.has(c)) next.delete(c);
+      else next.add(c);
+      return next;
+    });
+    setHovered(null);
+  }
 
   const recordsByMode = useLiveQuery(async () => {
     const entries = await Promise.all(
@@ -92,9 +135,15 @@ export function PointsPerDayByModeChart({ language }: Props) {
     listening: [],
     pronunciation: [],
   };
+  const vocabByDay =
+    useLiveQuery(() => getDailyVocabPoints(language), [language])?.byDay ??
+    new Map<number, number>();
+  const grammarByDay =
+    useLiveQuery(() => getDailyGrammarPoints(language), [language])?.byDay ??
+    new Map<number, number>();
 
   const days = Number(windowDays);
-  const buckets = buildBuckets(recordsByMode, days);
+  const buckets = buildBuckets(recordsByMode, vocabByDay, grammarByDay, days, excluded);
   const totalPoints = buckets.reduce((s, b) => s + b.total, 0);
   const maxDaily = Math.max(1, ...buckets.map((b) => b.total));
   const high = Math.max(5, Math.ceil(maxDaily * 1.1));
@@ -110,26 +159,28 @@ export function PointsPerDayByModeChart({ language }: Props) {
     return PAD_T + INNER_H - (value / high) * INNER_H;
   }
 
-  const MODE_LABEL: Record<Mode, string> = {
+  const CATEGORY_LABEL: Record<Category, string> = {
     reading: t(`Reading`),
     writing: t(`Writing`),
     listening: t(`Listening`),
     pronunciation: t(`Pronunciation`),
+    vocab: t(`Vocab`),
+    grammar: t(`Grammar`),
   };
 
   let tooltipNode: React.ReactNode = null;
   if (hovered && buckets[hovered.bucket]) {
     const b = buckets[hovered.bucket];
-    const value = b.byMode[hovered.mode];
+    const value = b.byCategory[hovered.category];
     let runningTotal = 0;
-    for (const m of MODES) {
-      if (m === hovered.mode) break;
-      runningTotal += b.byMode[m];
+    for (const c of CATEGORIES) {
+      if (c === hovered.category) break;
+      runningTotal += b.byCategory[c];
     }
     const topVal = runningTotal + value;
     tooltipNode = renderTooltip(groupX(hovered.bucket), toY(topVal), [
       shortDate(b.t),
-      `${MODE_LABEL[hovered.mode]}: ${value.toFixed(0)} pts`,
+      `${CATEGORY_LABEL[hovered.category]}: ${value.toFixed(0)} pts`,
       t(`Day total {{points}} pts`, { points: b.total.toFixed(0) }),
     ]);
   }
@@ -182,32 +233,32 @@ export function PointsPerDayByModeChart({ language }: Props) {
             const stackedX = cx - barW / 2;
             let runningTop = baseY;
             const segments: React.ReactNode[] = [];
-            for (const mode of MODES) {
-              const value = b.byMode[mode];
+            for (const category of CATEGORIES) {
+              const value = b.byCategory[category];
               if (value <= 0) continue;
               const segH = (value / high) * INNER_H;
               const segTop = runningTop - segH;
               segments.push(
                 <rect
-                  key={`bar-${mode}`}
+                  key={`bar-${category}`}
                   x={stackedX}
                   y={segTop}
                   width={barW}
                   height={segH}
-                  fill={MODE_COLOR[mode]}
-                  opacity={hovered?.bucket === i && hovered.mode === mode ? 0.8 : 1}
+                  fill={CATEGORY_COLOR[category]}
+                  opacity={hovered?.bucket === i && hovered.category === category ? 0.8 : 1}
                 />,
               );
               segments.push(
                 <rect
-                  key={`hit-${mode}`}
+                  key={`hit-${category}`}
                   x={stackedX}
                   y={segTop}
                   width={barW}
                   height={segH}
                   fill="transparent"
                   style={{ cursor: `pointer` }}
-                  onMouseEnter={() => setHovered({ bucket: i, mode })}
+                  onMouseEnter={() => setHovered({ bucket: i, category })}
                   onMouseLeave={() => setHovered(null)}
                 />,
               );
@@ -236,12 +287,22 @@ export function PointsPerDayByModeChart({ language }: Props) {
       )}
 
       <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-gray-500">
-        {MODES.map((m) => (
-          <span key={m} className="flex items-center gap-1.5">
-            <span className="w-3 h-3 rounded-sm" style={{ backgroundColor: MODE_COLOR[m] }} />
-            {MODE_LABEL[m]}
-          </span>
-        ))}
+        {CATEGORIES.map((c) => {
+          const isExcluded = excluded.has(c);
+          return (
+            <Button
+              key={c}
+              onClick={() => toggleCategory(c)}
+              title={isExcluded ? t(`Click to include`) : t(`Click to hide`)}
+              className={`flex items-center gap-1.5 cursor-pointer transition ${
+                isExcluded ? `opacity-40 line-through` : ``
+              }`}
+            >
+              <span className="w-3 h-3 rounded-sm" style={{ backgroundColor: CATEGORY_COLOR[c] }} />
+              {CATEGORY_LABEL[c]}
+            </Button>
+          );
+        })}
       </div>
     </ChartCard>
   );

@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { DEFAULT_TTS_MODEL, loadSettings, saveSettings } from "./settings";
+import { loadSettings, saveSettings } from "./settings";
+import { DEFAULT_TTS_MODEL } from "./models";
 
 beforeEach(() => {
   vi.stubEnv(`VITE_OPENAI_API_KEY`, ``);

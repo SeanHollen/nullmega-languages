@@ -33,14 +33,11 @@ export async function tts(
   const { ttsModel } = await loadSettings();
   const input = stripBold(text);
   if (ttsModel === `gpt-4o-mini-tts`) {
-    // gpt-4o-mini-tts defaults to a slower, more deliberate read than the classic
-    // models. The `speed` parameter is ignored on this model, so we lean on the
-    // instructions string to nudge it back to a normal conversational pace.
     return callTTS({
       model: `gpt-4o-mini-tts`,
       voice,
       input,
-      instructions: `language: ${language}. Read at a normal conversational pace, not slow or didactic.`,
+      instructions: `You are a native ${language} speaker mid-conversation with a friend. Deliver this line the way you'd actually say it — fast, casual, slurred where natural. Not for an audience, not for clarity, not slowed for any word.`,
     });
   }
   const model = kind === `passage` ? `tts-1-hd` : `tts-1`;

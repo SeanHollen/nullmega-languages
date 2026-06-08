@@ -22,6 +22,7 @@ import {
 } from "./prompts";
 import type { NarratorGender } from "../types";
 import { recordUsage, type UsageCategory } from "./apiUsage";
+import { BYOK_MODEL } from "./models";
 
 const ChatResponseSchema = z.object({
   choices: z.array(z.object({ message: z.object({ content: z.string() }) })),
@@ -65,8 +66,6 @@ export interface TTSBody {
   input: string;
   instructions?: string;
 }
-
-const BYOK_MODEL = "o4-mini";
 
 async function isBYOK(): Promise<boolean> {
   return (await loadSettings()).textGen !== null;

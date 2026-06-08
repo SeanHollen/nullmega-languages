@@ -1,4 +1,5 @@
 import { db } from "./db";
+import { DEFAULT_TTS_MODEL, type TtsModel } from "./models";
 
 export type Provider = "openai";
 
@@ -6,9 +7,6 @@ export interface ProviderConfig {
   provider: Provider;
   key: string;
 }
-
-export type TtsModel = "tts-1" | "gpt-4o-mini-tts";
-export const DEFAULT_TTS_MODEL: TtsModel = `gpt-4o-mini-tts`;
 
 export interface AppSettings {
   textGen: ProviderConfig | null;

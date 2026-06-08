@@ -3,8 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { useLiveQuery } from "dexie-react-hooks";
 import { useTranslation } from "react-i18next";
 import { BackHeader } from "../components/BackHeader";
-import type { Provider, TtsModel } from "../utils/settings";
-import { DEFAULT_TTS_MODEL, loadSettings, saveSettings } from "../utils/settings";
+import type { Provider } from "../utils/settings";
+import { loadSettings, saveSettings } from "../utils/settings";
+import { DEFAULT_TTS_MODEL, type TtsModel } from "../utils/models";
 import { TextGenKeySection } from "../components/onboarding/TextGenKeySection";
 import { Button } from "../components/Button";
 

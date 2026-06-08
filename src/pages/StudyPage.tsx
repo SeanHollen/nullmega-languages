@@ -38,7 +38,7 @@ function CardSource({ source, mode, revealedFull, onRevealText }: CardSourceProp
       onClick={onRevealText}
       className="text-sm text-gray-400 hover:text-gray-600 underline underline-offset-2 transition cursor-pointer"
     >
-      {t(`Show text`)}
+      {t(`Show full text`)}
     </Button>
   );
   if (mode === `show` || revealedFull) {
@@ -51,13 +51,15 @@ function CardSource({ source, mode, revealedFull, onRevealText }: CardSourceProp
     );
   }
   if (mode === `cloze`) {
+    // The reveal link belongs to the prompt above it — tight 8px gap visually pairs
+    // them, so it doesn't read as an equal-weight sibling of the audio/answer button.
     return (
-      <>
+      <div className="space-y-2">
         <p className="text-2xl text-gray-800 break-words leading-relaxed">
           <BoldWord text={source} cloze />
         </p>
         {revealButton}
-      </>
+      </div>
     );
   }
   return revealButton;

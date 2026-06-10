@@ -79,6 +79,10 @@ function buildFlashcardMask(text: string, sources: string[]): boolean[] {
 export function ClickableText({ text, language, source }: Props) {
   const { t } = useTranslation();
   const [popup, setPopup] = useState<Popup | null>(null);
+  const [activeIdx, setActiveIdx] = useState<number | null>(null);
+  const [isTouch] = useState(
+    () => typeof window !== `undefined` && window.matchMedia(`(hover: none)`).matches,
+  );
   const savedSources =
     useLiveQuery(
       async () => (language ? (await loadFlashcards(language)).map((f) => f.source) : []),
@@ -95,6 +99,7 @@ export function ClickableText({ text, language, source }: Props) {
       if (containerRef.current?.contains(target)) return;
       if (target.closest(`[data-popup]`)) return;
       setPopup(null);
+      setActiveIdx(null);
     }
     document.addEventListener(`mousedown`, handle);
     return () => document.removeEventListener(`mousedown`, handle);
@@ -113,21 +118,26 @@ export function ClickableText({ text, language, source }: Props) {
     })();
   }
 
-  function handleMouseUp(e: React.MouseEvent) {
+  function handleClick(e: React.MouseEvent) {
     const sel = window.getSelection();
     const selText = sel && !sel.isCollapsed ? sel.toString().trim() : ``;
     if (selText) {
       const range = sel!.getRangeAt(0);
       const rect = range.getBoundingClientRect();
+      setActiveIdx(null);
       showPopupAt(selText, rect);
       return;
     }
     const target = (e.target as HTMLElement).closest(`[data-word]`) as HTMLElement | null;
-    if (target) {
-      const word = target.textContent ?? ``;
-      const rect = target.getBoundingClientRect();
-      showPopupAt(word, rect);
+    if (!target) {
+      setActiveIdx(null);
+      return;
     }
+    const word = target.textContent ?? ``;
+    const rect = target.getBoundingClientRect();
+    const idx = Number(target.dataset.idx);
+    setActiveIdx(Number.isFinite(idx) ? idx : null);
+    showPopupAt(word, rect);
   }
 
   const alreadySaved =
@@ -139,16 +149,22 @@ export function ClickableText({ text, language, source }: Props) {
     if (!language || !popup || !popup.translation) return;
     void addFlashcard(language, popup.text, popup.translation, source ? [source] : []);
     setPopup(null);
+    setActiveIdx(null);
   }
 
   function handleRemoveFlashcard() {
     if (!language || !popup) return;
     void removeFlashcard(language, popup.text);
     setPopup(null);
+    setActiveIdx(null);
   }
 
   return (
-    <span ref={containerRef} onMouseUp={handleMouseUp}>
+    <span
+      ref={containerRef}
+      onClick={handleClick}
+      className={isTouch ? `select-none [-webkit-touch-callout:none]` : `select-text`}
+    >
       {tokens.map((token, i) => {
         if (!token.isWord) {
           const isFlashcarded = flashcardMask.slice(token.start, token.end).some(Boolean);
@@ -159,12 +175,12 @@ export function ClickableText({ text, language, source }: Props) {
           );
         }
         const isFlashcarded = flashcardMask.slice(token.start, token.end).some(Boolean);
+        const isActive = i === activeIdx;
+        let bg = `hover:bg-yellow-100`;
+        if (isActive) bg = `bg-yellow-200`;
+        else if (isFlashcarded) bg = `bg-blue-100 text-blue-900`;
         return (
-          <span
-            key={i}
-            data-word="true"
-            className={`cursor-pointer rounded ${isFlashcarded ? `bg-blue-100 text-blue-900` : `hover:bg-yellow-100`}`}
-          >
+          <span key={i} data-word="true" data-idx={i} className={`cursor-pointer rounded ${bg}`}>
             {token.text}
           </span>
         );

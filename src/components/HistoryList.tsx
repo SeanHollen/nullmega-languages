@@ -190,10 +190,10 @@ export function HistoryList({ mode, language, limit = 10, writingMode }: Props) 
       {allFiltered.length > visible && (
         <div className="mt-3 text-center">
           <Button
-            onClick={() => setVisible((v) => v + limit)}
+            onClick={() => setVisible(allFiltered.length)}
             className="text-xs text-gray-500 hover:text-gray-700 transition cursor-pointer"
           >
-            {t(`Show more ({{count}} hidden)`, { count: allFiltered.length - visible })}
+            {t(`Show all ({{count}} hidden)`, { count: allFiltered.length - visible })}
           </Button>
         </div>
       )}

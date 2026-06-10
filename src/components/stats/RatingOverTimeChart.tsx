@@ -7,6 +7,7 @@ import {
   CHART_WIDTH,
   ChartCard,
   ChartFrame,
+  ChartToggle,
   INNER_H,
   INNER_W,
   PAD_B,
@@ -16,6 +17,9 @@ import {
   renderTooltip,
   shortDate,
 } from "./chartCommon";
+
+type Window = "7" | "30" | "90" | "all";
+const DAY_MS = 24 * 60 * 60 * 1000;
 
 interface RatingPoint {
   t: number;
@@ -33,11 +37,16 @@ interface Props {
 export function RatingOverTimeChart({ history, color, label, language }: Props) {
   const { t } = useTranslation();
   const [hovered, setHovered] = useState<number | null>(null);
+  const [windowSize, setWindowSize] = useState<Window>(`all`);
+  const [now] = useState(() => Date.now());
 
-  const points: RatingPoint[] = history
+  const allPoints: RatingPoint[] = history
     .filter((r) => typeof r.ratingAfter === `number`)
     .sort((a, b) => a.completedAt - b.completedAt)
     .map((r) => ({ t: r.completedAt, rating: r.ratingAfter as number, title: r.title }));
+
+  const cutoff = windowSize === `all` ? -Infinity : now - Number(windowSize) * DAY_MS;
+  const points = allPoints.filter((p) => p.t >= cutoff);
 
   const hasData = points.length > 0;
   const tMin = hasData ? points[0].t : 0;
@@ -66,15 +75,30 @@ export function RatingOverTimeChart({ history, color, label, language }: Props) 
     <ChartCard
       title={t(`Rating over time — {{language}}`, { language })}
       right={
+        <ChartToggle
+          value={windowSize}
+          options={[
+            [`7`, t(`7d`)],
+            [`30`, t(`30d`)],
+            [`90`, t(`90d`)],
+            [`all`, t(`All`)],
+          ]}
+          onChange={(next) => {
+            setWindowSize(next);
+            setHovered(null);
+          }}
+        />
+      }
+      trailing={
         hasData ? (
-          <div className="text-sm">
+          <div className="text-sm text-right">
             <span className="text-gray-500">{t(`Latest:`)} </span>
             <span className="font-semibold text-gray-800">{latest}</span>
             {first !== latest && (
               <span className={`ml-2 text-xs font-medium ${deltaColor(delta)}`}>
                 {delta > 0 ? `+${delta.toFixed(1)}` : delta.toFixed(1)}
                 {` `}
-                {t(`overall`)}
+                {windowSize === `all` ? t(`overall`) : t(`in window`)}
               </span>
             )}
           </div>

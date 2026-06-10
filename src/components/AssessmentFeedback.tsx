@@ -3,7 +3,6 @@ import { useTranslation } from "react-i18next";
 import { FaThumbsUp, FaThumbsDown } from "react-icons/fa";
 import { updateFeedback } from "../utils/history";
 import { submitFeedback } from "../utils/api";
-import { getUserId } from "../utils/user";
 import { Button } from "./Button";
 
 interface Props {
@@ -30,7 +29,7 @@ export function AssessmentFeedback({ assessmentId }: Props) {
     setVoted(helpful);
     void (async () => {
       await updateFeedback(assessmentId, helpful);
-      submitFeedback({ id: assessmentId, userId: await getUserId(), helpful });
+      submitFeedback({ id: assessmentId, helpful });
     })();
   }
 

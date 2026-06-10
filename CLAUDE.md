@@ -32,6 +32,10 @@ The active backend is **Convex** at `../language-learning-backend-convex/`. The 
 
 `useEffect` is forbidden unless there is absolutely no other option. If something happens because a user clicked something, it must be triggered by that click handler — not by a reactive effect watching state. Before reaching for `useEffect`, ask: what user action caused this? Put the logic there instead.
 
+## Don't suggest rotating secrets when they appear in chat
+
+Even when an API key, OAuth secret, or token appears verbatim in the conversation, do NOT proactively recommend rotation. The user manages their own key lifecycle and will rotate at exposure time (e.g., before pre-launch). Suggesting rotation each time is noise. Still flag if a secret is about to be committed to a public repo or pushed somewhere broadly visible — that's a different category from "showed up in our chat."
+
 ## Don't ask permission for in-scope local changes
 
 When the next step is an obvious continuation of what the user just discussed — adding a test we just identified as missing, fixing a bug we just diagnosed, applying a refactor we just agreed on — just do it. Don't end a turn with "Want me to…?" or "Should I proceed?". The user can `git restore` anything they don't like; asking wastes their time. This applies to local edits to source/tests/config in this repo. It does NOT override the standing rules against destructive git ops, force-pushes, sending messages, etc. — those still need explicit approval.

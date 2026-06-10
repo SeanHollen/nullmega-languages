@@ -17,7 +17,6 @@ import { useLanguage } from "../contexts/LanguageContext";
 import { useLoading } from "../contexts/LoadingContext";
 import { saveAssessment, updateAssessment } from "../utils/history";
 import { uploadAssessment } from "../utils/api";
-import { getUserId } from "../utils/user";
 import { resolveSliderComplexity } from "../utils/sliderComplexity";
 import { loadPerModeDefault } from "../utils/onboarding";
 
@@ -181,7 +180,6 @@ export function PronunciationPage() {
     if (exercise.id) {
       uploadAssessment({
         id: exercise.id,
-        userId: await getUserId(),
         scoreEarned: weighted,
         scoreMax: total,
         completedAt,

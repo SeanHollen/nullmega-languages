@@ -5,8 +5,7 @@
 //     avoidance. The standard prompt may drift from the BYOK prompt over time.
 
 import { z } from "zod";
-import { loadSettings } from "./settings";
-import { getUserId } from "./user";
+import { loadSettings, loadAuthInfo } from "./settings";
 import { getPastSummariesByComplexity } from "./history";
 import { pickClosest } from "./proximity";
 import {
@@ -93,12 +92,18 @@ async function postBYOK(body: OpenAIChatBody, category: UsageCategory): Promise<
   return parsed;
 }
 
+async function authHeader(): Promise<Record<string, string>> {
+  const info = await loadAuthInfo();
+  return info ? { Authorization: `Bearer ${info.token}` } : {};
+}
+
 async function postBackend(path: string, body: object): Promise<ChatResponse> {
   const res = await fetch(`${await resolvedBackendUrl()}${path}`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...(await authHeader()) },
     body: JSON.stringify(body),
   });
+  if (res.status === 401) throw new Error("Not signed in. Sign in via Settings.");
   if (!res.ok) throw new Error(`API error: ${res.status}`);
   return ChatResponseSchema.parse(await res.json());
 }
@@ -130,7 +135,7 @@ export async function callReadingExercise(params: {
       params.mode,
     );
   }
-  return postBackend("/api/exercise/reading", { ...params, userId: await getUserId() });
+  return postBackend("/api/exercise/reading", { ...params });
 }
 
 // ---------- Writing exercise ----------
@@ -158,7 +163,7 @@ export async function callWritingExercise(params: {
       `writing`,
     );
   }
-  return postBackend("/api/exercise/writing", { ...params, userId: await getUserId() });
+  return postBackend("/api/exercise/writing", { ...params });
 }
 
 // ---------- Pronunciation ----------
@@ -185,7 +190,7 @@ export async function callPronunciationExercise(params: {
       `pronunciation`,
     );
   }
-  return postBackend("/api/exercise/pronunciation", { ...params, userId: await getUserId() });
+  return postBackend("/api/exercise/pronunciation", { ...params });
 }
 
 // ---------- Writing grader ----------
@@ -294,7 +299,7 @@ export async function callGrammarCardsGenerate(params: {
     );
   }
   const { existingCards: _ignored, ...backendBody } = params;
-  return postBackend("/api/grammar", { ...backendBody, userId: await getUserId() });
+  return postBackend("/api/grammar", { ...backendBody });
 }
 
 // ---------- TTS (unchanged shape — already operation-specific) ----------
@@ -314,9 +319,10 @@ export async function callTTS(body: TTSBody): Promise<Blob> {
 
   const res = await fetch(`${await resolvedBackendUrl()}/api/speak`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...(await authHeader()) },
     body: JSON.stringify(body),
   });
+  if (res.status === 401) throw new Error("Not signed in. Sign in via Settings.");
   if (!res.ok) throw new Error(`TTS error: ${res.status}`);
   const { url } = TTSUrlResponseSchema.parse(await res.json());
   const audioRes = await fetch(url);
@@ -326,14 +332,23 @@ export async function callTTS(body: TTSBody): Promise<Blob> {
 
 // ---------- Auth + onboarding ----------
 
-export async function callAuthLogin(): Promise<{ token: string; userId: string }> {
+export async function callAuthLogin(idToken: string): Promise<{ token: string; userId: string }> {
   const res = await fetch(`${await resolvedBackendUrl()}/api/auth/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ provider: "placeholder" }),
+    body: JSON.stringify({ idToken }),
   });
   if (!res.ok) throw new Error(`Login failed: ${res.status}`);
   return AuthLoginResponseSchema.parse(await res.json());
+}
+
+export async function callAuthLogout(): Promise<void> {
+  const info = await loadAuthInfo();
+  if (!info) return;
+  await fetch(`${await resolvedBackendUrl()}/api/auth/logout`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${info.token}` },
+  }).catch(() => {});
 }
 
 export async function callOnboardingComplexityExamples(
@@ -357,7 +372,7 @@ async function postJsonFireAndForget(path: string, payload: object): Promise<voi
   try {
     await fetch(url, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...(await authHeader()) },
       body: JSON.stringify(payload),
     });
   } catch {

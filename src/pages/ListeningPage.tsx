@@ -19,7 +19,6 @@ import { useLanguage } from "../contexts/LanguageContext";
 import { useLoading } from "../contexts/LoadingContext";
 import { saveAssessment, updateAssessment } from "../utils/history";
 import { uploadAssessment } from "../utils/api";
-import { getUserId } from "../utils/user";
 import { resolveSliderComplexity } from "../utils/sliderComplexity";
 import { loadPerModeDefault } from "../utils/onboarding";
 import type { ReadingLength } from "../utils/prompts";
@@ -184,7 +183,6 @@ export function ListeningPage() {
     if (exercise.id) {
       uploadAssessment({
         id: exercise.id,
-        userId: await getUserId(),
         scoreEarned: correct,
         scoreMax: total,
         completedAt,

@@ -77,3 +77,8 @@ export async function saveAuthInfo(info: AuthInfo): Promise<void> {
   await putValue(KEYS.authToken, info.token);
   await putValue(KEYS.authUserId, info.userId);
 }
+
+export async function clearAuthInfo(): Promise<void> {
+  await db().kv.delete(KEYS.authToken);
+  await db().kv.delete(KEYS.authUserId);
+}

@@ -4,13 +4,20 @@ import { useLiveQuery } from "dexie-react-hooks";
 import { useTranslation } from "react-i18next";
 import { BackHeader } from "../components/BackHeader";
 import type { Provider } from "../utils/settings";
-import { loadSettings, saveSettings, loadAuthInfo, saveAuthInfo } from "../utils/settings";
+import {
+  loadSettings,
+  saveSettings,
+  loadAuthInfo,
+  saveAuthInfo,
+  clearAuthInfo,
+} from "../utils/settings";
 import { DEFAULT_TTS_MODEL, type TtsModel } from "../utils/models";
 import { TextGenKeySection } from "../components/onboarding/TextGenKeySection";
 import { BackendChoice } from "../components/onboarding/BackendChoice";
 import type { BackendMode } from "../utils/onboarding";
 import { loadBackendMode, saveBackendMode } from "../utils/onboarding";
-import { callAuthLogin } from "../utils/api";
+import { callAuthLogin, callAuthLogout } from "../utils/api";
+import { GoogleSignInButton } from "../components/GoogleSignInButton";
 import { Button } from "../components/Button";
 
 export function SettingsPage() {
@@ -33,17 +40,24 @@ export function SettingsPage() {
     void saveBackendMode(mode);
   }
 
-  function handleLogin() {
+  function handleCredential(idToken: string) {
     setLoginError(null);
     setLoggingIn(true);
     void (async () => {
       try {
-        const info = await callAuthLogin();
+        const info = await callAuthLogin(idToken);
         await saveAuthInfo(info);
       } catch (err) {
         setLoginError(String(err));
       }
       setLoggingIn(false);
+    })();
+  }
+
+  function handleLogout() {
+    void (async () => {
+      await callAuthLogout();
+      await clearAuthInfo();
     })();
   }
 
@@ -85,20 +99,23 @@ export function SettingsPage() {
               <BackendChoice selected={backendMode} onSelect={handleBackendModeSelect} />
               {backendMode === `standard` && !authInfo && (
                 <div className="space-y-2">
-                  <Button
-                    onClick={handleLogin}
-                    disabled={loggingIn}
-                    className="w-full bg-green-600 text-white rounded-xl py-3 font-semibold hover:bg-green-700 transition cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
-                  >
-                    {loggingIn ? t(`Signing in…`) : t(`Login with Nullmega Languages`)}
-                  </Button>
+                  <GoogleSignInButton onCredential={handleCredential} />
+                  {loggingIn && <p className="text-xs text-gray-400">{t(`Signing in…`)}</p>}
                   {loginError && <p className="text-xs text-red-500">{loginError}</p>}
                 </div>
               )}
               {backendMode === `standard` && authInfo && (
-                <p className="text-xs text-gray-400">
-                  {t(`Signed in as {{userId}}`, { userId: authInfo.userId })}
-                </p>
+                <div className="space-y-2 flex items-center justify-between">
+                  <p className="text-xs text-gray-400">
+                    {t(`Signed in as {{userId}}`, { userId: authInfo.userId })}
+                  </p>
+                  <Button
+                    onClick={handleLogout}
+                    className="text-xs text-gray-500 hover:text-red-600 underline underline-offset-2 transition cursor-pointer"
+                  >
+                    {t(`Logout`)}
+                  </Button>
+                </div>
               )}
             </section>
 

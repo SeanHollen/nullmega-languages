@@ -116,6 +116,20 @@ export function StudyPage() {
       const ci = await pickNextContext(card);
       if (cancelled) return;
       setContextIndex(ci);
+      // Mirror the cursor advance + seen flag into React state so that if this card
+      // is shown again in this session, the sync `setContextIndex` line above reads
+      // the advanced cursor instead of the stale pre-pick value. Without this, the
+      // same context can briefly flash twice when the same card is re-picked.
+      const advance = (c: Flashcard): Flashcard =>
+        c.id !== card.id
+          ? c
+          : {
+              ...c,
+              contextCursor: (ci + 1) % c.contexts.length,
+              contexts: c.contexts.map((ctx, i) => (i === ci ? { ...ctx, seen: true } : ctx)),
+            };
+      setRemaining((prev) => prev.map(advance));
+      setCurrent((prev) => (prev ? advance(prev) : prev));
       const key = card.contexts[ci]?.audioKey;
       if (!settings?.generateAudio || !key) {
         setAudioUrl((prev) => {

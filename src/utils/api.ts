@@ -294,7 +294,7 @@ export async function callGrammarCardsGenerate(params: {
     );
   }
   const { existingCards: _ignored, ...backendBody } = params;
-  return postBackend("/api/grammar", backendBody);
+  return postBackend("/api/grammar", { ...backendBody, userId: await getUserId() });
 }
 
 // ---------- TTS (unchanged shape — already operation-specific) ----------

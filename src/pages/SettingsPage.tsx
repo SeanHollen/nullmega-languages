@@ -4,15 +4,21 @@ import { useLiveQuery } from "dexie-react-hooks";
 import { useTranslation } from "react-i18next";
 import { BackHeader } from "../components/BackHeader";
 import type { Provider } from "../utils/settings";
-import { loadSettings, saveSettings } from "../utils/settings";
+import { loadSettings, saveSettings, loadAuthInfo, saveAuthInfo } from "../utils/settings";
 import { DEFAULT_TTS_MODEL, type TtsModel } from "../utils/models";
 import { TextGenKeySection } from "../components/onboarding/TextGenKeySection";
+import { BackendChoice } from "../components/onboarding/BackendChoice";
+import type { BackendMode } from "../utils/onboarding";
+import { loadBackendMode, saveBackendMode } from "../utils/onboarding";
+import { callAuthLogin } from "../utils/api";
 import { Button } from "../components/Button";
 
 export function SettingsPage() {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const initial = useLiveQuery(() => loadSettings(), []);
+  const backendMode = useLiveQuery(() => loadBackendMode(), []) ?? null;
+  const authInfo = useLiveQuery(() => loadAuthInfo(), []) ?? null;
 
   const [textGenKey, setTextGenKey] = useState<string | null>(null);
   const [sameTTS, setSameTTS] = useState<boolean | null>(null);
@@ -20,6 +26,26 @@ export function SettingsPage() {
   const [ttsModel, setTtsModel] = useState<TtsModel>(DEFAULT_TTS_MODEL);
   const [showTtsKey, setShowTtsKey] = useState(false);
   const [ttsKeyTouched, setTtsKeyTouched] = useState(false);
+  const [loggingIn, setLoggingIn] = useState(false);
+  const [loginError, setLoginError] = useState<string | null>(null);
+
+  function handleBackendModeSelect(mode: BackendMode) {
+    void saveBackendMode(mode);
+  }
+
+  function handleLogin() {
+    setLoginError(null);
+    setLoggingIn(true);
+    void (async () => {
+      try {
+        const info = await callAuthLogin();
+        await saveAuthInfo(info);
+      } catch (err) {
+        setLoginError(String(err));
+      }
+      setLoggingIn(false);
+    })();
+  }
 
   // Once loaded, hydrate the form state from the stored settings (track-and-reset pattern).
   const [hydratedFor, setHydratedFor] = useState<unknown>(null);
@@ -54,6 +80,30 @@ export function SettingsPage() {
 
         {initial && textGenKey !== null && ttsKey !== null && sameTTS !== null && (
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-6">
+            <section className="space-y-3">
+              <h2 className="text-lg font-semibold text-gray-800">{t(`Backend Mode`)}</h2>
+              <BackendChoice selected={backendMode} onSelect={handleBackendModeSelect} />
+              {backendMode === `standard` && !authInfo && (
+                <div className="space-y-2">
+                  <Button
+                    onClick={handleLogin}
+                    disabled={loggingIn}
+                    className="w-full bg-green-600 text-white rounded-xl py-3 font-semibold hover:bg-green-700 transition cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+                  >
+                    {loggingIn ? t(`Signing in…`) : t(`Login with Nullmega Languages`)}
+                  </Button>
+                  {loginError && <p className="text-xs text-red-500">{loginError}</p>}
+                </div>
+              )}
+              {backendMode === `standard` && authInfo && (
+                <p className="text-xs text-gray-400">
+                  {t(`Signed in as {{userId}}`, { userId: authInfo.userId })}
+                </p>
+              )}
+            </section>
+
+            <hr className="border-gray-100" />
+
             <TextGenKeySection value={textGenKey} onChange={setTextGenKey} />
 
             <Button

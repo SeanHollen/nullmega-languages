@@ -90,7 +90,7 @@ export function SettingsPage() {
   return (
     <div className="min-h-screen bg-green-100 py-10 px-4">
       <div className="max-w-2xl mx-auto">
-        <BackHeader title={t(`Settings`)} to="/" />
+        <BackHeader title={t(`Settings`)} />
 
         {initial && textGenKey !== null && ttsKey !== null && sameTTS !== null && (
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-6">

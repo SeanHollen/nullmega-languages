@@ -10,8 +10,25 @@ const PER_MODE_RATIO: Record<Mode, number> = {
 
 const ONBOARDING_COMPLETE_KEY = `onboardingComplete`;
 const BACKEND_MODE_KEY = `backendMode`;
+const ONBOARDING_STAGE_KEY = `onboardingStage`;
 
 export type BackendMode = "standard" | "byok";
+export type OnboardingStage = "language" | "complexity" | "backend" | "auth";
+
+export async function loadOnboardingStage(): Promise<OnboardingStage | null> {
+  const row = await db().kv.get(ONBOARDING_STAGE_KEY);
+  const v = row?.value;
+  if (v === `language` || v === `complexity` || v === `backend` || v === `auth`) return v;
+  return null;
+}
+
+export async function saveOnboardingStage(stage: OnboardingStage): Promise<void> {
+  await db().kv.put({ key: ONBOARDING_STAGE_KEY, value: stage });
+}
+
+export async function clearOnboardingStage(): Promise<void> {
+  await db().kv.delete(ONBOARDING_STAGE_KEY);
+}
 
 function perModeKey(language: string): string {
   return `defaultLanguageComplexity_${language}`;
@@ -24,6 +41,7 @@ export async function isOnboardingComplete(): Promise<boolean> {
 
 export async function markOnboardingComplete(): Promise<void> {
   await db().kv.put({ key: ONBOARDING_COMPLETE_KEY, value: true });
+  await db().kv.delete(ONBOARDING_STAGE_KEY);
 }
 
 export async function clearOnboarding(): Promise<void> {

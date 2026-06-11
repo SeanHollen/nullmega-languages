@@ -35,7 +35,13 @@ const ChatResponseSchema = z.object({
 
 const TTSUrlResponseSchema = z.object({ url: z.string() });
 
-const AuthLoginResponseSchema = z.object({ token: z.string(), userId: z.string() });
+const AuthLoginResponseSchema = z.object({
+  token: z.string(),
+  userId: z.string(),
+  email: z.string().optional(),
+  name: z.string().optional(),
+  picture: z.string().optional(),
+});
 
 const OnboardingExamplesResponseSchema = z.object({ examples: z.record(z.string(), z.unknown()) });
 
@@ -332,7 +338,9 @@ export async function callTTS(body: TTSBody): Promise<Blob> {
 
 // ---------- Auth + onboarding ----------
 
-export async function callAuthLogin(idToken: string): Promise<{ token: string; userId: string }> {
+export async function callAuthLogin(
+  idToken: string,
+): Promise<z.infer<typeof AuthLoginResponseSchema>> {
   const res = await fetch(`${await resolvedBackendUrl()}/api/auth/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },

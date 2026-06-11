@@ -3,10 +3,18 @@ import { useNavigate } from "react-router-dom";
 import { useLiveQuery } from "dexie-react-hooks";
 import { useTranslation } from "react-i18next";
 import { useLanguage } from "../contexts/LanguageContext";
-import { addCustomLanguage, LANGUAGES, setStoredLanguage } from "../utils/language";
 import {
+  addCustomLanguage,
+  getStoredLanguage,
+  LANGUAGES,
+  setStoredLanguage,
+} from "../utils/language";
+import {
+  loadBackendMode,
+  loadOnboardingStage,
   markOnboardingComplete,
   saveBackendMode,
+  saveOnboardingStage,
   savePerModeDefaults,
   type BackendMode,
 } from "../utils/onboarding";
@@ -38,12 +46,35 @@ export function OnboardingPage() {
   const [complexity, setComplexity] = useState<number>(50);
   const [backendMode, setBackendMode] = useState<BackendMode | null>(null);
   const initialSettings = useLiveQuery(() => loadSettings(), []);
+  const persistedStage = useLiveQuery(() => loadOnboardingStage(), []);
+  const persistedBackendMode = useLiveQuery(() => loadBackendMode(), []);
+  const persistedLanguage = useLiveQuery(() => getStoredLanguage(), []);
+  const [hydrated, setHydrated] = useState(false);
   const [byokKey, setByokKey] = useState<string | null>(null);
   if (initialSettings && byokKey === null) {
     setByokKey(initialSettings.textGen?.key ?? ``);
   }
+  // Restore the wizard cursor + dependent state from Dexie on first render after
+  // useLiveQuery resolves. Without this, anything that reloads the page mid-flow
+  // (e.g. a mobile Google OAuth redirect) sends the user back to stage 1.
+  if (
+    !hydrated &&
+    persistedStage !== undefined &&
+    persistedBackendMode !== undefined &&
+    persistedLanguage !== undefined
+  ) {
+    setHydrated(true);
+    if (persistedStage) setStage(persistedStage);
+    if (persistedBackendMode) setBackendMode(persistedBackendMode);
+    if (persistedLanguage) setLocalLanguage(persistedLanguage);
+  }
   const [examples, setExamples] = useState<ComplexityExamples | null>(null);
   const [examplesError, setExamplesError] = useState<string | null>(null);
+
+  function setStageAndPersist(next: Stage): void {
+    setStage(next);
+    void saveOnboardingStage(next);
+  }
 
   function selectLanguage(lang: string): void {
     setLocalLanguage(lang);
@@ -70,17 +101,17 @@ export function OnboardingPage() {
       await setStoredLanguage(language);
       setLanguage(language);
       startExamplesFetch(language);
-      setStage(`complexity`);
+      setStageAndPersist(`complexity`);
       return;
     }
     if (stage === `complexity` && language) {
       await savePerModeDefaults(language, complexity);
-      setStage(`backend`);
+      setStageAndPersist(`backend`);
       return;
     }
     if (stage === `backend` && backendMode) {
       await saveBackendMode(backendMode);
-      setStage(`auth`);
+      setStageAndPersist(`auth`);
       return;
     }
   }
@@ -140,9 +171,9 @@ export function OnboardingPage() {
             {stage !== `language` ? (
               <Button
                 onClick={() => {
-                  if (stage === `complexity`) setStage(`language`);
-                  else if (stage === `backend`) setStage(`complexity`);
-                  else if (stage === `auth`) setStage(`backend`);
+                  if (stage === `complexity`) setStageAndPersist(`language`);
+                  else if (stage === `backend`) setStageAndPersist(`complexity`);
+                  else if (stage === `auth`) setStageAndPersist(`backend`);
                 }}
                 className="text-sm text-gray-500 px-4 py-2 rounded-xl border border-gray-200 hover:border-gray-300 cursor-pointer transition"
               >

@@ -105,13 +105,28 @@ export function SettingsPage() {
                 </div>
               )}
               {backendMode === `standard` && authInfo && (
-                <div className="space-y-2 flex items-center justify-between">
-                  <p className="text-xs text-gray-400">
-                    {t(`Signed in as {{userId}}`, { userId: authInfo.userId })}
-                  </p>
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-3 min-w-0">
+                    {authInfo.picture && (
+                      <img
+                        src={authInfo.picture}
+                        alt=""
+                        referrerPolicy="no-referrer"
+                        className="w-8 h-8 rounded-full shrink-0"
+                      />
+                    )}
+                    <div className="min-w-0">
+                      <p className="text-sm text-gray-700 truncate">
+                        {authInfo.name ?? authInfo.email ?? authInfo.userId}
+                      </p>
+                      {authInfo.name && authInfo.email && (
+                        <p className="text-xs text-gray-400 truncate">{authInfo.email}</p>
+                      )}
+                    </div>
+                  </div>
                   <Button
                     onClick={handleLogout}
-                    className="text-xs text-gray-500 hover:text-red-600 underline underline-offset-2 transition cursor-pointer"
+                    className="text-xs text-gray-500 hover:text-red-600 underline underline-offset-2 transition cursor-pointer shrink-0"
                   >
                     {t(`Logout`)}
                   </Button>

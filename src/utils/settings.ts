@@ -22,11 +22,17 @@ const KEYS = {
   backendUrl: `settings_backendUrl`,
   authToken: `authToken`,
   authUserId: `authUserId`,
+  authEmail: `authEmail`,
+  authName: `authName`,
+  authPicture: `authPicture`,
 };
 
 export interface AuthInfo {
   token: string;
   userId: string;
+  email?: string;
+  name?: string;
+  picture?: string;
 }
 
 async function getValue<T>(key: string): Promise<T | null> {
@@ -66,19 +72,36 @@ export async function saveSettings(s: AppSettings): Promise<void> {
 }
 
 export async function loadAuthInfo(): Promise<AuthInfo | null> {
-  const [token, userId] = await Promise.all([
+  const [token, userId, email, name, picture] = await Promise.all([
     getValue<string>(KEYS.authToken),
     getValue<string>(KEYS.authUserId),
+    getValue<string>(KEYS.authEmail),
+    getValue<string>(KEYS.authName),
+    getValue<string>(KEYS.authPicture),
   ]);
-  return token && userId ? { token, userId } : null;
+  return token && userId
+    ? {
+        token,
+        userId,
+        email: email ?? undefined,
+        name: name ?? undefined,
+        picture: picture ?? undefined,
+      }
+    : null;
 }
 
 export async function saveAuthInfo(info: AuthInfo): Promise<void> {
   await putValue(KEYS.authToken, info.token);
   await putValue(KEYS.authUserId, info.userId);
+  if (info.email) await putValue(KEYS.authEmail, info.email);
+  if (info.name) await putValue(KEYS.authName, info.name);
+  if (info.picture) await putValue(KEYS.authPicture, info.picture);
 }
 
 export async function clearAuthInfo(): Promise<void> {
   await db().kv.delete(KEYS.authToken);
   await db().kv.delete(KEYS.authUserId);
+  await db().kv.delete(KEYS.authEmail);
+  await db().kv.delete(KEYS.authName);
+  await db().kv.delete(KEYS.authPicture);
 }

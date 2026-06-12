@@ -21,7 +21,7 @@ export type ExerciseLlmResponse = z.infer<typeof ExerciseLlmResponseSchema>;
 
 export type ReadingLength = "short" | "medium" | "long";
 
-export type NarratorGender = "male" | "female";
+export type NarratorGender = "male" | "female" | "neutral";
 
 export interface Exercise {
   id?: string;

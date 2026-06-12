@@ -2,8 +2,17 @@ import type { NarratorGender } from "../types";
 import { callTTS } from "./api";
 import { loadSettings } from "./settings";
 
-const MALE_VOICES = ["echo", "fable", "onyx"] as const;
-const FEMALE_VOICES = ["nova", "shimmer"] as const;
+// Single source of truth: every TTS voice tagged with its narrator gender. The pool sizes
+// here determine the probability distribution of `pickNarratorGender()` — no separate
+// weighting magic number to keep in sync.
+const VOICES: { name: string; gender: NarratorGender }[] = [
+  { name: "echo", gender: "male" },
+  { name: "fable", gender: "male" },
+  { name: "onyx", gender: "male" },
+  { name: "nova", gender: "female" },
+  { name: "shimmer", gender: "female" },
+  { name: "alloy", gender: "neutral" },
+];
 
 // Describes what's being spoken so this module can pick the right model. Callers should
 // not pick models directly: tts-1-hd has better prosody on long narrative text but
@@ -11,11 +20,13 @@ const FEMALE_VOICES = ["nova", "shimmer"] as const;
 // abbreviation expansion); tts-1 is more literal — better for vocab card contexts.
 export type TtsKind = "passage" | "phrase";
 
+export function pickNarratorGender(): NarratorGender {
+  return VOICES[Math.floor(Math.random() * VOICES.length)].gender;
+}
+
 export function pickVoice(gender?: NarratorGender): string {
-  let pool: readonly string[] = [...MALE_VOICES, ...FEMALE_VOICES];
-  if (gender === `male`) pool = MALE_VOICES;
-  if (gender === `female`) pool = FEMALE_VOICES;
-  return pool[Math.floor(Math.random() * pool.length)];
+  const pool = gender ? VOICES.filter((v) => v.gender === gender) : VOICES;
+  return pool[Math.floor(Math.random() * pool.length)].name;
 }
 
 function stripBold(text: string): string {

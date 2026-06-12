@@ -1,8 +1,9 @@
 import { useMutation } from "@tanstack/react-query";
-import { ExerciseLlmResponseSchema, type Exercise, type NarratorGender } from "../types";
+import { ExerciseLlmResponseSchema, type Exercise } from "../types";
 import { callReadingExercise } from "../utils/api";
 import type { ReadingLength } from "../utils/prompts";
 import { shuffleQuestionOptions } from "../utils/seededRandom";
+import { pickNarratorGender } from "../utils/tts";
 import { translateBatch, translateOne } from "./useTranslate";
 
 async function fetchExercise(
@@ -11,7 +12,7 @@ async function fetchExercise(
   length: ReadingLength,
   mode: "reading" | "listening",
 ): Promise<Exercise> {
-  const narratorGender: NarratorGender = Math.random() < 0.5 ? `male` : `female`;
+  const narratorGender = pickNarratorGender();
   const data = await callReadingExercise({
     language,
     languageComplexity,

@@ -4,7 +4,7 @@ import { callReadingExercise } from "../utils/api";
 import type { ReadingLength } from "../utils/prompts";
 import { shuffleQuestionOptions } from "../utils/seededRandom";
 import { pickNarratorGender } from "../utils/tts";
-import { translateBatch, translateOne } from "./useTranslate";
+import { translateBatch } from "./useTranslate";
 
 async function fetchExercise(
   language: string,
@@ -21,10 +21,7 @@ async function fetchExercise(
     narratorGender,
   });
   const parsed = ExerciseLlmResponseSchema.parse(JSON.parse(data.choices[0].message.content));
-  const [translation, wordTranslations] = await Promise.all([
-    translateOne(parsed.passage),
-    translateBatch(parsed.difficultWords),
-  ]);
+  const wordTranslations = await translateBatch(parsed.difficultWords);
   const difficultWords = parsed.difficultWords.map((source, i) => ({
     source,
     translation: wordTranslations[i] ?? ``,
@@ -32,7 +29,6 @@ async function fetchExercise(
   return {
     ...parsed,
     questions: parsed.questions.map(shuffleQuestionOptions),
-    translation,
     difficultWords,
     properNouns: parsed.properNouns,
     languageComplexity,

@@ -27,7 +27,6 @@ export interface Exercise {
   id?: string;
   title: string;
   passage: string;
-  translation: string;
   difficultWords: { source: string; translation: string }[];
   properNouns: { name: string; description: string }[];
   insight: string;

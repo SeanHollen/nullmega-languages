@@ -73,14 +73,6 @@ export function ResultsView({
         <p className="text-gray-800 leading-relaxed whitespace-pre-wrap">
           <ClickableText source={mode} text={exercise.passage} language={language} />
         </p>
-        <div className="border-t border-green-100 pt-4">
-          <p className="text-xs text-gray-400 uppercase tracking-wide mb-2">
-            {t(`English Translation`)}
-          </p>
-          <p className="text-gray-500 leading-relaxed italic text-sm whitespace-pre-wrap">
-            {exercise.translation}
-          </p>
-        </div>
         <TermList
           title={t(`Vocabulary`)}
           items={exercise.difficultWords.map((w) => ({ left: w.source, right: w.translation }))}

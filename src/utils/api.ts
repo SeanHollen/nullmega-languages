@@ -110,6 +110,12 @@ async function postBackend(path: string, body: object): Promise<ChatResponse> {
     body: JSON.stringify(body),
   });
   if (res.status === 401) throw new Error("Not signed in. Sign in via Settings.");
+  if (res.status === 429) {
+    // Backend formats its own friendly message under `error`. Surface it as-is so
+    // the user sees the per-bucket limit and reset time.
+    const body = (await res.json().catch(() => null)) as { error?: string } | null;
+    throw new Error(body?.error ?? "Daily AI limit reached. Try again tomorrow.");
+  }
   if (!res.ok) throw new Error(`API error: ${res.status}`);
   return ChatResponseSchema.parse(await res.json());
 }

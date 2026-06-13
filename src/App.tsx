@@ -4,6 +4,7 @@ import { LanguageProvider } from "./contexts/LanguageContext";
 import { LoadingProvider } from "./contexts/LoadingContext";
 import { LanguageBanner } from "./components/LanguageBanner";
 import { LoadingOverlay } from "./components/LoadingOverlay";
+import { ScrollToTop } from "./components/ScrollToTop";
 import { DbReady } from "./components/DbReady";
 import { OnboardingGate } from "./components/OnboardingGate";
 import { HomePage } from "./pages/HomePage";
@@ -31,6 +32,7 @@ export function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
+        <ScrollToTop />
         <LanguageProvider>
           <LoadingProvider>
             <LoadingOverlay />

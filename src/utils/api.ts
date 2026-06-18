@@ -70,6 +70,7 @@ export interface TTSBody {
   voice: string;
   input: string;
   instructions?: string;
+  assessmentId?: string;
 }
 
 async function isBYOK(): Promise<boolean> {

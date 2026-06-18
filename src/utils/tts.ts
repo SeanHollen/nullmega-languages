@@ -40,6 +40,7 @@ export async function tts(
   voice: string,
   kind: TtsKind,
   language: string,
+  assessmentId?: string,
 ): Promise<Blob> {
   const { ttsModel } = await loadSettings();
   const input = stripBold(text);
@@ -49,8 +50,9 @@ export async function tts(
       voice,
       input,
       instructions: `You are a native ${language} speaker mid-conversation with a friend. Deliver this line the way you'd actually say it — fast, casual, slurred where natural. Not for an audience, not for clarity, not slowed for any word.`,
+      assessmentId,
     });
   }
   const model = kind === `passage` ? `tts-1-hd` : `tts-1`;
-  return callTTS({ model, voice, input });
+  return callTTS({ model, voice, input, assessmentId });
 }

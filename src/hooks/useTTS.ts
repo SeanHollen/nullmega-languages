@@ -19,7 +19,7 @@ export async function generateExerciseAudio(
 ): Promise<ExerciseAudio> {
   const voice = pickVoice(exercise.narratorGender);
   const blobs = await Promise.all([
-    tts(exercise.passage, voice, `passage`, language),
+    tts(exercise.passage, voice, `passage`, language, exercise.id),
     ...exercise.questions.map((q) => tts(q.question, voice, `passage`, language)),
   ]);
   await saveAudio(keys.passage, blobs[0]);

@@ -1,0 +1,21 @@
+{
+  "id": "chatcmpl-e2e-fixture",
+  "object": "chat.completion",
+  "created": 1781600000,
+  "model": "gpt-5.5",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "{\"title\":\"駅の傘\",\"passage\":\"火曜日の夕方、雨が急に強くなった。サクラ駅のホームで、田中さんは黒いかばんを抱え、青い傘を一本ずつ数えていた。落とし物の箱には、もう七本の傘が入っていた。「みんな同じ色ですね」と若い駅員の山田さんが笑った。田中さんは少し首を傾けて、「色じゃなくて、持ち主の癖を見ているんだ」と答えた。彼は柄をそっと触り、持ち手の汚れや、傘の畳み方の癖をひとつずつ確認した。最後の一本だけ、布の縁に小さな金色の刺繍があった。「これは昨日、子供と一緒に来た女性のものだ」と田中さんは静かに言った。山田さんは目を丸くしたが、夕方の改札に女性が走ってきた時、刺繍を見て笑顔になった。「ありがとう」と彼女が言うまで、田中さんはずっと黙っていた。\",\"difficultWords\":[\"癖\",\"刺繍\",\"改札\",\"持ち主\"],\"properNouns\":[{\"name\":\"田中さん\",\"description\":\"駅の遺失物係\"},{\"name\":\"山田さん\",\"description\":\"新人の駅員\"},{\"name\":\"サクラ駅\",\"description\":\"郊外の小さな駅\"}],\"insight\":\"「色じゃなくて、持ち主の癖」という一文に、観察を職人技として誇る老人の自意識が表れている。\",\"questions\":[{\"question\":\"田中さんは何を頼りに傘を見分けていますか？\",\"options\":[\"A) 色\",\"B) 価格\",\"C) 細かい使用の跡\",\"D) ブランド\"],\"correct\":2},{\"question\":\"山田さんの最初の反応は何を示していますか？\",\"options\":[\"A) 仕事への嫌悪\",\"B) 経験の浅さ\",\"C) 田中さんへの怒り\",\"D) 雨への恐れ\"],\"correct\":1},{\"question\":\"金色の刺繍はどんな役割を果たしますか？\",\"options\":[\"A) 飾りだけ\",\"B) 所有者を特定する手掛かり\",\"C) 駅員への合図\",\"D) 物語と無関係\"],\"correct\":1},{\"question\":\"最後の場面で田中さんが黙っていたのはなぜですか？\",\"options\":[\"A) 自慢を避けるため\",\"B) 言葉が分からなかったから\",\"C) 怒っていたから\",\"D) 雨の音で聞こえなかったから\"],\"correct\":0}],\"summary\":\"At a small suburban station on a rainy Tuesday, an elderly lost-and-found clerk named Tanaka uses subtle wear patterns and a gold-embroidered edge to identify a blue umbrella's owner before a woman returns to claim it.\"}"
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 2800,
+    "completion_tokens": 1100,
+    "total_tokens": 3900
+  }
+}

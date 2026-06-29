@@ -4,6 +4,10 @@
 
 If the user says "stop doing X", "X is becoming a problem", "I told you already", or otherwise corrects a behavior — add a rule to this CLAUDE.md immediately. Don't only save to `~/.claude/projects/.../memory/` — memory is per-user across projects, but CLAUDE.md is what gets loaded into every conversation in THIS repo. Project-specific corrections belong here. Add the rule, then continue the task. Skipping this step means the same mistake recurs next session.
 
+## Never run `git commit` — the user always commits
+
+The user runs all commits themselves. Do not call `git commit` even when the user's message *seems* to authorize it. Phrases like "I'm good to commit, then you can deploy" mean *they* will commit, not that you have permission. If you're unsure whether a sentence authorizes a commit, the answer is no — ask. The only thing you do around commits is run `git status` / `git diff` / `git log` to summarize state. Same for `git stash` and `git checkout` of branches.
+
 ## Use zod for all external-boundary validation
 
 Never hand-roll validators — no `typeof x === "string"` chains, `Array.isArray` ladders, or `if (!raw || typeof raw !== "object") return null` parsing. Use a zod schema with `.safeParse()` or `.parse()` and let TypeScript infer the type from the schema. This applies to: imported JSON files, LLM/HTTP API responses, file uploads, and any other data crossing a system boundary. Dexie is NOT a boundary (we own that storage and have migrations); zod isn't needed there.

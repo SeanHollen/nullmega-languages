@@ -15,6 +15,22 @@ export interface KVRow {
   value: unknown;
 }
 
+// Marker stamped on every row of a synced table by the Dexie hooks in sync.ts.
+// updatedAt is the local clock time of the last write; the sync worker uses it
+// as the dirty signal (push rows where updatedAt > lastPushedAt).
+export interface SyncFields {
+  updatedAt?: number;
+}
+
+// One row per (table, key) the sync worker has observed as deleted. The Dexie
+// `deleting` hook writes here so deletes can be propagated as tombstones.
+export interface TombstoneRow {
+  id: string; // `${table}|${key}`
+  table: string;
+  key: string;
+  updatedAt: number;
+}
+
 export interface AbilityRow {
   id: string; // `${language}|${mode}`
   language: string;
@@ -36,6 +52,7 @@ class LanguageLabDB extends Dexie {
   grammarCards!: Table<GrammarCard, string>;
   assessments!: Table<AssessmentRecord, string>;
   apiUsage!: Table<UsageRow, string>;
+  tombstones!: Table<TombstoneRow, string>;
 
   constructor() {
     super(`language-lab`);
@@ -370,6 +387,24 @@ class LanguageLabDB extends Dexie {
         await tx.table(`kv`).put({ key: `grammar_settings_${lang}`, value: oldRow.value });
         await tx.table(`kv`).delete(`grammar_settings`);
       });
+    // v20: backend sync. Add the `tombstones` table (records deletes for the
+    // sync worker) and index `updatedAt` on every synced user-owned table so
+    // the worker can cheaply query "rows changed since X". updatedAt is stamped
+    // by the Dexie hooks installed in src/utils/sync.ts.
+    this.version(20).stores({
+      audio: ``,
+      streaks: `&date`,
+      streaksLang: `&[language+date], date, language, updatedAt`,
+      goals: `&language, updatedAt`,
+      kv: `&key, updatedAt`,
+      abilities: `&id, [language+mode], updatedAt`,
+      customLanguages: `&name, updatedAt`,
+      flashcards: `&id, language, [language+source], updatedAt`,
+      grammarCards: `&id, language, [language+title], updatedAt`,
+      assessments: `&id, [mode+language], completedAt, createdAt, updatedAt`,
+      apiUsage: `&id, timestamp, category`,
+      tombstones: `&id, updatedAt`,
+    });
   }
 }
 

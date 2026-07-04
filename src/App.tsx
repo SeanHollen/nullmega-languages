@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Analytics } from "@vercel/analytics/react";
 import { LanguageProvider } from "./contexts/LanguageContext";
 import { LoadingProvider } from "./contexts/LoadingContext";
 import { LanguageBanner } from "./components/LanguageBanner";
@@ -31,6 +32,7 @@ const queryClient = new QueryClient();
 export function App() {
   return (
     <QueryClientProvider client={queryClient}>
+      <Analytics />
       <BrowserRouter>
         <ScrollToTop />
         <LanguageProvider>
